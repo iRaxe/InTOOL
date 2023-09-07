@@ -1,0 +1,276 @@
+#pragma once
+#include "../NewMenu.h"
+#include "../stdafx.h"
+
+namespace UPasta::SDK::Awareness
+{
+    namespace Resources
+    {
+        namespace EnemySidebar
+        {
+            namespace DX9
+            {
+                namespace HudDesign
+                {
+                    inline PDIRECT3DTEXTURE9 hudHpBar;
+                    inline PDIRECT3DTEXTURE9 hudChampPortrait;
+
+                    void InitializeHudImages();
+                }
+
+                namespace HeroIcons
+                {
+                    constexpr int numTextures = 10;
+                    inline PDIRECT3DTEXTURE9 textureArray[10] = { nullptr };
+
+                    void InitializeHeroImages();
+                }
+
+                namespace SummonerSpells
+                {
+                    inline PDIRECT3DTEXTURE9 summSpellBarrier;
+                    inline PDIRECT3DTEXTURE9 summSpellFlash;
+                    inline PDIRECT3DTEXTURE9 summSpellCleanse;
+                    inline PDIRECT3DTEXTURE9 summSpellExhaust;
+                    inline PDIRECT3DTEXTURE9 summSpellGhost;
+                    inline PDIRECT3DTEXTURE9 summSpellHeal;
+                    inline PDIRECT3DTEXTURE9 summSpellIgnite;
+                    inline PDIRECT3DTEXTURE9 summSpellSmite;
+                    inline PDIRECT3DTEXTURE9 summSpellTeleport;
+
+                    void InitializeSummSpellsImages();
+                }
+
+            }
+
+            namespace DX11
+            {
+                namespace HudDesign
+                {
+                    inline ID3D11ShaderResourceView* hudHpBar;
+                    inline ID3D11ShaderResourceView* hudChampPortrait;
+
+                    void InitializeHudImages();
+
+                }
+
+                namespace HeroIcons
+                {
+                    const int numTextures = 10;
+                    inline ID3D11ShaderResourceView* textureArray[numTextures] = { NULL };
+
+                    void InitializeHeroImages();
+                }
+
+                namespace SummonerSpells
+                {
+                    inline ID3D11ShaderResourceView* summSpellBarrier;
+                    inline ID3D11ShaderResourceView* summSpellFlash;
+                    inline ID3D11ShaderResourceView* summSpellCleanse;
+                    inline ID3D11ShaderResourceView* summSpellExhaust;
+                    inline ID3D11ShaderResourceView* summSpellGhost;
+                    inline ID3D11ShaderResourceView* summSpellHeal;
+                    inline ID3D11ShaderResourceView* summSpellIgnite;
+                    inline ID3D11ShaderResourceView* summSpellSmite;
+                    inline ID3D11ShaderResourceView* summSpellTeleport;
+
+                    void InitializeSummSpellsImages();
+                }
+
+            }
+
+            inline bool initializedTextures;
+            void InitializeTextures();
+        }
+
+        namespace JungleTracker
+        {
+            namespace DX9
+            {
+                namespace HudDesign
+                {
+
+                    inline PDIRECT3DTEXTURE9 hudJunglePortrait;
+
+                    void InitializeHudImages();
+
+                }
+
+                namespace JungleIcons
+                {
+                    inline PDIRECT3DTEXTURE9 baronTextureIcon;
+                    inline PDIRECT3DTEXTURE9 blueTextureIcon;
+                    inline PDIRECT3DTEXTURE9 crabTextureIcon;
+                    inline PDIRECT3DTEXTURE9 dragonTextureIcon;
+                    inline PDIRECT3DTEXTURE9 dragonairTextureIcon;
+                    inline PDIRECT3DTEXTURE9 dragonchemtechTextureIcon;
+                    inline PDIRECT3DTEXTURE9 dragonearthTextureIcon;
+                    inline PDIRECT3DTEXTURE9 dragonelderTextureIcon;
+                    inline PDIRECT3DTEXTURE9 dragonfireTextureIcon;
+                    inline PDIRECT3DTEXTURE9 dragonhextechTextureIcon;
+                    inline PDIRECT3DTEXTURE9 dragonwaterTextureIcon;
+                    inline PDIRECT3DTEXTURE9 grompTextureIcon;
+                    inline PDIRECT3DTEXTURE9 krugTextureIcon;
+                    inline PDIRECT3DTEXTURE9 murkwolfTextureIcon;
+                    inline PDIRECT3DTEXTURE9 razorbeakTextureIcon;
+                    inline PDIRECT3DTEXTURE9 redTextureIcon;
+                    inline PDIRECT3DTEXTURE9 riftheraldTextureIcon;
+
+                    void InitializeJungleImages();
+                }
+
+            }
+
+            namespace DX11
+            {
+
+                namespace HudDesign
+                {
+
+                    inline ID3D11ShaderResourceView* hudJunglePortrait;
+
+                    void InitializeHudImages();
+
+                }
+
+                namespace JungleIcons
+                {
+                    inline ID3D11ShaderResourceView* baronTextureIcon;
+                    inline ID3D11ShaderResourceView* blueTextureIcon;
+                    inline ID3D11ShaderResourceView* crabTextureIcon;
+                    inline ID3D11ShaderResourceView* dragonTextureIcon;
+                    inline ID3D11ShaderResourceView* dragonairTextureIcon;
+                    inline ID3D11ShaderResourceView* dragonchemtechTextureIcon;
+                    inline ID3D11ShaderResourceView* dragonearthTextureIcon;
+                    inline ID3D11ShaderResourceView* dragonelderTextureIcon;
+                    inline ID3D11ShaderResourceView* dragonfireTextureIcon;
+                    inline ID3D11ShaderResourceView* dragonhextechTextureIcon;
+                    inline ID3D11ShaderResourceView* dragonwaterTextureIcon;
+                    inline ID3D11ShaderResourceView* grompTextureIcon;
+                    inline ID3D11ShaderResourceView* krugTextureIcon;
+                    inline ID3D11ShaderResourceView* murkwolfTextureIcon;
+                    inline ID3D11ShaderResourceView* razorbeakTextureIcon;
+                    inline ID3D11ShaderResourceView* redTextureIcon;
+                    inline ID3D11ShaderResourceView* riftheraldTextureIcon;
+
+                    void InitializeJungleImages();
+                }
+
+            }
+
+            inline bool initializedTextures;
+            void InitializeTextures();
+        }
+    }
+
+
+    namespace Configs
+    {
+        inline bool initializedAwarenessMenu;
+        extern Menu* AwarenessMenu;
+
+        namespace EnemySidebar
+        {
+            inline bool open_ptr = true;
+            inline bool initializedSidebarMenu;
+            void Initialize();
+            void InitializeSidebarMenu();
+            extern Menu* EnemySidebarMenu;
+
+            inline CheckBox* status;
+            inline CheckBox* orientationHorizontal;
+            inline Slider* hudSize;
+        }
+
+        namespace Radius
+        {
+            inline bool initializedRadiusMenu;
+            void Initialize();
+            void InitializeRadiusMenu();
+            extern Menu* RadiusMenu;
+
+            inline CheckBox* status;
+            inline CheckBox* showBoundingRadius;
+            inline CheckBox* showAARadius;
+            inline CheckBox* showAARadiusSelf;
+            inline CheckBox* showAARadiusAllies;
+            inline CheckBox* showAARadiusEnemies;
+            inline Slider* qualityDraw;
+        }
+
+        namespace Zoom
+        {
+            inline bool initializedZoomMenu;
+            void Initialize();
+            void InitializeZoomMenu();
+
+            extern Menu* ZoomMenu;
+
+            inline CheckBox* status;
+            inline CheckBox* status3D;
+            inline CheckBox* statusKeyboard;
+            inline CheckBox* statusMouseWheel;
+            inline Slider* zoomValue;
+
+        }
+
+        namespace JungleTracker
+        {
+            inline bool initializedJungleTrackerMenu;
+            void Initialize();
+            void InitializeJungleTrackerMenu();
+            extern Menu* JungleTrackerMenu;
+
+            inline CheckBox* status;
+            inline CheckBox* showTimer;
+            inline CheckBox* showIcons;
+        }
+
+    }
+
+    namespace Functions
+    {
+        void Initialize();
+        void Update();
+        
+        namespace EnemySidebar
+        {
+            ImTextureID GetSummonerSpellTexture(Object* obj, int spellIndex);
+            void LoadDX9ImageIfNeeded(const char* filename, bool loaded, PDIRECT3DTEXTURE9 texture);
+            void LoadDX11ImageIfNeeded(const char* filename, bool loaded, ID3D11ShaderResourceView** texture);
+            static void ShowSidebar(bool* p_open);
+            void Initialize();
+            void Update();
+        }
+
+        namespace Radius
+        {
+            static void ShowBoundingRadius(Object* obj, int quality);
+            static void ShowAARadius(Object* obj, int quality);
+            void Initialize();
+            void Update();
+        }
+
+        namespace Zoom
+        {
+            inline Vector2 pathEnd2DLast;
+            void mouseLock();
+            void resetZoom();
+            void InitializeZoom();
+            void Initialize();
+            void Update();
+        }
+
+        namespace JungleTracker
+        {
+            void Initialize();
+            void Update();
+            void DrawJungleTracker();
+            void DrawJungleNames();
+            void DrawIcons(Vector3 objDrawPos, ImVec2 pos, float size);
+            void DrawTimers(Object* obj, ImVec2 pos);
+        }
+        
+    }
+
+}

@@ -1,0 +1,65 @@
+#include "VMTHook.h"
+
+#include "selfprotection/pipe/namedpipeclient.h"
+
+bool VMTHook::Init(void* original)
+{
+	if (original)
+	{
+		originalVMT = reinterpret_cast<uintptr_t**>(original);
+		copiedVMT = *originalVMT;
+
+		while (reinterpret_cast<void*>(copiedVMT[iMethods]))
+		{
+			iMethods++;
+		}
+
+		if (iMethods > 0)
+		{
+			ourVMT = std::make_unique<std::uintptr_t[]>(iMethods);
+			memcpy(ourVMT.get(), copiedVMT, iMethods * sizeof(std::uintptr_t));
+		}
+	}
+	return ourVMT != nullptr;
+}
+
+uintptr_t VMTHook::Hook(void* original, const size_t& index, const uintptr_t& function)
+{
+	if (!Init(original))
+		return false;
+
+	LOG("Hooked Original: %p -|-", original);
+	LOG("Copied Addresss: %p -|- ", copiedVMT);
+	return HookIndex(index, function);
+}
+
+uintptr_t VMTHook::HookIndex(const size_t& index, const uintptr_t& function)
+{
+	if (ourVMT && index < iMethods)
+	{
+		ourVMT[index] = function;
+
+		*originalVMT = ourVMT.get();
+
+		bEnabled = true;
+
+		return copiedVMT[index];
+
+	}
+	return 0;
+}
+
+bool VMTHook::UnHook()
+{
+	if (bEnabled)
+	{
+		*originalVMT = copiedVMT;
+
+		LOG("Unhooked Copied: %p -|- ", copiedVMT);
+		LOG("Copied Original: %p  -|-", originalVMT);
+		bEnabled = false;
+		return true;
+	}
+
+	return false;
+}

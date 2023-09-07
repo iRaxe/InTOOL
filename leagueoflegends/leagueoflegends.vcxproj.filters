@@ -1,0 +1,508 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="selfprotection">
+      <UniqueIdentifier>{125d59fd-ffc8-4544-af9a-9a866a161c7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="selfprotection\strings">
+      <UniqueIdentifier>{3ef579aa-f315-4b58-ab9e-6a1b2d6e7508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="selfprotection\pipe">
+      <UniqueIdentifier>{ef0fdef9-4f46-485b-beb6-e77e4500d2ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks">
+      <UniqueIdentifier>{ff6b6f0a-f5b6-4cf6-87ba-2a06b175c9f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks\Implementations">
+      <UniqueIdentifier>{b74db30c-95e9-4409-a277-8fb9e804d786}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks\VMTHook">
+      <UniqueIdentifier>{9f6ba2fc-6b15-458d-86cb-a238d9c3627c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks\EventManager">
+      <UniqueIdentifier>{5a0e8346-75d7-4aad-aa62-2213a8e58887}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks\EventManager\Manager">
+      <UniqueIdentifier>{84520c5a-9191-4b84-a49a-d6f0719c9db9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks\EventManager\Initialize">
+      <UniqueIdentifier>{2295694b-8fd0-41e7-94ae-3978604b3048}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks\EventManager\Destroy">
+      <UniqueIdentifier>{d15b92b4-a329-4e6c-91bd-43865572d6e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{15d93fed-cb45-4b86-932b-d7e1df221c86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IMGui">
+      <UniqueIdentifier>{9be325a5-02e3-4f04-a224-43d10354ec37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks\Kiero">
+      <UniqueIdentifier>{b0a39785-86f2-412b-a04a-9e53cc95aaad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{f4cc1cee-f2ee-4945-9752-cfa38a5786e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{5a4fe51e-5662-431e-827c-4337615faa38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu">
+      <UniqueIdentifier>{d166a879-5863-477f-8b36-e249d999d030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu">
+      <UniqueIdentifier>{e28418a4-eddb-4e55-9f6f-58806795a027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu\Components">
+      <UniqueIdentifier>{3cf11341-2d14-44bf-a8f4-a27529df0d53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu\Rendering">
+      <UniqueIdentifier>{955f8bb1-1234-4014-ad3b-5ea77b6d7b5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu\Components\Checkbox">
+      <UniqueIdentifier>{ede87041-a047-43e6-9475-132f0011937a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu\Components\Info">
+      <UniqueIdentifier>{f752cb7d-3c75-43b9-9e5f-612527758619}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu\Components\KeyBindings">
+      <UniqueIdentifier>{8b0fe8d7-fbb1-4cd5-b672-4c209afcaf57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu\Components\List">
+      <UniqueIdentifier>{0b56ca72-0b76-4567-9ca4-19304b30f339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu\Components\Slider">
+      <UniqueIdentifier>{8abffdc0-fa5f-4958-a500-113cae354420}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New Menu\Components\Rect">
+      <UniqueIdentifier>{5758bfad-cbbd-4e60-a73d-a84de24c50df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{2a1bb88d-0576-4781-a0e1-5e285260e70f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\ImageManager">
+      <UniqueIdentifier>{25c7c04b-8060-4914-95a2-b1ba0ea28ebe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{85eba398-4002-457b-a719-ff583cd85b6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\utils">
+      <UniqueIdentifier>{3cc5649c-3bb2-415c-9023-f7732588b9c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions">
+      <UniqueIdentifier>{5a45deb9-074c-4900-9f80-84a3b603b3b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\demo">
+      <UniqueIdentifier>{e52baac4-f603-4b88-9f41-c11592da1f23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Ashe">
+      <UniqueIdentifier>{aabc1889-aac5-4540-a536-c1074fe288f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities">
+      <UniqueIdentifier>{8802827e-c99d-4dbc-aa4c-fa7059a5f130}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Target Selector">
+      <UniqueIdentifier>{adfa8700-d964-405c-b8c2-58f9c8cfe375}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Damage Calculator">
+      <UniqueIdentifier>{f9c7cfc0-b708-47f4-b2f7-5cfea71a31ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Orbwalker">
+      <UniqueIdentifier>{95484a3c-8de8-4402-9de0-c50fa486b7ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\SDK">
+      <UniqueIdentifier>{cbb6b9da-f1b8-4af1-876f-e7c40fff4bf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Awareness">
+      <UniqueIdentifier>{5e7ba45f-fb8b-4909-b78b-317e98f27b76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\ImageManager\LoadTextures">
+      <UniqueIdentifier>{edb49661-ae5a-4192-b185-c389f05553ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Awareness\Zoom">
+      <UniqueIdentifier>{4e63f8d3-5ad4-44d0-95dc-36588b9e231c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="global\globals.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="global\settings.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="mem\mem.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="global\targetver.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="classes\classes.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="render\render.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imconfig.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_win32.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_internal.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_rectpack.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_textedit.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_truetype.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\kiero.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\minhook\include\MinHook.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\minhook\src\hde\hde32.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\minhook\src\hde\hde64.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\minhook\src\hde\pstdint.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\minhook\src\hde\table32.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\minhook\src\hde\table64.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\minhook\src\buffer.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="kiero\minhook\src\trampoline.h">
+      <Filter>Hooks\Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="hooks\hooks.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="menu\menu.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_dx9.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="hooks\impl\impl.h">
+      <Filter>Hooks\Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="global\structs.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="global\offsets.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="global\utils.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="global\functions.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="global\colors.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="mem\spoof_call.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="global\strings.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="selfprotection\strings\obfuscator.h">
+      <Filter>selfprotection\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="selfprotection\utils.h">
+      <Filter>selfprotection</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_dx11.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="selfprotection\pipe\namedpipeclient.h">
+      <Filter>selfprotection\pipe</Filter>
+    </ClInclude>
+    <ClInclude Include="global\leagueobfuscation.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="OnProcessSpellCast.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="VMTHook.h">
+      <Filter>Hooks\VMTHook</Filter>
+    </ClInclude>
+    <ClInclude Include="customimages.h">
+      <Filter>Rendering\ImageManager</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Rendering\ImageManager</Filter>
+    </ClInclude>
+    <ClInclude Include="clipper.hpp" />
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="NewMenu.h">
+      <Filter>Menu\New Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuSettings.h">
+      <Filter>Menu\New Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuRenderer.h">
+      <Filter>Menu\New Menu\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Plugins.h">
+      <Filter>Scripts\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginTemplate.h">
+      <Filter>Scripts\Champions\demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Ashe.h">
+      <Filter>Scripts\Champions\Ashe</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetSelector.h">
+      <Filter>Scripts\Utilities\Target Selector</Filter>
+    </ClInclude>
+    <ClInclude Include="Damage.h">
+      <Filter>Scripts\Utilities\Damage Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="zoom.h">
+      <Filter>Scripts\Utilities\Awareness\Zoom</Filter>
+    </ClInclude>
+    <ClInclude Include="Orbwalker.h">
+      <Filter>Scripts\Utilities\Orbwalker</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagerTemplate.h">
+      <Filter>Scripts\Utilities\Orbwalker</Filter>
+    </ClInclude>
+    <ClInclude Include="InitializeEvents.h">
+      <Filter>Hooks\EventManager\Initialize</Filter>
+    </ClInclude>
+    <ClInclude Include="DestroyEvents.h">
+      <Filter>Hooks\EventManager\Destroy</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuComponent.h">
+      <Filter>Menu\New Menu\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Checkbox.h">
+      <Filter>Menu\New Menu\Components\Checkbox</Filter>
+    </ClInclude>
+    <ClInclude Include="Info.h">
+      <Filter>Menu\New Menu\Components\Info</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyBind.h">
+      <Filter>Menu\New Menu\Components\KeyBindings</Filter>
+    </ClInclude>
+    <ClInclude Include="List.h">
+      <Filter>Menu\New Menu\Components\List</Filter>
+    </ClInclude>
+    <ClInclude Include="Slider.h">
+      <Filter>Menu\New Menu\Components\Slider</Filter>
+    </ClInclude>
+    <ClInclude Include="Rect.h">
+      <Filter>Menu\New Menu\Components\Rect</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\championmodule.h">
+      <Filter>Scripts\Champions</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\skillshotdatabase.h">
+      <Filter>Scripts\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\scripts.h">
+      <Filter>Scripts\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Awareness.h">
+      <Filter>Scripts\Utilities\Awareness</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadImages.h">
+      <Filter>Rendering\ImageManager\LoadTextures</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="global\globals.cpp">
+      <Filter>Global</Filter>
+    </ClCompile>
+    <ClCompile Include="global\settings.cpp">
+      <Filter>Global</Filter>
+    </ClCompile>
+    <ClCompile Include="mem\mem.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="render\render.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_win32.cpp">
+      <Filter>IMGui</Filter>
+    </ClCompile>
+    <ClCompile Include="kiero\kiero.cpp">
+      <Filter>Hooks\Kiero</Filter>
+    </ClCompile>
+    <ClCompile Include="kiero\minhook\src\hde\hde32.c">
+      <Filter>Hooks\Kiero</Filter>
+    </ClCompile>
+    <ClCompile Include="kiero\minhook\src\hde\hde64.c">
+      <Filter>Hooks\Kiero</Filter>
+    </ClCompile>
+    <ClCompile Include="kiero\minhook\src\buffer.c">
+      <Filter>Hooks\Kiero</Filter>
+    </ClCompile>
+    <ClCompile Include="kiero\minhook\src\hook.c">
+      <Filter>Hooks\Kiero</Filter>
+    </ClCompile>
+    <ClCompile Include="kiero\minhook\src\trampoline.c">
+      <Filter>Hooks\Kiero</Filter>
+    </ClCompile>
+    <ClCompile Include="hooks\hooks.cpp">
+      <Filter>Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="menu\menu.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>IMGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <Filter>IMGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <Filter>IMGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_dx9.cpp">
+      <Filter>IMGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <Filter>IMGui</Filter>
+    </ClCompile>
+    <ClCompile Include="hooks\impl\impl.cpp">
+      <Filter>Hooks\Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_tables.cpp">
+      <Filter>IMGui</Filter>
+    </ClCompile>
+    <ClCompile Include="global\functions.cpp">
+      <Filter>Global</Filter>
+    </ClCompile>
+    <ClCompile Include="classes\classes.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="render\renderfunctions.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="main\dllmain.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\champions\syndra.cpp">
+      <Filter>Scripts\Champions</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx11.cpp">
+      <Filter>IMGui</Filter>
+    </ClCompile>
+    <ClCompile Include="VMTHook.cpp">
+      <Filter>Hooks\VMTHook</Filter>
+    </ClCompile>
+    <ClCompile Include="NewMenu.cpp">
+      <Filter>Menu\New Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuSettings.cpp">
+      <Filter>Menu\New Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuRenderer.cpp">
+      <Filter>Menu\New Menu\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Plugins.cpp">
+      <Filter>Scripts\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PluginTemplate.cpp">
+      <Filter>Scripts\Champions\demo</Filter>
+    </ClCompile>
+    <ClCompile Include="Ashe.cpp">
+      <Filter>Scripts\Champions\Ashe</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\TargetSelector.cpp">
+      <Filter>Scripts\Utilities\Target Selector</Filter>
+    </ClCompile>
+    <ClCompile Include="Damage.cpp">
+      <Filter>Scripts\Utilities\Damage Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="zoom.cpp">
+      <Filter>Scripts\Utilities\Awareness\Zoom</Filter>
+    </ClCompile>
+    <ClCompile Include="Orbwalker.cpp">
+      <Filter>Scripts\Utilities\Orbwalker</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagerTemplate.cpp">
+      <Filter>Scripts\Utilities\Orbwalker</Filter>
+    </ClCompile>
+    <ClCompile Include="EventManager.cpp">
+      <Filter>Hooks\EventManager\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Eventmanager.h">
+      <Filter>Hooks\EventManager\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="InitializeEvents.cpp">
+      <Filter>Hooks\EventManager\Initialize</Filter>
+    </ClCompile>
+    <ClCompile Include="DestroyEvents.cpp">
+      <Filter>Hooks\EventManager\Destroy</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuComponent.cpp">
+      <Filter>Menu\New Menu\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Checkbox.cpp">
+      <Filter>Menu\New Menu\Components\Checkbox</Filter>
+    </ClCompile>
+    <ClCompile Include="Info.cpp">
+      <Filter>Menu\New Menu\Components\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyBind.cpp">
+      <Filter>Menu\New Menu\Components\KeyBindings</Filter>
+    </ClCompile>
+    <ClCompile Include="List.cpp">
+      <Filter>Menu\New Menu\Components\List</Filter>
+    </ClCompile>
+    <ClCompile Include="Slider.cpp">
+      <Filter>Menu\New Menu\Components\Slider</Filter>
+    </ClCompile>
+    <ClCompile Include="Rect.cpp">
+      <Filter>Menu\New Menu\Components\Rect</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\skillshotdatabase.cpp">
+      <Filter>Scripts\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\scripts.cpp">
+      <Filter>Scripts\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\prediction.cpp">
+      <Filter>Scripts\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Awareness.cpp">
+      <Filter>Scripts\Utilities\Awareness</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadImages.cpp">
+      <Filter>Rendering\ImageManager\LoadTextures</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="mem\spoofer.asm">
+      <Filter>Memory</Filter>
+    </MASM>
+  </ItemGroup>
+</Project>
