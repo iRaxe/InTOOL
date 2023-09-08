@@ -732,7 +732,7 @@ bool Object::IsInAARange()
 bool Object::CanCastSpell(int slotId)
 {
 	auto spell = this->GetSpellBySlotId(slotId);
-	return this->CanCast() && spell->IsReady() && spell->GetManaCost() <= this->GetMana();
+	return this->CanCast() && functions::GetSpellState(this, slotId) == IsReady;
 }
 
 Vector3 Object::GetServerPosition()

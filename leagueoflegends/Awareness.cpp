@@ -832,12 +832,14 @@ namespace UPasta
 								{
 									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, PI / 3, functions::GetMouseWorldPos(), true);
 								}
-
 							}
 							else
 							{
+
 								if (obj->IsEnemy() && Configs::Radius::showAARadiusEnemies->Value == true)
+								{
 									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, PI / 3, globals::localPlayer->GetPosition(), true);
+								}
 								if (obj->IsAlly() && Configs::Radius::showAARadiusAllies->Value == true)
 									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, PI / 3, globals::localPlayer->GetPosition(), true);
 							}

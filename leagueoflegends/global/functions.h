@@ -60,6 +60,7 @@ namespace functions
 
 	unsigned int GetCollisionFlags(Vector3 pos);
 	float GetRespawnTimer(Object* obj);
+	int GetSpellState(Object* obj, int slotId);
 	float GetSpellRange(int slotid);
 	QWORD GetZoomAddress();
 	bool IsBrush(Vector3 pos);

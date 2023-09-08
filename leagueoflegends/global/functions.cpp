@@ -209,6 +209,14 @@ namespace functions
 		return _fnGetRespawnTimer(obj);
 	}
 
+	int GetSpellState(Object* obj, int slotId)
+	{
+		// Ready = 0 || NotAvailable = 4 || Supressed = 8 || NotLearned = 12 || Disabled = 16 || Processing = 24 || Cooldown = 32 || NoMana = 64 || Unknown = 96
+		typedef int(__fastcall* fnGetSpellState)(void*, int, const QWORD&);
+		fnGetSpellState _fnGetSpellState = (fnGetSpellState)(globals::moduleBase + fGetSpellState);
+		return _fnGetSpellState(obj + oObjSpellBook, slotId, NULL);
+	}
+
 	float GetSpellRange(int level)
 	{
 		typedef float(__fastcall* fnGetSpellRange)(int level);

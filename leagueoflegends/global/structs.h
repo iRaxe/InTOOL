@@ -318,6 +318,18 @@ enum ObjectType : unsigned long long
     Less = 126939457912832
 };
 
+enum SpellStatus : int
+{
+    IsReady = 0,
+    IsNotAvailable = 4,
+    IsSupressed = 8,
+    IsNotLearned = 12,
+    IsDisabled = 16,
+    IsProcessing = 24,
+    IsCooldown = 32,
+    IsNoMana = 64
+};
+
 enum CollisionFlags
 {
     None = 0,
