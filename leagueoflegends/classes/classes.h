@@ -101,6 +101,13 @@ public:
 
 class SpellInput
 {
+public:
+	void SetCaster(int index);
+	void SetTarget(int index);
+	void SetStartPos(Vector3 pos);
+	void SetEndPos(Vector3 pos);
+	void SetClickedPos(Vector3 pos);
+	void SetUnkPos(Vector3 pos);
 };
 
 class Spell

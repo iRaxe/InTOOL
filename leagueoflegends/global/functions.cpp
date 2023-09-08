@@ -277,7 +277,7 @@ namespace functions
 		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueOrderCheck) = 0x0;
 
 		typedef bool(__fastcall* fnIssueOrder)(QWORD* player, int order, bool isAttackMove, bool isMinion, int screenX, int screenY, int unknown);
-		fnIssueOrder _fnIssueOrder = (fnIssueOrder)(globals::moduleBase + oIssueOrder);
+		fnIssueOrder _fnIssueOrder = (fnIssueOrder)(globals::moduleBase + oIssueClick);
 		spoof_call(spoof_trampoline, _fnIssueOrder, (QWORD*)globals::localPlayer, 2, false, false, (int)pos.x, (int)pos.y, 0);
 
 		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck1) = floatCheck1;
@@ -295,7 +295,85 @@ namespace functions
 		spoof_call(spoof_trampoline, _fnIssueMove, (QWORD*)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceInput)), (int)pos.x, (int)pos.y, false, 0, 0);
 	}
 
-	void CastSpell(int spellId, Vector3 pos)
+	bool CastSpell(int spellId, Object* Target)
+	{
+		Object* me = globals::localPlayer;
+		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
+		SpellInput* TargetInfo = spell->GetSpellInput();
+
+		if (!TargetInfo || !Target) return false;
+		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + 0x68);
+
+		// set spell position
+		TargetInfo->SetCaster(me->GetNetId());
+		TargetInfo->SetTarget(Target->GetNetId());
+		TargetInfo->SetStartPos(me->GetPosition());
+		TargetInfo->SetEndPos(Target->GetPosition());
+		TargetInfo->SetClickedPos(Target->GetPosition());
+		TargetInfo->SetUnkPos(Target->GetPosition());
+
+		typedef void(__fastcall* HudCastSpellFn)(uintptr_t* HudInput, SpellInfo* SpellData);
+		HudCastSpellFn _HudCastSpellFn = (HudCastSpellFn)(globals::moduleBase + oCastSpellWrapper);
+		SpellInfo* spellInfo = spell->GetSpellInfo();
+
+		_HudCastSpellFn(InputLogic, spellInfo);
+
+		return true;
+	}
+
+	bool CastSpell(int spellId)
+	{
+		Object* me = globals::localPlayer;
+		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
+		SpellInput* TargetInfo = spell->GetSpellInput();
+
+		if (!TargetInfo) return false;
+		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + 0x68);
+
+		// set spell position
+		TargetInfo->SetCaster(me->GetNetId());
+		TargetInfo->SetTarget(0);
+		TargetInfo->SetStartPos(me->GetPosition());
+		TargetInfo->SetEndPos(me->GetPosition());
+		TargetInfo->SetClickedPos(me->GetPosition());
+		TargetInfo->SetUnkPos(me->GetPosition());
+
+		typedef void(__fastcall* HudCastSpellFn)(uintptr_t* HudInput, SpellInfo* SpellData);
+		HudCastSpellFn _HudCastSpellFn = (HudCastSpellFn)(globals::moduleBase + oCastSpellWrapper);
+		SpellInfo* spellInfo = spell->GetSpellInfo();
+
+		_HudCastSpellFn(InputLogic, spellInfo);
+
+		return true;
+	}
+
+	bool CastSpell(int spellId, Vector3 pos)
+	{
+		Object* me = globals::localPlayer;
+		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
+		SpellInput* TargetInfo = spell->GetSpellInput();
+
+		if (!TargetInfo) return false;
+		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + 0x68);
+
+		// set spell position
+		TargetInfo->SetCaster(me->GetNetId());
+		TargetInfo->SetTarget(0);
+		TargetInfo->SetStartPos(pos);
+		TargetInfo->SetEndPos(pos);
+		TargetInfo->SetClickedPos(pos);
+		TargetInfo->SetUnkPos(pos);
+
+		typedef void(__fastcall* HudCastSpellFn)(uintptr_t* HudInput, SpellInfo* SpellData);
+		HudCastSpellFn _HudCastSpellFn = (HudCastSpellFn)(globals::moduleBase + oCastSpellWrapper);
+		SpellInfo* spellInfo = spell->GetSpellInfo();
+
+		_HudCastSpellFn(InputLogic, spellInfo);
+
+		return true;
+	}
+
+	void OldCastSpell(int spellId, Vector3 pos)
 	{
 		EventManager::TriggerProcess(EventManager::EventType::OnCastSpell, spellId, pos);
 

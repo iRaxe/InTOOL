@@ -126,6 +126,36 @@ SpellData* SpellInfo::GetSpellData()
 	return *(SpellData**)((QWORD)this + oSpellInfoSpellData);
 }
 
+void SpellInput::SetCaster(int index)
+{
+	*reinterpret_cast<uintptr_t*>((QWORD)this + 0x10) = index;
+}
+
+void SpellInput::SetTarget(int index)
+{
+	*reinterpret_cast<uintptr_t*>((QWORD)this + 0x14) = index;
+}
+
+void SpellInput::SetStartPos(Vector3 pos)
+{
+	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputStartPos) = pos;
+}
+
+void SpellInput::SetEndPos(Vector3 pos)
+{
+	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputEndPos) = pos;
+}
+
+void SpellInput::SetClickedPos(Vector3 pos)
+{
+	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputEndPos + sizeof(Vector3)) = pos;
+}
+
+void SpellInput::SetUnkPos(Vector3 pos)
+{
+	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputEndPos + sizeof(Vector3) * 2) = pos;
+}
+
 int Spell::GetLevel()
 {
 	return *(int*)((QWORD)this + oSpellSlotLevel);

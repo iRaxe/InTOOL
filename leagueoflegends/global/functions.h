@@ -58,7 +58,10 @@ namespace functions
 	void TryRightClick(Vector2 pos);
 	void IssueOrder(Vector2 pos);
 	void IssueMove(Vector2 pos);
-	void CastSpell(int spellId, Vector3 pos);
+	bool CastSpell(int spellId, Object* Target);
+	bool CastSpell(int spellId);
+	bool CastSpell(int spellId, Vector3 pos);
+	void OldCastSpell(int spellId, Vector3 pos);
 
 	bool CanSendInput();
 

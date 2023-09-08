@@ -2,46 +2,46 @@
 
 // Functions
 #define oGetBaseDrawPosition 0x1FA420 // E8 ? ? ? ? EB 06 49 8B 06 Stesso sub della sig OK
-#define oWorldToScreen 0xE0C4C0 // 48 83 EC 38 49 8B C0 Sub sopra a tutto OK
-#define oTryRightClick 0x8A4AC0 // 48 89 5C 24 ? 57 48 83 EC 50 48 8B D9 0F 29 74 24 ? 48 8B 0D ? ? ? ? Sub sopra a tutto OK
-#define oIssueOrder 0x8B8BF0 // E8 ? ? ? ? 84 C0 74 0A 33 F6 Stesso sub della sig OK mio sbagliato forse
-#define oIssueMove 0x8A3CE0 // 41 0F B6 F9 48 8B 0D ? ? ? ? Sub sopra a tutto OK
-#define oCastSpellWrapper 0x8AF600 // E8 ? ? ? ? 48 8B 53 08 48 8B 42 60 Stesso sub della sig OK
-#define oPrintChat 0x860740 // E8 ? ? ? ? 4C 8B C3 B2 01 Stesso sub della sig OK
+#define oWorldToScreen 0xE0C4D0 // 48 83 EC 38 49 8B C0 Sub sopra a tutto OK
+#define oTryRightClick 0x8A4AD0 // 48 89 5C 24 ? 57 48 83 EC 50 48 8B D9 0F 29 74 24 ? 48 8B 0D ? ? ? ? Sub sopra a tutto OK
+#define oIssueClick 0x8B8C00 // 44 88 44 24 ? 55 56 41 54 
+#define oIssueMove 0x8A3CF0 // 41 0F B6 F9 48 8B 0D ? ? ? ? Sub sopra a tutto OK
+#define oCastSpellWrapper 0x8AF610 // E8 ? ? ? ? 48 8B 53 08 48 8B 42 60 Stesso sub della sig OK
+#define oPrintChat 0x860750 // E8 ? ? ? ? 4C 8B C3 B2 01 Stesso sub della sig OK
 #define oGetBoundingRadius 0x1F7B90 // E8 ? ? ? ? 0F 28 F8 48 8B D6 Stesso sub della sig FORSE TROVATO
-#define oGetAttackDelay 0x3B5B80 // F3 0F 10 89 ? ? ? ? E9 ? ? ? ? Sub sopra a tutto OK
-#define oGetAttackWindup 0x3B5A80 // E8 ? ? ? ? 48 8B CE F3 0F 11 83 ? ? ? ? Stesso sub della sig OK
-#define oGetObjectFromNetId 0x394270 // 4C 8B C1 85 D2 74 1B Sub sopra a tutto OK
-#define oGetCollisionFlags 0xD83300 // 48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A Stesso sub della sig FORSE TROVATO
+#define oGetAttackDelay 0x3B5B90 // F3 0F 10 89 ? ? ? ? E9 ? ? ? ? Sub sopra a tutto OK
+#define oGetAttackWindup 0x3B5A90 // E8 ? ? ? ? 48 8B CE F3 0F 11 83 ? ? ? ? Stesso sub della sig OK
+#define oGetObjectFromNetId 0x394280 // 4C 8B C1 85 D2 74 1B Sub sopra a tutto OK
+#define oGetCollisionFlags 0xD83310 // 48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A Stesso sub della sig FORSE TROVATO
 #define oCharacterDataStackUpdate 0x1843C0 // E8 ? ? ? ? 80 BD ? ? ? ? ? 74 0D Stesso sub della sig
 //https://www.unknowncheats.me/forum/3788589-post9938.html
 
 // Maybe not needed now da render, sono tutti uintptr?
-#define fIsAlive 0x240ED0 //E8 ? ? ? ? 84 C0 74 35 48 8D 8F ? ? ? ? 
-#define fIsHero 0x257650 //E8 ? ? ? ? 0F B6 B4 24 ? ? ? ? Sub sopra a tutto
-#define fIsMinion 0x2576B0 //E8 ? ? ? ? 48 8B 0B F3 0F 10 41 ? Sub sopra a tutto
-#define fIsTurret 0x257800 //E8 ? ? ? ? 84 C0 74 56 48 8B 06 Sub sopra a tutto
-#define fIsMissile 0x2576E0 //E8 ? ? ? ? 84 C0 74 0C 48 8B 17 Sub sopra a tutto
-#define fIsInhibitor 0x257590 //E8 ? ? ? ? 48 8B CB 0F B6 F8 Sub sopra a tutto
-#define fIsNexus 0x2575D0 //E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? F3 0F 10 44 24 ? 48 8D 54 24 ? Sub sopra a tutto
-#define fIsObjectType 0x207D00 //0F B6 41 48 4C 8B C9 Sub sopra a tutto
-#define fIsDead 0x206F50 // E8 ? ? ? ? 0F B6 F0 EB 17 Sub sopra a tutto è un int
-#define fIsCanSee 0x24FE70 // 40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 90 ? ? ? ? 84 C0 75 19 Sub sopra a tutto è un int
-#define fIsNotWall 0xD76400 // E8 ? ? ? ? 44 3A E8 Sub sopra a tutto
-#define fGetPing 0x49BF00 // E8 ? ? ? ? 8B F8 39 03Sub sopra a tutto
-#define fRenderUsualSuspects 0x50BAA0 // 48 8B C4 48 89 58 18 89
-#define fIsTargetable 0x9F6AF0 // 40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 84 C0 74 41
-#define fIsVisible 0x2091E0 //40 56 48 83 EC 20 48 8B F1 48 81 C1 ? ? ? ? E8 ? ? ? ?
-#define fGetSpellState 0x6EA580 // E8 ? ? ? ? 48 8B CE 44 8B F8
-#define fGetOwnerPlayer 0x1FF6F0 //40 53 48 83 EC 20 48 81 C1 E8 02 00 00 48 8B DA 48 8B
+#define fIsAlive 0x23CD00 //E8 ? ? ? ? 84 C0 74 35 48 8D 8F ? ? ? ? 
+#define fIsHero 0x253450 //E8 ? ? ? ? 0F B6 B4 24 ? ? ? ? Sub sopra a tutto
+#define fIsMinion 0x2534B0 //E8 ? ? ? ? 48 8B 0B F3 0F 10 41 ? Sub sopra a tutto
+#define fIsTurret 0x253600 //E8 ? ? ? ? 84 C0 74 56 48 8B 06 Sub sopra a tutto
+#define fIsMissile 0x2534E0 //E8 ? ? ? ? 84 C0 74 0C 48 8B 17 Sub sopra a tutto
+#define fIsInhibitor 0x253390 //E8 ? ? ? ? 48 8B CB 0F B6 F8 Sub sopra a tutto
+#define fIsNexus 0x2533D0 //E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? F3 0F 10 44 24 ? 48 8D 54 24 ? Sub sopra a tutto
+#define fIsObjectType 0x205800 //0F B6 41 48 4C 8B C9 Sub sopra a tutto
+#define fIsDead 0x204BF0 // E8 ? ? ? ? 0F B6 F0 EB 17 Sub sopra a tutto è un int
+#define fIsCanSee 0x2A4CF0 // 40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 90 ? ? ? ? 84 C0 75 19 Sub sopra a tutto è un int
+#define fIsNotWall 0xD76400 // E8 ? ? ? ? 44 3A E8 Sub sopra a tutto DA TROVARE IN 13.16
+#define fGetPing 0x49F810 // E8 ? ? ? ? 8B F8 39 03Sub sopra a tutto
+#define fRenderUsualSuspects 0x50BDC0 // 48 8B C4 48 89 58 18 89
+#define fIsTargetable 0xA10DC0 // 40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 84 C0 74 41
+#define fIsVisible 0x206870 //40 56 48 83 EC 20 48 8B F1 48 81 C1 ? ? ? ? E8 ? ? ? ?
+#define fGetSpellState 0x6FB030 // E8 ? ? ? ? 48 8B CE 44 8B F8
+#define fGetOwnerPlayer 0x1FD7F0 //40 53 48 83 EC 20 48 81 C1 E8 02 00 00 48 8B DA 48 8B
 
 // Events not needed now
-#define fOnStartSpellCast 0x7065D0 // 40 53 48 83 EC 30 4C 8B 0A DWORD64
-#define fOnProcessSpell 0x162FD0 // 48 89 5C 24 ? 55 56 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 44 8B 05 ? ? ? ? 
+#define fOnStartSpellCast 0x717EE0 // 40 53 48 83 EC 30 4C 8B 0A DWORD64
+#define fOnProcessSpell 0x1632B0 // 48 89 5C 24 ? 55 56 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 44 8B 05 ? ? ? ? 
 #define fOnProcessSpellIndex 0x1188 // 48 81 C1 ? ? ? ? 48 8B 01 FF 90 ? ? ? ? 48 83 7B ? ? 72 03 48 8B 1B 4C 8B C3 https://www.unknowncheats.me/forum/3750580-post9420.html
 #define fOnStopSpellCast 0x706930 // 44 88 4C 24 20 4C 89 44 24 18 88 DWORD64
 #define fOnSpellImpact 0x6FF7C0 //48 89 5C 24 10 48 89 6C 24 18 57 41 54 41 55 41 56 41 57 48 81 QWORD* __fastcall Spell::SpellbookClient::OnSpellImpact(Spell::SpellbookClient* a1, const Spell::SpellCastInfo *a2) https://streamable.com/x4e7ib https://streamable.com/xuvq05 https://www.unknowncheats.me/forum/3755876-post9525.html
-#define fGetRespawnTimeRemaining 0x201420 //40 53 48 83 EC 20 48 8B D9 48 81 C1 ? ? ? ? E8 ? ? ? ? 0F B6 83 ? ? ? ?
+#define fGetRespawnTimeRemaining 0x1FE320 //40 53 48 83 EC 20 48 8B D9 48 81 C1 ? ? ? ? E8 ? ? ? ? 0F B6 83 ? ? ? ?
 #define fShopActions 0x0 //40 55 53 56 41 56 41 57 48 8D 6C
 #define fGetCircleIconPortrait 0x1FBEE0 //E8 ? ? ? ? 4C 3B F8 0F 94 C0
 #define fBuildNavPath 0xCD0460 // 48 8B C4 48 89 58 10 55 56 57 41 54 41 55 41 56 41 57 48 8D
