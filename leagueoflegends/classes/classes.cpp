@@ -303,9 +303,8 @@ bool Object::IsVisible()
 
 bool Object::IsAlive()
 {
-	if (this->GetHealth() == 0)
-		return false;
-	return true;
+	return !functions::IsDead(this);
+	
 	//return !(*(int*)((QWORD)this + oObjAlive) % 2);
 }
 
@@ -429,9 +428,9 @@ float Object::GetMaxHealth()
 	return *(float*)((QWORD)this + oObjMaxHealth);
 }
 
-float Object::GetPercentHealth(Object* obj)
+float Object::GetPercentHealth()
 {
-	return 100 * obj->GetHealth() / obj->GetMaxHealth() > 100 ? 100 : 100 * obj->GetHealth() / obj->GetMaxHealth();
+	return 100 * this->GetHealth() / this->GetMaxHealth() > 100 ? 100 : 100 * this->GetHealth() / this->GetMaxHealth();
 }
 
 unsigned short Object::GetActionState()

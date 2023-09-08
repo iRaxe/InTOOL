@@ -46,7 +46,8 @@ namespace functions
 	Vector2 GetHpBarPosition(Object* obj);
 
 	Object* GetSelectedObject();
-	bool fnIsAlive(Object* obj);
+	bool IsAlive(Object* obj);
+	bool IsDead(Object* obj);
 
 	unsigned int GetCollisionFlags(Vector3 pos);
 	float GetRespawnTimer(Object* obj);
@@ -56,7 +57,7 @@ namespace functions
 	bool IsAttackWindupSpell(int spellId);
 
 	void TryRightClick(Vector2 pos);
-	void IssueOrder(Vector2 pos);
+	void IssueClick(Vector2 pos);
 	void IssueMove(Vector2 pos);
 	bool CastSpell(int spellId, Object* Target);
 	bool CastSpell(int spellId);

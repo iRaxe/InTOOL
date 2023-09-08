@@ -214,12 +214,20 @@ namespace functions
 		return (*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceCamera) + 0x2B0);
 	}
 
-	bool fnIsAlive(Object* obj)
+	bool IsAlive(Object* obj)
 	{
 		typedef bool(__fastcall* fnIsAlive)(Object* obj);
 		fnIsAlive _fnIsAlive = (fnIsAlive)(globals::moduleBase + fIsAlive);
 
 		return _fnIsAlive(obj);
+	}
+
+	bool IsDead(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsDead)(Object* obj);
+		fnIsDead _fnIsDead = (fnIsDead)(globals::moduleBase + fIsDead);
+
+		return _fnIsDead(obj);
 	}
 
 	bool IsBrush(Vector3 pos)
@@ -241,13 +249,13 @@ namespace functions
 	{
 		EventManager::TriggerProcess(EventManager::EventType::OnIssueOrder, pos);
 
-		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck1);
-		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck2);
-		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + oObjIssueOrderCheck);
+		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1);
+		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2);
+		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck);
 
-		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck1) = 0.0f;
-		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck2) = 0.0f;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueOrderCheck) = 0x0;
+		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = 0.0f;
+		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = 0.0f;
+		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = 0x0;
 
 		typedef bool(__fastcall* fnTryRightClick)(QWORD* player, unsigned int* params);
 		fnTryRightClick _fnTryRightClick = (fnTryRightClick)(globals::moduleBase + oTryRightClick);
@@ -259,30 +267,28 @@ namespace functions
 
 		spoof_call(spoof_trampoline, _fnTryRightClick, (QWORD*)globals::localPlayer, params);
 
-		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck1) = floatCheck1;
-		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck2) = floatCheck2;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueOrderCheck) = check;
+		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
+		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
+		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = check;
 	}
 
-	void IssueOrder(Vector2 pos)
+	void IssueClick(Vector2 pos)
 	{
-		EventManager::TriggerProcess(EventManager::EventType::OnIssueOrder, pos);
+		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1);
+		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2);
+		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck);
 
-		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck1);
-		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck2);
-		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + oObjIssueOrderCheck);
+		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = 0.0f;
+		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = 0.0f;
+		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = 0x0;
 
-		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck1) = 0.0f;
-		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck2) = 0.0f;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueOrderCheck) = 0x0;
+		typedef bool(__fastcall* fnIssueClick)(QWORD* player, int order, bool isAttackMove, bool isMinion, int screenX, int screenY, int unknown);
+		fnIssueClick _fnIssueClick = (fnIssueClick)(globals::moduleBase + oIssueClick);
+		spoof_call(spoof_trampoline, _fnIssueClick, (QWORD*)globals::localPlayer, 2, false, false, (int)pos.x, (int)pos.y, 0);
 
-		typedef bool(__fastcall* fnIssueOrder)(QWORD* player, int order, bool isAttackMove, bool isMinion, int screenX, int screenY, int unknown);
-		fnIssueOrder _fnIssueOrder = (fnIssueOrder)(globals::moduleBase + oIssueClick);
-		spoof_call(spoof_trampoline, _fnIssueOrder, (QWORD*)globals::localPlayer, 2, false, false, (int)pos.x, (int)pos.y, 0);
-
-		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck1) = floatCheck1;
-		*(float*)((QWORD)globals::localPlayer + oObjIssueOrderFloatCheck2) = floatCheck2;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueOrderCheck) = check;
+		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
+		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
+		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = check;
 	}
 
 	void IssueMove(Vector2 pos)

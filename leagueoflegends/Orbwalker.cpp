@@ -316,6 +316,13 @@ namespace UPasta
 								Actions::AttackObject(minion);
 								return;
 							}
+
+							auto jungle = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange());
+							if (jungle)
+							{
+								Actions::AttackObject(jungle);
+								return;
+							}
 						}
 
 						Actions::Idle();

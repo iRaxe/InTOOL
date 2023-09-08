@@ -754,7 +754,7 @@ namespace UPasta
 								}
 
 								float altezzaIntera = 80.00f;
-								float altezzaDaTogliere = globals::localPlayer->GetPercentHealth(obj);
+								float altezzaDaTogliere = obj->GetPercentHealth();
 								float altezzaTotale = altezzaIntera * (altezzaDaTogliere / 100);
 
 								ImVec2 hudHpMin = ImVec2(p.x + 60, p.y + 5);

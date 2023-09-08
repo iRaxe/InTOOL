@@ -184,7 +184,7 @@ public:
     bool HasConqueror();
     float GetHealth();
     float GetMaxHealth();
-    float GetPercentHealth(Object* obj);
+    float GetPercentHealth();
 
     unsigned short GetActionState();
     float GetBonusAttackDamage();

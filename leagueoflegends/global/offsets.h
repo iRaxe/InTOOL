@@ -46,9 +46,9 @@
 #define fGetCircleIconPortrait 0x1FBEE0 //E8 ? ? ? ? 4C 3B F8 0F 94 C0
 #define fBuildNavPath 0xCD0460 // 48 8B C4 48 89 58 10 55 56 57 41 54 41 55 41 56 41 57 48 8D
 #define fSmoothPath 0x8D8B70 //40 53 55 41 56 48 83 EC 50 48
-#define fBuyItem 0xE8E030 //40 55 53 56 41 56 41 57 48 8D 6C 24 ? 48 81 EC
-#define fSellItem 0x3E6640 //40 57 48 83 EC 20 8B FA E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 48 89 5C 24
-#define fUndoItem 0x242CC0 //48 89 5C 24 ? 57 48 83 EC 30 48 8B F9 48 8B 49 08 48 8B 01 FF 90 ? ? ? ? 48 85 C0 74 15 48 8B 4F 08 48 8B 01
+#define fBuyItem 0xEA3040 //40 55 53 56 41 56 41 57 48 8D 6C 24 ? 48 81 EC
+#define fSellItem 0x3E83D0 //40 57 48 83 EC 20 8B FA E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 48 89 5C 24
+#define fUndoItem 0x23EB50 //48 89 5C 24 ? 57 48 83 EC 30 48 8B F9 48 8B 49 08 48 8B 01 FF 90 ? ? ? ? 48 85 C0 74 15 48 8B 4F 08 48 8B 01
 
 // Variables
 #define oSpoofGadget 0x1033100 // E8 ? ? ? ? 48 8B C8 E8 ? ? ? ? 80 3B 00 oppure 48 8B 41 08 48 85 C0 74 04 48 8B 00
@@ -94,9 +94,9 @@
 //structs
 #define oObjNetId 0x10
 #define oObjTeam 0x3C
-#define oObjIssueOrderFloatCheck1 0x84
-#define oObjIssueOrderFloatCheck2 0x88
-#define oObjIssueOrderCheck 0xD4
+#define oObjIssueClickFloatCheck1 0x84
+#define oObjIssueClickFloatCheck2 0x88
+#define oObjIssueClickCheck 0xD4 
 #define oObjPosition 0x220
 #define oObjVisible 0x310
 #define oObjAlive 0x328
