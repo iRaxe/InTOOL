@@ -298,14 +298,14 @@ Vector3 Object::GetPosition()
 
 bool Object::IsVisible()
 {
+	return functions::IsVisible(this);
 	return *(bool*)((QWORD)this + oObjVisible);
 }
 
 bool Object::IsAlive()
 {
 	return !functions::IsDead(this);
-	
-	//return !(*(int*)((QWORD)this + oObjAlive) % 2);
+	return !(*(int*)((QWORD)this + oObjAlive) % 2);
 }
 
 float Object::GetMana()
@@ -315,6 +315,7 @@ float Object::GetMana()
 
 bool Object::IsTargetable()
 {
+	return functions::IsTargetable(this);
 	return *(bool*)((QWORD)this + oObjTargetable);
 }
 
@@ -502,6 +503,7 @@ float Object::GetMagicPenetrationMulti()
 {
 	return *(float*)((QWORD)this + oObjMagicPenMulti);
 }
+
 
 float Object::GetTotalMagicPenetration()
 {
@@ -765,6 +767,304 @@ CharacterDataStack* Object::GetCharacterDataStack()
 {
 	return (CharacterDataStack*)((QWORD)this + oObjCharacterDataStack);
 }
+
+#pragma region CharacterStateIntermediate
+CharacterStateIntermediate* Object::GetCharacterStateIntermediate()
+{
+	return (CharacterStateIntermediate*)((QWORD)this + oCharacterStateIntermediate);
+}
+
+float CharacterStateIntermediate::GetAbilityHasteMod()
+{
+	return *(float*)((QWORD)this + oAbilityHasteMod);
+}
+
+float CharacterStateIntermediate::GetPercentCooldownCapMod()
+{
+	return *(float*)((QWORD)this + oPercentCooldownCapMod);
+}
+
+float CharacterStateIntermediate::GetPassiveCooldownEndTime()
+{
+	return *(float*)((QWORD)this + oPassiveCooldownEndTime);
+}
+
+float CharacterStateIntermediate::GetPassiveCooldownTotalTime()
+{
+	return *(float*)((QWORD)this + oPassiveCooldownTotalTime);
+}
+
+float CharacterStateIntermediate::GetFlatPhysicalDamageMod()
+{
+	return *(float*)((QWORD)this + oFlatPhysicalDamageMod);
+}
+
+float CharacterStateIntermediate::GetPercentPhysicalDamageMod()
+{
+	return *(float*)((QWORD)this + oPercentPhysicalDamageMod);
+}
+
+float CharacterStateIntermediate::GetPercentBonusPhysicalDamageMod()
+{
+	return *(float*)((QWORD)this + oPercentBonusPhysicalDamageMod);
+}
+
+float CharacterStateIntermediate::GetPercentBasePhysicalDamageAsFlatBonusMod()
+{
+	return *(float*)((QWORD)this + oPercentBasePhysicalDamageAsFlatBonusMod);
+}
+
+float CharacterStateIntermediate::GetFlatMagicDamageMod()
+{
+	return *(float*)((QWORD)this + oFlatMagicDamageMod);
+}
+
+float CharacterStateIntermediate::GetPercentMagicDamageMod()
+{
+	return *(float*)((QWORD)this + oPercentMagicDamageMod);
+}
+
+float CharacterStateIntermediate::GetFlatMagicReduction()
+{
+	return *(float*)((QWORD)this + oFlatMagicReduction);
+}
+
+float CharacterStateIntermediate::GetPercentMagicReduction()
+{
+	return *(float*)((QWORD)this + oPercentMagicReduction);
+}
+
+float CharacterStateIntermediate::GetFlatCastRangeMod()
+{
+	return *(float*)((QWORD)this + oFlatCastRangeMod);
+}
+
+float CharacterStateIntermediate::GetAttackSpeedMod()
+{
+	return *(float*)((QWORD)this + oAttackSpeedMod);
+}
+
+float CharacterStateIntermediate::GetPercentAttackSpeedMod()
+{
+	return *(float*)((QWORD)this + oPercentAttackSpeedMod);
+}
+
+float CharacterStateIntermediate::GetPercentMultiplicativeAttackSpeedMod()
+{
+	return *(float*)((QWORD)this + oPercentMultiplicativeAttackSpeedMod);
+}
+
+float CharacterStateIntermediate::GetBaseAttackDamage()
+{
+	return *(float*)((QWORD)this + oBaseAttackDamage);
+}
+
+float CharacterStateIntermediate::GetBaseAttackDamageSansPercentScale()
+{
+	return *(float*)((QWORD)this + oBaseAttackDamageSansPercentScale);
+}
+
+float CharacterStateIntermediate::GetFlatBaseAttackDamageMod()
+{
+	return *(float*)((QWORD)this + oFlatBaseAttackDamageMod);
+}
+
+float CharacterStateIntermediate::GetPercentBaseAttackDamageMod()
+{
+	return *(float*)((QWORD)this + oPercentBaseAttackDamageMod);
+}
+
+float CharacterStateIntermediate::GetBaseAbilityDamage()
+{
+	return *(float*)((QWORD)this + oBaseAbilityDamage);
+}
+
+float CharacterStateIntermediate::GetCritDamageMultiplier()
+{
+	return *(float*)((QWORD)this + oCritDamageMultiplier);
+}
+
+float CharacterStateIntermediate::GetScaleSkinCoef()
+{
+	return *(float*)((QWORD)this + oScaleSkinCoef);
+}
+
+float CharacterStateIntermediate::GetDodge()
+{
+	return *(float*)((QWORD)this + oDodge);
+}
+
+float CharacterStateIntermediate::GetCritPercent()
+{
+	return *(float*)((QWORD)this + oCritPercent);
+}
+
+float CharacterStateIntermediate::GetFlatBaseHPPoolMod()
+{
+	return *(float*)((QWORD)this + oFlatBaseHPPoolMod);
+}
+
+float CharacterStateIntermediate::GetArmor()
+{
+	return *(float*)((QWORD)this + oArmor);
+}
+
+float CharacterStateIntermediate::GetBonusArmor()
+{
+	return *(float*)((QWORD)this + oBonusArmor);
+}
+
+float CharacterStateIntermediate::GetSpellBlock()
+{
+	return *(float*)((QWORD)this + oSpellBlock);
+}
+
+float CharacterStateIntermediate::GetBonusSpellBlock()
+{
+	return *(float*)((QWORD)this + oBonusSpellBlock);
+}
+
+float CharacterStateIntermediate::GetHPRegenRate()
+{
+	return *(float*)((QWORD)this + oHPRegenRate);
+}
+
+float CharacterStateIntermediate::GetBaseHPRegenRate()
+{
+	return *(float*)((QWORD)this + oBaseHPRegenRate);
+}
+
+float CharacterStateIntermediate::GetMoveSpeed()
+{
+	return *(float*)((QWORD)this + oMoveSpeed);
+}
+
+float CharacterStateIntermediate::GetAttackRange()
+{
+	return *(float*)((QWORD)this + oAttackRange);
+}
+
+float CharacterStateIntermediate::GetFlatBubbleRadiusMod()
+{
+	return *(float*)((QWORD)this + oFlatBubbleRadiusMod);
+}
+
+float CharacterStateIntermediate::GetPercentBubbleRadiusMod()
+{
+	return *(float*)((QWORD)this + oPercentBubbleRadiusMod);
+}
+
+float CharacterStateIntermediate::GetFlatArmorPenetration()
+{
+	return *(float*)((QWORD)this + oFlatArmorPenetration);
+}
+
+float CharacterStateIntermediate::GetPhysicalLethality()
+{
+	return *(float*)((QWORD)this + oPhysicalLethality);
+}
+
+float CharacterStateIntermediate::GetPercentArmorPenetration()
+{
+	return *(float*)((QWORD)this + oPercentArmorPenetration);
+}
+
+float CharacterStateIntermediate::GetPercentBonusArmorPenetration()
+{
+	return *(float*)((QWORD)this + oPercentBonusArmorPenetration);
+}
+
+float CharacterStateIntermediate::GetPercentCritBonusArmorPenetration()
+{
+	return *(float*)((QWORD)this + oPercentCritBonusArmorPenetration);
+}
+
+float CharacterStateIntermediate::GetPercentCritTotalArmorPenetration()
+{
+	return *(float*)((QWORD)this + oPercentCritTotalArmorPenetration);
+}
+
+float CharacterStateIntermediate::GetFlatMagicPenetration()
+{
+	return *(float*)((QWORD)this + oFlatMagicPenetration);
+}
+
+float CharacterStateIntermediate::GetMagicLethality()
+{
+	return *(float*)((QWORD)this + oMagicLethality);
+}
+
+float CharacterStateIntermediate::GetPercentMagicPenetration()
+{
+	return *(float*)((QWORD)this + oPercentMagicPenetration);
+}
+
+float CharacterStateIntermediate::GetPercentBonusMagicPenetration()
+{
+	return *(float*)((QWORD)this + oPercentBonusMagicPenetration);
+}
+
+float CharacterStateIntermediate::GetPercentLifeStealMod()
+{
+	return *(float*)((QWORD)this + oPercentLifeStealMod);
+}
+
+float CharacterStateIntermediate::GetPercentSpellVampMod()
+{
+	return *(float*)((QWORD)this + oPercentSpellVampMod);
+}
+
+float CharacterStateIntermediate::GetPercentOmnivampMod()
+{
+	return *(float*)((QWORD)this + oPercentOmnivampMod);
+}
+
+float CharacterStateIntermediate::GetPercentPhysicalVamp()
+{
+	return *(float*)((QWORD)this + oPercentPhysicalVamp);
+}
+
+float CharacterStateIntermediate::GetPathfindingRadiusMod()
+{
+	return *(float*)((QWORD)this + oPathfindingRadiusMod);
+}
+
+float CharacterStateIntermediate::GetPercentCCReduction()
+{
+	return *(float*)((QWORD)this + oPercentCCReduction);
+}
+
+float CharacterStateIntermediate::GetPercentEXPBonus()
+{
+	return *(float*)((QWORD)this + oPercentEXPBonus);
+}
+
+float CharacterStateIntermediate::GetFlatBaseArmorMod()
+{
+	return *(float*)((QWORD)this + oFlatBaseArmorMod);
+}
+
+float CharacterStateIntermediate::GetFlatBaseSpellBlockMod()
+{
+	return *(float*)((QWORD)this + oFlatBaseSpellBlockMod);
+}
+
+float CharacterStateIntermediate::GetPrimaryARBaseRegenRateRep()
+{
+	return *(float*)((QWORD)this + oPrimaryARBaseRegenRateRep);
+}
+
+float CharacterStateIntermediate::GetSecondaryARRegenRateRep()
+{
+	return *(float*)((QWORD)this + oSecondaryARRegenRateRep);
+}
+
+float CharacterStateIntermediate::GetSecondaryARBaseRegenRateRep()
+{
+	return *(float*)((QWORD)this + oSecondaryARBaseRegenRateRep);
+}
+
+#pragma endregion
 
 int ObjectManager::GetListSize()
 {

@@ -43,6 +43,69 @@ public:
     void Update(bool change);
 };
 
+class CharacterStateIntermediate
+{
+public:
+    float GetAbilityHasteMod();
+    float GetPercentCooldownCapMod();
+    float GetPassiveCooldownEndTime();
+    float GetPassiveCooldownTotalTime();
+    float GetFlatPhysicalDamageMod();
+    float GetPercentPhysicalDamageMod();
+    float GetPercentBonusPhysicalDamageMod();
+    float GetPercentBasePhysicalDamageAsFlatBonusMod();
+    float GetFlatMagicDamageMod();
+    float GetPercentMagicDamageMod();
+    float GetFlatMagicReduction();
+    float GetPercentMagicReduction();
+    float GetFlatCastRangeMod();
+    float GetAttackSpeedMod();
+    float GetPercentAttackSpeedMod();
+    float GetPercentMultiplicativeAttackSpeedMod();
+    float GetBaseAttackDamage();
+    float GetBaseAttackDamageSansPercentScale();
+    float GetFlatBaseAttackDamageMod();
+    float GetPercentBaseAttackDamageMod();
+    float GetBaseAbilityDamage();
+    float GetCritDamageMultiplier();
+    float GetScaleSkinCoef();
+    float GetDodge();
+    float GetCritPercent();
+    float GetFlatBaseHPPoolMod();
+    float GetArmor();
+    float GetBonusArmor();
+    float GetSpellBlock();
+    float GetBonusSpellBlock();
+    float GetHPRegenRate();
+    float GetBaseHPRegenRate();
+    float GetMoveSpeed();
+    float GetAttackRange();
+    float GetFlatBubbleRadiusMod();
+    float GetPercentBubbleRadiusMod();
+    float GetFlatArmorPenetration();
+    float GetPhysicalLethality();
+    float GetPercentArmorPenetration();
+    float GetPercentBonusArmorPenetration();
+    float GetPercentCritBonusArmorPenetration();
+    float GetPercentCritTotalArmorPenetration();
+    float GetFlatMagicPenetration();
+    float GetMagicLethality();
+    float GetPercentMagicPenetration();
+    float GetPercentBonusMagicPenetration();
+    float GetPercentLifeStealMod();
+    float GetPercentSpellVampMod();
+    float GetPercentOmnivampMod();
+    float GetPercentPhysicalVamp();
+    float GetPathfindingRadiusMod();
+    float GetPercentCCReduction();
+    float GetPercentEXPBonus();
+    float GetFlatBaseArmorMod();
+    float GetFlatBaseSpellBlockMod();
+    float GetPrimaryARBaseRegenRateRep();
+    float GetSecondaryARRegenRateRep();
+    float GetSecondaryARBaseRegenRateRep();
+};
+
 class AiManager
 {
 public:
@@ -248,6 +311,7 @@ public:
     Buff* GetBuffByName(std::string name);
 public:
     CharacterDataStack* GetCharacterDataStack();
+    CharacterStateIntermediate* GetCharacterStateIntermediate();
 };
 
 class ObjectManager

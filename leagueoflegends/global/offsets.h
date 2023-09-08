@@ -33,6 +33,8 @@
 #define fIsTargetable 0xA10DC0 // 40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 84 C0 74 41
 #define fIsVisible 0x206870 //40 56 48 83 EC 20 48 8B F1 48 81 C1 ? ? ? ? E8 ? ? ? ?
 #define fGetSpellState 0x6FB030 // E8 ? ? ? ? 48 8B CE 44 8B F8
+#define fGetSpellRange 0x6C0120 // E8 ? ? ? ? 0F 28 F0 48 8B CE
+#define fGetStatTotal 0x281210 // E8 ? ? ? ? 0F B6 47 02
 #define fGetOwnerPlayer 0x1FD7F0 //40 53 48 83 EC 20 48 81 C1 E8 02 00 00 48 8B DA 48 8B
 
 // Events not needed now
@@ -96,7 +98,7 @@
 #define oObjTeam 0x3C
 #define oObjIssueClickFloatCheck1 0x84
 #define oObjIssueClickFloatCheck2 0x88
-#define oObjIssueClickCheck 0xD4 
+#define oObjIssueClickCheck 0xCC 
 #define oObjPosition 0x220
 #define oObjVisible 0x310
 #define oObjAlive 0x328
@@ -214,6 +216,8 @@
 //https://www.unknowncheats.me/forum/3727406-post9100.html i need this shit
 
 //CharacterStateIntermediate
+#define CharacterStateIntermediateStruct 0x187560 //E8 ? ? ? ? 48 8B BB ? ? ? ? 4C 8D 0D ? ? ? ? 4C 8D 83 ? ? ? ? 48 8B D3 49 8B CF
+#define oCharacterStateIntermediate 0x19D8 
 #define oAbilityHasteMod 0x18
 #define oPercentCooldownCapMod 0x30
 #define oPassiveCooldownEndTime 0x48
@@ -238,7 +242,7 @@
 #define oCritDamageMultiplier 0x258
 #define oScaleSkinCoef 0x270
 #define oDodge 0x288
-#define oCrit 0x2A0
+#define oCritPercent 0x2A0
 #define oFlatBaseHPPoolMod 0x2B8
 #define oArmor 0x2D0
 #define oBonusArmor 0x2E8
@@ -272,7 +276,6 @@
 #define oPrimaryARBaseRegenRateRep 0x5B8
 #define oSecondaryARRegenRateRep 0x5D0
 #define oSecondaryARBaseRegenRateRep 0x5E8
-
 
 //Items managament
 #define oObjItemManager 0x3FF8

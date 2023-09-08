@@ -825,10 +825,14 @@ namespace UPasta
 					{
 						if (obj->IsAlive() && obj->IsVisible())
 						{
+							
 							if (obj->GetNetId() == globals::localPlayer->GetNetId())
 							{
 								if (Configs::Radius::showAARadiusSelf->Value == true)
+								{
 									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, PI / 3, functions::GetMouseWorldPos(), true);
+								}
+
 							}
 							else
 							{

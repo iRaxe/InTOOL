@@ -209,6 +209,14 @@ namespace functions
 		return _fnGetRespawnTimer(obj);
 	}
 
+	float GetSpellRange(int level)
+	{
+		typedef float(__fastcall* fnGetSpellRange)(int level);
+		//Not working, need find spellDataSpellRange 
+		fnGetSpellRange _fnGetSpellRange = (fnGetSpellRange)(globals::moduleBase + fGetSpellRange);
+		return _fnGetSpellRange(level);
+	}
+
 	QWORD GetZoomAddress()
 	{
 		return (*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceCamera) + 0x2B0);
@@ -222,12 +230,84 @@ namespace functions
 		return _fnIsAlive(obj);
 	}
 
+	bool IsHero(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsHero)(Object* obj);
+		fnIsHero _fnIsHero = (fnIsHero)(globals::moduleBase + fIsHero);
+
+		return _fnIsHero(obj);
+	}
+
+	bool IsMinion(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsMinion)(Object* obj);
+		fnIsMinion _fnIsMinion = (fnIsMinion)(globals::moduleBase + fIsMinion);
+
+		return _fnIsMinion(obj);
+	}
+
+	bool IsTurret(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsTurret)(Object* obj);
+		fnIsTurret _fnIsTurret = (fnIsTurret)(globals::moduleBase + fIsTurret);
+
+		return _fnIsTurret(obj);
+	}
+
+	bool IsMissile(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsMissile)(Object* obj);
+		fnIsMissile _fnIsMissile = (fnIsMissile)(globals::moduleBase + fIsMissile);
+
+		return _fnIsMissile(obj);
+	}
+
+	bool IsInhibitor(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsInhibitor)(Object* obj);
+		fnIsInhibitor _fnIsInhibitor = (fnIsInhibitor)(globals::moduleBase + fIsInhibitor);
+
+		return _fnIsInhibitor(obj);
+	}
+
+	bool IsNexus(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsNexus)(Object* obj);
+		fnIsNexus _fnIsNexus = (fnIsNexus)(globals::moduleBase + fIsNexus);
+
+		return _fnIsNexus(obj);
+	}
+
 	bool IsDead(Object* obj)
 	{
 		typedef bool(__fastcall* fnIsDead)(Object* obj);
 		fnIsDead _fnIsDead = (fnIsDead)(globals::moduleBase + fIsDead);
 
 		return _fnIsDead(obj);
+	}
+
+	bool IsCanSee(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsCanSee)(Object* obj);
+		fnIsCanSee _fnIsCanSee = (fnIsCanSee)(globals::moduleBase + fIsCanSee);
+
+		return _fnIsCanSee(obj);
+	}
+
+	bool IsTargetable(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsTargetable)(Object* obj);
+		fnIsTargetable _fnIsTargetable = (fnIsTargetable)(globals::moduleBase + fIsTargetable);
+
+		return _fnIsTargetable(obj);
+	}
+
+	bool IsVisible(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsVisible)(Object* obj);
+		fnIsVisible _fnIsVisible = (fnIsVisible)(globals::moduleBase + fIsVisible);
+
+		return _fnIsVisible(obj);
 	}
 
 	bool IsBrush(Vector3 pos)
@@ -251,11 +331,11 @@ namespace functions
 
 		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1);
 		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2);
-		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck);
+		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + 0xD4);
 
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = 0.0f;
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = 0.0f;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = 0x0;
+		*(DWORD*)((QWORD)globals::localPlayer + 0xD4) = 0x0;
 
 		typedef bool(__fastcall* fnTryRightClick)(QWORD* player, unsigned int* params);
 		fnTryRightClick _fnTryRightClick = (fnTryRightClick)(globals::moduleBase + oTryRightClick);
@@ -269,7 +349,7 @@ namespace functions
 
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = check;
+		*(DWORD*)((QWORD)globals::localPlayer + 0xD4) = check;
 	}
 
 	void IssueClick(Vector2 pos)
@@ -282,9 +362,14 @@ namespace functions
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = 0.0f;
 		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = 0x0;
 
-		typedef bool(__fastcall* fnIssueClick)(QWORD* player, int order, bool isAttackMove, bool isMinion, int screenX, int screenY, int unknown);
+		typedef bool(__fastcall* fnIssueClick)(QWORD* player, unsigned int* params);
 		fnIssueClick _fnIssueClick = (fnIssueClick)(globals::moduleBase + oIssueClick);
-		spoof_call(spoof_trampoline, _fnIssueClick, (QWORD*)globals::localPlayer, 2, false, false, (int)pos.x, (int)pos.y, 0);
+		unsigned int* params = new unsigned int[20];
+		params[17] = (int)pos.x;
+		params[18] = (int)pos.y;
+		params[19] = 2;
+
+		spoof_call(spoof_trampoline, _fnIssueClick, (QWORD*)globals::localPlayer, params);
 
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
