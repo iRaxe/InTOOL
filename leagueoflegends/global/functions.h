@@ -50,17 +50,18 @@ namespace functions
 	bool IsHero(Object* obj);
 	bool IsMinion(Object* obj);
 	bool IsTurret(Object* obj);
-	bool IsMissile(Object* obj);
+	bool IsMissile(Missile* obj);
 	bool IsInhibitor(Object* obj);
 	bool IsNexus(Object* obj);
 	bool IsDead(Object* obj);
 	bool IsCanSee(Object* obj);
 	bool IsTargetable(Object* obj);
 	bool IsVisible(Object* obj);
+	bool IsVisible(Missile* obj);
 
 	unsigned int GetCollisionFlags(Vector3 pos);
 	float GetRespawnTimer(Object* obj);
-	int GetSpellState(Object* obj, int slotId);
+	int GetSpellState(int slotId);
 	float GetSpellRange(int slotid);
 	QWORD GetZoomAddress();
 	bool IsBrush(Vector3 pos);

@@ -572,6 +572,36 @@ Spell* Object::GetSpellBySlotId(int slotId)
 	return *(Spell**)((QWORD)this + oObjSpellBook + oObjSpellBookSpellSlot + (sizeof(QWORD) * slotId));
 }
 
+std::string Missile::GetName()
+{
+	return *(char**)((QWORD)this + oMissileName);
+}
+
+Missile* Object::GetMissileByIndex()
+{
+	return *(Missile**)((QWORD)this + oMissileMapVal);
+}
+
+int Missile::GetMissileSrcId()
+{
+	return *(int*)((QWORD)this + oMissileSrcIdx);
+}
+
+Vector3 Missile::GetSpellStartPos()
+{
+	return functions::ReadVector3((QWORD)this + oMissileStartPos);
+}
+
+Vector3 Missile::GetSpellPos()
+{
+	return functions::ReadVector3((QWORD)this + oMissilePos);
+}
+
+Vector3 Missile::GetSpellEndPos()
+{
+	return functions::ReadVector3((QWORD)this + oMissileEndPos);
+}
+
 float Object::GetBoundingRadius()
 {
 	typedef float(__fastcall* fnGetBoundingRadius)(Object* obj);
@@ -732,7 +762,7 @@ bool Object::IsInAARange()
 bool Object::CanCastSpell(int slotId)
 {
 	auto spell = this->GetSpellBySlotId(slotId);
-	return this->CanCast() && functions::GetSpellState(this, slotId) == IsReady;
+	return this->CanCast() && functions::GetSpellState(slotId) == IsReady;
 }
 
 Vector3 Object::GetServerPosition()
@@ -1073,35 +1103,11 @@ int ObjectManager::GetListSize()
 
 Object* ObjectManager::GetIndex(int index)
 {
-	index = min(index, this->GetListSize());
 	return *(Object**)(*(QWORD*)((QWORD)this + oManagerList) + (sizeof(QWORD) * index));
 }
-
 
 Vector3 SpellData::GetSpellEndPos()
 {
 	return functions::ReadVector3((QWORD)this + oMissileDestIdx);
-}
-
-//NEW
-
-int Missiles::GetMissileId()
-{
-	return *(int*)((QWORD)this + oObjNetId);
-}
-
-int Missiles::GetMissileSrcId()
-{
-	return *(int*)((QWORD)this + oMissileSrcIdx);
-}
-
-Vector3 Missiles::GetSpellStartPos()
-{
-	return functions::ReadVector3((QWORD)this + oMissileStartPos);
-}
-
-Vector3 Missiles::GetSpellEndPos()
-{
-	return functions::ReadVector3((QWORD)this + oMissileEndPos);
 }
 

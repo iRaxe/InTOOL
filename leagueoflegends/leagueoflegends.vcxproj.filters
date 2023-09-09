@@ -331,6 +331,10 @@
     <ClInclude Include="LoadImages.h">
       <Filter>Rendering\ImageManager\LoadTextures</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="clipper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">

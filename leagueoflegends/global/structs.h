@@ -2,6 +2,11 @@
 
 #include "../stdafx.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846f
+#define M_PI_F (float)M_PI
+#endif
+
 struct Vector2
 {
     float x, y;
@@ -112,6 +117,76 @@ struct Vector3
         }
 
         return *this;
+    }
+
+    Vector3 Center(Vector3 const& other) const
+    {
+        return (*this + other) / 2;
+    }
+
+    float Polar() const
+    {
+        if (this->Close(x, 0.f, 0.f))
+        {
+            if (z > 0.f)
+            {
+                return 90.f;
+            }
+            return z < 0.f ? 270.f : 0.f;
+        }
+
+        auto theta = atan(z / x) * 180.f / M_PI;
+        if (x < 0.f)
+        {
+            theta = theta + 180.f;
+        }
+        if (theta < 0.f)
+        {
+            theta = theta + 360.f;
+        }
+        return theta;
+    }
+
+    float AngleBetween(Vector3 const& other) const
+    {
+        auto theta = Polar() - other.Polar();
+        if (theta < 0.f)
+        {
+            theta = theta + 360.f;
+        }
+        if (theta > 180.f)
+        {
+            theta = 360.f - theta;
+        }
+        return theta;
+    }
+
+    bool Close(float a, float b, float eps) const
+    {
+        if (abs(eps) < FLT_EPSILON)
+        {
+            eps = static_cast<float>(1e-9);
+        }
+        return abs(a - b) <= eps;
+
+    }
+
+    Vector3 Rotated(float angle) const
+    {
+        auto const c = cos(angle);
+        auto const s = sin(angle);
+
+        return { static_cast<float>(x * c - z * s), y, static_cast<float>(z * c + x * s) };
+    }
+
+    Vector3 Perpendicular() const
+    {
+        return { -z,y,x };
+    }
+
+    Vector3 Perpendicular2() const
+    {
+        return { z,y,-x };
     }
 
     Vector3 Rotate(Vector3 startPos, float theta)

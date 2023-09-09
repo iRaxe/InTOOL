@@ -162,6 +162,16 @@ public:
     Vector3 GetSpellEndPos();
 };
 
+class Missile
+{
+public:
+    std::string GetName();
+    int GetMissileSrcId();
+    Vector3 GetSpellStartPos();
+    Vector3 GetSpellPos();
+    Vector3 GetSpellEndPos();
+};
+
 class SpellInput
 {
 public:
@@ -270,6 +280,7 @@ public:
     QWORD* GetBuffManagerEntriesEnd();
     SpellCast* GetActiveSpellCast();
 	Spell* GetSpellBySlotId(int slotId);
+    Missile* GetMissileByIndex();
     CharacterData* GetCharacterData();
     AiManager* GetAiManager();
     InventorySlot* GetInventorySlotById(int slotId);

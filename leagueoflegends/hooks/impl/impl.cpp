@@ -21,7 +21,7 @@ namespace hooks
 			globals::buildingsManager = *(ObjectManager**)(globals::moduleBase + oBuildingsManager);
 			globals::attackableManager = *(ObjectManager**)(globals::moduleBase + oAttackableList);
 			globals::objManager = *(ObjectManager**)(globals::moduleBase + oObjManager);
-			//globals::missileManager = *(ObjectManager**)(globals::moduleBase + oMissilesList);
+			globals::missileManager = *(ObjectManager**)(globals::moduleBase + oMissilesList);
 
 			menu::InitNewMenu();
 			functions::Init();

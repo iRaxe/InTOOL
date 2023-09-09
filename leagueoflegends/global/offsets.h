@@ -14,9 +14,7 @@
 #define oGetObjectFromNetId 0x394280 // 4C 8B C1 85 D2 74 1B Sub sopra a tutto OK
 #define oGetCollisionFlags 0xD83310 // 48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A Stesso sub della sig FORSE TROVATO
 #define oCharacterDataStackUpdate 0x1843C0 // E8 ? ? ? ? 80 BD ? ? ? ? ? 74 0D Stesso sub della sig
-//https://www.unknowncheats.me/forum/3788589-post9938.html
 
-// Maybe not needed now da render, sono tutti uintptr?
 #define fIsAlive 0x23CD00 //E8 ? ? ? ? 84 C0 74 35 48 8D 8F ? ? ? ? 
 #define fIsHero 0x253450 //E8 ? ? ? ? 0F B6 B4 24 ? ? ? ? Sub sopra a tutto
 #define fIsMinion 0x2534B0 //E8 ? ? ? ? 48 8B 0B F3 0F 10 41 ? Sub sopra a tutto
@@ -32,6 +30,7 @@
 #define fRenderUsualSuspects 0x50BDC0 // 48 8B C4 48 89 58 18 89
 #define fIsTargetable 0xA10DC0 // 40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 84 C0 74 41
 #define fIsVisible 0x206870 //40 56 48 83 EC 20 48 8B F1 48 81 C1 ? ? ? ? E8 ? ? ? ?
+#define fGetSpellSlot 0x8915D0 //E8 ? ? ? ? 4C 8D 4D 08
 #define fGetSpellState 0x6FB030 // E8 ? ? ? ? 48 8B CE 44 8B F8
 #define fGetSpellRange 0x6C0120 // E8 ? ? ? ? 0F 28 F0 48 8B CE
 #define fGetStatTotal 0x281210 // E8 ? ? ? ? 0F B6 47 02
@@ -193,7 +192,6 @@
 
 
 // For Missile
-#define oMissileList 0x2196118
 #define oMissileName 0x60
 #define oMissileSpellName 0xB0
 
@@ -207,6 +205,7 @@
 #define oMissileDestIdx 0x3C8
 #define oMissileDestCheck 0x320
 #define oMissileStartPos 0x38C
+#define oMissilePos 0x104
 #define oMissileEndPos 0x398
 #define oObjMissileSpellCast 0x250
 

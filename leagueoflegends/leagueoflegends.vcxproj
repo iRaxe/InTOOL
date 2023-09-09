@@ -179,10 +179,12 @@
     <ClInclude Include="Awareness.h" />
     <ClInclude Include="Checkbox.h" />
     <ClInclude Include="classes\classes.h" />
+    <ClInclude Include="clipper.h" />
     <ClInclude Include="clipper.hpp" />
     <ClInclude Include="customimages.h" />
     <ClInclude Include="Damage.h" />
     <ClInclude Include="DestroyEvents.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="global\colors.h" />
     <ClInclude Include="global\functions.h" />
     <ClInclude Include="global\globals.h" />

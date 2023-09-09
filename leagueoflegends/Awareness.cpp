@@ -5,7 +5,7 @@
 #include "TargetSelector.h"
 #include "zoom.h"
 #include "../stdafx.h"
-
+#include "Geometry.h"
 namespace UPasta
 {
 	namespace SDK
@@ -825,7 +825,6 @@ namespace UPasta
 					{
 						if (obj->IsAlive() && obj->IsVisible())
 						{
-							
 							if (obj->GetNetId() == globals::localPlayer->GetNetId())
 							{
 								if (Configs::Radius::showAARadiusSelf->Value == true)
@@ -845,7 +844,6 @@ namespace UPasta
 							}
 						}
 					}
-
 					static void ShowAARadius(Object* obj, int quality)
 					{
 						if (obj->IsAlive() && obj->IsVisible())
@@ -872,11 +870,74 @@ namespace UPasta
 							Configs::Radius::InitializeRadiusMenu();
 						}
 					}
+					std::map<Object*, std::tuple<Missile*, Vector3, Vector3, Vector3>> missileMap;
+					std::vector<Object*> objectsToRemove; // Lista degli oggetti da rimuovere
+
+					std::vector<Object*> GetMissilesInRange2()
+					{
+						std::vector<Object*> validMissiles;
+						for (int i = 0; i < 3; i++)
+						{
+							auto obj = globals::missileManager->GetIndex(i);
+							if (obj && !missileMap.contains(obj))
+							{
+								auto missileTest = obj->GetMissileByIndex();
+								if (missileTest)
+								{
+									/*Vector3 extended = missileTest->GetSpellStartPos().Extend
+									(missileTest->GetSpellEndPos(), missileTest->GetSpellStartPos().Distance
+									(missileTest->GetSpellEndPos()) + 100.0f);*/
+									Vector3 startPosVector = missileTest->GetSpellStartPos();
+									Vector3 posVector = missileTest->GetSpellPos();
+									Vector3 endPosVector = missileTest->GetSpellEndPos();
+
+									missileMap[obj] = std::make_tuple(missileTest, startPosVector, posVector, endPosVector);
+
+									validMissiles.push_back(obj);
+								}
+							}
+						}
+
+						if (missileMap.size() > 10)
+							missileMap.clear();
+
+						if (validMissiles.size() > 0)
+							return validMissiles;
+
+						
+
+						return validMissiles;
+					}
 
 					void Update()
 					{
 						if (Configs::Radius::initializedRadiusMenu)
 						{
+							GetMissilesInRange2();
+							for (auto it = missileMap.begin(); it != missileMap.end(); ++it)
+							{
+								Object* correspondingObject = it->first;
+
+								Missile* correspondingMissile = std::get<0>(it->second); // Missile*
+								Vector3 startPosVector = std::get<1>(it->second); // Vector3
+								Vector3 posVector = std::get<2>(it->second); // Vector3
+								Vector3 endPosVector = std::get<3>(it->second); // Vector3
+
+								//Vector3 extendedVector = std::get<1>(it->second); // Vector3
+								if (IsValidPtr(correspondingMissile))
+								{
+									Geometry::Polygon poly = Geometry::Rectangle(startPosVector, endPosVector, 70.f).ToPolygon();
+									//Geometry::Polygon poly2 = Geometry::Rectangle(startPosVector, posVector, 70.f).ToPolygon();
+
+									render::RenderPolygon(poly, COLOR_WHITE, 1.0f);
+									//render::RenderFilledPolygon(poly2, COLOR_WHITE);
+									missileMap.erase(correspondingObject);
+								}
+
+							}
+
+
+
 							if (Configs::Radius::status->Value == true)
 							{
 								for (int i = 0; i < globals::heroManager->GetListSize(); i++)
@@ -895,6 +956,7 @@ namespace UPasta
 									}
 								}
 							}
+
 						}
 					}
 				}

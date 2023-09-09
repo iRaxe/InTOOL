@@ -289,8 +289,7 @@ namespace UPasta
 						}
 					}
 					return hero;
-
-										
+														
 				}
 
 				Object* Functions::GetEnemyMinionInRange(float radius)

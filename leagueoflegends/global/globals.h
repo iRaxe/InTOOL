@@ -21,7 +21,7 @@ namespace globals
 	extern ObjectManager* minionManager;
 	extern ObjectManager* turretManager;
 	extern ObjectManager* inhibitorsManager;
-	//extern ObjectManager* missileManager;
+	extern ObjectManager* missileManager;
 
 
 	extern ObjectManager* buildingsManager;

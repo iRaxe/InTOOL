@@ -209,12 +209,12 @@ namespace functions
 		return _fnGetRespawnTimer(obj);
 	}
 
-	int GetSpellState(Object* obj, int slotId)
+	int GetSpellState(int slotId)
 	{
 		// Ready = 0 || NotAvailable = 4 || Supressed = 8 || NotLearned = 12 || Disabled = 16 || Processing = 24 || Cooldown = 32 || NoMana = 64 || Unknown = 96
 		typedef int(__fastcall* fnGetSpellState)(void*, int, const QWORD&);
 		fnGetSpellState _fnGetSpellState = (fnGetSpellState)(globals::moduleBase + fGetSpellState);
-		return _fnGetSpellState(obj + oObjSpellBook, slotId, NULL);
+		return _fnGetSpellState(globals::localPlayer + oObjSpellBook, slotId, NULL);
 	}
 
 	float GetSpellRange(int level)
@@ -262,9 +262,9 @@ namespace functions
 		return _fnIsTurret(obj);
 	}
 
-	bool IsMissile(Object* obj)
+	bool IsMissile(Missile* obj)
 	{
-		typedef bool(__fastcall* fnIsMissile)(Object* obj);
+		typedef bool(__fastcall* fnIsMissile)(Missile* obj);
 		fnIsMissile _fnIsMissile = (fnIsMissile)(globals::moduleBase + fIsMissile);
 
 		return _fnIsMissile(obj);
@@ -313,6 +313,14 @@ namespace functions
 	bool IsVisible(Object* obj)
 	{
 		typedef bool(__fastcall* fnIsVisible)(Object* obj);
+		fnIsVisible _fnIsVisible = (fnIsVisible)(globals::moduleBase + fIsVisible);
+
+		return _fnIsVisible(obj);
+	}
+
+	bool IsVisible(Missile* obj)
+	{
+		typedef bool(__fastcall* fnIsVisible)(Missile* obj);
 		fnIsVisible _fnIsVisible = (fnIsVisible)(globals::moduleBase + fIsVisible);
 
 		return _fnIsVisible(obj);

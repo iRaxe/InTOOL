@@ -1,5 +1,4 @@
 #include "../stdafx.h"
-
 namespace render
 {
 	float Distance(Vector2 vec1, Vector2 vec2)
@@ -292,6 +291,46 @@ namespace render
 			ImGui::GetBackgroundDrawList()->PathStroke(color, ImDrawFlags_None, thickness);
 		}
 
+	}
+
+	void RenderPolygon(const Geometry::Polygon poly, uintptr_t color, float thickness)
+	{
+		float a = (float)((color >> 24) & 0xff);
+		float r = (float)((color >> 16) & 0xff);
+		float g = (float)((color >> 8) & 0xff);
+		float b = (float)((color) & 0xff);
+
+
+		static ImVec2 points[200];
+		int i = 0;
+		for (const auto& point : poly.Points)
+		{
+			ImVec2 pos = functions::WorldToScreen(point).ToImVec();
+			points[i].x = pos.x;
+			points[i].y = pos.y;
+			i++;
+		}
+		ImGui::GetBackgroundDrawList()->AddPolyline(points, i, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, thickness);
+	}
+
+	void RenderFilledPolygon(const Geometry::Polygon poly, uintptr_t color)
+	{
+		float a = (float)((color >> 24) & 0xff);
+		float r = (float)((color >> 16) & 0xff);
+		float g = (float)((color >> 8) & 0xff);
+		float b = (float)((color) & 0xff);
+
+
+		static ImVec2 points[200];
+		int i = 0;
+		for (const auto& point : poly.Points)
+		{
+			ImVec2 pos = functions::WorldToScreen(point).ToImVec();
+			points[i].x = pos.x;
+			points[i].y = pos.y;
+			i++;
+		}
+		ImGui::GetBackgroundDrawList()->AddConvexPolyFilled(points, i, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }));
 	}
 
 	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls)

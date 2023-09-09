@@ -47,6 +47,7 @@
 #include "global/colors.h"
 #include "global/offsets.h"
 #include "global/structs.h"
+#include "Geometry.h"
 #include "global/utils.h"
 #include "global/leagueobfuscation.h"
 #include "classes/classes.h"
@@ -58,7 +59,6 @@
 #include "scripts/championmodule.h"
 #include "scripts/skillshotdatabase.h"
 #include "scripts/scripts.h"
-
 #include "hooks/hooks.h"
 #include "hooks/impl/impl.h"
 #include "menu/menu.h"
@@ -69,3 +69,7 @@
 #include "json.hpp"
 using json = nlohmann::json;
 #define RVA(address) (globals::moduleBase + address)
+#ifndef M_PI
+#define M_PI 3.14159265358979323846f
+#define M_PI_F (float)M_PI
+#endif
