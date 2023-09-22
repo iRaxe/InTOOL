@@ -75,6 +75,19 @@ namespace functions
 		PrintChat(GetHexString((QWORD)address));
 	}
 
+	std::string GetServerIP()
+	{
+		auto test = *(char**)(*(QWORD*)(globals::moduleBase + oGameMap) + 0x140);
+
+		char nameobj[18];
+		memcpy(nameobj, reinterpret_cast<void*>(*(reinterpret_cast<QWORD*>(globals::moduleBase + oGameMap) + 0x140)), sizeof(nameobj));
+		//ServerInfo va bene
+		//LOG("%s", test);
+		return test;
+
+
+	}
+
 	float GetGameTime()
 	{
 		return *(float*)(globals::moduleBase + oGameTime);
@@ -230,6 +243,22 @@ namespace functions
 		return (*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceCamera) + 0x2B0);
 	}
 
+	bool IsNotLocalPlayer(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsNotLocalPlayer)(Object* obj);
+		fnIsNotLocalPlayer _fnIsNotLocalPlayer = (fnIsNotLocalPlayer)(globals::moduleBase + fIsNotLocalPlayer);
+
+		return _fnIsNotLocalPlayer(obj);
+	}
+
+	/*bool IsAttackingLocalPlayer(Object* obj)
+	{
+		typedef bool(__fastcall* fnIsAttackingLocalPlayer)(Object* obj);
+		fnIsAttackingLocalPlayer _fnIsAttackingLocalPlayer = (fnIsAttackingLocalPlayer)(globals::moduleBase + fIsAttackingLocalPlayer);
+
+		return _fnIsAttackingLocalPlayer(obj);
+	}*/
+
 	bool IsAlive(Object* obj)
 	{
 		typedef bool(__fastcall* fnIsAlive)(Object* obj);
@@ -347,11 +376,11 @@ namespace functions
 
 		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1);
 		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2);
-		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + 0xD4);
+		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck);
 
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = 0.0f;
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = 0.0f;
-		*(DWORD*)((QWORD)globals::localPlayer + 0xD4) = 0x0;
+		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = 0x0;
 
 		typedef bool(__fastcall* fnTryRightClick)(QWORD* player, unsigned int* params);
 		fnTryRightClick _fnTryRightClick = (fnTryRightClick)(globals::moduleBase + oTryRightClick);
@@ -365,10 +394,23 @@ namespace functions
 
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
-		*(DWORD*)((QWORD)globals::localPlayer + 0xD4) = check;
+		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = check;
 	}
 
 	void IssueClick(Vector2 pos)
+	{
+		typedef bool(__fastcall* fnIssueClick)(uintptr_t*, int, unsigned int, int, unsigned int, unsigned int, int);
+		fnIssueClick _fnIssueClick = (fnIssueClick)(globals::moduleBase + oIssueClick);
+
+		unsigned int* params = new unsigned int[20];
+		params[17] = (int)pos.x;
+		params[18] = (int)pos.y;
+		params[19] = 2;
+
+		_fnIssueClick((uintptr_t*)globals::localPlayer,params[19], 0, 0, params[17], params[18], 0);
+	}
+
+	/*void IssueClick(Vector2 pos)
 	{
 		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1);
 		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2);
@@ -390,7 +432,7 @@ namespace functions
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
 		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = check;
-	}
+	}*/
 
 	void IssueMove(Vector2 pos)
 	{
@@ -409,7 +451,7 @@ namespace functions
 		SpellInput* TargetInfo = spell->GetSpellInput();
 
 		if (!TargetInfo || !Target) return false;
-		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + 0x68);
+		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo);
 
 		// set spell position
 		TargetInfo->SetCaster(me->GetNetId());
@@ -435,7 +477,7 @@ namespace functions
 		SpellInput* TargetInfo = spell->GetSpellInput();
 
 		if (!TargetInfo) return false;
-		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + 0x68);
+		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo);
 
 		// set spell position
 		TargetInfo->SetCaster(me->GetNetId());
@@ -461,7 +503,7 @@ namespace functions
 		SpellInput* TargetInfo = spell->GetSpellInput();
 
 		if (!TargetInfo) return false;
-		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + 0x68);
+		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo);
 
 		// set spell position
 		TargetInfo->SetCaster(me->GetNetId());

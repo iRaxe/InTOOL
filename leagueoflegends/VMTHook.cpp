@@ -27,9 +27,6 @@ uintptr_t VMTHook::Hook(void* original, const size_t& index, const uintptr_t& fu
 {
 	if (!Init(original))
 		return false;
-
-	LOG("Hooked Original: %p -|-", original);
-	LOG("Copied Addresss: %p -|- ", copiedVMT);
 	return HookIndex(index, function);
 }
 
@@ -54,9 +51,6 @@ bool VMTHook::UnHook()
 	if (bEnabled)
 	{
 		*originalVMT = copiedVMT;
-
-		LOG("Unhooked Copied: %p -|- ", copiedVMT);
-		LOG("Copied Original: %p  -|-", originalVMT);
 		bEnabled = false;
 		return true;
 	}

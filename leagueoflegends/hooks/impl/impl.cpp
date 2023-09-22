@@ -1,8 +1,10 @@
-﻿#include "../../stdafx.h"
+﻿#include "../../ListManager.h"
+#include "../../stdafx.h"
 #include "../../OnProcessSpellCast.h"
 #include "../../NewMenu.h"
 #include "../../zoom.h"
 #include "../../Orbwalker.h"
+
 namespace hooks
 {
 	namespace impl
@@ -22,6 +24,7 @@ namespace hooks
 			globals::attackableManager = *(ObjectManager**)(globals::moduleBase + oAttackableList);
 			globals::objManager = *(ObjectManager**)(globals::moduleBase + oObjManager);
 			globals::missileManager = *(ObjectManager**)(globals::moduleBase + oMissilesList);
+			UPasta::SDK::ListManager::Functions::Initialize();
 
 			menu::InitNewMenu();
 			functions::Init();
@@ -49,6 +52,7 @@ namespace hooks
 
 		void Updates()
 		{
+			UPasta::SDK::ListManager::Functions::Refresh();
 			scripts::Update();
 			render::Update();
 			//menu::Update();

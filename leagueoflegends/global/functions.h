@@ -28,6 +28,7 @@ namespace functions
 	void PrintChat(float number);
 	void PrintChat(void* address);
 
+	std::string GetServerIP();
 	float GetGameTime();
 	int GetGameTick();
 	std::string ConvertTime(float seconds);
@@ -46,6 +47,8 @@ namespace functions
 	Vector2 GetHpBarPosition(Object* obj);
 
 	Object* GetSelectedObject();
+	bool IsNotLocalPlayer(Object* obj);
+	int IsAttackingLocalPlayer(Object* obj);
 	bool IsAlive(Object* obj);
 	bool IsHero(Object* obj);
 	bool IsMinion(Object* obj);

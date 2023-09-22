@@ -220,6 +220,7 @@
     <ClInclude Include="kiero\minhook\src\hde\table64.h" />
     <ClInclude Include="kiero\minhook\src\trampoline.h" />
     <ClInclude Include="List.h" />
+    <ClInclude Include="ListManager.h" />
     <ClInclude Include="LoadImages.h" />
     <ClInclude Include="ManagerTemplate.h" />
     <ClInclude Include="mem\mem.h" />
@@ -280,6 +281,7 @@
     <ClCompile Include="kiero\minhook\src\hook.c" />
     <ClCompile Include="kiero\minhook\src\trampoline.c" />
     <ClCompile Include="List.cpp" />
+    <ClCompile Include="ListManager.cpp" />
     <ClCompile Include="LoadImages.cpp" />
     <ClCompile Include="main\dllmain.cpp" />
     <ClCompile Include="ManagerTemplate.cpp" />

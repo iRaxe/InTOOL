@@ -288,7 +288,12 @@ int Object::GetTeam()
 
 int Object::GetLevel()
 {
-	return *(int*)((QWORD)this + oManagerListSize);
+	return *(int*)((QWORD)this + oObjLevel);
+}
+
+float Object::GetExperience()
+{
+	return *(float*)((QWORD)this + oObjExperience);
 }
 
 Vector3 Object::GetPosition()
@@ -298,7 +303,7 @@ Vector3 Object::GetPosition()
 
 bool Object::IsVisible()
 {
-	return functions::IsVisible(this);
+	//return functions::IsCanSee(this);
 	return *(bool*)((QWORD)this + oObjVisible);
 }
 
@@ -311,6 +316,16 @@ bool Object::IsAlive()
 float Object::GetMana()
 {
 	return *(float*)((QWORD)this + oObjMana);
+}
+
+float Object::GetMaxMana()
+{
+	return *(float*)((QWORD)this + oObjMaxMana);
+}
+
+float Object::GetPercentMana()
+{
+	return 100 * this->GetMana() / this->GetMaxMana() > 100 ? 100 : 100 * this->GetMana() / this->GetMaxMana();
 }
 
 bool Object::IsTargetable()
@@ -517,7 +532,13 @@ float Object::GetAttackRange()
 
 std::string Object::GetName()
 {
-	return *(char**)((QWORD)this + oObjName);
+	char* name = *reinterpret_cast<char**>(reinterpret_cast<QWORD>(this) + oObjName);
+	if (!IsValidPtr(name))
+	{
+		LOG("Error in getting Object Name");
+		return "";
+	}
+	return name;
 }
 
 BuffManager* Object::GetBuffManager()
@@ -572,9 +593,45 @@ Spell* Object::GetSpellBySlotId(int slotId)
 	return *(Spell**)((QWORD)this + oObjSpellBook + oObjSpellBookSpellSlot + (sizeof(QWORD) * slotId));
 }
 
-std::string Missile::GetName()
+bool isASCII(const std::string& s)
 {
-	return *(char**)((QWORD)this + oMissileName);
+	return !std::any_of(s.begin(), s.end(), [](char c) {
+		return static_cast<unsigned char>(c) > 0x80;
+		});
+}
+
+std::string MissileData::GetMissileName()
+{
+	const auto missileDataPtr = *reinterpret_cast<MissileData**>(reinterpret_cast<QWORD>(this) + oMissileName);
+	if (IsValidPtr(missileDataPtr))
+	{
+		const char* textToReturnPtr = reinterpret_cast<char*>(missileDataPtr);
+		return textToReturnPtr;
+	}
+
+	return "";
+}
+
+bool MissileData::IsAutoAttack()
+{
+	return this->GetMissileName().contains("Attack") || this->GetSpellName().contains("Attack");
+}
+
+std::string MissileData::GetSpellName()
+{
+	const auto missileDataPtr = *reinterpret_cast<MissileData**>(reinterpret_cast<QWORD>(this) + oMissileSpellName);
+	if (IsValidPtr(missileDataPtr))
+	{
+		const char* textToReturnPtr = reinterpret_cast<char*>(missileDataPtr);
+		return textToReturnPtr;
+	}
+
+	return "";
+}
+
+MissileData* Missile::GetMissileData()
+{
+	return *(MissileData**)((QWORD)this + oMissileSpellInfo);
 }
 
 Missile* Object::GetMissileByIndex()
@@ -656,6 +713,11 @@ bool Object::IsJungle()
 bool Object::IsValidTarget()
 {
 	return this->IsVisible() && this->IsAlive() && this->IsEnemy() && this->IsTargetable();
+}
+
+bool Object::IsRespawnMarker()
+{
+	return this->GetCharacterData()->GetObjectTypeHash() == ObjectType::RespawnMarker;
 }
 
 bool Object::IsHero()

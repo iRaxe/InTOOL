@@ -158,8 +158,10 @@ public:
         if (pEnemy)
         {
             prediction::PredictionOutput wPrediction;
+
             if (GetPrediction(w, wPrediction))
             {
+
                 Orbwalker::Functions::Actions::CastSpell(SpellIndex::W, wPrediction.position);
             }
         }
@@ -183,7 +185,6 @@ public:
     void Update() override
     {
         gameTime = functions::GetGameTime();
-
         /*InventorySlot* item2 = globals::localPlayer->GetInventorySlotById(2);
         if (item2 != nullptr)
         {

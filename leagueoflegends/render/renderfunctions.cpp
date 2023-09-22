@@ -203,6 +203,18 @@ namespace render
 		window->DrawList->AddImage(pTexture, from, to, { 0.0f, 0.0f }, { 1.0f, 1.0f }, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }));
 	}
 
+	void RenderImageHFlip(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color)
+	{
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+		float a = (float)((color >> 24) & 0xff);
+		float r = (float)((color >> 16) & 0xff);
+		float g = (float)((color >> 8) & 0xff);
+		float b = (float)((color) & 0xff);
+
+		window->DrawList->AddImage(pTexture, from, to, { 1.0f, 0.0f }, { 0.0f, 1.0f }, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }));
+	}
+
 	void RenderImageRounded(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags)
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
@@ -256,41 +268,31 @@ namespace render
 		return angle_radians;
 	}
 
-	void RenderCircleWorld(const Vector3& worldPos, int numPoints, const float radius, const uintptr_t color, const float thickness, bool rainbow)
+	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness)
 	{
-		Vector3 world_pos(worldPos.x, worldPos.y, worldPos.z);
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
 
-		for (uint32_t i = 0; i < numPoints; ++i)
+		float a = (float)((color >> 24) & 0xff);
+		float r = (float)((color >> 16) & 0xff);
+		float g = (float)((color >> 8) & 0xff);
+		float b = (float)((color) & 0xff);
+
+		numPoints = min(numPoints, 49);
+		ImVec2 points[50];
+
+		float step = 6.2831f / numPoints;
+		float theta = 0.f;
+		for (int i = 0; i < numPoints; i++, theta += step)
 		{
-			world_pos.x = worldPos.x + cosine_table_2[i] * radius;
-			world_pos.z = worldPos.z + sine_table_2[i] * radius;
+			Vector3 worldSpace = { worldPos.x + radius * cos(theta), worldPos.y, worldPos.z - radius * sin(theta) };
+			ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
 
-			if (functions::IsWall(world_pos) || functions::IsBrush(world_pos))
-				continue;
-
-			ImGui::GetBackgroundDrawList()->PathLineTo(functions::WorldToScreen(world_pos).ToImVec());
-
+			points[i] = screenSpace;
 		}
 
-		if (rainbow)
-		{
-			float rainbowSpeed = 0.001;
-			static float staticHue = 0;
-			staticHue -= rainbowSpeed;
-			if (staticHue < -1.f) staticHue += 1.f;
-			for (int i = 0; i < 50; i++)
-			{
-				float hue = staticHue + (1.f / 50.0f) * i;
-				if (hue < 0.f) hue += 1.f;
-				ImColor cRainbow = ImColor::HSV(hue, 1.f, 1.f);
-				ImGui::GetBackgroundDrawList()->PathStroke(cRainbow, ImDrawFlags_None, thickness);
-			}
-		}
-		else
-		{
-			ImGui::GetBackgroundDrawList()->PathStroke(color, ImDrawFlags_None, thickness);
-		}
+		points[numPoints] = points[0];
 
+		window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, thickness);
 	}
 
 	void RenderPolygon(const Geometry::Polygon poly, uintptr_t color, float thickness)
@@ -310,7 +312,8 @@ namespace render
 			points[i].y = pos.y;
 			i++;
 		}
-		ImGui::GetBackgroundDrawList()->AddPolyline(points, i, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, thickness);
+
+		ImGui::GetBackgroundDrawList()->AddPolyline(points, i, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), ImDrawFlags_Closed | ImDrawFlags_RoundCornersMask_, thickness);
 	}
 
 	void RenderFilledPolygon(const Geometry::Polygon poly, uintptr_t color)

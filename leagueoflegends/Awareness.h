@@ -8,41 +8,6 @@ namespace UPasta::SDK::Awareness
     {
         namespace EnemySidebar
         {
-            namespace DX9
-            {
-                namespace HudDesign
-                {
-                    inline PDIRECT3DTEXTURE9 hudHpBar;
-                    inline PDIRECT3DTEXTURE9 hudChampPortrait;
-
-                    void InitializeHudImages();
-                }
-
-                namespace HeroIcons
-                {
-                    constexpr int numTextures = 10;
-                    inline PDIRECT3DTEXTURE9 textureArray[10] = { nullptr };
-
-                    void InitializeHeroImages();
-                }
-
-                namespace SummonerSpells
-                {
-                    inline PDIRECT3DTEXTURE9 summSpellBarrier;
-                    inline PDIRECT3DTEXTURE9 summSpellFlash;
-                    inline PDIRECT3DTEXTURE9 summSpellCleanse;
-                    inline PDIRECT3DTEXTURE9 summSpellExhaust;
-                    inline PDIRECT3DTEXTURE9 summSpellGhost;
-                    inline PDIRECT3DTEXTURE9 summSpellHeal;
-                    inline PDIRECT3DTEXTURE9 summSpellIgnite;
-                    inline PDIRECT3DTEXTURE9 summSpellSmite;
-                    inline PDIRECT3DTEXTURE9 summSpellTeleport;
-
-                    void InitializeSummSpellsImages();
-                }
-
-            }
-
             namespace DX11
             {
                 namespace HudDesign
@@ -85,42 +50,6 @@ namespace UPasta::SDK::Awareness
 
         namespace JungleTracker
         {
-            namespace DX9
-            {
-                namespace HudDesign
-                {
-
-                    inline PDIRECT3DTEXTURE9 hudJunglePortrait;
-
-                    void InitializeHudImages();
-
-                }
-
-                namespace JungleIcons
-                {
-                    inline PDIRECT3DTEXTURE9 baronTextureIcon;
-                    inline PDIRECT3DTEXTURE9 blueTextureIcon;
-                    inline PDIRECT3DTEXTURE9 crabTextureIcon;
-                    inline PDIRECT3DTEXTURE9 dragonTextureIcon;
-                    inline PDIRECT3DTEXTURE9 dragonairTextureIcon;
-                    inline PDIRECT3DTEXTURE9 dragonchemtechTextureIcon;
-                    inline PDIRECT3DTEXTURE9 dragonearthTextureIcon;
-                    inline PDIRECT3DTEXTURE9 dragonelderTextureIcon;
-                    inline PDIRECT3DTEXTURE9 dragonfireTextureIcon;
-                    inline PDIRECT3DTEXTURE9 dragonhextechTextureIcon;
-                    inline PDIRECT3DTEXTURE9 dragonwaterTextureIcon;
-                    inline PDIRECT3DTEXTURE9 grompTextureIcon;
-                    inline PDIRECT3DTEXTURE9 krugTextureIcon;
-                    inline PDIRECT3DTEXTURE9 murkwolfTextureIcon;
-                    inline PDIRECT3DTEXTURE9 razorbeakTextureIcon;
-                    inline PDIRECT3DTEXTURE9 redTextureIcon;
-                    inline PDIRECT3DTEXTURE9 riftheraldTextureIcon;
-
-                    void InitializeJungleImages();
-                }
-
-            }
-
             namespace DX11
             {
 
@@ -169,6 +98,18 @@ namespace UPasta::SDK::Awareness
         inline bool initializedAwarenessMenu;
         extern Menu* AwarenessMenu;
 
+        namespace EnemyTracker
+        {
+            inline bool initializedTrackerMenu;
+            void Initialize();
+            void InitializeTrackerMenu();
+            extern Menu* EnemyTrackerMenu;
+
+            inline CheckBox* status;
+            inline CheckBox* showExperience;
+            inline CheckBox* showPaths;
+        }
+
         namespace EnemySidebar
         {
             inline bool open_ptr = true;
@@ -190,6 +131,8 @@ namespace UPasta::SDK::Awareness
             extern Menu* RadiusMenu;
 
             inline CheckBox* status;
+            inline List* drawMode;
+        	inline CheckBox* showMissiles;
             inline CheckBox* showBoundingRadius;
             inline CheckBox* showAARadius;
             inline CheckBox* showAARadiusSelf;
@@ -232,11 +175,28 @@ namespace UPasta::SDK::Awareness
     {
         void Initialize();
         void Update();
-        
+
+        namespace EnemyTracker
+        {
+            constexpr float levelExp[18] = { 0.f, 280.f, 660.f, 1140.f, 1720.f, 2400.f, 3180.f, 4060.f,
+                         5040.f, 6120.f, 7300.f, 8580.f, 9960.f, 11440.f, 13020.f,
+                         14700.f, 16480.f, 18360.f };
+
+            constexpr float expNeeded[18] = { 0.f, 280.f, 380.f, 480.f, 580.f, 680.f, 780.f, 880.f,
+                                                           980.f, 1080.f, 1180.f, 1280.f, 1380.f, 1480.f, 1580.f,
+                                                           1680.f, 1780.f, 1880.f };
+
+            void DrawEnemyTracker();
+            void DrawExperience(Object* object);
+            void DrawPlayerPaths(Object* obj);
+
+            void Initialize();
+            void Update();
+        }
+
         namespace EnemySidebar
         {
             ImTextureID GetSummonerSpellTexture(Object* obj, int spellIndex);
-            void LoadDX9ImageIfNeeded(const char* filename, bool loaded, PDIRECT3DTEXTURE9 texture);
             void LoadDX11ImageIfNeeded(const char* filename, bool loaded, ID3D11ShaderResourceView** texture);
             static void ShowSidebar(bool* p_open);
             void Initialize();
@@ -245,6 +205,8 @@ namespace UPasta::SDK::Awareness
 
         namespace Radius
         {
+            static void DrawRadius(const Vector3& worldPos, float radius, uintptr_t color, float thickness);
+            static void ShowMissiles();
             static void ShowBoundingRadius(Object* obj, int quality);
             static void ShowAARadius(Object* obj, int quality);
             void Initialize();

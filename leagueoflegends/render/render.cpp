@@ -32,6 +32,8 @@ namespace render
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
+		//ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.85f, 0.85f, 0.88f, 1.00f));
+
 		ImGui::Begin(SP_STRING("transparentwindow"), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs);
 
 		ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -199,11 +201,11 @@ namespace render
 
 			void DrawObjectData()
 			{
-				auto minion = Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
+				/*auto minion = Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
 				if (minion)
 				{
 					RenderText(minion->GetName(), functions::WorldToScreen(minion->GetPosition()).ToImVec(), 18.0f, COLOR_WHITE, true);
-				}
+				}*/
 				/*for (int i = 0; i < globals::minionManager->GetListSize(); i++)
 				{
 					auto obj = globals::minionManager->GetIndex(i);
@@ -232,13 +234,14 @@ namespace render
 					RenderCircleWorld(playerPos, 200, 500, COLOR_WHITE, 1.0f, false);
 				}*/
 
-				/*
+				
 				auto spellCast = globals::localPlayer->GetActiveSpellCast();
 				if (spellCast)
 				{
-					Spell* spell = globals::localPlayer->GetSpellBySlotId(64);
+					Spell* spell = globals::localPlayer->GetSpellBySlotId(2);
 					if (spell)
 					{
+						//LOG("CASTER");
 						QWORD spellInput = (QWORD)spell->GetSpellInput();
 
 						auto spellInputStartPos = spell->GetSpellInfo()->GetSpellData()->GetSpellEndPos();
@@ -251,7 +254,7 @@ namespace render
 
 				}
 
-				*/
+				
 
 			}
 
@@ -285,7 +288,7 @@ namespace render
 				if (functions::IsBrush(mouseWorldPos))
 					RenderText(SP_STRING("grass"), (mouseWorldScreenPos - Vector2(0.0f, 58.0f)).ToImVec(), 18.0f, COLOR_WHITE, true);
 
-				RenderCircleWorld(mouseWorldPos, 12, 30.0f, COLOR_WHITE, 2.0f, false);
+				RenderCircleWorld(mouseWorldPos, 12, 30.0f, COLOR_WHITE, 2.0f);
 			}
 
 			void DrawPlayerPaths()

@@ -162,10 +162,19 @@ public:
     Vector3 GetSpellEndPos();
 };
 
+class MissileData
+{
+public:
+    std::string GetMissileName();
+    bool IsAutoAttack();
+    std::string GetSpellName();
+
+};
+
 class Missile
 {
 public:
-    std::string GetName();
+    MissileData* GetMissileData();
     int GetMissileSrcId();
     Vector3 GetSpellStartPos();
     Vector3 GetSpellPos();
@@ -239,10 +248,13 @@ public:
 	unsigned int GetNetId();
 	int GetTeam();
     int GetLevel();
-    Vector3 GetPosition();
+	float GetExperience();
+	Vector3 GetPosition();
     bool IsVisible();
 	bool IsAlive();
     float GetMana();
+    float GetMaxMana();
+    float GetPercentMana();
     bool IsTargetable();
     bool IsCursed();
     bool HasBarrier(int slotId);
@@ -257,7 +269,7 @@ public:
     bool HasConqueror();
     float GetHealth();
     float GetMaxHealth();
-    float GetPercentHealth();
+	float GetPercentHealth();
 
     unsigned short GetActionState();
     float GetBonusAttackDamage();
@@ -296,7 +308,8 @@ public:
     bool IsAlly();
     bool IsJungle();
     bool IsValidTarget();
-    bool IsHero();
+	bool IsRespawnMarker();
+	bool IsHero();
     bool IsSpecial();
     bool IsMinion();
     bool IsSiegeMinion();

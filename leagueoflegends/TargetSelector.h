@@ -116,7 +116,8 @@ namespace UPasta::SDK::TargetSelector
 
     }
 
-    namespace Functions {
+    namespace Functions
+	{
         std::vector<Object*> GetMinionsInRange(float range);
         int GetMinionPriority(Object* minion);
         float GetMinionReducedPriority(Object* minion);

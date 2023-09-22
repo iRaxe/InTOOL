@@ -6,6 +6,8 @@
 #include "zoom.h"
 #include "../stdafx.h"
 #include "Geometry.h"
+#include "ListManager.h"
+
 namespace UPasta
 {
 	namespace SDK
@@ -16,99 +18,6 @@ namespace UPasta
 			{
 				namespace EnemySidebar
 				{
-					namespace DX9
-					{
-
-						namespace HudDesign
-						{
-							static bool hudImagesLoaded = false;
-							void InitializeHudImages()
-							{
-								if (!hudImagesLoaded)
-								{
-									const std::string awarenessFolder = "C:\\UPorn\\Media\\Awareness";
-
-									static bool hudHpBarLoaded = false;
-									const std::string hudHpBarFile = awarenessFolder + "\\hud_champ_hpbar.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(hudHpBarFile.c_str(), hudHpBarLoaded, hudHpBar);
-
-									static bool hudChampPortraitLoaded = false;
-									const std::string hudChampPortraitFile = awarenessFolder + "\\hud_champ_portrait.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(hudChampPortraitFile.c_str(), hudChampPortraitLoaded, hudChampPortrait);
-
-									hudImagesLoaded = true;
-								}
-							}
-						}
-
-						namespace HeroIcons
-						{
-							static bool heroImagesLoaded = false;
-							void InitializeHeroImages()
-							{
-								for (int i = 0; i < globals::heroManager->GetListSize(); i++)
-								{
-									auto obj = globals::heroManager->GetIndex(i);
-									const std::string heroIconFile = "C:\\UPorn\\Media\\Champions\\" + str_tolower(obj->GetName()) + ".png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(heroIconFile.c_str(), false, textureArray[i]);
-								}
-
-								heroImagesLoaded = true;
-							}
-						}
-						
-						namespace SummonerSpells
-						{
-							static bool summSpellsImagesLoaded = false;
-							void InitializeSummSpellsImages()
-							{
-								if (!summSpellsImagesLoaded)
-								{
-									const std::string awarenessFolder = "C:\\UPorn\\Media\\Champions";
-
-									static bool summSpellBarrierLoaded = false;
-									const std::string summSpellBarrierFile = awarenessFolder + "\\Barrier.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellBarrierFile.c_str(), summSpellBarrierLoaded, summSpellBarrier);
-
-									static bool summSpellFlashLoaded = false;
-									const std::string summSpellFlashFile = awarenessFolder + "\\Flash.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellFlashFile.c_str(), summSpellFlashLoaded, summSpellFlash);
-
-									static bool summSpellCleanseLoaded = false;
-									const std::string summSpellCleanseFile = awarenessFolder + "\\Cleanse.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellCleanseFile.c_str(), summSpellCleanseLoaded, summSpellCleanse);
-
-									static bool summSpellExhaustLoaded = false;
-									const std::string summSpellExhaustFile = awarenessFolder + "\\Exhaust.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellExhaustFile.c_str(), summSpellExhaustLoaded, summSpellExhaust);
-
-									static bool summSpellGhostLoaded = false;
-									const std::string summSpellGhostFile = awarenessFolder + "\\Ghost.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellGhostFile.c_str(), summSpellGhostLoaded, summSpellGhost);
-
-									static bool summSpellHealLoaded = false;
-									const std::string summSpellHealFile = awarenessFolder + "\\Heal.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellHealFile.c_str(), summSpellHealLoaded, summSpellHeal);
-
-									static bool summSpellIgniteLoaded = false;
-									const std::string summSpellIgniteFile = awarenessFolder + "\\Ignite.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellIgniteFile.c_str(), summSpellIgniteLoaded, summSpellIgnite);
-
-									static bool summSpellSmiteLoaded = false;
-									const std::string summSpellSmiteFile = awarenessFolder + "\\Smite.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellSmiteFile.c_str(), summSpellSmiteLoaded, summSpellSmite);
-
-									static bool summSpellTeleportLoaded = false;
-									const std::string summSpellTeleportFile = awarenessFolder + "\\Teleport.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(summSpellTeleportFile.c_str(), summSpellTeleportLoaded, summSpellTeleport);
-
-									summSpellsImagesLoaded = true;
-								}
-							}
-						}
-
-					}
-
 					namespace DX11
 					{
 
@@ -206,19 +115,7 @@ namespace UPasta
 					{
 						__try
 						{
-							if (globals::renderType == "D3D9")
-							{
-								__try { DX9::HeroIcons::InitializeHeroImages(); }
-								__except (1) { LOG("[AWARENESS - ENEMY SIDEBAR] Error in initializing hero images"); }
-
-								__try { DX9::HudDesign::InitializeHudImages(); }
-								__except (1) { LOG("[AWARENESS - ENEMY SIDEBAR] Error in initializing hud images"); }
-
-								__try { DX9::SummonerSpells::InitializeSummSpellsImages(); }
-								__except (1) { LOG("[AWARENESS - ENEMY SIDEBAR] Error in initializing summspells images"); }
-								initializedTextures = true;
-							}
-							else if (globals::renderType == "D3D11")
+							if (globals::renderType == "D3D11")
 							{
 								__try { DX11::HeroIcons::InitializeHeroImages(); }
 								__except (1) { LOG("[AWARENESS - ENEMY SIDEBAR] Error in initializing hero images"); }
@@ -240,109 +137,6 @@ namespace UPasta
 
 				namespace JungleTracker
 				{
-					namespace DX9
-					{
-
-						namespace HudDesign
-						{
-							static bool hudImagesLoaded = false;
-							void InitializeHudImages()
-							{
-								if (!hudImagesLoaded)
-								{
-									const std::string awarenessFolder = "C:\\UPorn\\Media\\Awareness";
-
-									static bool hudJunglePortraitLoaded = false;
-									const std::string hudJunglePortraitFile = awarenessFolder + "\\hud_jung_portrait.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(hudJunglePortraitFile.c_str(), hudJunglePortraitLoaded, hudJunglePortrait);
-									hudImagesLoaded = true;
-								}
-							}
-						}
-
-						namespace JungleIcons
-						{
-							static bool JungleImagesLoaded = false;
-							void InitializeJungleImages()
-							{
-								if (!JungleImagesLoaded)
-								{
-									const std::string jungleFolder = "C:\\UPorn\\Media\\Jungle";
-
-									static bool baronIconLoaded = false;
-									const std::string baronIconFile = jungleFolder + "\\SRU_Baron.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(baronIconFile.c_str(), baronIconLoaded, baronTextureIcon);
-
-									static bool blueIconLoaded = false;
-									const std::string blueIconFile = jungleFolder + "\\SRU_Blue.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(blueIconFile.c_str(), blueIconLoaded, blueTextureIcon);
-
-									static bool crabIconLoaded = false;
-									const std::string crabIconFile = jungleFolder + "\\Sru_Crab.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(crabIconFile.c_str(), crabIconLoaded, crabTextureIcon);
-
-									static bool dragonIconLoaded = false;
-									const std::string dragonIconFile = jungleFolder + "\\SRU_Dragon.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(dragonIconFile.c_str(), dragonIconLoaded, dragonTextureIcon);
-
-									static bool dragonairIconLoaded = false;
-									const std::string dragonairIconFile = jungleFolder + "\\SRU_Dragon_Air.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(dragonairIconFile.c_str(), dragonairIconLoaded, dragonairTextureIcon);
-
-									static bool dragonchemtechIconLoaded = false;
-									const std::string dragonchemtechIconFile = jungleFolder + "\\SRU_Dragon_Chemtech.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(dragonchemtechIconFile.c_str(), dragonchemtechIconLoaded, dragonchemtechTextureIcon);
-
-									static bool dragonearthIconLoaded = false;
-									const std::string dragonearthIconFile = jungleFolder + "\\SRU_Dragon_Earth.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(dragonearthIconFile.c_str(), dragonearthIconLoaded, dragonearthTextureIcon);
-
-									static bool dragonelderIconLoaded = false;
-									const std::string dragonelderIconFile = jungleFolder + "\\SRU_Dragon_Elder.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(dragonelderIconFile.c_str(), dragonelderIconLoaded, dragonelderTextureIcon);
-
-									static bool dragonfireIconLoaded = false;
-									const std::string dragonfireIconFile = jungleFolder + "\\SRU_Dragon_Fire.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(dragonfireIconFile.c_str(), dragonfireIconLoaded, dragonfireTextureIcon);
-
-									static bool dragonhextechIconLoaded = false;
-									const std::string dragonhextechIconFile = jungleFolder + "\\SRU_Dragon_Hextech.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(dragonhextechIconFile.c_str(), dragonhextechIconLoaded, dragonhextechTextureIcon);
-
-									static bool dragonwaterIconLoaded = false;
-									const std::string dragonwaterIconFile = jungleFolder + "\\SRU_Dragon_Water.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(dragonwaterIconFile.c_str(), dragonwaterIconLoaded, dragonwaterTextureIcon);
-
-									static bool grompIconLoaded = false;
-									const std::string grompIconFile = jungleFolder + "\\SRU_Gromp.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(grompIconFile.c_str(), grompIconLoaded, grompTextureIcon);
-
-									static bool krugIconLoaded = false;
-									const std::string krugIconFile = jungleFolder + "\\SRU_Krug.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(krugIconFile.c_str(), krugIconLoaded, krugTextureIcon);
-
-									static bool murkwolfIconLoaded = false;
-									const std::string murkwolfIconFile = jungleFolder + "\\SRU_Murkwolf.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(murkwolfIconFile.c_str(), murkwolfIconLoaded, murkwolfTextureIcon);
-
-									static bool razorbeakIconLoaded = false;
-									const std::string razorbeakIconFile = jungleFolder + "\\SRU_Razorbeak.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(razorbeakIconFile.c_str(), razorbeakIconLoaded, razorbeakTextureIcon);
-
-									static bool redIconLoaded = false;
-									const std::string redIconFile = jungleFolder + "\\SRU_Red.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(redIconFile.c_str(), redIconLoaded, redTextureIcon);
-
-									static bool riftheraldIconLoaded = false;
-									const std::string riftheraldIconFile = jungleFolder + "\\SRU_RiftHerald.png";
-									Functions::EnemySidebar::LoadDX9ImageIfNeeded(riftheraldIconFile.c_str(), riftheraldIconLoaded, riftheraldTextureIcon);
-									JungleImagesLoaded = true;
-								}
-							}
-						}
-
-					}
-
 					namespace DX11
 					{
 
@@ -451,17 +245,7 @@ namespace UPasta
 					{
 						__try
 						{
-							if (globals::renderType == "D3D9")
-							{
-								__try { DX9::HudDesign::InitializeHudImages(); }
-								__except (1) { LOG("[AWARENESS - JUNGLE TRACKER] Error in initializing hud images"); }
-
-								__try { DX9::JungleIcons::InitializeJungleImages(); }
-								__except (1) { LOG("[AWARENESS - JUNGLE TRACKER] Error in initializing jungle images"); }
-
-								initializedTextures = true;
-							}
-							else if (globals::renderType == "D3D11")
+							if (globals::renderType == "D3D11")
 							{
 								__try { DX11::HudDesign::InitializeHudImages(); }
 								__except (1) { LOG("[AWARENESS - JUNGLE TRACKER] Error in initializing hud images"); }
@@ -490,6 +274,19 @@ namespace UPasta
 					initializedAwarenessMenu = true;
 				}
 
+				namespace EnemyTracker
+				{
+					Menu* EnemyTrackerMenu;
+					void InitializeTrackerMenu()
+					{
+						EnemyTrackerMenu = AwarenessMenu->AddMenu("enemyTracker", "Enemies Tracker");
+						status = EnemyTrackerMenu->AddCheckBox("status", "Enable the Tracker", true);
+						showExperience = EnemyTrackerMenu->AddCheckBox("showExperience", "Show experience", true);
+						showPaths = EnemyTrackerMenu->AddCheckBox("showPaths", "Show paths", true);
+						initializedTrackerMenu = true;
+					}
+				}
+
 				namespace EnemySidebar
 				{
 					Menu* EnemySidebarMenu;
@@ -498,7 +295,7 @@ namespace UPasta
 						EnemySidebarMenu = AwarenessMenu->AddMenu("enemySidebar", "Enemies sidebar");
 						status = EnemySidebarMenu->AddCheckBox("status", "Enable the sidebar", true);
 						orientationHorizontal = EnemySidebarMenu->AddCheckBox("orientationHorizontal", "Rotate horizontal", false);
-						hudSize = EnemySidebarMenu->AddSlider("hudSize", "Sidebar Size", 100, 50, 300, 50);
+						hudSize = EnemySidebarMenu->AddSlider("hudSize", "Sidebar Multiplier", 50.0f, 10.0f, 100.0f, 10.0f);
 						initializedSidebarMenu = true;
 					}
 				}
@@ -509,7 +306,9 @@ namespace UPasta
 					void InitializeRadiusMenu()
 					{
 						RadiusMenu = AwarenessMenu->AddMenu("utilityRadius", "Radius drawings");
+						drawMode = RadiusMenu->AddList("drawMode", "Draw Mode", std::vector<std::string>{"Circle", "Arc"}, 0);
 						status = RadiusMenu->AddCheckBox("status", "Enable radius drawings", true);
+						showMissiles = RadiusMenu->AddCheckBox("showMissiles", "Enable missiles drawings", true);
 						showBoundingRadius = RadiusMenu->AddCheckBox("showBoundingRadius", "Enable bounding radius", true);
 						showAARadius = RadiusMenu->AddCheckBox("showAARadius", "Enable autoattack radius", true);
 						showAARadiusSelf = RadiusMenu->AddCheckBox("showAARadiusSelf", "Show your radius", true);
@@ -562,6 +361,7 @@ namespace UPasta
 
 					if (Configs::initializedAwarenessMenu)
 					{
+						EnemyTracker::Initialize();
 						EnemySidebar::Initialize();
 						Radius::Initialize();
 						Zoom::Initialize();
@@ -581,107 +381,147 @@ namespace UPasta
 
 				void Update()
 				{
+					EnemyTracker::Update();
 					EnemySidebar::Update();
 					Radius::Update();
 					Zoom::Update();
 					JungleTracker::Update();
 				}
-				
+
+				namespace EnemyTracker
+				{
+					void Initialize()
+					{
+						if (!Configs::EnemyTracker::initializedTrackerMenu)
+						{
+							Configs::EnemyTracker::InitializeTrackerMenu();
+						}
+					}
+
+
+					void Update()
+					{
+						if (Configs::EnemyTracker::initializedTrackerMenu)
+						{
+							if (Configs::EnemyTracker::showExperience->Value == true)
+							{
+								DrawEnemyTracker();
+							}
+						}
+					}
+
+					
+					float calcolaProgresso(float expAttuale, int livelloCorrente)
+					{
+						float progresso = (expAttuale - levelExp[livelloCorrente - 1]) /
+							(expNeeded[livelloCorrente]) * 100;
+
+						return livelloCorrente == 18 ? 100.0f : progresso;
+					}
+
+
+					void DrawEnemyTracker()
+					{
+						for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+						{
+							auto obj = globals::heroManager->GetIndex(i);
+							if (obj->GetName() == "PracticeTool_TargetDummy" || obj->IsAlly())
+								continue;
+
+							if (obj && obj->IsVisible())
+							{
+								if (Configs::EnemyTracker::showExperience->Value == true)
+								{
+									DrawExperience(obj);
+								}
+
+								if (Configs::EnemyTracker::showPaths->Value == true)
+								{
+									DrawPlayerPaths(obj);
+								}
+							}
+						}
+					}
+
+					void DrawExperience(Object* obj)
+					{
+						float expAttuale = obj->GetExperience();
+						int livelloCorrente = obj->GetLevel();
+
+						float progresso = calcolaProgresso(expAttuale, livelloCorrente);
+						float maxWidth = 128.0f;
+						float width = 108.0f * (progresso / 100);
+						float height = 30.0f;
+						float cdWidth = 20.0f;
+						float cdHeight = 6.0f;
+
+						float yOffset = 0.0f;
+						float xOffset = -maxWidth / 2.0f + 18.0f;
+
+						Vector2 screenPos = functions::GetHpBarPosition(obj);
+
+						//Base sopra? 
+						Vector2 basePos = Vector2(screenPos.x + xOffset, screenPos.y + yOffset);
+
+						Vector2 outerBorderAngle1 = Vector2(basePos.x, basePos.y - height);
+						float hpBarWidthLimit = (outerBorderAngle1.x + width);
+						Vector2 outerBorderAngle2 = Vector2(hpBarWidthLimit, outerBorderAngle1.y + 2);
+
+						render::RenderRectFilled(outerBorderAngle1.ToImVec(), outerBorderAngle2.ToImVec(), COLOR_WHITE, 0.0f, 0);
+					}
+
+					void DrawPlayerPaths(Object* obj)
+					{
+						auto path = obj->GetAiManager()->GetFutureSegments();
+						int countSegments = (int)path.size();
+						if (countSegments)
+						{
+							for (int i = -1; i < countSegments - 1; i++)
+							{
+								Vector2 screenPos1 = functions::WorldToScreen((i < 0) ? obj->GetPosition() : path[i]);
+								Vector2 screenPos2 = functions::WorldToScreen(path[i + 1]);
+								render::RenderLine(screenPos1.ToImVec(), screenPos2.ToImVec(), COLOR_WHITE, 1.0f);
+							}
+						}
+					}
+				}
+
 				namespace EnemySidebar
 				{
 					ImTextureID GetSummonerSpellTexture(Object* obj, int spellIndex)
 					{
-						if (obj->HasBarrier(spellIndex)) {
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellBarrier;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellBarrier;
-						}
+						if (obj->HasBarrier(spellIndex))
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellBarrier;
+
 
 						else if (obj->HasFlash(spellIndex))
-						{
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellFlash;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellFlash;
-						}
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellFlash;
+
 
 						else if (obj->HasCleanse(spellIndex))
-						{
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellCleanse;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellCleanse;
-						}
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellCleanse;
+
 
 						else if (obj->HasExhaust(spellIndex))
-						{
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellExhaust;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellExhaust;
-						}
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellExhaust;
 
 						else if (obj->HasGhost(spellIndex))
-						{
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellGhost;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellGhost;
-						}
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellGhost;
+
 
 						else if (obj->HasHeal(spellIndex))
-						{
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellHeal;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellHeal;
-						}
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellHeal;
 
 						else if (obj->HasIgnite(spellIndex))
-						{
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellIgnite;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellIgnite;
-						}
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellIgnite;
 
 						else if (obj->HasSmite(spellIndex))
-						{
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellSmite;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellSmite;
-						}
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellSmite;
 
 						else if (obj->HasTeleport(spellIndex))
-						{
-							if (globals::renderType == "D3D9")
-								return Resources::EnemySidebar::DX9::SummonerSpells::summSpellTeleport;
-							else if (globals::renderType == "D3D11")
-								return Resources::EnemySidebar::DX11::SummonerSpells::summSpellTeleport;
-						}
+							return Resources::EnemySidebar::DX11::SummonerSpells::summSpellTeleport;
 
 						return nullptr;
-					}
-					
-					void LoadDX9ImageIfNeeded(const char* filename, bool loaded, PDIRECT3DTEXTURE9 texture)
-					{
-						__try
-						{
-							if (!loaded)
-							{
-								int image_width = 0;
-								int image_height = 0;
-								bool success = LoadTextureFromFileDX9(filename, &texture, &image_width, &image_height);
-								IM_ASSERT(success);
-								loaded = true;
-							}
-						}
-						__except (1)
-						{
-							LOG("[TEXTURE LOAD] Error in load texture by DX9");
-						}
 					}
 
 					void LoadDX11ImageIfNeeded(const char* filename, bool loaded, ID3D11ShaderResourceView** texture)
@@ -705,91 +545,82 @@ namespace UPasta
 
 					static void ShowSidebar(bool* p_open)
 					{
-						float portrait_size = 80.0;
-						float offsetX = 0.65;
-						float offsetY = -0.3;
-
-						float portrait_hsize = portrait_size / 2.0;
-						ImVec2 portrait_vsize = ImVec2(portrait_size, portrait_size);
-						ImVec2 champ_icon_size = ImVec2(portrait_size * 0.75, portrait_size * 0.75);
-						ImVec2 spell1_offset = ImVec2(-portrait_size / 5, portrait_size / 3.2);
-						ImVec2 spell1_size = ImVec2(portrait_size / 4.0, portrait_size / 4.0);
-						ImVec2 spell2_offset = ImVec2(portrait_size / 5.3, portrait_size / 3.3);
-						ImVec2 spell2_size = ImVec2(portrait_size / 4.0, portrait_size / 4.0);
-						ImVec2 hpbar_size = ImVec2(50 * (portrait_size * 0.007), 122 * (portrait_size * 0.007));
-						ImVec2 hpbar_offset = ImVec2(portrait_size * 0.3, -portrait_size * 0.05);
-
-						ImGuiWindowFlags window_flags = 0;
-						window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse;
-						window_flags |= ImGuiWindowFlags_NoBackground;
+						ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize;
 
 						if (ImGui::Begin("Hero awareness", p_open, window_flags))
 						{
+							int champListSize = globals::heroManager->GetListSize();
 							ImVec2 p2 = ImGui::GetCursorScreenPos();
-							ImGui::BeginChild("Test", ImVec2(600, 600), false);
+							float size = Configs::EnemySidebar::hudSize->Value / 100.0f;
 							float spacing = 0.0f;
-							for (int i = 1; i < globals::heroManager->GetListSize(); i++)
+							ImGui::BeginChild(
+								"Test", 
+								Configs::EnemySidebar::orientationHorizontal->Value ? 
+								ImVec2(champListSize * ((200 + spacing) * size), 200 * size) : 
+								ImVec2(200 * size, champListSize * ((200 + spacing) * size)), 
+								false);
+
+							for (int i = 1; i < champListSize; i++)
 							{
 								auto obj = globals::heroManager->GetIndex(i);
-								if (obj->GetName() == "PracticeTool_TargetDummy") continue;
-								if (obj->IsAlly()) continue;
-								ImVec2 p = ImVec2(0 ,0);
-								if (Configs::EnemySidebar::orientationHorizontal->Value == true)
-									p = ImVec2(p2.x + spacing, p2.y);
-								else
-									p = ImVec2(p2.x , p2.y + spacing);
+								if (obj->GetName() == "PracticeTool_TargetDummy" || obj->IsAlly())
+									continue;
 
-								ImVec2 heroIconMin = ImVec2(p.x + 10, p.y + 10);
-								ImVec2 heroIconMax = ImVec2(p.x + 80, p.y + 80);
-								if (globals::renderType == "D3D9")
-									ImGui::GetWindowDrawList()->AddImage(Resources::EnemySidebar::DX9::HeroIcons::textureArray[i], heroIconMin, heroIconMax, { 0.0f, 0.0f }, { 1.0f, 1.0f });
-								else if (globals::renderType == "D3D11")
-									ImGui::GetWindowDrawList()->AddImage(Resources::EnemySidebar::DX11::HeroIcons::textureArray[i], heroIconMin, heroIconMax, { 0.0f, 0.0f }, { 1.0f, 1.0f });
+								ImVec2 p = Configs::EnemySidebar::orientationHorizontal->Value ? ImVec2(p2.x + (spacing * size), p2.y) : ImVec2(p2.x, p2.y + (spacing * size));
+								ImVec2 heroIconMin = ImVec2(p.x + 40 * size, p.y + 30 * size);
+								ImVec2 heroIconMax = ImVec2(p.x + 170 * size, p.y + 150 * size);
 
-								if (obj->GetHealth() <= 0)
+								const auto& heroIcons = Resources::EnemySidebar::DX11::HeroIcons::textureArray;
+								render::RenderImage(heroIcons[i], heroIconMin, heroIconMax, COLOR_WHITE);
+
+								if (!obj->IsAlive())
 								{
-									render::RenderCircleFilled(ImVec2(p.x + 45, p.y + 45), 35, COLOR_DARK_TRANSPARENT, 0);
+									render::RenderCircleFilled(ImVec2(p.x + 105 * size, p.y + 85 * size), 58 * size, COLOR_DARK_TRANSPARENT, 0);
 									float respawnTime = functions::GetRespawnTimer(obj) + 1;
-									render::RenderText(functions::ConvertTime(respawnTime), heroIconMin, 24, COLOR_RED, false);
+									render::RenderText(functions::ConvertTime(respawnTime), ImVec2(p.x + 100 * size, p.y + 50 * size), 24 * size, COLOR_RED, true);
 								}
 
-								float altezzaIntera = 80.00f;
-								float altezzaDaTogliere = obj->GetPercentHealth();
+								float altezzaIntera = 140.00f * size;
+
+								float progresso = EnemyTracker::calcolaProgresso(obj->GetExperience(), obj->GetLevel());
+								float altezzaDaTogliere = 100 - progresso;
 								float altezzaTotale = altezzaIntera * (altezzaDaTogliere / 100);
 
-								ImVec2 hudHpMin = ImVec2(p.x + 60, p.y + 5);
-								ImVec2 hudHpMax = ImVec2(p.x + 95, p.y + altezzaTotale);
-								if (globals::renderType == "D3D9")
-									ImGui::GetWindowDrawList()->AddImage(Resources::EnemySidebar::DX9::HudDesign::hudHpBar, hudHpMin, hudHpMax, { 0.0f, 0.0f }, { 1.0f, altezzaDaTogliere / 100 }, COLOR_GREEN);
-								else if (globals::renderType == "D3D11")
-									ImGui::GetWindowDrawList()->AddImage(Resources::EnemySidebar::DX11::HudDesign::hudHpBar, hudHpMin, hudHpMax, { 0.0f, 0.0f }, { 1.0f, altezzaDaTogliere / 100 }, COLOR_GREEN);
+								ImVec2 hudExpMin = ImVec2(p.x + 130 * size, p.y + altezzaTotale + 14 * size);
+								ImVec2 hudExpMax = ImVec2(p.x + 195 * size, p.y + altezzaIntera);
+								const auto& hudHpBar = Resources::EnemySidebar::DX11::HudDesign::hudHpBar;
+								ImGui::GetWindowDrawList()->AddImage(hudHpBar, hudExpMin, hudExpMax, { 0.0f, altezzaDaTogliere /100 }, { 1.0f, 1.0f }, COLOR_WHITE);
 
-								ImVec2 hudChampPortraitPosition = ImVec2(p.x + 100, p.y + 100);
-								if (globals::renderType == "D3D9")
-									ImGui::GetWindowDrawList()->AddImage(Resources::EnemySidebar::DX9::HudDesign::hudChampPortrait, p, hudChampPortraitPosition);
-								else if (globals::renderType == "D3D11")
-									ImGui::GetWindowDrawList()->AddImage(Resources::EnemySidebar::DX11::HudDesign::hudChampPortrait, p, hudChampPortraitPosition);
+								float altezzaDaTogliere2 = 100 - obj->GetPercentMana();
+								float altezzaTotale2 = altezzaIntera * (altezzaDaTogliere2 / 100);
+								ImVec2 hudManaMin = ImVec2(p.x + 20 * size, p.y + altezzaTotale2 + 14 * size);
+								ImVec2 hudManaMax = ImVec2(p.x + 85 * size, p.y + altezzaIntera);
+								ImGui::GetWindowDrawList()->AddImage(hudHpBar, hudManaMin, hudManaMax, { 1.0f,  altezzaDaTogliere2 / 100 }, { 0.0f, 1.0f }, COLOR_RED);
 
-								ImVec2 SummSpell1Min = ImVec2(p.x + 20, p.y + 70);
-								ImVec2 SummSpell1Max = ImVec2(p.x + 40, p.y + 90);
-								if (globals::renderType == "D3D9")
-									ImGui::GetWindowDrawList()->AddImageRounded(GetSummonerSpellTexture(obj,4), SummSpell1Min, SummSpell1Max, { 0.0f, 0.0f }, { 1.0f, 1.0f }, COLOR_WHITE, 200.0f);
-								else if (globals::renderType == "D3D11")
-									ImGui::GetWindowDrawList()->AddImageRounded(GetSummonerSpellTexture(obj, 4), SummSpell1Min, SummSpell1Max, { 0.0f, 0.0f }, { 1.0f, 1.0f }, COLOR_WHITE, 200.0f);
+								float altezzaDaTogliere3 = 100 - obj->GetPercentHealth();
+								float altezzaTotale3 = altezzaIntera * (altezzaDaTogliere3 / 100);
+								ImVec2 hudHpMin = ImVec2(p.x + 5 * size, p.y + altezzaTotale3 + 5 * size);
+								ImVec2 hudHpMax = ImVec2(p.x + 60 * size, p.y + altezzaIntera);
+								ImGui::GetWindowDrawList()->AddImage(hudHpBar, hudHpMin, hudHpMax, { 1.0f,  altezzaDaTogliere3 / 100 }, { 0.0f, 1.0f }, COLOR_GREEN);
 
-								ImVec2 SummSpell2Min = ImVec2(p.x + 58, p.y + 70);
-								ImVec2 SummSpell2Max = ImVec2(p.x + 80, p.y + 90);
+								ImVec2 SummSpell1Min = ImVec2(p.x + 26 * size, p.y + 111 * size);
+								ImVec2 SummSpell1Max = ImVec2(p.x + 65 * size, p.y + 148 * size);
+								render::RenderImageRounded(GetSummonerSpellTexture(obj, 4), SummSpell1Min, SummSpell1Max, COLOR_WHITE, 200.0f, ImDrawFlags_RoundCornersAll);
 
-								if (globals::renderType == "D3D9")
-									ImGui::GetWindowDrawList()->AddImageRounded(GetSummonerSpellTexture(obj, 5), SummSpell2Min, SummSpell2Max, { 0.0f, 0.0f }, { 1.0f, 1.0f }, COLOR_WHITE, 200.0f);
-								else if (globals::renderType == "D3D11")
-									ImGui::GetWindowDrawList()->AddImageRounded(GetSummonerSpellTexture(obj, 5), SummSpell2Min, SummSpell2Max, { 0.0f, 0.0f }, { 1.0f, 1.0f }, COLOR_WHITE, 200.0f);
+								ImVec2 SummSpell2Min = ImVec2(p.x + 68 * size, p.y + 131 * size);
+								ImVec2 SummSpell2Max = ImVec2(p.x + 107 * size, p.y + 168 * size);
+								render::RenderImageRounded(GetSummonerSpellTexture(obj, 5), SummSpell2Min, SummSpell2Max, COLOR_WHITE, 200.0f, ImDrawFlags_RoundCornersAll);
 
-								spacing += 120;
+								ImVec2 hudChampPortraitPosition = ImVec2(p.x + 200 * size, p.y + 172 * size);
+								const auto& hudChampPortrait = Resources::EnemySidebar::DX11::HudDesign::hudChampPortrait;
+								render::RenderImage(hudChampPortrait, p, hudChampPortraitPosition, COLOR_WHITE);
+
+								ImVec2 SummLevelPos = ImVec2(p.x + 146 * size, p.y + 114 * size);
+								render::RenderText(std::to_string(obj->GetLevel()), SummLevelPos, 20 * size, COLOR_WHITE, true);
+								spacing += 200;
 							}
 
 							ImGui::EndChild();
-
 						}
 
 						ImGui::End();
@@ -821,6 +652,43 @@ namespace UPasta
 
 				namespace Radius
 				{
+					void ShowMissiles()
+					{
+						for (auto it = ListManager::Functions::missileMap.begin(); it != ListManager::Functions::missileMap.end(); ++it)
+						{
+							Object* correspondingObject = it->first;
+							if (!correspondingObject) continue;
+
+							Missile* correspondingMissile = std::get<0>(it->second); // Missile*
+							Vector3 startPosVector = std::get<1>(it->second); // Vector3
+							Vector3 posVector = std::get<2>(it->second); // Vector3
+							Vector3 endPosVector = std::get<3>(it->second); // Vector3
+							std::string name = std::get<4>(it->second); // std::string
+
+							if (IsValidPtr(correspondingMissile) && functions::IsMissile(correspondingMissile))
+							{
+								Geometry::Polygon poly = Geometry::Rectangle(startPosVector, endPosVector, 70.f).ToPolygon();
+								render::RenderPolygon(poly, COLOR_WHITE, 1.0f);
+							}
+
+							ListManager::Functions::missileMap.erase(correspondingObject);
+						}
+					}
+
+					static void DrawRadius(const Vector3& worldPos, float radius, uintptr_t color, float thickness)
+					{
+						switch (Configs::Radius::drawMode->Value)
+						{
+						case 0: //Circle
+							render::RenderCircleWorld(worldPos, Configs::Radius::qualityDraw->Value, radius, color, thickness);
+							break;
+						case 1: //Arc
+							render::RenderArcWorld(worldPos, Configs::Radius::qualityDraw->Value, radius, color, thickness, PI / 3, functions::GetMouseWorldPos(), true);
+							break;
+						}
+
+					}
+
 					static void ShowBoundingRadius(Object* obj, int quality)
 					{
 						if (obj->IsAlive() && obj->IsVisible())
@@ -829,21 +697,21 @@ namespace UPasta
 							{
 								if (Configs::Radius::showAARadiusSelf->Value == true)
 								{
-									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, PI / 3, functions::GetMouseWorldPos(), true);
+									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f);
 								}
 							}
 							else
 							{
-
 								if (obj->IsEnemy() && Configs::Radius::showAARadiusEnemies->Value == true)
 								{
-									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, PI / 3, globals::localPlayer->GetPosition(), true);
+									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f);
 								}
 								if (obj->IsAlly() && Configs::Radius::showAARadiusAllies->Value == true)
-									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, PI / 3, globals::localPlayer->GetPosition(), true);
+									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f);
 							}
 						}
 					}
+
 					static void ShowAARadius(Object* obj, int quality)
 					{
 						if (obj->IsAlive() && obj->IsVisible())
@@ -851,14 +719,14 @@ namespace UPasta
 							if (obj->GetNetId() == globals::localPlayer->GetNetId())
 							{
 								if (Configs::Radius::showAARadiusSelf->Value == true)
-									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetRealAttackRange(), COLOR_WHITE, 1.0f, PI / 2, functions::GetMouseWorldPos(), true);
+									DrawRadius(obj->GetPosition(), obj->GetRealAttackRange(), COLOR_WHITE, 1.0f);
 							}
 							else
 							{
 								if (obj->IsEnemy() && Configs::Radius::showAARadiusEnemies->Value == true)
-									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetRealAttackRange(), COLOR_WHITE, 1.0f, PI / 2, globals::localPlayer->GetPosition(), true);
+									DrawRadius(obj->GetPosition(), obj->GetRealAttackRange(), COLOR_WHITE, 1.0f);
 								if (obj->IsAlly() && Configs::Radius::showAARadiusAllies->Value == true)
-									render::RenderArcWorld(obj->GetPosition(), quality, obj->GetRealAttackRange(), COLOR_WHITE, 1.0f, PI / 2, globals::localPlayer->GetPosition(), true);
+									DrawRadius(obj->GetPosition(), obj->GetRealAttackRange(), COLOR_WHITE, 1.0f);
 							}
 						}
 					}
@@ -870,76 +738,20 @@ namespace UPasta
 							Configs::Radius::InitializeRadiusMenu();
 						}
 					}
-					std::map<Object*, std::tuple<Missile*, Vector3, Vector3, Vector3>> missileMap;
-					std::vector<Object*> objectsToRemove; // Lista degli oggetti da rimuovere
 
-					std::vector<Object*> GetMissilesInRange2()
-					{
-						std::vector<Object*> validMissiles;
-						for (int i = 0; i < 3; i++)
-						{
-							auto obj = globals::missileManager->GetIndex(i);
-							if (obj && !missileMap.contains(obj))
-							{
-								auto missileTest = obj->GetMissileByIndex();
-								if (missileTest)
-								{
-									/*Vector3 extended = missileTest->GetSpellStartPos().Extend
-									(missileTest->GetSpellEndPos(), missileTest->GetSpellStartPos().Distance
-									(missileTest->GetSpellEndPos()) + 100.0f);*/
-									Vector3 startPosVector = missileTest->GetSpellStartPos();
-									Vector3 posVector = missileTest->GetSpellPos();
-									Vector3 endPosVector = missileTest->GetSpellEndPos();
-
-									missileMap[obj] = std::make_tuple(missileTest, startPosVector, posVector, endPosVector);
-
-									validMissiles.push_back(obj);
-								}
-							}
-						}
-
-						if (missileMap.size() > 10)
-							missileMap.clear();
-
-						if (validMissiles.size() > 0)
-							return validMissiles;
-
-						
-
-						return validMissiles;
-					}
+					
 
 					void Update()
 					{
 						if (Configs::Radius::initializedRadiusMenu)
 						{
-							GetMissilesInRange2();
-							for (auto it = missileMap.begin(); it != missileMap.end(); ++it)
-							{
-								Object* correspondingObject = it->first;
-
-								Missile* correspondingMissile = std::get<0>(it->second); // Missile*
-								Vector3 startPosVector = std::get<1>(it->second); // Vector3
-								Vector3 posVector = std::get<2>(it->second); // Vector3
-								Vector3 endPosVector = std::get<3>(it->second); // Vector3
-
-								//Vector3 extendedVector = std::get<1>(it->second); // Vector3
-								if (IsValidPtr(correspondingMissile))
-								{
-									Geometry::Polygon poly = Geometry::Rectangle(startPosVector, endPosVector, 70.f).ToPolygon();
-									//Geometry::Polygon poly2 = Geometry::Rectangle(startPosVector, posVector, 70.f).ToPolygon();
-
-									render::RenderPolygon(poly, COLOR_WHITE, 1.0f);
-									//render::RenderFilledPolygon(poly2, COLOR_WHITE);
-									missileMap.erase(correspondingObject);
-								}
-
-							}
-
-
-
 							if (Configs::Radius::status->Value == true)
 							{
+								if (Configs::Radius::showMissiles->Value == true)
+								{
+									ShowMissiles();
+								}
+
 								for (int i = 0; i < globals::heroManager->GetListSize(); i++)
 								{
 									auto obj = globals::heroManager->GetIndex(i);

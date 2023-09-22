@@ -300,7 +300,7 @@ namespace UPasta
 								return;
 							}
 
-							auto nexus = TargetSelector::Functions::GetEnemyNexusInRange(globals::localPlayer->GetRealAttackRange());
+							/*auto nexus = TargetSelector::Functions::GetEnemyNexusInRange(globals::localPlayer->GetRealAttackRange());
 							if (nexus)
 							{
 								if (nexus->GetMaxHealth() == 5500)
@@ -308,7 +308,7 @@ namespace UPasta
 									Actions::AttackInhib(nexus);
 									return;
 								}
-							}
+							}*/
 
 							auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
 							if (minion)

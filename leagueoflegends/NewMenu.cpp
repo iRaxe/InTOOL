@@ -66,30 +66,11 @@ namespace UPasta {
 				MenuSettings::BackgroundOpacity = value;
 				})->Value;
 
+
 			MenuSettings::DrawMenu = false;
 			menuSettings->AddKeyBind("MenuKey", "Menu Key", VK_SHIFT, false, false, [](KeyBind*, bool value) {
 				MenuSettings::DrawMenu = value;
 				});
-
-
-			auto zoomMenu = menu->AddMenu("Zoom", "Zoom");
-			MenuSettings::Zoom = zoomMenu->AddCheckBox("zoomEnabled", "Enable Zoom", true, [](CheckBox*, bool value) {
-				MenuSettings::Zoom = value;
-				})->Value;
-
-			auto coreMenu = menu->AddMenu("Core", "Core");
-			MenuSettings::TicksPerSecond = coreMenu->AddSlider("TicksPerSecond", "Ticks per second", 30, 1, 75, 1, [](Slider*, int value) {
-				MenuSettings::TicksPerSecond = value;
-				})->Value;
-
-			MenuSettings::DeveloperMode = coreMenu->AddCheckBox("DeveloperMode", "Developer Mode", false, [](CheckBox*, bool value) {
-				MenuSettings::DeveloperMode = value;
-				})->Value;
-
-			auto hacksMenu = menu->AddMenu("Hacks", "Hacks");
-			MenuSettings::AntiAFK = hacksMenu->AddCheckBox("AntiAFK", "Anti AFK", false, [](CheckBox*, bool value) {
-				MenuSettings::AntiAFK = value;
-				})->Value;
 		}
 
 		void Menu::Dispose()

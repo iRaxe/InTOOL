@@ -4,9 +4,9 @@
 #include "VMTHook.h"
 #include "selfprotection/pipe/namedpipeclient.h"
 
-uintptr_t pOnProcessSpellCast;
+inline uintptr_t pOnProcessSpellCast;
 
-VMTHook VMTHOnProcessSpellCast[10];
+inline VMTHook VMTHOnProcessSpellCast[10];
 class LolString
 {
 	char content[0x10]; // 0x0
@@ -91,7 +91,7 @@ public:
 	}
 	std::string GetName()
 	{
-		return *(char**)((QWORD)this + 0x28);
+		return (char*)((QWORD)this + oMissileName);
 	}
 };
 
@@ -109,23 +109,18 @@ public:
  
 }*/
 
-void __fastcall hkOnProcessSpellCast(void* thisptr, int state, void* spellCastInfo, __int64 a6) noexcept
+int __fastcall hkOnProcessSpellCast(void* spell_book, void* edx, SpellCastInfo2* spellCastInfo) noexcept
 {
-	static auto fn = reinterpret_cast<void(__fastcall*)(void*, int, void*, __int64)>(pOnProcessSpellCast);
+	static auto fn = reinterpret_cast<int(__fastcall*)(void*, void*, SpellCastInfo2*)>(pOnProcessSpellCast);
 
-	//if (spellCastInfo == nullptr)
-		//return fn(thisptr, state, spellCastInfo, a6);
-	//else
-	if (spellCastInfo != nullptr)
-	{
-		LOG("%p", spellCastInfo);
-	}
-		//functions::PrintChat(thisptr);
+	//Spell* spell = cheatManager.memory->localPlayer->GetSpellBySlotId(SpellIndex::Q);
+	//cheatManager.memory->PrintChat(tfm::format("spell %x", spell));
 
-	//return fn(thisptr, state, spellCastInfo, a6);
+	return fn(spell_book, edx, spellCastInfo);
 }
 
-void HookOnProcessSpellCast()
+
+inline void HookOnProcessSpellCast()
 {
 
 	for (int i = 0; i < globals::heroManager->GetListSize(); i++)
@@ -143,7 +138,7 @@ void HookOnProcessSpellCast()
     
 }
 
-void UnHookOnProcessSpellCast()
+inline void UnHookOnProcessSpellCast()
 {
 	for (VMTHook& vmt : VMTHOnProcessSpellCast)
 		vmt.UnHook();

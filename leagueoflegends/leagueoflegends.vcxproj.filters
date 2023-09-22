@@ -125,6 +125,9 @@
     <Filter Include="Scripts\Utilities\Awareness\Zoom">
       <UniqueIdentifier>{4e63f8d3-5ad4-44d0-95dc-36588b9e231c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Utilities\Lists Management">
+      <UniqueIdentifier>{4b76b81e-de88-4dad-9888-11aee1568818}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -335,6 +338,9 @@
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="clipper.h" />
+    <ClInclude Include="ListManager.h">
+      <Filter>Scripts\Utilities\Lists Management</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -499,6 +505,9 @@
     </ClCompile>
     <ClCompile Include="LoadImages.cpp">
       <Filter>Rendering\ImageManager\LoadTextures</Filter>
+    </ClCompile>
+    <ClCompile Include="ListManager.cpp">
+      <Filter>Scripts\Utilities\Lists Management</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

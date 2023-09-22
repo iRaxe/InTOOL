@@ -213,13 +213,13 @@ public:
     {
         if (e.IsCastable() && SETTINGS_BOOL("Syndra", "draw Q-E range"))
         {
-            render::RenderCircleWorld(globals::localPlayer->GetPosition(), 40, e.GetRange(), COLOR_PURPLE, 1.0f, false);
+            render::RenderCircleWorld(globals::localPlayer->GetPosition(), 40, e.GetRange(), COLOR_PURPLE, 1.0f);
         }
 
         if (lastEObjPos.IsValid() && lastEProjectionPos.IsValid() && lastETargetPos.IsValid() && SETTINGS_BOOL("Syndra", "draw E calculation"))
         {
-            render::RenderCircleWorld(lastEObjPos, 20, 30.0f, COLOR_BLUE, 3.0f, false);
-            render::RenderCircleWorld(lastETargetPos, 20, 30.0f, COLOR_RED, 3.0f, false);
+            render::RenderCircleWorld(lastEObjPos, 20, 30.0f, COLOR_BLUE, 3.0f);
+            render::RenderCircleWorld(lastETargetPos, 20, 30.0f, COLOR_RED, 3.0f);
 
             auto projectionDirection = lastEProjectionPos - lastETargetPos;
             auto projectionDirectionN = projectionDirection.Normalized();
