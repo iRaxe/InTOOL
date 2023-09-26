@@ -430,10 +430,7 @@ namespace UPasta
 
 							if (obj && obj->IsVisible())
 							{
-								if (Configs::EnemyTracker::showExperience->Value == true)
-								{
-									DrawExperience(obj);
-								}
+								DrawCooldownBar(obj);
 
 								if (Configs::EnemyTracker::showPaths->Value == true)
 								{
@@ -443,31 +440,77 @@ namespace UPasta
 						}
 					}
 
-					void DrawExperience(Object* obj)
+					void DrawCooldownBar(Object* obj)
 					{
-						float expAttuale = obj->GetExperience();
-						int livelloCorrente = obj->GetLevel();
+						if (!obj->IsValidTarget()) return;
 
-						float progresso = calcolaProgresso(expAttuale, livelloCorrente);
-						float maxWidth = 128.0f;
-						float width = 108.0f * (progresso / 100);
-						float height = 30.0f;
-						float cdWidth = 20.0f;
-						float cdHeight = 6.0f;
-
-						float yOffset = 0.0f;
-						float xOffset = -maxWidth / 2.0f + 18.0f;
+						const float barWidth = 128.0f;
+						const float cdWidth = 26.5f;
+						const float cdHeight = 6.0f;
+						const float yOffset = 3.0f;
+						const float xOffset = -barWidth / 2.0f + 18.0f;
 
 						Vector2 screenPos = functions::GetHpBarPosition(obj);
+						Vector2 basePos = Vector2(screenPos.x + xOffset, screenPos.y - yOffset);
 
-						//Base sopra? 
-						Vector2 basePos = Vector2(screenPos.x + xOffset, screenPos.y + yOffset);
+						if (Configs::EnemyTracker::showExperience->Value == true)
+						{
+							const float expMaxWidth = 128.0f;
+							const float expHeight = 30.0f;
+							const float expYOffset = 1.0f;
+							const float expXOffset = -expMaxWidth / 2.0f + 18.0f;
 
-						Vector2 outerBorderAngle1 = Vector2(basePos.x, basePos.y - height);
-						float hpBarWidthLimit = (outerBorderAngle1.x + width);
-						Vector2 outerBorderAngle2 = Vector2(hpBarWidthLimit, outerBorderAngle1.y + 2);
+							// Calculate experience progress
+							float expAttuale = obj->GetExperience();
+							int livelloCorrente = obj->GetLevel();
+							float progresso = calcolaProgresso(expAttuale, livelloCorrente);
 
-						render::RenderRectFilled(outerBorderAngle1.ToImVec(), outerBorderAngle2.ToImVec(), COLOR_WHITE, 0.0f, 0);
+							// Calculate the width of the filled bar
+							float width = 108.0f * (progresso / 100);
+							float hpBarWidthLimit = screenPos.x + expXOffset + width;
+
+							Vector2 outerBorderAngle1 = Vector2(screenPos.x + expXOffset, screenPos.y - expYOffset - expHeight);
+							Vector2 outerBorderAngle2 = Vector2(hpBarWidthLimit, screenPos.y - expYOffset - expHeight + 2);
+
+							render::RenderRectFilled(outerBorderAngle1.ToImVec(), outerBorderAngle2.ToImVec(), COLOR_WHITE, 0.0f, 0);
+						}
+
+						// Function to draw a spell cooldown bar
+						auto drawSpellCooldown = [&](int slotId, float xOffset, float xLimit, float yOffset, float yLimit)
+						{
+							Vector2 spellAngle1 = Vector2(basePos.x + xOffset, basePos.y + yOffset);
+							Vector2 spellAngle2 = Vector2(basePos.x + xLimit, basePos.y + yLimit);
+
+							Spell* spell = obj->GetSpellBySlotId(slotId);
+							float relativeCooldown = spell->GetRelativeCooldown();
+							spellAngle2.x -= relativeCooldown * cdWidth;
+
+							uint32_t color = (relativeCooldown == 0.0f) ? COLOR_LIGHT_GREEN : COLOR_ORANGE;
+							render::RenderRectFilled(spellAngle1.ToImVec(), spellAngle2.ToImVec(), color, 0.0f, 0);
+							};
+
+						// Draw spell cooldown bars for slots 0 to 3
+						for (int i = 0; i < 4; i++) {
+							drawSpellCooldown(i,
+								i * (cdWidth + 1.0f) + 1.0f, 
+								(i + 1) * (cdWidth + 1.0f),
+								1.0f, 
+								cdHeight);
+						}
+
+						// Draw D spell cooldown bar
+						drawSpellCooldown(4, 
+							4 * (cdWidth + 1.0f) + 1.0f,
+							(4 + 1) * (cdWidth + 1.0f),
+							-30.0f,
+							-13.0f);
+
+						// Draw F spell cooldown bar
+						drawSpellCooldown(5,
+							4 * (cdWidth + 1.0f) + 1.0f,
+							(4 + 1) * (cdWidth + 1.0f),
+							-11.0f,
+							cdHeight);
 					}
 
 					void DrawPlayerPaths(Object* obj)
@@ -675,7 +718,7 @@ namespace UPasta
 						}
 					}
 
-					static void DrawRadius(const Vector3& worldPos, float radius, uintptr_t color, float thickness)
+					void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness)
 					{
 						switch (Configs::Radius::drawMode->Value)
 						{
@@ -811,7 +854,7 @@ namespace UPasta
 
 							const Vector3 pathEnd = globals::localPlayer->GetAiManager()->GetPathEnd();
 
-							if (!globals::localPlayer->GetAiManager()->IsMoving()) //&& Orbwalker::Functions::Values::lastAttackTime + 5.0f < gameTime)
+							if (!globals::localPlayer->GetAiManager()->IsMoving() && Orbwalker::Functions::lastAttackTime + 5.0f < gameTime)
 							{
 								refresh = true;
 								if (refresh)

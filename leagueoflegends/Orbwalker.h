@@ -25,6 +25,8 @@ namespace UPasta::SDK::Orbwalker
 
             inline Slider* windupDelay;
             inline Slider* beforeAttackDelay;
+            inline Slider* farmAttackDelay;
+
         }
 
         namespace Status
@@ -74,6 +76,7 @@ namespace UPasta::SDK::Orbwalker
 
         void CheckActiveAttack();
         void StopOrbwalkCheck();
+        bool CanDoAction();
         void IsReloadingCheck();
 
         namespace Actions
@@ -87,6 +90,10 @@ namespace UPasta::SDK::Orbwalker
 
 		namespace States
 		{
+			inline Object* LastHitMinion;
+            inline Object* AlmostLastHitMinion;
+            inline Object* LaneClearMinion;
+
 			void Attack();
 			void Laneclear();
 			void Harass();

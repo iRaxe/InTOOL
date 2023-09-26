@@ -25,6 +25,32 @@ bool WINAPI HideThread(const HANDLE hThread) noexcept
 	}
 }
 
+bool RestoreVMHook() noexcept
+{
+	__try {
+		HMODULE NTDLL = GetModuleHandle(L"ntdll.dll");
+		if (!NTDLL)
+			return false;
+
+		DWORD64 ZwProtectVirtualMemoryAddr = reinterpret_cast<DWORD64>(
+			GetProcAddress(NTDLL, "ZwProtectVirtualMemory"));
+
+		BYTE ZwPVM[] = {
+		0x4C, 0x8B, 0xD1, 0xB8, 0x50, 0x00, 0x00, 0x00, 0xF6, 0x04, 0x25, 0x08, 0x03, 0xFE, 0x7F, 0x01
+		};
+
+		int i = 0;
+		for (BYTE _byte : ZwPVM) {
+			*(BYTE*)(ZwProtectVirtualMemoryAddr + i) = _byte;
+			i++;
+		}
+	}
+	__except (TRUE) {
+		return false;
+	}
+}
+
+
 DWORD __stdcall EjectThread(LPVOID lpParameter)
 {
 	Sleep(100);
@@ -43,6 +69,7 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 #endif
 
 	LOG("Injected");
+	RestoreVMHook();
 	std::thread(startZoom).detach();
 	Sleep(100);
 

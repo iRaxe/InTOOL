@@ -242,6 +242,8 @@
 #define oPercentBasePhysicalDamageAsFlatBonusMod 0x108
 #define oFlatMagicDamageMod 0x120
 #define oPercentMagicDamageMod 0x138
+#define oGetPercentDamageToBarracksMinionMod 0x1A50
+#define oGetFlatDamageReductionFromBarracksMinionMod 0x1A68
 #define oFlatMagicReduction 0x150
 #define oPercentMagicReduction 0x168
 #define oFlatCastRangeMod 0x180
@@ -292,7 +294,7 @@
 #define oSecondaryARBaseRegenRateRep 0x5E8
 
 //Items managament
-#define oObjItemManager 0x3FF8
+#define oObjItemManager 0x4040
 
 #define oItemManagerList 0x20
  

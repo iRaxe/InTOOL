@@ -187,7 +187,7 @@ namespace UPasta::SDK::Awareness
                                                            1680.f, 1780.f, 1880.f };
 
             void DrawEnemyTracker();
-            void DrawExperience(Object* object);
+            void DrawCooldownBar(Object* obj);
             void DrawPlayerPaths(Object* obj);
 
             void Initialize();
@@ -205,7 +205,7 @@ namespace UPasta::SDK::Awareness
 
         namespace Radius
         {
-            static void DrawRadius(const Vector3& worldPos, float radius, uintptr_t color, float thickness);
+            void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness);
             static void ShowMissiles();
             static void ShowBoundingRadius(Object* obj, int quality);
             static void ShowAARadius(Object* obj, int quality);

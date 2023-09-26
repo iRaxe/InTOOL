@@ -147,6 +147,7 @@ namespace UPasta::SDK::TargetSelector
         Object* GetEnemyNexusInRange(float range);
         Object* GetEnemyInhibitorInRange(float range);
         Object* GetEnemyTurretInRange(float range);
+        Object* GetAllyTurretInRange(float range);
         Object* GetMinionInRange(float range);
         Object* GetEnemyObjectInRange(float range);
         Object* GetObjectInRange(float range, std::string name = "", std::vector<QWORD> includefilterTypeHashes = {}, std::vector<QWORD> excludeFilterTypeHashesDetailed = {}, bool isSpecial = false);

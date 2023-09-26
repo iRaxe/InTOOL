@@ -341,15 +341,17 @@ enum SpellIndex
 	Recall
 };
 
-enum SpellState
+enum SpellState : int
 {
-    Ready = 0,
-    DoesNotExist = 2,
-    NotAvailable = 4,
-    NotLearned = 12,
-    Processing = 24,
-    Cooldown = 32,
-    NoMana = 64
+    IsReady = 0,
+    IsDoesNotExist = 2,
+    IsNotAvailable = 4,
+    IsSupressed = 8,
+    IsNotLearned = 12,
+    IsDisabled = 16,
+    IsCooldown = 32,
+    IsProcessing = 48,
+    IsNoMana = 64
 };
 
 enum CharacterState : unsigned short
@@ -393,17 +395,7 @@ enum ObjectType : unsigned long long
     Less = 126939457912832
 };
 
-enum SpellStatus : int
-{
-    IsReady = 0,
-    IsNotAvailable = 4,
-    IsSupressed = 8,
-    IsNotLearned = 12,
-    IsDisabled = 16,
-    IsProcessing = 24,
-    IsCooldown = 32,
-    IsNoMana = 64
-};
+
 
 enum CollisionFlags
 {

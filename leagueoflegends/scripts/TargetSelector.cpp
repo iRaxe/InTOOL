@@ -634,7 +634,8 @@ namespace UPasta
 						if (!obj->IsValidTarget()) continue;
 						if (!functions::GetCollisionFlags(obj->GetPosition()) & CollisionFlags::Building) continue;
 						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
-
+						if (obj->GetMaxHealth() != 5500) continue;
+						
 						if (obj)
 						{
 								best = obj;
@@ -672,6 +673,28 @@ namespace UPasta
 					for (Object* obj : *globals::turretManager)
 					{
 						if (!obj->IsValidTarget()) continue;
+
+						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+
+						if (obj)
+						{
+							best = obj;
+							break;
+						}
+					}
+
+					return best;
+				}
+
+				Object* Functions::GetAllyTurretInRange(float range)
+				{
+					Object* best = nullptr;
+
+					for (Object* obj : *globals::turretManager)
+					{
+						if (!obj->IsVisible()) continue;
+						if (!obj->IsAlive()) continue;
+						if (!obj->IsAlly()) continue;
 
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
 

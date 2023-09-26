@@ -184,6 +184,7 @@
     <ClInclude Include="customimages.h" />
     <ClInclude Include="Damage.h" />
     <ClInclude Include="DestroyEvents.h" />
+    <ClInclude Include="Ezreal.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="global\colors.h" />
     <ClInclude Include="global\functions.h" />
@@ -225,6 +226,7 @@
     <ClInclude Include="ManagerTemplate.h" />
     <ClInclude Include="mem\mem.h" />
     <ClInclude Include="mem\spoof_call.h" />
+    <ClInclude Include="Nautilus.h" />
     <ClInclude Include="NewMenu.h" />
     <ClInclude Include="MenuComponent.h" />
     <ClInclude Include="MenuRenderer.h" />
@@ -258,6 +260,7 @@
     <ClCompile Include="DestroyEvents.cpp" />
     <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="Eventmanager.h" />
+    <ClCompile Include="Ezreal.cpp" />
     <ClCompile Include="global\functions.cpp" />
     <ClCompile Include="global\globals.cpp" />
     <ClCompile Include="global\settings.cpp" />
@@ -286,6 +289,7 @@
     <ClCompile Include="main\dllmain.cpp" />
     <ClCompile Include="ManagerTemplate.cpp" />
     <ClCompile Include="mem\mem.cpp" />
+    <ClCompile Include="Nautilus.cpp" />
     <ClCompile Include="NewMenu.cpp" />
     <ClCompile Include="MenuComponent.cpp" />
     <ClCompile Include="MenuRenderer.cpp" />

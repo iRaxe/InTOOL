@@ -1,4 +1,6 @@
+#include "../Awareness.h"
 #include "../stdafx.h"
+#include "../TargetSelector.h"
 
 int InventorySlot::GetId()
 {
@@ -15,18 +17,10 @@ std::string InventorySlot::GetName()
 	return *(char**)((QWORD)this + oInventorySlotItemName);
 }
 
-InventorySlot* InventorySlotWrapper::GetSlot()
+InventorySlot* ItemListObject::GetSlot()
 {
-	LOG("Trying to get slot");
 	return (InventorySlot*)*(QWORD*)((QWORD)this + oInventorySlot);
 }
-
-InventorySlotWrapper* ItemListObject::GetWrapper()
-{
-	LOG("Trying to get wrapper");
-	return (InventorySlotWrapper*)*(QWORD*)((QWORD)this + oInventorySlotWrapper);
-}
-
 
 void CharacterDataStack::Update(bool change)
 {
@@ -571,20 +565,12 @@ AiManager* Object::GetAiManager()
 
 InventorySlot* Object::GetInventorySlotById(int slotId)
 {
-	ItemListObject* listObj = (ItemListObject*)*(QWORD*)(*(QWORD*)((QWORD)this + oObjItemManager + oItemManagerList) + itemListObjectSize * slotId + oInventorySlotWrapper);
-	// [<League of Legends.exe> + 0x2196050] OK
-	// [[<League of Legends.exe> + 0x2196050] +  0x3FF8 + 0x20] OK
-	// [[[<League of Legends.exe> + 0x2196050] +  0x3FF8 + 0x20] + 0x20 * 1 + 0x10] OK
-	LOG("Test1: %p", (QWORD)this + oObjItemManager + oItemManagerList);
-
-	//LOG("SlotID: %d", slotId);
-	//LOG("ListObj: %p", listObj);
-	// [[[[<League of Legends.exe> + 0x2196050] +  0x3FF8 + 0x30 + -2 * 0x8] + 0x10] + 0x38] <= Address of HeroInventory + itemslot 1
-	// [[[<League of Legends.exe> + 0x2196050] +  oObjItemManager + 0x20] + 0x20 * 2 + 0x10]
-
-	//InventorySlotWrapper* wrapper = listObj->GetWrapper();
-	//LOG("Wrapper: %p", wrapper);
-	//return wrapper->GetSlot();
+	ItemListObject* listObj = (ItemListObject*)*(QWORD*)(*(QWORD*)((QWORD)this + oObjItemManager) + itemListObjectSize * slotId + oInventorySlotWrapper);
+	if (IsValidPtr(listObj))
+	{
+		InventorySlot* wrapper = listObj->GetSlot();
+		return wrapper;
+	}
 	return nullptr;
 }
 
@@ -816,6 +802,24 @@ bool Object::IsInRange(Vector3 pos, float radius)
 	return radius + this->GetBoundingRadius() >= render::Distance(pos, this->GetPosition());
 }
 
+bool Object::IsUnderEnemyTower()
+{
+	const auto turret = UPasta::SDK::TargetSelector::Functions::GetEnemyTurretInRange(2000.0f);
+	if (turret && turret->IsEnemy())
+		return this->IsInRange(turret->GetPosition(), 992.0f);
+
+	return false;
+}
+
+bool Object::IsUnderAllyTower()
+{
+	const auto turret = UPasta::SDK::TargetSelector::Functions::GetAllyTurretInRange(2000.0f);
+	if (turret && turret->IsAlly())
+		return this->IsInRange(turret->GetPosition(), 992.0f);
+
+	return false;
+}
+
 bool Object::IsInAARange()
 {
 	return globals::localPlayer->GetRealAttackRange() + globals::localPlayer->GetBoundingRadius() >= render::Distance(globals::localPlayer->GetPosition(), this->GetPosition());
@@ -824,7 +828,7 @@ bool Object::IsInAARange()
 bool Object::CanCastSpell(int slotId)
 {
 	auto spell = this->GetSpellBySlotId(slotId);
-	return this->CanCast() && functions::GetSpellState(slotId) == IsReady;
+	return this->CanCast() && functions::GetSpellState(slotId) == SpellState::IsReady;
 }
 
 Vector3 Object::GetServerPosition()
@@ -919,6 +923,16 @@ float CharacterStateIntermediate::GetPercentMagicDamageMod()
 float CharacterStateIntermediate::GetFlatMagicReduction()
 {
 	return *(float*)((QWORD)this + oFlatMagicReduction);
+}
+
+float CharacterStateIntermediate::GetPercentDamageToBarracksMinionMod()
+{
+	return *(float*)((QWORD)this + oGetPercentDamageToBarracksMinionMod);
+}
+
+float CharacterStateIntermediate::GetFlatDamageReductionFromBarracksMinionMod()
+{
+	return *(float*)((QWORD)this + oGetFlatDamageReductionFromBarracksMinionMod);
 }
 
 float CharacterStateIntermediate::GetPercentMagicReduction()

@@ -44,6 +44,8 @@ namespace UPasta
 						windupDelay = HumanizerMenu->AddSlider("windupDelay", "AA Travel time delay", 30, 10, 100, 1);
 
 						beforeAttackDelay = HumanizerMenu->AddSlider("beforeAttackDelay", "AA before attack order delay", 10, 10, 100, 1);
+						farmAttackDelay = HumanizerMenu->AddSlider("farmAttackDelay", "Farm delay", 10, 10, 100, 1);
+
 
 						initializedHumanizerMenu = true;
 					}
@@ -90,11 +92,8 @@ namespace UPasta
 				float gameTime = 0.0f;
 				float lastAttackTime = 0.0f;
 				QWORD lastSpellCastAddress = 0;
-				float lastActionTime = 0.0f;
 				bool shouldWait = false;
 				bool isReloading = false;
-				bool canDoAction = true;
-
 				void Initialize()
 				{
 					if (!Configs::initializedOrbwalkerMenu)
@@ -127,8 +126,7 @@ namespace UPasta
 					CheckActiveAttack();
 					StopOrbwalkCheck();
 					IsReloadingCheck();
-
-
+					
 					/*if (Configs::KeyBindings::comboKey->Value)
 					{
 						Vector2 screenPos = functions::WorldToScreen(globals::localPlayer->GetPosition());
@@ -189,14 +187,39 @@ namespace UPasta
 						shouldWait = false;
 				}
 
+				float lastActionTime = 0.0f;
 				bool CanDoAction()
 				{
-					if (!lastActionTime) lastActionTime = gameTime;
-					if (gameTime < lastActionTime + (Configs::Humanizer::clickDelay->Value / 1000.0f) + nextRngBuffer)
+					if (lastActionTime == 0.0f) 
+						lastActionTime = gameTime;
+
+					const float humanizerTimer = (Configs::Humanizer::clickDelay->Value / 1000.0f) + nextRngBuffer;
+					if (gameTime < lastActionTime + humanizerTimer) 
 						return false;
 
 					lastActionTime = gameTime;
 					return true;
+				}
+
+				bool ShouldWaitUnderTurret(Object* noneKillableMinion)
+				{
+					for (int i = 0; i < globals::minionManager->GetListSize(); i++)
+					{
+						auto minion = globals::minionManager->GetIndex(i);
+						if (minion->IsAlive() && minion->IsVisible())
+						{
+							if (minion->GetName() == "") continue;
+							if (!minion->IsValidTarget()) continue;
+							if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
+							if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange())) continue;
+							if (minion)
+							{
+								return
+									((noneKillableMinion != nullptr ? noneKillableMinion->GetNetId() != minion->GetNetId() : true)
+										&& minion->IsInAARange() && Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) > minion->GetHealth());
+							}
+						}
+					}
 				}
 
 				void IsReloadingCheck()
@@ -207,16 +230,69 @@ namespace UPasta
 						isReloading = false;
 				}
 
-				
-
 				void RefreshBuffer()
 				{
-					if (!Configs::Humanizer::randomizeDelay)
+					if (Configs::Humanizer::randomizeDelay->Value == false)
 					{
 						nextRngBuffer = 0.0f;
 						return;
 					}
 					nextRngBuffer = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.01f);
+				}
+
+				float GetAttackMissileSpeed()
+				{
+					float def = globals::localPlayer->GetAttackRange() < 300.0f ? FLT_MAX : globals::localPlayer->GetAttackWindup();
+
+					if (globals::localPlayer->GetName() == "Thresh" 
+					|| globals::localPlayer->GetName() == "Azir" 
+					|| globals::localPlayer->GetName() == "Velkoz" 
+					|| globals::localPlayer->GetName() == "Rakan")
+						return FLT_MAX;
+
+					else if (globals::localPlayer->GetName() == "Thresh")
+					{
+						if (globals::localPlayer->GetBuffByName("ViktorPowerTransferReturn"))
+							return FLT_MAX;
+					}
+
+					else if (globals::localPlayer->GetName() == "Jinx")
+					{
+						if (globals::localPlayer->GetBuffByName("JinxQ"))
+							return 2000.0f;
+					}
+
+					else if (globals::localPlayer->GetName() == "Poppy")
+					{
+						if (globals::localPlayer->GetBuffByName("poppypassivebuff"))
+							return 1600.0f;
+					}
+
+					else if (globals::localPlayer->GetName() == "Ivern")
+					{
+						if (globals::localPlayer->GetBuffByName("ivernwpassive"))
+							return 1600.0f;
+					}
+
+					else if (globals::localPlayer->GetName() == "Caitlyn")
+					{
+						if (globals::localPlayer->GetBuffByName("caitlynheadshot"))
+							return 3000.0f;
+					}
+
+					else if (globals::localPlayer->GetName() == "Twitch")
+					{
+						if (globals::localPlayer->GetBuffByName("TwitchFullAutomatic"))
+							return 4000.0f;
+					}
+
+					else if (globals::localPlayer->GetName() == "Jayce")
+					{
+						if (globals::localPlayer->GetBuffByName("jaycestancegun"))
+							return 2000.0f;
+					}
+
+					return def;
 				}
 
 				namespace Actions
@@ -260,7 +336,8 @@ namespace UPasta
 
 					void CastSpell(int spellId, Vector3 pos)
 					{
-						if (!CanDoAction()) return;
+						/*if (!CanDoAction())
+							return;*/
 						functions::CastSpell(spellId, pos);
 					}
 				}
@@ -286,42 +363,87 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetRealAttackRange());
-							if (turret)
+							if (const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetRealAttackRange()))
 							{
 								Actions::AttackObject(turret);
 								return;
 							}
 
-							auto inhibitor = TargetSelector::Functions::GetEnemyInhibitorInRange(globals::localPlayer->GetRealAttackRange());
-							if (inhibitor)
+							if (const auto inhibitor = TargetSelector::Functions::GetEnemyInhibitorInRange(globals::localPlayer->GetRealAttackRange()))
 							{
 								Actions::AttackInhib(inhibitor);
 								return;
 							}
 
-							/*auto nexus = TargetSelector::Functions::GetEnemyNexusInRange(globals::localPlayer->GetRealAttackRange());
-							if (nexus)
+							if (const auto nexus = TargetSelector::Functions::GetEnemyNexusInRange(globals::localPlayer->GetRealAttackRange()))
 							{
 								if (nexus->GetMaxHealth() == 5500)
 								{
 									Actions::AttackInhib(nexus);
 									return;
 								}
-							}*/
-
-							auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
-							if (minion)
-							{
-								Actions::AttackObject(minion);
-								return;
 							}
 
-							auto jungle = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange());
-							if (jungle)
+							if (const auto jungle = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange()))
 							{
 								Actions::AttackObject(jungle);
 								return;
+							}
+
+							if (const auto minion = TargetSelector::Functions::GetMinionInRange(globals::localPlayer->GetRealAttackRange()))
+							{
+								//const int missileSpeed = GetAttackMissileSpeed();
+								for (int i = 0; i < globals::minionManager->GetListSize(); i++)
+								{
+									auto minion = globals::minionManager->GetIndex(i);
+									if (minion->IsAlive() && minion->IsVisible())
+									{
+										if (minion->GetName() == "") continue;
+										if (!minion->IsValidTarget()) continue;
+										if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
+										if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange())) continue;
+
+										if (minion)
+										{
+											float test = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
+											//float t = (globals::localPlayer->GetAttackDelay() * 1000) - 100 + Configs::Humanizer::windupDelay->Value / 2 + 1000 * max(0.0f, globals::localPlayer->GetDistanceTo(minion) - globals::localPlayer->GetBoundingRadius()) / missileSpeed;
+											const float minionHealth = minion->GetHealth() - Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
+
+											const auto attackDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
+
+											const auto turret = TargetSelector::Functions::GetAllyTurretInRange(globals::localPlayer->GetRealAttackRange());
+											if (turret && turret->GetDistanceTo(minion) <= 900)
+											{
+												if (minion->GetHealth() > attackDamage)
+												{
+													const auto turretDamage = Damage::CalculateAutoAttackDamage(turret, minion);
+													if (minion->GetHealth() - turretDamage > 0.0f)
+													{
+														for (auto minionHealth = minion->GetHealth(); minionHealth > 0.0f && turretDamage > 0.0f; minionHealth -= turretDamage)
+														{
+															if (minionHealth <= attackDamage)
+																break;
+														}
+
+														if (!ShouldWaitUnderTurret(globals::localPlayer))
+														{
+															Actions::AttackObject(minion);
+															break;
+														}
+													}
+												}
+												break;
+											}
+
+											if (minionHealth >= 2.0f * attackDamage || minionHealth < attackDamage)
+											{
+												Actions::AttackObject(minion);
+												return;
+											}
+
+										}
+									}
+								}
 							}
 						}
 
@@ -347,11 +469,26 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							auto minion = UPasta::SDK::TargetSelector::Functions::GetObjectInRange(globals::localPlayer->GetRealAttackRange());
-							if (minion)
+							for (int i = 0; i < globals::minionManager->GetListSize(); i++)
 							{
-								Actions::AttackObject(minion);
-								return;
+								auto minion = globals::minionManager->GetIndex(i);
+								if (minion->IsValidTarget())
+								{
+									if (minion->GetName() == "") continue;
+									if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
+									if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange())) continue;
+
+									if (minion)
+									{
+										const float minionHealth = minion->GetHealth() - Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
+										const auto attackDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
+										if (minionHealth < attackDamage)
+										{
+											Actions::AttackObject(minion);
+											return;
+										}
+									}
+								}
 							}
 						}
 

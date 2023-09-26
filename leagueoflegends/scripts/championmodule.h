@@ -12,7 +12,6 @@ public:
 	virtual void Clear() = 0;
 	virtual void Harass() = 0;
 	virtual void Lasthit() = 0;
-	virtual void Killsteal() = 0;
 	virtual void Render() = 0;
 };
 

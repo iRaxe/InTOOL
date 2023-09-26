@@ -45,7 +45,7 @@ class SpellCastInfo2 {
 public:
 	std::string GetCasterName()
 	{
-		auto r = (LolString*)((QWORD)this + 0x18);
+		auto r = (LolString*)((QWORD)this + 0x28);
 		return r->str();
 	}
 
@@ -91,7 +91,7 @@ public:
 	}
 	std::string GetName()
 	{
-		return (char*)((QWORD)this + oMissileName);
+		return (char*)*(QWORD*)((QWORD)this + 0x0) + 0x28;
 	}
 };
 
@@ -113,6 +113,12 @@ int __fastcall hkOnProcessSpellCast(void* spell_book, void* edx, SpellCastInfo2*
 {
 	static auto fn = reinterpret_cast<int(__fastcall*)(void*, void*, SpellCastInfo2*)>(pOnProcessSpellCast);
 
+	if (spellCastInfo != nullptr)
+	{
+		LOG("PTR %p", edx);
+		return fn(spell_book, edx, spellCastInfo);
+
+	}
 	//Spell* spell = cheatManager.memory->localPlayer->GetSpellBySlotId(SpellIndex::Q);
 	//cheatManager.memory->PrintChat(tfm::format("spell %x", spell));
 

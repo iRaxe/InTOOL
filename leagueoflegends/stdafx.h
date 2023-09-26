@@ -73,3 +73,5 @@ using json = nlohmann::json;
 #define M_PI 3.14159265358979323846f
 #define M_PI_F (float)M_PI
 #endif
+
+inline SkillShotDB database;

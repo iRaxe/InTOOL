@@ -7,12 +7,13 @@ class AsheModule : public ChampionModule
 {
 private:
     std::string name = SP_STRING("Ashe");
-
-    Skillshot w = SkillshotManager::RegisterSpell(name, SpellIndex::W, Skillshot(1040.0f, 60.0f, 1600.0f, 0.25f, SkillshotType::SkillshotCone, { CollidableObjects::Objects }));
-    Skillshot r = SkillshotManager::RegisterSpell(name, SpellIndex::R, Skillshot(3000.0f, 300.0f, 2500.0f, 0.25f, SkillshotType::SkillshotLine, { CollidableObjects::Objects }));
-
 private:
     float gameTime = 0.0f;
+
+    float QCastedTime = 0.0f;
+    float WCastedTime = 0.0f;
+    float ECastedTime = 0.0f;
+    float RCastedTime = 0.0f;
 
 private:
     bool Ashe_IsQReady()
@@ -41,7 +42,7 @@ private:
 
     float Ashe_speedR(float distance)
     {
-        if (!r.IsCastable())
+        if (!database.AsheR.IsCastable())
             return 0;
 
         float travelingTime, kekwTime;
@@ -103,7 +104,7 @@ public:
 
     float Ashe_dmgW(Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy || !w.IsCastable())
+        if (!globals::localPlayer || !pEnemy || !database.AsheW.IsCastable())
             return -9999;
 
         int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
@@ -119,7 +120,7 @@ public:
 
     float Ashe_dmgR(Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy || !r.IsCastable())
+        if (!globals::localPlayer || !pEnemy || !database.AsheR.IsCastable())
             return -9999;
 
         int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
@@ -141,64 +142,60 @@ public:
         if (!globals::localPlayer || !pEnemy || !Ashe_IsQReady())
             return;
 
-        if (pEnemy)
+        if (pEnemy && gameTime > QCastedTime + 0.25f)
         {
             if (pEnemy->IsInAARange())
             {
-                Orbwalker::Functions::Actions::CastSpell(SpellIndex::Q, globals::localPlayer);
+                functions::CastSpell(SpellIndex::Q, globals::localPlayer);
+                QCastedTime = gameTime;
             }
         }
     }
 
     void Ashe_UseW(Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy || !w.IsCastable())
+        if (!globals::localPlayer || !pEnemy || !database.AsheW.IsCastable())
             return;
 
-        if (pEnemy)
+        if (pEnemy && gameTime > WCastedTime + database.AsheW.GetCastTime())
         {
             prediction::PredictionOutput wPrediction;
 
-            if (GetPrediction(w, wPrediction))
+            if (GetPrediction(database.AsheW, wPrediction))
             {
-
-                Orbwalker::Functions::Actions::CastSpell(SpellIndex::W, wPrediction.position);
+                functions::CastSpell(SpellIndex::W, wPrediction.position);
+                WCastedTime = gameTime;
             }
+            
         }
     }
 
     void Ashe_UseR(Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy || !r.IsCastable())
+        if (!globals::localPlayer || !pEnemy || !database.AsheR.IsCastable())
             return;
 
-        if (pEnemy)
+        if (pEnemy && gameTime > RCastedTime + database.AsheR.GetCastTime())
         {
             prediction::PredictionOutput rPrediction;
-            if (GetPrediction(r, rPrediction))
+
+            if (GetPrediction(database.AsheR, rPrediction))
             {
-                Orbwalker::Functions::Actions::CastSpell(SpellIndex::R, rPrediction.position);
+                functions::CastSpell(SpellIndex::R, rPrediction.position);
+                RCastedTime = gameTime;
             }
+
         }
     }
 
     void Update() override
     {
         gameTime = functions::GetGameTime();
-        /*InventorySlot* item2 = globals::localPlayer->GetInventorySlotById(2);
+        /*InventorySlot* item2 = globals::localPlayer->GetInventorySlotById(1);
         if (item2 != nullptr)
         {
-            LOG("Pointer: %p", item2);
-            static bool test = false;
-            if (test)
-            {
-                //LOG("Item Name: %s", item2->GetName());
-                //LOG("Item Path: %s", item2->GetTexturePath());
-                LOG("Item Id: %d", item2->GetId());
-                test = true;
-            }
+            LOG("Item Name: %d", item2->GetId());
         }*/
-
     }
 
     void Attack() override
@@ -214,7 +211,7 @@ public:
 
         if (AsheConfig::AsheCombo::UseW->Value == true)
         {
-            auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(w.GetMaxRange());
+            auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.AsheW.GetMaxRange());
             if (wTarget)
             {
                 if (AsheConfig::AsheCombo::UseWIfInAARange->Value == true && wTarget->IsInAARange()
@@ -255,10 +252,10 @@ public:
 
         if (AsheConfig::AsheClear::UseW->Value == true)
         {
-            if (w.IsCastable())
+            if (database.AsheW.IsCastable())
             {
                 auto wMonster = TargetSelector::Functions::GetObjectInRange(
-                    w.GetMaxRange(), "",
+                    database.AsheW.GetMaxRange(), "",
                     { ObjectType::Minion_Lane, ObjectType::Monster },
                     { ObjectType::Monster_Epic, ObjectType::Monster_Dragon }, false);
 
@@ -279,8 +276,8 @@ public:
     {
 
     }
-    void Killsteal() override
-    {
+    void Killsteal()
+	{
 
     }
 

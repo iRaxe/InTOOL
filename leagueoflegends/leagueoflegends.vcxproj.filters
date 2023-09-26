@@ -128,6 +128,12 @@
     <Filter Include="Scripts\Utilities\Lists Management">
       <UniqueIdentifier>{4b76b81e-de88-4dad-9888-11aee1568818}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Champions\Nautilus">
+      <UniqueIdentifier>{984c743c-31fd-4d40-b7a6-7461a974d133}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Ezreal">
+      <UniqueIdentifier>{c73b577c-a548-4309-a0d1-27790e29276b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -341,6 +347,12 @@
     <ClInclude Include="ListManager.h">
       <Filter>Scripts\Utilities\Lists Management</Filter>
     </ClInclude>
+    <ClInclude Include="Nautilus.h">
+      <Filter>Scripts\Champions\Nautilus</Filter>
+    </ClInclude>
+    <ClInclude Include="Ezreal.h">
+      <Filter>Scripts\Champions\Ezreal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -508,6 +520,12 @@
     </ClCompile>
     <ClCompile Include="ListManager.cpp">
       <Filter>Scripts\Utilities\Lists Management</Filter>
+    </ClCompile>
+    <ClCompile Include="Nautilus.cpp">
+      <Filter>Scripts\Champions\Nautilus</Filter>
+    </ClCompile>
+    <ClCompile Include="Ezreal.cpp">
+      <Filter>Scripts\Champions\Ezreal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

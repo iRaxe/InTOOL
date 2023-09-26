@@ -29,6 +29,7 @@ namespace UPasta
 				rawPhysicalDamage += damageOnHit.PhysicalDamage;
 				rawMagicalDamage += damageOnHit.MagicalDamage;
 				rawTrueDamage += damageOnHit.TrueDamage;
+				
 			}
 
 			switch (autoAttackDamageType)
@@ -40,10 +41,8 @@ namespace UPasta
 				rawMagicalDamage += rawTotalDamage;
 				break;
 			}
-
 			calculatedPhysicalDamage += CalculatePhysicalDamage(source, target, rawPhysicalDamage);
 			calculatedMagicalDamage += CalculateMagicalDamage(source, target, rawMagicalDamage);
-
 			return calculatedPhysicalDamage + calculatedMagicalDamage + rawTrueDamage;
 		}
 
@@ -52,9 +51,9 @@ namespace UPasta
 			if (amount <= 0.0f) 
 				return 0.0f;
 
-			auto flatArmorPenetration = source->GetLethality() * (0.6f + (0.4f * source->GetLevel() / 18.0f));
-			auto percentArmorPenetration = source->GetArmorPenetration();
-			auto percentBonusArmorPenetration = 1.0f;
+			auto flatArmorPenetration = source->GetCharacterStateIntermediate()->GetPhysicalLethality() * (0.6f + (0.4f * source->GetLevel() / 18.0f));
+			auto percentArmorPenetration = source->GetCharacterStateIntermediate()->GetPercentArmorPenetration();
+			auto percentBonusArmorPenetration = source->GetCharacterStateIntermediate()->GetPercentBonusArmorPenetration();
 			auto armor = target->GetArmor();
 			auto bonusArmor = target->GetBonusArmor();
 
@@ -98,8 +97,8 @@ namespace UPasta
 			if (amount <= 0.0f)
 				return 0.0f;
 
-			auto flatMagicPenetration = source->GetMagicPenetration();
-			auto percentMagicPenetration = source->GetMagicPenetrationMulti();
+			auto flatMagicPenetration = source->GetCharacterStateIntermediate()->GetFlatMagicPenetration();
+			auto percentMagicPenetration = source->GetCharacterStateIntermediate()->GetPercentMagicPenetration();
 			auto magicResist = target->GetMagicResist();
 
 			auto bonusTrueDamage = 0.0f;
@@ -135,14 +134,14 @@ namespace UPasta
 		DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* target, DamageType damageType)
 		{
 			DamageModifierResult result;
-			result.Flat = 0;
-			result.Percent = 1.0f;
+			result.Flat = - source->GetCharacterStateIntermediate()->GetFlatMagicReduction();
+			result.Percent = 1.0f - source->GetCharacterStateIntermediate()->GetFlatMagicReduction();
 
 			// Pushing advatange
 			if (source->IsMinion() && target->IsMinion())
 			{
-				result.Flat -= target->GetBaseAttackDamage();
-				result.Percent *= 1.0f + source->GetBonusAttackDamage();
+				result.Flat -= target->GetCharacterStateIntermediate()->GetFlatDamageReductionFromBarracksMinionMod();
+				result.Percent *= 1.0f + source->GetCharacterStateIntermediate()->GetPercentDamageToBarracksMinionMod();
 			}
 
 			// Target buffs
@@ -213,83 +212,64 @@ namespace UPasta
 		DamageOnHitResult Damage::ComputeDamageOnHit(Object* source, Object* target)
 		{
 			DamageOnHitResult result;
-
-
 #pragma region Source items
-			/*bool isItemChecked[4011] = {false};
-			auto inventorySlots = source->HeroInventory.Slots;
 			for (auto i = 0; i < 6; i++)
 			{
-				auto item = inventorySlots[i];
-				auto itemInfo = item->ItemInfo;
+				InventorySlot* item = globals::localPlayer->GetInventorySlotById(i);
+				if (item == nullptr) continue;
 
-				if (!itemInfo) {
-					continue;
-				}
+				if (item)
+				{
+					auto itemID = item->GetId();
 
-				auto itemID = itemInfo->ItemData->ItemId;
-
-				if (isItemChecked[static_cast<int>(itemID)]) {
-					continue;
-				}
-
-				isItemChecked[static_cast<int>(itemID)] = true;
-
-				switch (itemID) {
-				case Item::Noonquiver: {
-					if (target->IsMinion())
-						result.PhysicalDamage += 20;
-					break;
-				}
-				case Item::Blade_of_the_Ruined_King: {
-					auto itemDamage = target->Health * 0.08f;
-					//if (targetFlags & GameObjectFlags_AIMinionClient) {
-					if (target->Minion()) {
-						itemDamage = std::min(itemDamage, 60.0f);
+					switch (itemID)
+					{
+					case 6670: {
+						if (target->IsMinion())
+							result.PhysicalDamage += 20;
+						break;
 					}
-					result.PhysicalDamage += std::max(itemDamage, 15.0f);
-					break;
-				}
-				case Item::Stalkers_Blade_Enchantment_Bloodrazor: {
-					auto itemDamage = target->MaxHealth * 0.04f;
-					//if (targetFlags & GameObjectFlags_AIMinionClient) {
-					if (target->Minion()) {
-						itemDamage = std::min(itemDamage, 75.0f);
-					}
-					result.PhysicalDamage += itemDamage;
-					break;
-				}
-				case Item::Nashors_Tooth:
-					result.MagicalDamage += 15.0f + 0.15f * source->TotalAbilityPower();
-					break;
-				case Item::Recurve_Bow:
-					result.PhysicalDamage += 15.0f;
-					break;
-				case Item::Titanic_Hydra:
-					// "itemtitanichydracleavebuff"
-					result.PhysicalDamage += source->FindBuffHash(0x9848DC51) ? 40.0f + 0.1f * source->MaxHealth : 5.0f + 0.01f * source->MaxHealth;
-					break;
-				case Item::Dead_Mans_Plate: {
-					auto buff = source->FindBuffHash(0xBB077487); // "dreadnoughtmomentumbuff"
-					if (buff) {
-						result.MagicalDamage += buff->Counter;
-					}
-					break;
-				}
-				case Item::Wits_End:
-					result.MagicalDamage += 42.0f;
-					break;
-				case Item::Muramana:
-					//if (targetFlags & GameObjectFlags_AIHeroClient) {
-					if (target->Hero()) {
-						auto mana = source->Resource;
-						if (mana / source->MaxResource > 0.2f) {
-							result.PhysicalDamage += 0.06f * mana;
+					case 3153: {
+						auto itemDamage = target->GetHealth() * 0.08f;
+						//if (targetFlags & GameObjectFlags_AIMinionClient) {
+						if (target->IsMinion()) {
+							itemDamage = min(itemDamage, 60.0f);
 						}
+						result.PhysicalDamage += max(itemDamage, 15.0f);
+						break;
 					}
-					break;
+					case 3115:
+						result.MagicalDamage += 15.0f + 0.15f * source->GetAbilityPower();
+						break;
+					case 1043:
+						result.PhysicalDamage += 15.0f;
+						break;
+					case 3748:
+						result.PhysicalDamage += source->GetBuffByName("itemtitanichydracleavebuff") ? 40.0f + 0.1f * source->GetMaxHealth() : 5.0f + 0.01f * source->GetMaxHealth();
+						break;
+					case 3742:
+					{
+						auto buff = source->GetBuffByName("dreadnoughtmomentumbuff");
+						if (buff)
+						{
+							result.MagicalDamage += buff->GetStacks();
+						}
+						break;
+					}
+					case 3091:
+						result.MagicalDamage += 42.0f;
+						break;
+					case 3042:
+						if (target->IsHero()) {
+							auto mana = source->GetMana();
+							if (mana / source->GetMaxMana() > 0.2f) {
+								result.PhysicalDamage += 0.06f * mana;
+							}
+						}
+						break;
+					}
 				}
-			}*/
+			}
 #pragma endregion
 
 #pragma region Source buffs

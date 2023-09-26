@@ -167,12 +167,11 @@ namespace render
 				for (int i = 0; i < globals::heroManager->GetListSize(); i++)
 				{
 					auto obj = globals::heroManager->GetIndex(i);
-					if (obj->IsValidTarget())
+					if (obj->IsHero())
 					{
-						if (SETTINGS_BOOL("Drawings", "Draw BuffList"))
-						{
-							DrawBuffNames(obj);
-						}
+						
+							//DrawBuffNames(obj);
+						
 
 						if (SETTINGS_BOOL("Drawings", "Draw Spells cooldown"))
 						{

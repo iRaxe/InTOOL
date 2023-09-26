@@ -31,6 +31,7 @@ namespace hooks
 			render::Init();
 			scripts::Init();
 			settings::Load();
+			Skillshot::PopulateSpellsDB();
 
 			//menu::Init();
 			

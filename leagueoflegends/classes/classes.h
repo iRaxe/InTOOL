@@ -10,16 +10,10 @@ public:
     std::string GetName();
 };
 
-class InventorySlotWrapper
-{
-public:
-    InventorySlot* GetSlot();
-};
-
 class ItemListObject
 {
 public:
-    InventorySlotWrapper* GetWrapper();
+    InventorySlot* GetSlot();
 };
 
 
@@ -57,6 +51,8 @@ public:
     float GetFlatMagicDamageMod();
     float GetPercentMagicDamageMod();
     float GetFlatMagicReduction();
+    float GetPercentDamageToBarracksMinionMod();
+    float GetFlatDamageReductionFromBarracksMinionMod();
     float GetPercentMagicReduction();
     float GetFlatCastRangeMod();
     float GetAttackSpeedMod();
@@ -328,7 +324,9 @@ public:
     float GetRealAttackRange();
     float GetDistanceTo(Object* obj);
     bool IsInRange(Vector3 pos, float radius);
-    bool IsInAARange();
+	bool IsUnderEnemyTower();
+	bool IsUnderAllyTower();
+	bool IsInAARange();
     bool CanCastSpell(int slotId);
     Vector3 GetServerPosition();
     int GetBuffListSize();

@@ -204,7 +204,7 @@ public:
     {
 
     }
-    void Killsteal() override
+    void Killsteal()
     {
 
     }
