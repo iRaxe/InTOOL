@@ -40,6 +40,9 @@ namespace functions
 	Vector3 GetMouseWorldPos();
 
 	Vector2 WorldToScreen(Vector3 in);
+	float GetHeightAtPosition(Vector3 in);
+	void ReadOnce();
+	float GetHeight3D_Recreated(Vector2 pos);
 	Vector2 GetMinimapPos();
 	float GetMinimapSize();
 	Vector2 WorldToMinimap(Object* objectToShow);

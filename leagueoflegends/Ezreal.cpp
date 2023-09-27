@@ -240,6 +240,12 @@ public:
             if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(EzrealConfig::EzrealCombo::maxTargetDistance->Value))
                 Ezreal_UseR(rTarget);
         }
+
+        /*InventorySlot* item2 = globals::localPlayer->GetInventorySlotById(0);
+        if (item2 != nullptr)
+        {
+            LOG("Item Name: %d", item2->GetId());
+        }*/
     }
 
     void Attack() override

@@ -4,29 +4,66 @@
 
 int InventorySlot::GetId()
 {
-	return *(int*)((QWORD)this + oInventorySlotItemId);
+	const auto item_id = reinterpret_cast<uintptr_t>(this) + oInventorySlotItemId;
+	const auto pointer = *reinterpret_cast<int*>(item_id);
+	return pointer;
 }
 
 std::string InventorySlot::GetTexturePath()
 {
-	return *(char**)((QWORD)this + oInventorySlotItemTexturePath);
+	const auto item_texture_path = reinterpret_cast<uintptr_t>(this) + oInventorySlotItemTexturePath;
+	const auto pointer = *reinterpret_cast<char**>(item_texture_path);
+	if (IsValidPtr(pointer))
+		return pointer;
+
+	LOG("GetTexturePath Doesnt work");
+	return "";
 }
 
 std::string InventorySlot::GetName()
 {
-	return *(char**)((QWORD)this + oInventorySlotItemName);
+	const auto item_name = reinterpret_cast<uintptr_t>(this) + oInventorySlotItemName;
+	const auto pointer = *reinterpret_cast<char**>(item_name);
+	if (IsValidPtr(pointer))
+		return pointer;
+
+	LOG("GetName Doesnt work");
+	return "";
 }
 
 InventorySlot* ItemListObject::GetSlot()
 {
-	return (InventorySlot*)*(QWORD*)((QWORD)this + oInventorySlot);
+	const auto item_slot = reinterpret_cast<uintptr_t>(this) + oInventorySlot;
+	const auto pointer_item_slot = *reinterpret_cast<uintptr_t*>(item_slot);
+	const auto pointer = reinterpret_cast<InventorySlot*>(pointer_item_slot);
+	if (IsValidPtr(pointer)) 
+		return pointer;
+
+	LOG("GetSlot Doesnt work");
+	return nullptr;
+}
+
+InventorySlot* Object::GetInventorySlotById(int slotId)
+{
+	const auto hero_inventory = reinterpret_cast<QWORD>(this) + 0x4040;
+	const auto inventory_slot = *reinterpret_cast<QWORD*>(hero_inventory) + itemListObjectSize * slotId + oInventorySlotWrapper;
+	const auto pointer_to_slot = *reinterpret_cast<QWORD*>(inventory_slot);
+
+	if (auto list_obj = reinterpret_cast<ItemListObject*>(pointer_to_slot); IsValidPtr(list_obj))
+	{
+		InventorySlot* wrapper = list_obj->GetSlot();
+		return wrapper;
+	}
+
+	LOG("GetInventorySlotById Doesnt work");
+	return nullptr;
 }
 
 void CharacterDataStack::Update(bool change)
 {
 	typedef void(__thiscall* fnUpdate)(QWORD, bool);
-	fnUpdate _update = (fnUpdate)(globals::moduleBase + oCharacterDataStackUpdate);
-	spoof_call(functions::spoof_trampoline, _update, (QWORD)this, change);
+	const auto _update = reinterpret_cast<fnUpdate>(globals::moduleBase + oCharacterDataStackUpdate);
+	spoof_call(functions::spoof_trampoline, _update, reinterpret_cast<QWORD>(this), change);
 }
 
 Vector3 AiManager::GetTargetPosition()
@@ -303,7 +340,7 @@ bool Object::IsVisible()
 
 bool Object::IsAlive()
 {
-	return !functions::IsDead(this);
+	//return !functions::IsDead(this);
 	return !(*(int*)((QWORD)this + oObjAlive) % 2);
 }
 
@@ -324,7 +361,7 @@ float Object::GetPercentMana()
 
 bool Object::IsTargetable()
 {
-	return functions::IsTargetable(this);
+	//return functions::IsTargetable(this);
 	return *(bool*)((QWORD)this + oObjTargetable);
 }
 
@@ -561,17 +598,6 @@ AiManager* Object::GetAiManager()
 {
 	LeagueObfuscation<QWORD> aiManagerObf = *(LeagueObfuscation<QWORD>*)((QWORD)this + oObjAiManager);
 	return (AiManager*)(*(QWORD*)(Decrypt(aiManagerObf) + 0x10));
-}
-
-InventorySlot* Object::GetInventorySlotById(int slotId)
-{
-	ItemListObject* listObj = (ItemListObject*)*(QWORD*)(*(QWORD*)((QWORD)this + oObjItemManager) + itemListObjectSize * slotId + oInventorySlotWrapper);
-	if (IsValidPtr(listObj))
-	{
-		InventorySlot* wrapper = listObj->GetSlot();
-		return wrapper;
-	}
-	return nullptr;
 }
 
 Spell* Object::GetSpellBySlotId(int slotId)

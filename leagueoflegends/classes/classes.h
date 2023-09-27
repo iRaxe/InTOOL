@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../itemsdatabase.h"
 #include "../stdafx.h"
 
 class InventorySlot

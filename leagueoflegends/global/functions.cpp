@@ -146,6 +146,29 @@ namespace functions
 		return Vector2(out.x, out.y);
 	}
 
+	float GetHeightAtPosition(Vector3 in)
+	{
+		float World_y;
+		typedef float(__fastcall* fnpointHeight)(float, float, float*);
+		fnpointHeight _fnpointHeight = reinterpret_cast<fnpointHeight>(globals::moduleBase + fGetHeightAtPosition);
+		_fnpointHeight(in.x, in.z, &World_y);
+		return _fnpointHeight(in.x, in.z, &World_y);
+	}
+
+	template <typename Type>
+	Type RPM(const QWORD address)
+	{
+		if (!address)
+			return Type();
+
+		Type buffer;
+
+		return NT_SUCCESS(ReadProcessMemory(GetCurrentProcess(), (LPVOID)address, &buffer, sizeof(Type), NULL)) ? buffer : Type();
+	};
+
+
+	//0xD901B0		
+
 	Vector2 GetMinimapPos()
 	{
 		return ReadVector2((QWORD)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oMinimapObject) + MinimapObjectHud) + MinimapHudPos));

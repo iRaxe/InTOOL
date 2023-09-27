@@ -58,6 +58,7 @@
 #include "global/targetver.h"
 #include "scripts/championmodule.h"
 #include "scripts/skillshotdatabase.h"
+#include "itemsdatabase.h"
 #include "scripts/scripts.h"
 #include "hooks/hooks.h"
 #include "hooks/impl/impl.h"

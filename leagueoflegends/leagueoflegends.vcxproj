@@ -209,6 +209,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Info.h" />
     <ClInclude Include="InitializeEvents.h" />
+    <ClInclude Include="itemsdatabase.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="KeyBind.h" />
     <ClInclude Include="kiero\kiero.h" />
@@ -276,6 +277,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
+    <ClCompile Include="itemsdatabase.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
     <ClCompile Include="kiero\minhook\src\buffer.c" />

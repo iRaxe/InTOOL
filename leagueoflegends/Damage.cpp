@@ -224,12 +224,12 @@ namespace UPasta
 
 					switch (itemID)
 					{
-					case 6670: {
+					case Noonquiver: {
 						if (target->IsMinion())
 							result.PhysicalDamage += 20;
 						break;
 					}
-					case 3153: {
+					case Blade_of_the_Ruined_King: {
 						auto itemDamage = target->GetHealth() * 0.08f;
 						//if (targetFlags & GameObjectFlags_AIMinionClient) {
 						if (target->IsMinion()) {
@@ -238,16 +238,16 @@ namespace UPasta
 						result.PhysicalDamage += max(itemDamage, 15.0f);
 						break;
 					}
-					case 3115:
+					case Nashors_Tooth:
 						result.MagicalDamage += 15.0f + 0.15f * source->GetAbilityPower();
 						break;
-					case 1043:
+					case Recurve_Bow:
 						result.PhysicalDamage += 15.0f;
 						break;
-					case 3748:
+					case Titanic_Hydra:
 						result.PhysicalDamage += source->GetBuffByName("itemtitanichydracleavebuff") ? 40.0f + 0.1f * source->GetMaxHealth() : 5.0f + 0.01f * source->GetMaxHealth();
 						break;
-					case 3742:
+					case Dead_Mans_Plate:
 					{
 						auto buff = source->GetBuffByName("dreadnoughtmomentumbuff");
 						if (buff)
@@ -256,10 +256,10 @@ namespace UPasta
 						}
 						break;
 					}
-					case 3091:
+					case Wits_End:
 						result.MagicalDamage += 42.0f;
 						break;
-					case 3042:
+					case Muramana:
 						if (target->IsHero()) {
 							auto mana = source->GetMana();
 							if (mana / source->GetMaxMana() > 0.2f) {

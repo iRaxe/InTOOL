@@ -134,6 +134,12 @@
     <Filter Include="Scripts\Champions\Ezreal">
       <UniqueIdentifier>{c73b577c-a548-4309-a0d1-27790e29276b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\SDK\Skills">
+      <UniqueIdentifier>{66adef8e-e4b0-443b-bd2f-449650213be6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\SDK\Items">
+      <UniqueIdentifier>{26997e6d-ea89-43f3-8614-282cfc5371e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -328,9 +334,6 @@
     <ClInclude Include="scripts\championmodule.h">
       <Filter>Scripts\Champions</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\skillshotdatabase.h">
-      <Filter>Scripts\SDK</Filter>
-    </ClInclude>
     <ClInclude Include="scripts\scripts.h">
       <Filter>Scripts\SDK</Filter>
     </ClInclude>
@@ -352,6 +355,12 @@
     </ClInclude>
     <ClInclude Include="Ezreal.h">
       <Filter>Scripts\Champions\Ezreal</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\skillshotdatabase.h">
+      <Filter>Scripts\SDK\Skills</Filter>
+    </ClInclude>
+    <ClInclude Include="itemsdatabase.h">
+      <Filter>Scripts\SDK\Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -503,9 +512,6 @@
     <ClCompile Include="Rect.cpp">
       <Filter>Menu\New Menu\Components\Rect</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\skillshotdatabase.cpp">
-      <Filter>Scripts\SDK</Filter>
-    </ClCompile>
     <ClCompile Include="scripts\scripts.cpp">
       <Filter>Scripts\SDK</Filter>
     </ClCompile>
@@ -526,6 +532,12 @@
     </ClCompile>
     <ClCompile Include="Ezreal.cpp">
       <Filter>Scripts\Champions\Ezreal</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\skillshotdatabase.cpp">
+      <Filter>Scripts\SDK\Skills</Filter>
+    </ClCompile>
+    <ClCompile Include="itemsdatabase.cpp">
+      <Filter>Scripts\SDK\Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

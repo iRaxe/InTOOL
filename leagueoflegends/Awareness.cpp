@@ -274,27 +274,37 @@ namespace UPasta
 					initializedAwarenessMenu = true;
 				}
 
+				Menu* TrackerMenu;
 				namespace EnemyTracker
 				{
-					Menu* EnemyTrackerMenu;
 					void InitializeTrackerMenu()
 					{
-						EnemyTrackerMenu = AwarenessMenu->AddMenu("enemyTracker", "Enemies Tracker");
-						status = EnemyTrackerMenu->AddCheckBox("status", "Enable the Tracker", true);
-						showExperience = EnemyTrackerMenu->AddCheckBox("showExperience", "Show experience", true);
-						showPaths = EnemyTrackerMenu->AddCheckBox("showPaths", "Show paths", true);
+						TrackerMenu = AwarenessMenu->AddMenu("TrackerDrawings", "Tracker Drawings");
+						status = TrackerMenu->AddCheckBox("status", "Enable the Tracker", true);
+
+						const auto ExperienceDrawingsMenu = TrackerMenu->AddMenu("ExperienceDrawingsMenu", "Experience Tracker");
+						showExperience = ExperienceDrawingsMenu->AddCheckBox("showExperience", "Show experience", true);
+						showExperienceSelf = ExperienceDrawingsMenu->AddCheckBox("showExperienceSelf", "Show your experience", false);
+						showExperienceAllies = ExperienceDrawingsMenu->AddCheckBox("showExperienceAllies", "Show experience for allies", false);
+						showExperienceEnemies = ExperienceDrawingsMenu->AddCheckBox("showExperienceEnemies", "Show experience for enemies", true);
+
+						const auto PathDrawingsMenu = TrackerMenu->AddMenu("PathDrawingsMenu", "Path Tracker");
+						showPaths = PathDrawingsMenu->AddCheckBox("showPaths", "Show paths", true);
+						showPathsSelf = PathDrawingsMenu->AddCheckBox("showExperienceSelf", "Show your path", false);
+						showPathsAllies = PathDrawingsMenu->AddCheckBox("showExperienceAllies", "Show path for allies", false);
+						showPathsEnemies = PathDrawingsMenu->AddCheckBox("showExperienceEnemies", "Show path for enemies", true);
+
 						initializedTrackerMenu = true;
 					}
 				}
 
 				namespace EnemySidebar
 				{
-					Menu* EnemySidebarMenu;
 					void InitializeSidebarMenu()
 					{
-						EnemySidebarMenu = AwarenessMenu->AddMenu("enemySidebar", "Enemies sidebar");
+						const auto EnemySidebarMenu = TrackerMenu->AddMenu("enemySidebar", "Enemies sidebar");
 						status = EnemySidebarMenu->AddCheckBox("status", "Enable the sidebar", true);
-						orientationHorizontal = EnemySidebarMenu->AddCheckBox("orientationHorizontal", "Rotate horizontal", false);
+						orientation = EnemySidebarMenu->AddList("orientationMode", "Draw Mode", std::vector<std::string>{"Vertical", "Horizontal"}, 0);
 						hudSize = EnemySidebarMenu->AddSlider("hudSize", "Sidebar Multiplier", 50.0f, 10.0f, 100.0f, 10.0f);
 						initializedSidebarMenu = true;
 					}
@@ -302,29 +312,37 @@ namespace UPasta
 
 				namespace Radius
 				{
-					Menu* RadiusMenu;
+
 					void InitializeRadiusMenu()
 					{
-						RadiusMenu = AwarenessMenu->AddMenu("utilityRadius", "Radius drawings");
-						drawMode = RadiusMenu->AddList("drawMode", "Draw Mode", std::vector<std::string>{"Circle", "Arc"}, 0);
+						const auto RadiusMenu = AwarenessMenu->AddMenu("utilityRadius", "Radius drawings");
 						status = RadiusMenu->AddCheckBox("status", "Enable radius drawings", true);
-						showMissiles = RadiusMenu->AddCheckBox("showMissiles", "Enable missiles drawings", true);
-						showBoundingRadius = RadiusMenu->AddCheckBox("showBoundingRadius", "Enable bounding radius", true);
-						showAARadius = RadiusMenu->AddCheckBox("showAARadius", "Enable autoattack radius", true);
-						showAARadiusSelf = RadiusMenu->AddCheckBox("showAARadiusSelf", "Show your radius", true);
-						showAARadiusAllies = RadiusMenu->AddCheckBox("showAARadiusAllies", "Show radius for allies", false);
-						showAARadiusEnemies = RadiusMenu->AddCheckBox("showAARadiusEnemies", "Show radius for enemies", false);
-						qualityDraw = RadiusMenu->AddSlider("qualityDraw", "Drawings quality", 50, 10, 100, 10);
+						drawMode = RadiusMenu->AddList("drawMode", "Draw Mode", std::vector<std::string>{"Circle", "Arc"}, 0);
+
+						const auto DrawingsToShowMenu = RadiusMenu->AddMenu("DrawingsToShowMenu", "Drawings To Show");
+						showMissiles = DrawingsToShowMenu->AddCheckBox("showMissiles", "Enable missiles drawings", true);
+						showBoundingRadius = DrawingsToShowMenu->AddCheckBox("showBoundingRadius", "Enable bounding radius", true);
+						showAARadius = DrawingsToShowMenu->AddCheckBox("showAARadius", "Enable autoattack radius", true);
+
+						const auto EnableDrawingsForMenu = RadiusMenu->AddMenu("EnableDrawingsForMenu", "Show Drawings For");
+						showAARadiusSelf = EnableDrawingsForMenu->AddCheckBox("showAARadiusSelf", "Show your radius", true);
+						showAARadiusAllies = EnableDrawingsForMenu->AddCheckBox("showAARadiusAllies", "Show radius for allies", false);
+						showAARadiusEnemies = EnableDrawingsForMenu->AddCheckBox("showAARadiusEnemies", "Show radius for enemies", false);
+
+						const auto additionalMenu = RadiusMenu->AddMenu("Additional Settings", "Additional Settings");
+						showHeight = additionalMenu->AddCheckBox("showHeight", "Consider terrain height", false);
+						heightTollerance = additionalMenu->AddSlider("heightTollerance", "Terrain height tollerance", 20, 10, 60, 10);
+
+						qualityDraw = additionalMenu->AddSlider("qualityDraw", "Drawings quality", 50, 10, 100, 10);
 						initializedRadiusMenu = true;
 					}
 				}
 
 				namespace Zoom
 				{
-					Menu* ZoomMenu;
 					void InitializeZoomMenu()
 					{
-						ZoomMenu = AwarenessMenu->AddMenu("zoomUtility", "Camera settings");
+						const auto ZoomMenu = AwarenessMenu->AddMenu("zoomUtility", "Camera settings");
 						status = ZoomMenu->AddCheckBox("status", "Enable camera tool", true);
 						status3D = ZoomMenu->AddCheckBox("status3D", "Enable view 3D", false);
 						statusKeyboard = ZoomMenu->AddCheckBox("statusKeyboard", "Enable Keyboard inputs", true);
@@ -337,10 +355,9 @@ namespace UPasta
 
 				namespace JungleTracker
 				{
-					Menu* JungleTrackerMenu;
 					void InitializeJungleTrackerMenu()
 					{
-						JungleTrackerMenu = AwarenessMenu->AddMenu("jungleUtility", "Jungle tracker settings");
+						const auto JungleTrackerMenu = AwarenessMenu->AddMenu("jungleUtility", "Jungle tracker settings");
 						status = JungleTrackerMenu->AddCheckBox("status", "Enable jungle tracker tool", true);
 						showTimer = JungleTrackerMenu->AddCheckBox("showTimer", "Show timers", true);
 						showIcons = JungleTrackerMenu->AddCheckBox("showIcons", "Show icons", true);
@@ -403,9 +420,9 @@ namespace UPasta
 					{
 						if (Configs::EnemyTracker::initializedTrackerMenu)
 						{
-							if (Configs::EnemyTracker::showExperience->Value == true)
+							if (Configs::EnemyTracker::status->Value == true)
 							{
-								DrawEnemyTracker();
+								DrawTracker();
 							}
 						}
 					}
@@ -420,20 +437,32 @@ namespace UPasta
 					}
 
 
-					void DrawEnemyTracker()
+					void DrawTracker()
 					{
 						for (int i = 0; i < globals::heroManager->GetListSize(); i++)
 						{
 							auto obj = globals::heroManager->GetIndex(i);
-							if (obj->GetName() == "PracticeTool_TargetDummy" || obj->IsAlly())
-								continue;
+							if (obj->GetName() == "PracticeTool_TargetDummy") continue;
 
 							if (obj && obj->IsVisible())
 							{
-								DrawCooldownBar(obj);
+								if (!obj->IsAlive()) continue;
+
+								if (Configs::EnemyTracker::status->Value == true)
+								{
+									if (Configs::EnemyTracker::showExperienceSelf->Value == false && obj->GetNetId() == globals::localPlayer->GetNetId()) continue;
+									if (Configs::EnemyTracker::showExperienceAllies->Value == false && obj->IsAlly() && obj->GetNetId() != globals::localPlayer->GetNetId()) continue;
+									if (Configs::EnemyTracker::showExperienceEnemies->Value == false && obj->IsEnemy()) continue;
+
+									DrawCooldownBar(obj);
+								}
 
 								if (Configs::EnemyTracker::showPaths->Value == true)
 								{
+									if (Configs::EnemyTracker::showPathsSelf->Value == false && obj->GetNetId() == globals::localPlayer->GetNetId()) continue;
+									if (Configs::EnemyTracker::showPathsAllies->Value == false && obj->IsAlly() && obj->GetNetId() != globals::localPlayer->GetNetId()) continue;
+									if (Configs::EnemyTracker::showPathsEnemies->Value == false && obj->IsEnemy()) continue;
+
 									DrawPlayerPaths(obj);
 								}
 							}
@@ -442,8 +471,6 @@ namespace UPasta
 
 					void DrawCooldownBar(Object* obj)
 					{
-						if (!obj->IsValidTarget()) return;
-
 						const float barWidth = 128.0f;
 						const float cdWidth = 26.5f;
 						const float cdHeight = 6.0f;
@@ -598,7 +625,7 @@ namespace UPasta
 							float spacing = 0.0f;
 							ImGui::BeginChild(
 								"Test", 
-								Configs::EnemySidebar::orientationHorizontal->Value ? 
+								Configs::EnemySidebar::orientation->Value ? 
 								ImVec2(champListSize * ((200 + spacing) * size), 200 * size) : 
 								ImVec2(200 * size, champListSize * ((200 + spacing) * size)), 
 								false);
@@ -609,7 +636,7 @@ namespace UPasta
 								if (obj->GetName() == "PracticeTool_TargetDummy" || obj->IsAlly())
 									continue;
 
-								ImVec2 p = Configs::EnemySidebar::orientationHorizontal->Value ? ImVec2(p2.x + (spacing * size), p2.y) : ImVec2(p2.x, p2.y + (spacing * size));
+								ImVec2 p = Configs::EnemySidebar::orientation->Value ? ImVec2(p2.x + (spacing * size), p2.y) : ImVec2(p2.x, p2.y + (spacing * size));
 								ImVec2 heroIconMin = ImVec2(p.x + 40 * size, p.y + 30 * size);
 								ImVec2 heroIconMax = ImVec2(p.x + 170 * size, p.y + 150 * size);
 
@@ -718,12 +745,12 @@ namespace UPasta
 						}
 					}
 
-					void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness)
+					void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness, bool takeHeightInConsideration)
 					{
 						switch (Configs::Radius::drawMode->Value)
 						{
 						case 0: //Circle
-							render::RenderCircleWorld(worldPos, Configs::Radius::qualityDraw->Value, radius, color, thickness);
+							render::RenderCircleWorld(worldPos, Configs::Radius::qualityDraw->Value, radius, color, thickness, takeHeightInConsideration);
 							break;
 						case 1: //Arc
 							render::RenderArcWorld(worldPos, Configs::Radius::qualityDraw->Value, radius, color, thickness, PI / 3, functions::GetMouseWorldPos(), true);
@@ -739,18 +766,14 @@ namespace UPasta
 							if (obj->GetNetId() == globals::localPlayer->GetNetId())
 							{
 								if (Configs::Radius::showAARadiusSelf->Value == true)
-								{
-									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f);
-								}
+									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, false);
 							}
 							else
 							{
 								if (obj->IsEnemy() && Configs::Radius::showAARadiusEnemies->Value == true)
-								{
-									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f);
-								}
+									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, false);
 								if (obj->IsAlly() && Configs::Radius::showAARadiusAllies->Value == true)
-									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f);
+									DrawRadius(obj->GetPosition(), obj->GetBoundingRadius(), COLOR_WHITE, 1.0f, false);
 							}
 						}
 					}
@@ -920,6 +943,10 @@ namespace UPasta
 							Vector3 objDrawPos = functions::GetBaseDrawPosition(obj);
 							Vector2 objMinimapPos = functions::WorldToMinimap(obj);
 							ImVec2 p = objMinimapPos.ToImVec();
+
+							const Vector3 ignorePos1(2000.000000, 195.748108, 2000.000000);
+							if (render::IsVectorEqual(objDrawPos, ignorePos1)) continue;
+
 							if (Configs::JungleTracker::showIcons->Value == true)
 							{
 								DrawIcons(objDrawPos, p, 30);
@@ -981,6 +1008,8 @@ namespace UPasta
 								render::RenderImage(Resources::JungleTracker::DX11::JungleIcons::riftheraldTextureIcon, jungleIconMin, jungleIconMax, COLOR_WHITE);
 						}
 						render::RenderImage(Resources::JungleTracker::DX11::HudDesign::hudJunglePortrait, pos, ImVec2(pos.x + 30, pos.y + 30), COLOR_WHITE);
+						render::RenderCircleFilled(ImVec2(pos.x + 15.0f, pos.y + 15.0f), 15, COLOR_DARK_TRANSPARENT, 0);
+
 					}
 
 					void DrawTimers(Object* obj, ImVec2 pos)
@@ -994,7 +1023,6 @@ namespace UPasta
 
 							if (timeToShow > 0.0f)
 							{
-								render::RenderCircleFilled(ImVec2(pos.x + 15.0f, pos.y + 15.0f), 15, COLOR_DARK_TRANSPARENT, 0);
 								render::RenderText(functions::ConvertTime(timeToShow), ImVec2(pos.x - 7.0f, pos.y - 7.0f), 14, COLOR_RED, false);
 							}
 
@@ -1006,7 +1034,6 @@ namespace UPasta
 
 							if (timeToShow > 0.0f)
 							{
-								render::RenderCircleFilled(ImVec2(pos.x + 15.0f, pos.y + 15.0f), 15, COLOR_DARK_TRANSPARENT, 0);
 								render::RenderText(functions::ConvertTime(timeToShow), ImVec2(pos.x - 7.0f, pos.y - 7.0f), 14, COLOR_RED, false);
 							}
 						}

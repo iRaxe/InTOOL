@@ -32,7 +32,7 @@ namespace render
 	void RenderImage(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color);
 	void RenderImageHFlip(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color);
 	void RenderImageRounded(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags);
-	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness);
+	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height = false);
 	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls);
 	void RenderPolygon(const Geometry::Polygon poly, const uintptr_t color, float thickness);
 	void RenderFilledPolygon(const Geometry::Polygon poly, uintptr_t color);

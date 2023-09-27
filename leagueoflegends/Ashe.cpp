@@ -191,11 +191,6 @@ public:
     void Update() override
     {
         gameTime = functions::GetGameTime();
-        /*InventorySlot* item2 = globals::localPlayer->GetInventorySlotById(1);
-        if (item2 != nullptr)
-        {
-            LOG("Item Name: %d", item2->GetId());
-        }*/
     }
 
     void Attack() override

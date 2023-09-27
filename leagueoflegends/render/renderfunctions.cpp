@@ -1,3 +1,4 @@
+#include "../Awareness.h"
 #include "../stdafx.h"
 namespace render
 {
@@ -268,7 +269,7 @@ namespace render
 		return angle_radians;
 	}
 
-	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness)
+	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height)
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
 
@@ -284,10 +285,14 @@ namespace render
 		float theta = 0.f;
 		for (int i = 0; i < numPoints; i++, theta += step)
 		{
-			Vector3 worldSpace = { worldPos.x + radius * cos(theta), worldPos.y, worldPos.z - radius * sin(theta) };
-			ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
+			const Vector3 worldSpace = { worldPos.x + radius * cos(theta), worldPos.y , worldPos.z - radius * sin(theta) };
+			const ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
+			points[i].x = screenSpace.x;
 
-			points[i] = screenSpace;
+			if (height)
+				points[i].y = screenSpace.y - min(max(-UPasta::SDK::Awareness::Configs::Radius::heightTollerance->Value, functions::GetHeightAtPosition(worldSpace)), UPasta::SDK::Awareness::Configs::Radius::heightTollerance->Value);
+			else
+				points[i].y = screenSpace.y;
 		}
 
 		points[numPoints] = points[0];

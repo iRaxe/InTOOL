@@ -103,11 +103,18 @@ namespace UPasta::SDK::Awareness
             inline bool initializedTrackerMenu;
             void Initialize();
             void InitializeTrackerMenu();
-            extern Menu* EnemyTrackerMenu;
 
             inline CheckBox* status;
+
             inline CheckBox* showExperience;
+            inline CheckBox* showExperienceSelf;
+            inline CheckBox* showExperienceAllies;
+            inline CheckBox* showExperienceEnemies;
+            
             inline CheckBox* showPaths;
+            inline CheckBox* showPathsSelf;
+            inline CheckBox* showPathsAllies;
+            inline CheckBox* showPathsEnemies;
         }
 
         namespace EnemySidebar
@@ -116,10 +123,9 @@ namespace UPasta::SDK::Awareness
             inline bool initializedSidebarMenu;
             void Initialize();
             void InitializeSidebarMenu();
-            extern Menu* EnemySidebarMenu;
 
             inline CheckBox* status;
-            inline CheckBox* orientationHorizontal;
+            inline List* orientation;
             inline Slider* hudSize;
         }
 
@@ -128,17 +134,21 @@ namespace UPasta::SDK::Awareness
             inline bool initializedRadiusMenu;
             void Initialize();
             void InitializeRadiusMenu();
-            extern Menu* RadiusMenu;
 
             inline CheckBox* status;
             inline List* drawMode;
+            inline CheckBox* showHeight;
+            inline Slider* heightTollerance;
+
+            inline Slider* qualityDraw;
+
         	inline CheckBox* showMissiles;
             inline CheckBox* showBoundingRadius;
             inline CheckBox* showAARadius;
             inline CheckBox* showAARadiusSelf;
             inline CheckBox* showAARadiusAllies;
             inline CheckBox* showAARadiusEnemies;
-            inline Slider* qualityDraw;
+
         }
 
         namespace Zoom
@@ -146,8 +156,6 @@ namespace UPasta::SDK::Awareness
             inline bool initializedZoomMenu;
             void Initialize();
             void InitializeZoomMenu();
-
-            extern Menu* ZoomMenu;
 
             inline CheckBox* status;
             inline CheckBox* status3D;
@@ -162,7 +170,6 @@ namespace UPasta::SDK::Awareness
             inline bool initializedJungleTrackerMenu;
             void Initialize();
             void InitializeJungleTrackerMenu();
-            extern Menu* JungleTrackerMenu;
 
             inline CheckBox* status;
             inline CheckBox* showTimer;
@@ -186,7 +193,7 @@ namespace UPasta::SDK::Awareness
                                                            980.f, 1080.f, 1180.f, 1280.f, 1380.f, 1480.f, 1580.f,
                                                            1680.f, 1780.f, 1880.f };
 
-            void DrawEnemyTracker();
+            void DrawTracker();
             void DrawCooldownBar(Object* obj);
             void DrawPlayerPaths(Object* obj);
 
@@ -205,7 +212,7 @@ namespace UPasta::SDK::Awareness
 
         namespace Radius
         {
-            void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness);
+            void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness, bool takeHeightInConsideration = Configs::Radius::showHeight->Value);
             static void ShowMissiles();
             static void ShowBoundingRadius(Object* obj, int quality);
             static void ShowAARadius(Object* obj, int quality);
