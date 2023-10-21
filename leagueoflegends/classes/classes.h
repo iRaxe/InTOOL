@@ -3,6 +3,51 @@
 #include "../itemsdatabase.h"
 #include "../stdafx.h"
 
+class LolString
+{
+    char content[0x10]; // 0x0
+    int len = 0; // 0x10
+    int max = 0; // 0x14
+
+public:
+
+    LolString()
+    {
+        len = *(int*)((uintptr_t)this + 0x10);
+    }
+
+    operator const char* (void)
+    {
+        return c_str();
+    }
+    operator std::string(void)
+    {
+        return std::string(c_str());
+    }
+
+    std::string str()
+    {
+        return std::string(c_str());
+    }
+
+private:
+
+    char* c_str(void)
+    {
+        if (QWORD(this) <= 0x1000)
+            return (char*)"";
+        if (len > 15)
+        {
+            auto text = *reinterpret_cast<char**>((uintptr_t)this);
+            return text;
+        }
+        else
+        {
+            return content;
+        }
+    }
+};
+
 class InventorySlot
 {
 public:
@@ -11,12 +56,19 @@ public:
     std::string GetName();
 };
 
+
 class ItemListObject
 {
 public:
     InventorySlot* GetSlot();
 };
 
+class HeroInventory
+{
+public:
+    InventorySlot* GetInventorySlot(int slotId);
+    InventorySlot* FindItemID(int itemID);
+};
 
 class CharacterStackData
 {
@@ -142,13 +194,6 @@ public:
 	SpellData* GetSpellData();
 };
 
-struct MissileManager
-{
-public:
-    QWORD* vtable;
-    std::map<QWORD, void*> missile_map;
-};
-
 class Missiles
 {
 public:
@@ -187,6 +232,7 @@ public:
 	void SetEndPos(Vector3 pos);
 	void SetClickedPos(Vector3 pos);
 	void SetUnkPos(Vector3 pos);
+	void SetReleasePos(Vector3 pos);
 };
 
 class Spell
@@ -210,6 +256,7 @@ class SpellCast
 {
 public:
     SpellInfo* GetSpellInfo();
+    SpellInfo* GetProcessSpellInfo();
     int GetSpellId();
 public:
     bool IsAutoAttack();
@@ -239,6 +286,13 @@ public:
     BuffEntry* GetBuffEntryByIndex(int index);
 };
 
+struct KappaManager
+{
+public:
+    uintptr_t* vtable;
+    std::map<uintptr_t, Missile*> missile_map;
+};
+
 class Object
 {
 public:
@@ -253,7 +307,8 @@ public:
     float GetMaxMana();
     float GetPercentMana();
     bool IsTargetable();
-    bool IsCursed();
+	bool IsInvulnerable();
+	bool IsCursed();
     bool HasBarrier(int slotId);
     bool HasFlash(int slotId);
     bool HasCleanse(int slotId);
@@ -274,7 +329,8 @@ public:
     float GetBaseAttackDamage();
 	float GetScale();
     float GetMovementSpeed();
-    float GetLethality();
+	float GetAttackSpeed();
+	float GetLethality();
 	float GetArmor();
     float GetBonusArmor();
     float GetTotalArmor();
@@ -284,7 +340,8 @@ public:
     float GetMagicPenetrationMulti();
     float GetTotalMagicPenetration();
     float GetAttackRange();
-	std::string GetName();
+    std::string GetName();
+    MissileData* MissileMgr();
     BuffManager* GetBuffManager();
     QWORD* GetBuffManagerEntriesEnd();
     SpellCast* GetActiveSpellCast();
@@ -292,11 +349,14 @@ public:
     Missile* GetMissileByIndex();
     CharacterData* GetCharacterData();
     AiManager* GetAiManager();
-    InventorySlot* GetInventorySlotById(int slotId);
+	HeroInventory* GetHeroInventory();
+
 public:
     float GetBoundingRadius();
     float GetAttackDelay();
     float GetAttackWindup();
+	bool IsCastingSpell();
+
 public:
     bool CanAttack();
     bool CanCast();
@@ -306,6 +366,8 @@ public:
     bool IsJungle();
     bool IsValidTarget();
 	bool IsRespawnMarker();
+	bool IsMelee();
+	bool IsRanged();
 	bool IsHero();
     bool IsSpecial();
     bool IsMinion();
@@ -319,7 +381,8 @@ public:
     bool IsWard();
     bool IsEpicMonster();
     bool IsTurret();
-    float CharGetAttackDamage();
+	bool IsBuilding();
+	float CharGetAttackDamage();
     float GetAttackDamage();
     float GetEffectiveHealth(int damageType);
     float GetRealAttackRange();
@@ -340,6 +403,8 @@ public:
 class ObjectManager
 {
 public:
+    uintptr_t* vtable;
+    std::map<uintptr_t, Missile*> missile_map;
     int GetListSize();
     Object* GetIndex(int index);
 public:

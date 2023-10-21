@@ -3,54 +3,11 @@
 #include "Awareness.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
-#include "Orbwalker.h"
 
 class NautilusModule : public ChampionModule
 {
 private:
     std::string name = SP_STRING("Nautilus");
-
-	Skillshot q = SkillshotManager::RegisterSpell(
-        name,
-        SpellIndex::Q,
-        Skillshot(
-            NautilusDamages::QSpell::range,
-            NautilusDamages::QSpell::width,
-            NautilusDamages::QSpell::speed,
-            NautilusDamages::QSpell::delay,
-            SkillshotType::SkillshotLine,
-            { CollidableObjects::Objects, CollidableObjects::Walls }));
-
-    Skillshot w = SkillshotManager::RegisterSpell(
-        name,
-        SpellIndex::W,
-        Skillshot(
-            NautilusDamages::ESpell::range,
-            NautilusDamages::ESpell::range,
-            NautilusDamages::ESpell::speed,
-            NautilusDamages::ESpell::delay,
-            SkillshotType::SkillshotNone));
-
-    Skillshot e = SkillshotManager::RegisterSpell(
-        name,
-        SpellIndex::E,
-        Skillshot(
-            NautilusDamages::ESpell::range,
-            NautilusDamages::ESpell::range,
-            NautilusDamages::ESpell::speed,
-            NautilusDamages::ESpell::delay,
-            SkillshotType::SkillshotNone));
-
-    Skillshot r = SkillshotManager::RegisterSpell(
-        name,
-        SpellIndex::R,
-        Skillshot(
-            NautilusDamages::RSpell::range,
-            NautilusDamages::RSpell::range,
-            NautilusDamages::RSpell::speed,
-            NautilusDamages::RSpell::delay,
-            SkillshotType::SkillshotNone));
-
 private:
     float gameTime = 0.0f;
 
@@ -91,9 +48,9 @@ public:
 
     void Init() override
     {
-        auto NautilusMenu = Menu::CreateMenu("vezNautilus", "vez.Nautilus");
+        const auto NautilusMenu = Menu::CreateMenu("vezNautilus", "vez.Nautilus");
 
-        auto combo = NautilusMenu->AddMenu("Combo Settings", "Combo Settings");
+        const auto combo = NautilusMenu->AddMenu("Combo Settings", "Combo Settings");
         NautilusConfig::NautilusCombo::UseQ = combo->AddCheckBox("Use Q", "Use SpellSlot Q", true);
         NautilusConfig::NautilusCombo::UseW = combo->AddCheckBox("Use W", "Use SpellSlot W", true);
         NautilusConfig::NautilusCombo::UseE = combo->AddCheckBox("Use E", "Use SpellSlot E", true);
@@ -102,93 +59,149 @@ public:
         NautilusConfig::NautilusCombo::enemiesInRange = combo->AddSlider("minEnemiesInRange", "Minimum enemies to use R", 2, 1, 5, 1);
         NautilusConfig::NautilusCombo::engageModeKey = combo->AddKeyBind("engageModeKey", "Engage Mode Key", VK_CONTROL, false, true);
 
-    	auto harassMenu = NautilusMenu->AddMenu("Harass Settings", "Harass Settings");
+        const auto harassMenu = NautilusMenu->AddMenu("Harass Settings", "Harass Settings");
         NautilusConfig::NautilusHarass::UseQ = harassMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
         NautilusConfig::NautilusHarass::UseQDive = harassMenu->AddCheckBox("Use Q Dive", "Use SpellSlot Q Under Enemy Turret", false);
         NautilusConfig::NautilusHarass::UseE = harassMenu->AddCheckBox("Use E", "Use SpellSlot E", true);
         NautilusConfig::NautilusHarass::minMana = harassMenu->AddSlider("minHarassMana", "Minimum Mana", 60, 1, 100, 5);
 
-        auto jungleMenu = NautilusMenu->AddMenu("Jungleclear Settings", "Jungleclear Settings");
+        const auto jungleMenu = NautilusMenu->AddMenu("Jungleclear Settings", "Jungleclear Settings");
         NautilusConfig::NautilusJungle::UseQ = jungleMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
         NautilusConfig::NautilusJungle::UseW = jungleMenu->AddCheckBox("Use W", "Use SpellSlot W", true);
         NautilusConfig::NautilusJungle::minMana = jungleMenu->AddSlider("minClearMana", "Minimum Mana", 60, 1, 100, 5);
 
-        auto ksMenu = NautilusMenu->AddMenu("Killsteal Settings", "Killsteal Settings");
+    	const auto additionalMenu = NautilusMenu->AddMenu("Additional Settings", "Additional Settings");
+
+        const auto ksMenu = additionalMenu->AddMenu("Killsteal Settings", "Killsteal Settings");
         NautilusConfig::NautilusKillsteal::UseQ = ksMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
         NautilusConfig::NautilusKillsteal::UseE = ksMenu->AddCheckBox("Use E", "Use SpellSlot E", true);
         NautilusConfig::NautilusKillsteal::UseR = ksMenu->AddCheckBox("Use R", "Use SpellSlot R", true);
 
-    	auto antiGapMenu = NautilusMenu->AddMenu("AntiGapCloser Settings", "AntiGapCloser Settings");
+        const auto antiGapMenu = additionalMenu->AddMenu("AntiGapCloser Settings", "AntiGapCloser Settings");
         NautilusConfig::NautilusAntiGapCloser::UseE = antiGapMenu->AddCheckBox("Use E", "Use SpellSlot E", true);
 
-        auto interrupterMenu = NautilusMenu->AddMenu("Interrupter Settings", "Interrupter Settings");
+        const auto whitelistMenu = additionalMenu->AddMenu("Whitelist Settings", "Whitelist Settings");
+        const auto qWhitelistMenu = whitelistMenu->AddMenu("Q Whitelist Settings", "Q Whitelist Settings");
+        const auto rWhitelistMenu = whitelistMenu->AddMenu("R Whitelist Settings", "R Whitelist Settings");
+
+        for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+        {
+            auto obj = globals::heroManager->GetIndex(i);
+            if (obj != nullptr && obj->IsEnemy())
+            {
+                const auto q_checkbox = qWhitelistMenu->AddCheckBox(obj->GetName().c_str(),
+                    obj->GetName().c_str(),
+                    true,
+                    [obj](const CheckBox* self, bool newValue)
+                    {
+                        if (self->Value == false && !NautilusConfig::q_whitelist.empty())
+                        {
+	                        const auto it = std::ranges::find(NautilusConfig::q_whitelist, obj);
+                            NautilusConfig::q_whitelist.erase(it);
+                        }
+                        else
+                        {
+                            NautilusConfig::q_whitelist.push_back(obj);
+                        }
+                    });
+
+                if (q_checkbox->Value == true)
+                {
+                    NautilusConfig::q_whitelist.push_back(obj);
+                }
+
+                const auto r_checkbox = rWhitelistMenu->AddCheckBox(obj->GetName().c_str(),
+                    obj->GetName().c_str(),
+                    true,
+                    [obj]
+                    (const CheckBox* self, bool newValue)
+                    {
+                        if (self->Value == false && !NautilusConfig::r_whitelist.empty())
+                        {
+	                        const auto it = std::ranges::find(NautilusConfig::r_whitelist, obj);
+                            NautilusConfig::r_whitelist.erase(it);
+                        }
+                        else
+                        {
+                            NautilusConfig::r_whitelist.push_back(obj);
+                        }
+                    });
+
+                if (r_checkbox->Value == true)
+                {
+                    NautilusConfig::r_whitelist.push_back(obj);
+                }
+            }
+        }
+       
+        const auto interrupterMenu = additionalMenu->AddMenu("Interrupter Settings", "Interrupter Settings");
         NautilusConfig::NautilusInterrupter::UseQ = interrupterMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
         NautilusConfig::NautilusInterrupter::UseR = interrupterMenu->AddCheckBox("Use R", "Use SpellSlot R", true);
 
-        auto fleeMenu = NautilusMenu->AddMenu("Flee Settings", "Flee Settings");
+        const auto fleeMenu = additionalMenu->AddMenu("Flee Settings", "Flee Settings");
         NautilusConfig::NautilusFlee::UseQ = fleeMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
 
-    	auto drawMenu = NautilusMenu->AddMenu("Drawings Settings", "Drawings Settings");
+        const auto drawMenu = NautilusMenu->AddMenu("Drawings Settings", "Drawings Settings");
         NautilusConfig::NautilusDrawings::DrawQ = drawMenu->AddCheckBox("Draw Q", "Draw SpellSlot Q", true);
         NautilusConfig::NautilusDrawings::DrawE = drawMenu->AddCheckBox("Draw E", "Draw SpellSlot E", true);
         NautilusConfig::NautilusDrawings::DrawR = drawMenu->AddCheckBox("Draw R", "Draw SpellSlot R", true);
         NautilusConfig::NautilusDrawings::DrawIfReady = drawMenu->AddCheckBox("DrawIfReady", "Draw SpellSlots Only If Ready", true);
     }
 
-    float Nautilus_dmgQ(Object* pEnemy)
+    static float Nautilus_dmgQ(const Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy || !q.IsCastable())
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusQ.IsCastable())
             return -9999;
 
-        int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
-        const float skillDamage = NautilusDamages::QSpell::dmgSkillQ[levelSpell];
+        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const float skillDamage = NautilusDamages::QSpell::dmgSkillQ[levelSpell - 1];
 
-        float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalSkillDamage = NautilusDamages::QSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
         return totalDamage;
     }
 
-    float Nautilus_dmgW(Object* pEnemy)
+    static float Nautilus_dmgW(const Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy || !w.IsCastable())
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusW.IsCastable())
             return -9999;
 
-        int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
-        const float skillDamage = NautilusDamages::WSpell::dmgSkillW[levelSpell];
+        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
+        const float skillDamage = NautilusDamages::WSpell::dmgSkillW[levelSpell - 1];
 
-        float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalSkillDamage = NautilusDamages::WSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
         return totalDamage;
     }
 
-    float Nautilus_dmgE(Object* pEnemy)
+    static float Nautilus_dmgE(const Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy || !e.IsCastable())
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusE.IsCastable())
             return -9999;
 
-        int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
-        const float skillDamage = NautilusDamages::ESpell::dmgSkillE[levelSpell];
+        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
+        const float skillDamage = NautilusDamages::ESpell::dmgSkillE[levelSpell - 1];
 
-        float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalSkillDamage = NautilusDamages::ESpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
         return totalDamage;
     }
 
-    float Nautilus_dmgR(Object* pEnemy)
+    static float Nautilus_dmgR(const Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy || !r.IsCastable())
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusR.IsCastable())
             return -9999;
 
-        int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
-        const float skillDamage = NautilusDamages::RSpell::dmgSkillR[levelSpell];
+        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const float skillDamage = NautilusDamages::RSpell::dmgSkillR[levelSpell - 1];
 
-        float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalSkillDamage = NautilusDamages::RSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -197,39 +210,42 @@ public:
 
     void Nautilus_UseQ(Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy)
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusQ.IsCastable())
             return;
 
-        if (pEnemy && gameTime > QCastedTime + q.GetCastTime())
+        if (pEnemy && gameTime > QCastedTime + database.NautilusQ.GetCastTime())
         {
-            prediction::PredictionOutput qPrediction;
-
-            if (GetPrediction(q, qPrediction))
+            if (functions::MenuItemContains(NautilusConfig::q_whitelist, pEnemy->GetName().c_str()))
             {
-                functions::CastSpell(SpellIndex::Q, qPrediction.position);
-                QCastedTime = gameTime;
+                prediction::PredictionOutput qPrediction;
+
+                if (GetPrediction(database.NautilusQ, qPrediction))
+                {
+                    functions::CastSpell(SpellIndex::Q, qPrediction.position);
+                    QCastedTime = gameTime;
+                }
             }
         }
     }
 
-    void Nautilus_UseW(Object* pEnemy)
+    void Nautilus_UseW(const Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy)
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusW.IsCastable())
             return;
 
-        if (pEnemy && gameTime > WCastedTime + w.GetCastTime())
+        if (pEnemy && gameTime > WCastedTime + database.NautilusW.GetCastTime())
         {
         	functions::CastSpell(SpellIndex::W);
             WCastedTime = gameTime;
         }
     }
 
-    void Nautilus_UseE(Object* pEnemy)
+    void Nautilus_UseE(const Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy)
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusE.IsCastable())
             return;
 
-        if (pEnemy && gameTime > ECastedTime + e.GetCastTime())
+        if (pEnemy && gameTime > ECastedTime + database.NautilusE.GetCastTime())
         {
             functions::CastSpell(SpellIndex::E);
             ECastedTime = gameTime;
@@ -238,13 +254,16 @@ public:
 
     void Nautilus_UseR(Object* pEnemy)
     {
-        if (!globals::localPlayer || !pEnemy)
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusR.IsCastable())
             return;
 
-        if (pEnemy && gameTime > RCastedTime + r.GetCastTime())
+        if (pEnemy && gameTime > RCastedTime + database.NautilusR.GetCastTime())
         {
-            functions::CastSpell(SpellIndex::R, pEnemy);
-            RCastedTime = gameTime;
+            if (functions::MenuItemContains(NautilusConfig::r_whitelist, pEnemy->GetName().c_str()))
+            {
+                functions::CastSpell(SpellIndex::R, pEnemy);
+                RCastedTime = gameTime;
+            }
         }
     }
 
@@ -260,68 +279,62 @@ public:
     {
         if (NautilusConfig::NautilusCombo::engageModeKey->Value == true)
         {
-            if (NautilusConfig::NautilusCombo::UseR->Value == true && r.IsCastable())
+            if (NautilusConfig::NautilusCombo::UseR->Value == true && database.NautilusR.IsCastable())
             {
-                auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(r.GetRange());
-                if (rTarget)
+	            if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusR.GetRange()))
                 {
                     Nautilus_UseR(rTarget);
                 }
             }
 
-            auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(q.GetRange());
-            if (qTarget)
+            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange()))
             {
-                if (!qTarget->CanMove() && q.IsCastable())
+                if (!qTarget->CanMove() && database.NautilusQ.IsCastable())
                 {
                     Nautilus_UseQ(qTarget);
                 }
 
                 if (qTarget->IsInAARange())
                 {
-	                if (w.IsCastable())
+	                if (database.NautilusW.IsCastable())
                         Nautilus_UseW(qTarget);
 
-                    if (e.IsCastable())
+                    if (database.NautilusE.IsCastable())
                         Nautilus_UseE(qTarget);
                 }
             }
         }
         else
         {
-            if (NautilusConfig::NautilusCombo::UseQ->Value == true && q.IsCastable())
+            if (NautilusConfig::NautilusCombo::UseQ->Value == true && database.NautilusQ.IsCastable())
             {
-                auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(q.GetRange());
-                if (qTarget)
+	            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange()))
                 {
                     Nautilus_UseQ(qTarget);
                 }
             }
 
-            if (!q.IsCastable() )
+            if (!database.NautilusQ.IsCastable() )
             {
-                if (NautilusConfig::NautilusCombo::UseW->Value == true && w.IsCastable())
+                if (NautilusConfig::NautilusCombo::UseW->Value == true && database.NautilusW.IsCastable())
                 {
-                    auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(w.GetRange());
-                    if (wTarget)
+	                if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusW.GetRange()))
                     {
                         Nautilus_UseW(wTarget);
                     }
                 }
 
-                if (NautilusConfig::NautilusCombo::UseE->Value == true && e.IsCastable())
+                if (NautilusConfig::NautilusCombo::UseE->Value == true && database.NautilusE.IsCastable())
                 {
-                    auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(e.GetRange());
-                    if (eTarget)
+	                if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusE.GetRange()))
                     {
                         Nautilus_UseE(eTarget);
                     }
                 }
 
-                if (NautilusConfig::NautilusCombo::UseR->Value == true && r.IsCastable())
+                if (NautilusConfig::NautilusCombo::UseR->Value == true && database.NautilusR.IsCastable())
                 {
-                    auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(r.GetRange());
-                    if (rTarget)
+	                if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusR.GetRange()))
                     {
                         Nautilus_UseR(rTarget);
                     }
@@ -337,20 +350,19 @@ public:
         if (globals::localPlayer->GetPercentMana() < NautilusConfig::NautilusJungle::minMana->Value)
             return;
 
-        if (NautilusConfig::NautilusJungle::UseQ->Value == true && q.IsCastable())
+        if (NautilusConfig::NautilusJungle::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-            auto qMonster = TargetSelector::Functions::GetJungleInRange(q.GetRange());
-            if (qMonster && gameTime > QCastedTime + q.GetCastTime())
+	        const auto qMonster = TargetSelector::Functions::GetJungleInRange(database.NautilusQ.GetRange());
+            if (qMonster && gameTime > QCastedTime + database.NautilusQ.GetCastTime())
             {
                 functions::CastSpell(SpellIndex::Q, qMonster->GetPosition());
                 QCastedTime = gameTime;
             }
         }
         
-        if (NautilusConfig::NautilusJungle::UseW->Value == true && w.IsCastable())
+        if (NautilusConfig::NautilusJungle::UseW->Value == true && database.NautilusW.IsCastable())
         {
-            auto wMonster = TargetSelector::Functions::GetJungleInRange(w.GetRange());
-            if (wMonster)
+	        if (const auto wMonster = TargetSelector::Functions::GetJungleInRange(database.NautilusW.GetRange()))
                 Nautilus_UseW(wMonster);
         }
     }
@@ -361,20 +373,18 @@ public:
             return;
         
 
-        if (NautilusConfig::NautilusHarass::UseQ->Value == true && q.IsCastable())
+        if (NautilusConfig::NautilusHarass::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-            auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(q.GetRange());
-            if (qTarget)
+	        if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange()))
             {
                 if (NautilusConfig::NautilusHarass::UseQDive->Value == true && qTarget->IsUnderEnemyTower() || !qTarget->IsUnderEnemyTower())
 					Nautilus_UseQ(qTarget);
             }
         }
 
-        if (NautilusConfig::NautilusHarass::UseE->Value == true && e.IsCastable())
+        if (NautilusConfig::NautilusHarass::UseE->Value == true && database.NautilusE.IsCastable())
         {
-            auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(e.GetRange());
-            if (eTarget)
+	        if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusE.GetRange()))
             {
                 Nautilus_UseE(eTarget);
             }
@@ -386,30 +396,44 @@ public:
 
     }
 
+    void Flee() override
+    {
+        if (NautilusConfig::NautilusFlee::UseQ->Value == true && database.NautilusQ.IsCastable())
+        {
+	        if (const auto mousePos = functions::GetMouseWorldPos(); 
+                functions::IsWall(mousePos) 
+                && mousePos.Distance(globals::localPlayer->GetPosition()) <= database.NautilusQ.GetRange())
+	        {
+                functions::CastSpell(SpellIndex::Q, functions::GetMouseWorldPos());
+                QCastedTime = gameTime;
+	        }
+        }
+    }
+
     void Killsteal()
     {
 
-        if (NautilusConfig::NautilusKillsteal::UseQ->Value == true && q.IsCastable())
+        if (NautilusConfig::NautilusKillsteal::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-            auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(q.GetRange());
+	        const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange());
             if (qTarget && qTarget->GetHealth() < Nautilus_dmgQ(qTarget))
             {
                 Nautilus_UseQ(qTarget);
             }
         }
 
-        if (NautilusConfig::NautilusKillsteal::UseE->Value == true && e.IsCastable())
+        if (NautilusConfig::NautilusKillsteal::UseE->Value == true && database.NautilusE.IsCastable())
         {
-            auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(e.GetRange());
+	        const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusE.GetRange());
             if (eTarget && eTarget->GetHealth() < Nautilus_dmgE(eTarget))
             {
                 Nautilus_UseE(eTarget);
             }
         }
 
-        if (NautilusConfig::NautilusKillsteal::UseR->Value == true && r.IsCastable())
+        if (NautilusConfig::NautilusKillsteal::UseR->Value == true && database.NautilusR.IsCastable())
         {
-            auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(r.GetRange());
+	        const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusR.GetRange());
             if (rTarget && rTarget->GetHealth() < Nautilus_dmgR(rTarget))
             {
                 Nautilus_UseR(rTarget);
@@ -419,9 +443,9 @@ public:
 
     void AntiGapCloser()
     {
-        if (NautilusConfig::NautilusAntiGapCloser::UseE->Value == true && e.IsCastable())
+        if (NautilusConfig::NautilusAntiGapCloser::UseE->Value == true && database.NautilusE.IsCastable())
         {
-            for (auto target : TargetSelector::Functions::GetTargetsInRange(e.GetRange()))
+            for (const auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), database.NautilusE.GetRange()))
             {
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
@@ -429,11 +453,22 @@ public:
                 if (target)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, e.GetRange()))
+                    if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, database.NautilusE.GetRange()))
                         Nautilus_UseE(target);
                 }
             }
         }
+    }
+
+    //Events
+    void OnBeforeAttack() override
+    {
+
+    }
+
+    void OnCastSpell() override
+    {
+
     }
 
     void Render() override
@@ -444,12 +479,12 @@ public:
             render::RenderText("Engage Mode: ON", screenPos.ToImVec(), 18.0f, COLOR_RED, true);
         }
 
-        if (NautilusConfig::NautilusDrawings::DrawQ->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && q.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), q.GetRange(), COLOR_WHITE, 1.0f);
-        if (NautilusConfig::NautilusDrawings::DrawE->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && e.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), e.GetRange(), COLOR_WHITE, 1.0f);
-        if (NautilusConfig::NautilusDrawings::DrawR->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && r.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), r.GetRange(), COLOR_WHITE, 1.0f);
+        if (NautilusConfig::NautilusDrawings::DrawQ->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && database.NautilusQ.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
+            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.NautilusQ.GetRange(), COLOR_WHITE, 1.0f);
+        if (NautilusConfig::NautilusDrawings::DrawE->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && database.NautilusE.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
+            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.NautilusE.GetRange(), COLOR_WHITE, 1.0f);
+        if (NautilusConfig::NautilusDrawings::DrawR->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && database.NautilusR.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
+            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.NautilusR.GetRange(), COLOR_WHITE, 1.0f);
     }
 };
 

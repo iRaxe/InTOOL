@@ -95,9 +95,6 @@
     <Filter Include="Scripts\Champions">
       <UniqueIdentifier>{5a45deb9-074c-4900-9f80-84a3b603b3b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scripts\Champions\demo">
-      <UniqueIdentifier>{e52baac4-f603-4b88-9f41-c11592da1f23}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scripts\Champions\Ashe">
       <UniqueIdentifier>{aabc1889-aac5-4540-a536-c1074fe288f9}</UniqueIdentifier>
     </Filter>
@@ -139,6 +136,33 @@
     </Filter>
     <Filter Include="Scripts\SDK\Items">
       <UniqueIdentifier>{26997e6d-ea89-43f3-8614-282cfc5371e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Xerath">
+      <UniqueIdentifier>{ba1b74f7-5be7-4aa6-aefb-44f5291c8506}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KeyAuth">
+      <UniqueIdentifier>{5465d425-12ab-4256-97e3-7719d1eae121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KeyAuth\Header Files">
+      <UniqueIdentifier>{c0df4590-8f79-465e-9699-ac433dad1b4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Yorick">
+      <UniqueIdentifier>{781ce784-200b-476b-a8a3-6dff6b5d572b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\SDK">
+      <UniqueIdentifier>{e52baac4-f603-4b88-9f41-c11592da1f23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Syndra">
+      <UniqueIdentifier>{1c3f9d62-2762-4cf7-a4c5-a296234a7e75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Vayne">
+      <UniqueIdentifier>{0b500233-e9dd-4ed3-8926-0cf941a2d47c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New New Menu">
+      <UniqueIdentifier>{71739673-28ef-4db8-8b53-c56fb2a0687e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu\New New Menu\Notification">
+      <UniqueIdentifier>{0c59187d-68b5-4f3c-9b34-b96216cedd0a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -284,7 +308,7 @@
       <Filter>Scripts\utils</Filter>
     </ClInclude>
     <ClInclude Include="PluginTemplate.h">
-      <Filter>Scripts\Champions\demo</Filter>
+      <Filter>Scripts\Champions\SDK</Filter>
     </ClInclude>
     <ClInclude Include="Ashe.h">
       <Filter>Scripts\Champions\Ashe</Filter>
@@ -362,6 +386,21 @@
     <ClInclude Include="itemsdatabase.h">
       <Filter>Scripts\SDK\Items</Filter>
     </ClInclude>
+    <ClInclude Include="Xerath.h">
+      <Filter>Scripts\Champions\Xerath</Filter>
+    </ClInclude>
+    <ClInclude Include="auth.hpp">
+      <Filter>KeyAuth\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="skStr.h">
+      <Filter>KeyAuth\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Yorick.h">
+      <Filter>Scripts\Champions\Yorick</Filter>
+    </ClInclude>
+    <ClInclude Include="Vayne.h">
+      <Filter>Scripts\Champions\Vayne</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -436,9 +475,6 @@
     <ClCompile Include="main\dllmain.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\champions\syndra.cpp">
-      <Filter>Scripts\Champions</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx11.cpp">
       <Filter>IMGui</Filter>
@@ -459,7 +495,7 @@
       <Filter>Scripts\utils</Filter>
     </ClCompile>
     <ClCompile Include="PluginTemplate.cpp">
-      <Filter>Scripts\Champions\demo</Filter>
+      <Filter>Scripts\Champions\SDK</Filter>
     </ClCompile>
     <ClCompile Include="Ashe.cpp">
       <Filter>Scripts\Champions\Ashe</Filter>
@@ -539,6 +575,21 @@
     <ClCompile Include="itemsdatabase.cpp">
       <Filter>Scripts\SDK\Items</Filter>
     </ClCompile>
+    <ClCompile Include="Xerath.cpp">
+      <Filter>Scripts\Champions\Xerath</Filter>
+    </ClCompile>
+    <ClCompile Include="Yorick.cpp">
+      <Filter>Scripts\Champions\Yorick</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\champions\syndra.cpp">
+      <Filter>Scripts\Champions\Syndra</Filter>
+    </ClCompile>
+    <ClCompile Include="Vayne.cpp">
+      <Filter>Scripts\Champions\Vayne</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_settings.h">
+      <Filter>Menu\New New Menu\Notification</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -547,5 +598,10 @@
     <MASM Include="mem\spoofer.asm">
       <Filter>Memory</Filter>
     </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="library_x64.lib">
+      <Filter>KeyAuth\Header Files</Filter>
+    </Library>
   </ItemGroup>
 </Project>

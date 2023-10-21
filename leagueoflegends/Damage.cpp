@@ -215,58 +215,58 @@ namespace UPasta
 #pragma region Source items
 			for (auto i = 0; i < 6; i++)
 			{
-				InventorySlot* item = globals::localPlayer->GetInventorySlotById(i);
-				if (item == nullptr) continue;
-
-				if (item)
+				InventorySlot* item = globals::localPlayer->GetHeroInventory()->GetInventorySlot(i);
+				if (item != nullptr)
 				{
 					auto itemID = item->GetId();
-
-					switch (itemID)
+					if (itemID != 0)
 					{
-					case Noonquiver: {
-						if (target->IsMinion())
-							result.PhysicalDamage += 20;
-						break;
-					}
-					case Blade_of_the_Ruined_King: {
-						auto itemDamage = target->GetHealth() * 0.08f;
-						//if (targetFlags & GameObjectFlags_AIMinionClient) {
-						if (target->IsMinion()) {
-							itemDamage = min(itemDamage, 60.0f);
-						}
-						result.PhysicalDamage += max(itemDamage, 15.0f);
-						break;
-					}
-					case Nashors_Tooth:
-						result.MagicalDamage += 15.0f + 0.15f * source->GetAbilityPower();
-						break;
-					case Recurve_Bow:
-						result.PhysicalDamage += 15.0f;
-						break;
-					case Titanic_Hydra:
-						result.PhysicalDamage += source->GetBuffByName("itemtitanichydracleavebuff") ? 40.0f + 0.1f * source->GetMaxHealth() : 5.0f + 0.01f * source->GetMaxHealth();
-						break;
-					case Dead_Mans_Plate:
-					{
-						auto buff = source->GetBuffByName("dreadnoughtmomentumbuff");
-						if (buff)
+						switch (itemID)
 						{
-							result.MagicalDamage += buff->GetStacks();
+						case Noonquiver: {
+							if (target->IsMinion())
+								result.PhysicalDamage += 20;
+							break;
 						}
-						break;
-					}
-					case Wits_End:
-						result.MagicalDamage += 42.0f;
-						break;
-					case Muramana:
-						if (target->IsHero()) {
-							auto mana = source->GetMana();
-							if (mana / source->GetMaxMana() > 0.2f) {
-								result.PhysicalDamage += 0.06f * mana;
+						case Blade_of_the_Ruined_King: {
+							auto itemDamage = target->GetHealth() * 0.08f;
+							//if (targetFlags & GameObjectFlags_AIMinionClient) {
+							if (target->IsMinion()) {
+								itemDamage = min(itemDamage, 60.0f);
 							}
+							result.PhysicalDamage += max(itemDamage, 15.0f);
+							break;
 						}
-						break;
+						case Nashors_Tooth:
+							result.MagicalDamage += 15.0f + 0.15f * source->GetAbilityPower();
+							break;
+						case Recurve_Bow:
+							result.PhysicalDamage += 15.0f;
+							break;
+						case Titanic_Hydra:
+							result.PhysicalDamage += source->GetBuffByName("itemtitanichydracleavebuff") ? 40.0f + 0.1f * source->GetMaxHealth() : 5.0f + 0.01f * source->GetMaxHealth();
+							break;
+						case Dead_Mans_Plate:
+						{
+							auto buff = source->GetBuffByName("dreadnoughtmomentumbuff");
+							if (buff)
+							{
+								result.MagicalDamage += buff->GetStacks();
+							}
+							break;
+						}
+						case Wits_End:
+							result.MagicalDamage += 42.0f;
+							break;
+						case Muramana:
+							if (target->IsHero()) {
+								auto mana = source->GetMana();
+								if (mana / source->GetMaxMana() > 0.2f) {
+									result.PhysicalDamage += 0.06f * mana;
+								}
+							}
+							break;
+						}
 					}
 				}
 			}

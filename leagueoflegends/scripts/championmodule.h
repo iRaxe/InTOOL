@@ -12,7 +12,14 @@ public:
 	virtual void Clear() = 0;
 	virtual void Harass() = 0;
 	virtual void Lasthit() = 0;
+	virtual void Flee() = 0;
+
+	virtual void OnBeforeAttack() = 0;
+	virtual void OnCastSpell() = 0;
+
+
 	virtual void Render() = 0;
+
 };
 
 class ChampionModuleManager

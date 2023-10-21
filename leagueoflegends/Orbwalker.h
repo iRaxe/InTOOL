@@ -43,6 +43,8 @@ namespace UPasta::SDK::Orbwalker
             inline CheckBox* statusFastClearMode;
             inline CheckBox* statusLastHitMode;
             inline CheckBox* statusHarassMode;
+            inline CheckBox* statusFleeMode;
+
         }
 
         namespace KeyBindings
@@ -58,6 +60,8 @@ namespace UPasta::SDK::Orbwalker
             inline KeyBind* fastClearKey;
             inline KeyBind* lastHitKey;
             inline KeyBind* harassKey;
+            inline KeyBind* fleeKey;
+
         }
 
     }

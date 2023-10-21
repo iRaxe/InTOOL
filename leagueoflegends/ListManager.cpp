@@ -1,6 +1,8 @@
 #include "../stdafx.h"
 #include "../ListManager.h"
 
+#include <unordered_set>
+
 namespace UPasta
 {
 	namespace SDK
@@ -9,7 +11,8 @@ namespace UPasta
 		{
 			namespace Functions
 			{
-				void PopulateMissilesMap()
+
+				/*void PopulateMissilesMap()
 				{
 					for (int i = 0; i < 3; ++i)
 					{
@@ -35,7 +38,7 @@ namespace UPasta
 
 					if (missileMap.size() > globals::missileManager->GetListSize())
 						missileMap.clear();
-				}
+				}*/
 
 				void PopulatePlayersMap()
 				{
@@ -191,14 +194,13 @@ namespace UPasta
 						}
 					}
 				}
-
 				void Test()
 				{
 					LOG("PLAYERS MAP SIZE: %d", playersMap.size());
 					LOG("MINIONS MAP SIZE: %d", minionsMap.size());
 					LOG("TURRETS MAP SIZE: %d", turretsMap.size());
 					LOG("INHIBITORS MAP SIZE: %d", inhibitorsMap.size());
-					LOG("MISSILES MAP SIZE: %d", missileMap.size());
+					//LOG("MISSILES MAP SIZE: %d", missileMap.size());
 				}
 
 				void Initialize()
@@ -222,7 +224,7 @@ namespace UPasta
 					__except (1) { LOG("[MAP] Error in initializing inhibitors map"); }
 					__try { PopulateInhibitorsMaps(); }
 					__except (1) { LOG("[MAPS] Error in initializing inhibitors maps"); }
-					Test();
+					//Test();
 				}
 
 			
@@ -243,10 +245,8 @@ namespace UPasta
 					__try { if (inhibitorsMap.size() < globals::heroManager->GetListSize())	PopulateInhibitorsMaps(); }
 					__except (1) { LOG("[MAPS] Error in refreshing inhibitors maps"); }
 
-					__try { if (missileMap.size() < globals::heroManager->GetListSize())	PopulateMissilesMap(); }
-					__except (1) { LOG("[MAPS] Error in refreshing missiles map"); }
-
-
+					/*__try { if (missileMap.size() < globals::heroManager->GetListSize())	PopulateMissilesMap(); }
+					__except (1) { LOG("[MAPS] Error in refreshing missiles map"); }*/
 				}
 
 				

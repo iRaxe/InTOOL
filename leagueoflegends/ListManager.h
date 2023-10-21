@@ -40,8 +40,8 @@ namespace UPasta::SDK::ListManager
         inline std::map<Object*, int> alliesInhibitorsMap;
         void PopulateInhibitorsMaps();
 
-        inline std::map<Object*, std::tuple<Missile*, Vector3, Vector3, Vector3, std::string>> missileMap;
-        void PopulateMissilesMap();
+        /*inline std::map<Missile*, std::tuple<Missile*, Vector3, Vector3, Vector3, std::string>> missileMap;
+        void PopulateMissilesMap();*/
 
         void Initialize();
         void Refresh();

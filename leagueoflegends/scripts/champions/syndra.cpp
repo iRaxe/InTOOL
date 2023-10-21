@@ -209,6 +209,22 @@ public:
 
     }
 
+    void Flee() override
+    {
+
+    }
+
+    //Events
+    void OnBeforeAttack() override
+    {
+
+    }
+
+    void OnCastSpell() override
+    {
+
+    }
+
     void Render() override
     {
         if (e.IsCastable() && SETTINGS_BOOL("Syndra", "draw Q-E range"))

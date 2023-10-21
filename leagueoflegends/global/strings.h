@@ -50,3 +50,5 @@ inline std::string RemoveSubstring(const std::string substringToAnalyze, const s
 
 	return result;
 }
+
+

@@ -5,44 +5,79 @@ using namespace scripts;
 
 namespace AsheConfig
 {
-    namespace AsheMisc {
-        CheckBox* UseQOnObjectives;
-    }
-
     namespace AsheCombo {
-        CheckBox* UseQ;
-        CheckBox* UseW;
-        CheckBox* UseWIfInAARange;
-        CheckBox* UseR;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseW;
+        inline CheckBox* UseR;
 
-       //Slider* enemiesInRange;
+        inline Slider* enemiesInRange;
     }
 
     namespace AsheHarass {
-        CheckBox* UseW;
-        Slider* minMana;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseW;
+        inline Slider* minMana;
     }
 
     namespace AsheClear {
-        CheckBox* UseQ;
-        CheckBox* UseW;
-        Slider* minMana;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseW;
+        inline Slider* minWMinions;
+        inline Slider* minMana;
     }
 
     namespace AsheJungle {
-        CheckBox* UseQ;
-        CheckBox* UseW;
-        Slider* minMana;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseW;
+        inline Slider* minMana;
+    }
+
+    namespace AsheLastHit {
+        inline CheckBox* UseW;
+        inline Slider* minMana;
+    }
+
+    namespace AsheSpellsSettings {
+
+        inline CheckBox* saveMana;
+
+        inline List* qCastMode;
+
+        inline List* wCastMode;
+        inline CheckBox* UseWIfInAARange;
+        inline CheckBox* UseWIfFullAASpeed;        
+        inline Slider* wRange;
+        inline CheckBox* DrawW;
+
+        inline List* targetMode;
+        inline KeyBind* rTapKey;
+        inline Slider* maxRDistance;
+        inline Slider* minRDistance;
+
+        inline CheckBox* DrawIfReady;
+        
     }
 
     namespace AsheKillsteal {
-        CheckBox* UseW;
-        CheckBox* UseR;
+        inline CheckBox* UseW;
+        inline CheckBox* UseR;
     }
 
-    namespace AsheDrawings {
-        CheckBox* DrawW;
+    namespace AsheAntiGapCloser {
+        inline CheckBox* UseW;
+        inline CheckBox* UseR;
+        inline std::vector<Object*> whitelist;
     }
+
+    namespace AsheAntiMelee {
+        inline CheckBox* UseW;
+        inline std::vector<Object*> whitelist;
+    }
+
+    namespace AsheFlee {
+        inline CheckBox* UseW;
+    }
+
 }
 
 namespace AsheDamages
@@ -51,18 +86,11 @@ namespace AsheDamages
         inline float dmgSkillArray[6] = { 0, 20, 35, 50, 65, 80 };
         inline float widthArray[6] = { 0, 75.00f, 100.00f, 100.00f, 123.00f, 123.00f };
         inline float additionalPercentageAD = 1.00f;
-        inline float range = 1200.0f;
-        inline float speed = 2000.0f;
-        inline float delay = 0.25f;
     }
 
     namespace RSpell {
-        inline float dmgSkillArray[4] = { -9999, 350, 500, 650 };
+        inline float dmgSkillArray[4] = { -9999, 200, 400, 600 };
         inline float dmgSkillArrayMonster[6] = { -9999, 175, 250, 325 };
-        inline float additionalPercentageAD = 1.00f;
-        inline float additionalPercentageAP = 0.90f;
-        inline float width = 120.0f;
-        inline float speed = 2000.0f;
-        inline float delay = 0.25f;
+        inline float additionalPercentageAP = 1.20f;
     }
 }

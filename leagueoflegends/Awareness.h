@@ -106,6 +106,9 @@ namespace UPasta::SDK::Awareness
 
             inline CheckBox* status;
 
+            inline CheckBox* showDamagePrediction;
+            inline CheckBox* showKillableStatus;
+
             inline CheckBox* showExperience;
             inline CheckBox* showExperienceSelf;
             inline CheckBox* showExperienceAllies;
@@ -115,6 +118,10 @@ namespace UPasta::SDK::Awareness
             inline CheckBox* showPathsSelf;
             inline CheckBox* showPathsAllies;
             inline CheckBox* showPathsEnemies;
+
+            inline CheckBox* showLastPosition;
+            inline CheckBox* showPosGuesser;
+        	inline CheckBox* showLastPositionMiniMap;
         }
 
         namespace EnemySidebar
@@ -125,6 +132,8 @@ namespace UPasta::SDK::Awareness
             void InitializeSidebarMenu();
 
             inline CheckBox* status;
+            inline CheckBox* locked;
+
             inline List* orientation;
             inline Slider* hudSize;
         }
@@ -143,6 +152,7 @@ namespace UPasta::SDK::Awareness
             inline Slider* qualityDraw;
 
         	inline CheckBox* showMissiles;
+            inline CheckBox* showMissilesAnimation;
             inline CheckBox* showBoundingRadius;
             inline CheckBox* showAARadius;
             inline CheckBox* showAARadiusSelf;
@@ -196,6 +206,9 @@ namespace UPasta::SDK::Awareness
             void DrawTracker();
             void DrawCooldownBar(Object* obj);
             void DrawPlayerPaths(Object* obj);
+            void ShowLastEnemyPosition(Object* obj, int index);
+            void DrawLastHitDamage();
+
 
             void Initialize();
             void Update();
@@ -212,7 +225,7 @@ namespace UPasta::SDK::Awareness
 
         namespace Radius
         {
-            void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness, bool takeHeightInConsideration = Configs::Radius::showHeight->Value);
+            void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness, bool takeHeightInConsideration = Configs::Radius::showHeight->Value, bool glow = false);
             static void ShowMissiles();
             static void ShowBoundingRadius(Object* obj, int quality);
             static void ShowAARadius(Object* obj, int quality);
@@ -236,7 +249,7 @@ namespace UPasta::SDK::Awareness
             void Update();
             void DrawJungleTracker();
             void DrawJungleNames();
-            void DrawIcons(Vector3 objDrawPos, ImVec2 pos, float size);
+            void DrawIcons(Vector3 objDrawPos, ImVec2 pos);
             void DrawTimers(Object* obj, ImVec2 pos);
         }
         

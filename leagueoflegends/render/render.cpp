@@ -60,18 +60,31 @@ namespace render
 			static bool loaded = false;
 			if (!loaded)
 			{
-				__try { EventManager::AddEventHandler(EventManager::EventType::OnDraw, scripts::champions::RenderUpdate); }
+				__try { AddEventHandler(EventManager::EventType::OnDraw, scripts::champions::RenderUpdate); }
 				__except (1) { LOG("[Event Handler - Add] Error in champions drawings"); }
 
-				__try { EventManager::AddEventHandler(EventManager::EventType::OnDraw, drawings::Update); }
+				__try { AddEventHandler(EventManager::EventType::OnDraw, drawings::Update); }
 				__except (1) { LOG("[Event Handler - Add] Error in utilities drawings"); }
 
-				__try { EventManager::AddEventHandler(EventManager::EventType::OnDraw, UPasta::SDK::Awareness::Functions::Update); }
+				__try { AddEventHandler(EventManager::EventType::OnDraw, UPasta::SDK::Awareness::Functions::Update); }
 				__except (1) { LOG("[Event Handler - Add] Error in awareness drawings"); }
+
+				__try { AddEventHandler(EventManager::EventType::OnDraw, UPasta::SDK::Awareness::Functions::Update); }
+				__except (1) { LOG("[Event Handler - Add] Error in awareness drawings"); }
+
+				__try { AddEventHandler(EventManager::EventType::OnAfterAttack, scripts::champions::DoBeforeAttack); }
+				__except (1) { LOG("[Event Handler - Add] Error in onAttack "); }
+
+				__try { AddEventHandler(EventManager::EventType::OnCastSpell, scripts::champions::DoCastSpell); }
+				__except (1) { LOG("[Event Handler - Add] Error in doCastSpell "); }
 
 				LOG("OnDraw triggered");
 				loaded = true;
 			}
+
+			
+
+
 			debug::Update();
 		}
 
@@ -151,7 +164,7 @@ namespace render
 					auto buff = buffEntry->GetBuff();
 					if (buff && buff->GetEndTime() >= functions::GetGameTime())
 					{
-						RenderText(buff->GetName(), (screenPos - Vector2(0.0f, 22.0f + baseDraw2)).ToImVec(), 18.0f, COLOR_WHITE, true);
+						RenderText(buff->GetName() + std::to_string(buff->GetStacksAlt()), (screenPos - Vector2(0.0f, 22.0f + baseDraw2)).ToImVec(), 18.0f, COLOR_WHITE, true);
 						baseDraw2 += 22.0f;
 					}
 				}
@@ -164,13 +177,13 @@ namespace render
 					DrawEnemyListNames();
 				}
 
-				for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+				/*for (int i = 0; i < globals::heroManager->GetListSize(); i++)
 				{
 					auto obj = globals::heroManager->GetIndex(i);
 					if (obj->IsHero())
 					{
 						
-							//DrawBuffNames(obj);
+							DrawBuffNames(obj);
 						
 
 						if (SETTINGS_BOOL("Drawings", "Draw Spells cooldown"))
@@ -178,7 +191,7 @@ namespace render
 							//DrawCooldownBar(obj);
 						}
 					}
-				}
+				}*/
 			}
 		}
 
@@ -188,11 +201,8 @@ namespace render
 			{
 				Vector2 screenPos = functions::WorldToScreen(obj->GetPosition());
 				if (!IsOnScreen(screenPos)) return;
-				auto minion = Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
-				if (minion)
-				{
-					RenderText(minion->GetName(), (screenPos - Vector2(0.0f, 22.0f)).ToImVec(), 18.0f, COLOR_WHITE, true);
-				}
+				RenderText(obj->GetName(), (screenPos - Vector2(0.0f, 22.0f)).ToImVec(), 18.0f, COLOR_WHITE, true);
+				
 				//drawings::DrawEnemyListNames();
 				//RenderText(std::to_string(functions::GetMinimapSize()), (screenPos - Vector2(0.0f, 22.0f)).ToImVec(), 18.0f, COLOR_WHITE, true);
 
@@ -205,6 +215,13 @@ namespace render
 				{
 					RenderText(minion->GetName(), functions::WorldToScreen(minion->GetPosition()).ToImVec(), 18.0f, COLOR_WHITE, true);
 				}*/
+				for (int i = 0; i < globals::buildingsManager->GetListSize(); i++)
+				{
+					auto obj = globals::buildingsManager->GetIndex(i);
+					if (obj->IsVisible())
+						DrawData(obj, i);
+				}
+
 				/*for (int i = 0; i < globals::minionManager->GetListSize(); i++)
 				{
 					auto obj = globals::minionManager->GetIndex(i);
@@ -224,36 +241,14 @@ namespace render
 					auto obj = globals::turretManager->GetIndex(i);
 					if (obj->IsAlive() && obj->IsVisible())
 						DrawData(obj, i);
-				}*/
+				}
 
 				/*auto test = Functions::GetEnemyInhibitorInRange(globals::localPlayer->GetRealAttackRange());
 				if (test != nullptr)
 				{
 					Vector3 playerPos = test->GetPosition();
 					RenderCircleWorld(playerPos, 200, 500, COLOR_WHITE, 1.0f, false);
-				}*/
-
-				
-				auto spellCast = globals::localPlayer->GetActiveSpellCast();
-				if (spellCast)
-				{
-					Spell* spell = globals::localPlayer->GetSpellBySlotId(2);
-					if (spell)
-					{
-						//LOG("CASTER");
-						QWORD spellInput = (QWORD)spell->GetSpellInput();
-
-						auto spellInputStartPos = spell->GetSpellInfo()->GetSpellData()->GetSpellEndPos();
-
-						Vector3 test = spellCast->GetSpellInfo()->GetSpellData()->GetSpellEndPos();
-
-						LOG("Source X =  %f | Source Y = %f | Source Z = %f", spellInputStartPos.x, spellInputStartPos.y, spellInputStartPos.z);
-					}
-					
-
-				}
-
-				
+				}*/			
 
 			}
 

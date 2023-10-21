@@ -48,6 +48,9 @@ namespace scripts
 		void Init();
 		void Update();
 		void RenderUpdate();
+		void DoBeforeAttack();
+		void DoCastSpell();
+
 	}
 
 }

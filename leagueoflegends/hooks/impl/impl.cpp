@@ -24,14 +24,14 @@ namespace hooks
 			globals::attackableManager = *(ObjectManager**)(globals::moduleBase + oAttackableList);
 			globals::objManager = *(ObjectManager**)(globals::moduleBase + oObjManager);
 			globals::missileManager = *(ObjectManager**)(globals::moduleBase + oMissilesList);
-			UPasta::SDK::ListManager::Functions::Initialize();
 
-			menu::InitNewMenu();
+			Skillshot::PopulateSpellsDB();
 			functions::Init();
+			menu::InitNewMenu();
 			render::Init();
 			scripts::Init();
 			settings::Load();
-			Skillshot::PopulateSpellsDB();
+			UPasta::SDK::ListManager::Functions::Initialize();
 
 			//menu::Init();
 			
@@ -53,11 +53,19 @@ namespace hooks
 
 		void Updates()
 		{
-			UPasta::SDK::ListManager::Functions::Refresh();
-			scripts::Update();
-			render::Update();
-			//menu::Update();
-			menu::Update2();
+			__try { UPasta::SDK::ListManager::Functions::Refresh(); }
+			__except (1) { LOG("ERROR IN LISTMANAGER UPDATE"); }
+
+			__try { scripts::Update(); }
+			__except (1) { LOG("ERROR IN SCRIPTS UPDATE"); }
+
+			__try { render::Update(); }
+			__except (1) { LOG("ERROR IN RENDER UPDATE"); }
+
+			__try { menu::Update2(); }
+			__except (1) { LOG("ERROR IN MENU UPDATE"); }
+
+			//menu::Update();			
 		}
 
 		bool KeyChecks()

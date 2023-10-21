@@ -46,10 +46,13 @@ namespace scripts
 
 	void Update()
 	{
-		champions::Update();
+		__try { champions::Update(); }
+		__except (1) { LOG("ERROR IN SCRIPTS -> CHAMPIONS UPDATE"); }
+		
 		if (UPasta::SDK::Orbwalker::Configs::status->Value)
 		{
-			UPasta::SDK::Orbwalker::Functions::Update();
+			__try {	UPasta::SDK::Orbwalker::Functions::Update();}
+			__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER UPDATE"); }
 		}
 	}
 
@@ -107,6 +110,9 @@ namespace scripts
 			case OrbwalkState::Lasthit:
 				activeChampModule->Lasthit();
 				break;
+			case OrbwalkState::Flee:
+				activeChampModule->Flee();
+				break;
 			}
 		}
 
@@ -116,6 +122,22 @@ namespace scripts
 				return;
 
 			activeChampModule->Render();
+		}
+
+		void DoBeforeAttack()
+		{
+			if (!activeChampModule)
+				return;
+
+			activeChampModule->OnBeforeAttack();
+		}
+
+		void DoCastSpell()
+		{
+			if (!activeChampModule)
+				return;
+
+			activeChampModule->OnCastSpell();
 		}
 	}
 }

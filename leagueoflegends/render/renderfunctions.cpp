@@ -269,9 +269,84 @@ namespace render
 		return angle_radians;
 	}
 
-	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height)
+	void test(ImVec2 lineStart, ImVec2 lineEnd)
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+		const int NUM_LINES = 10;
+		const float ALPHA_VALUE = 0.030f;
+		const float BASE_LINE_WIDTH = 2.f;
+		const float EXTRA_LINE_WIDTH = 5;
+
+		for (int j = 1; j <= NUM_LINES; ++j)
+		{
+			ImVec2 lineStartOffset = { lineStart.x + j, lineStart.y + j };
+			ImVec2 lineEndOffset = { lineEnd.x + j, lineEnd.y + j };
+
+			ImColor lineColor = ImVec4(1.0f, 1.0f, 0.4f, ALPHA_VALUE);
+			float lineWidth = BASE_LINE_WIDTH + j + EXTRA_LINE_WIDTH;
+
+			window->DrawList->AddLine(lineStartOffset, lineEndOffset, lineColor, lineWidth);
+
+			lineStartOffset = { lineStart.x - j, lineStart.y - j };
+			lineEndOffset = { lineEnd.x - j, lineEnd.y - j };
+
+			window->DrawList->AddLine(lineStartOffset, lineEndOffset, lineColor, lineWidth);
+		}
+	}
+
+	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height, bool glow)
+	{
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+		const int NUM_LINES = 3;
+		const float BASE_LINE_WIDTH = 1.f;
+		const float EXTRA_LINE_WIDTH = 3;
+
+		float a = (float)((color >> 24) & 0xff);
+		float r = (float)((color >> 16) & 0xff);
+		float g = (float)((color >> 8) & 0xff);
+		float b = (float)((color) & 0xff);
+
+		numPoints = min(numPoints, 49);
+		ImVec2 points[50];
+
+		float step = 6.2831f / numPoints;
+		float theta = 0.f;
+
+		for (int i = 0; i < numPoints; i++, theta += step)
+		{
+			const Vector3 worldSpace = { worldPos.x + radius * cos(theta), worldPos.y, worldPos.z - radius * sin(theta) };
+			const ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
+			points[i].x = screenSpace.x;
+
+			if (height)
+				points[i].y = screenSpace.y - min(max(-UPasta::SDK::Awareness::Configs::Radius::heightTollerance->Value, functions::GetHeightAtPosition(worldSpace)), UPasta::SDK::Awareness::Configs::Radius::heightTollerance->Value);
+			else
+				points[i].y = screenSpace.y;
+		}
+
+		points[numPoints] = points[0];
+		window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, 1.0f);
+		if (glow)
+		{
+			for (int j = 1; j <= NUM_LINES; ++j)
+			{
+				for (int i = 0; i < numPoints; i++)
+				{
+					ImVec2 lineStartOffset = { points[i].x + j, points[i].y + j };
+					ImVec2 lineEndOffset = { points[(i + 1) % numPoints].x + j, points[(i + 1) % numPoints].y + j };
+
+					window->DrawList->AddLine(lineStartOffset, lineEndOffset, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, 0.030f }), BASE_LINE_WIDTH + j + EXTRA_LINE_WIDTH);
+				}
+			}
+		}
+	}
+
+	/*void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height)
+	{
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		//window->DrawList->_FringeScale = 2.0f;
 
 		float a = (float)((color >> 24) & 0xff);
 		float r = (float)((color >> 16) & 0xff);
@@ -297,8 +372,9 @@ namespace render
 
 		points[numPoints] = points[0];
 
-		window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, thickness);
-	}
+		window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, 1.0f);
+
+	}*/
 
 	void RenderPolygon(const Geometry::Polygon poly, uintptr_t color, float thickness)
 	{
@@ -318,7 +394,8 @@ namespace render
 			i++;
 		}
 
-		ImGui::GetBackgroundDrawList()->AddPolyline(points, i, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), ImDrawFlags_Closed | ImDrawFlags_RoundCornersMask_, thickness);
+		ImGui::GetBackgroundDrawList()->AddPolyline(points, i, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, thickness);
+
 	}
 
 	void RenderFilledPolygon(const Geometry::Polygon poly, uintptr_t color)

@@ -176,6 +176,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Ashe.h" />
+    <ClInclude Include="auth.hpp" />
     <ClInclude Include="Awareness.h" />
     <ClInclude Include="Checkbox.h" />
     <ClInclude Include="classes\classes.h" />
@@ -245,11 +246,15 @@
     <ClInclude Include="selfprotection\pipe\namedpipeclient.h" />
     <ClInclude Include="selfprotection\strings\obfuscator.h" />
     <ClInclude Include="selfprotection\utils.h" />
+    <ClInclude Include="skStr.h" />
     <ClInclude Include="Slider.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TargetSelector.h" />
+    <ClInclude Include="Vayne.h" />
     <ClInclude Include="VMTHook.h" />
+    <ClInclude Include="Xerath.h" />
+    <ClInclude Include="Yorick.h" />
     <ClInclude Include="zoom.h" />
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +280,7 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="imgui_settings.h" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
     <ClCompile Include="itemsdatabase.cpp" />
@@ -310,7 +316,10 @@
     <ClCompile Include="scripts\TargetSelector.cpp" />
     <ClCompile Include="Slider.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Vayne.cpp" />
     <ClCompile Include="VMTHook.cpp" />
+    <ClCompile Include="Xerath.cpp" />
+    <ClCompile Include="Yorick.cpp" />
     <ClCompile Include="zoom.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -318,6 +327,9 @@
   </ItemGroup>
   <ItemGroup>
     <MASM Include="mem\spoofer.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="library_x64.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

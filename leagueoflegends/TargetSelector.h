@@ -58,6 +58,7 @@ namespace UPasta::SDK::TargetSelector
                 inline List* attackPriorities;
 
                 namespace Advanced {
+                    inline CheckBox* avoidAttackInvulnerable;
                     inline CheckBox* attackSelectedTarget;
                     inline CheckBox* attackOnlySelectedTarget;
                     inline CheckBox* attackClones;
@@ -118,18 +119,22 @@ namespace UPasta::SDK::TargetSelector
 
     namespace Functions
 	{
-        std::vector<Object*> GetMinionsInRange(float range);
+        std::vector<Object*> GetMinionsInRange(Vector3 pos, float range);
+        std::vector<Object*> GetKillableMinionsInRange(Vector3 pos, float range, float damage);
         int GetMinionPriority(Object* minion);
         float GetMinionReducedPriority(Object* minion);
         Object* GetMinion(std::vector<Object*> targets, DamageType damageType);
         Object* GetEnemyMinionInRange(float radius);
 
-        std::vector<Object*> GetTargetsInRange(float range);
+        std::vector<Object*> GetTargetsInRange(Vector3 pos, float range);
+        std::vector<Object*> GetKillableTargetsInRange(Vector3 pos, float range, float damage);
         extern Object* SelectedTarget;
         int GetPriority(Object* hero);
 
         std::vector<Object*> GetJungleMonstersInRange(float range);
         Object* GetJungleInRange(float range);
+        Object* GetWardInRange(float range);
+
 
         std::vector<Object*> GetJungleRespawnInRange(float range);
 
@@ -141,15 +146,18 @@ namespace UPasta::SDK::TargetSelector
         float GetReducedPriority(Object* hero);
 
         bool ChooseSelectedObject(Object* selectedObject, Object* checkObj);
-        Object* GetEnemyChampionInRange(float range, int damageType, Skillshot skillshot);
-        Object* GetEnemyChampionInRange(float range);
-        Object* GetEnemyChampionInRange(float range, Skillshot skillshot);
+        Object* GetEnemyChampionInRange(float radius, int damageType, Skillshot skillshot);
+        Object* GetEnemyChampionInRange(float radius);
+        Object* GetEnemyChampionInRange(Vector3 pos, float radius);
+        Object* GetEnemyChampionInRange(float radius, Skillshot skillshot);
         Object* GetEnemyNexusInRange(float range);
         Object* GetEnemyInhibitorInRange(float range);
         Object* GetEnemyTurretInRange(float range);
         Object* GetAllyTurretInRange(float range);
         Object* GetMinionInRange(float range);
         Object* GetEnemyObjectInRange(float range);
+        std::vector<Object*> GetObjectsInRange(Vector3 pos, std::string name, float range);
+        Object* GetObjectInRange(std::string name, float range);
         Object* GetObjectInRange(float range, std::string name = "", std::vector<QWORD> includefilterTypeHashes = {}, std::vector<QWORD> excludeFilterTypeHashesDetailed = {}, bool isSpecial = false);
     }
 

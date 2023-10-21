@@ -276,7 +276,7 @@ enum ItemsDatabase
 	Super_Spicy_Snax = 3681,
 	Targons_Brace = 3097,
 	Targons_Buckler = 3859,
-	Tear_of_the_Goddess = 3070,
+	Tear_of_the_Goddess = 2003,
 	Tear_of_the_Goddess_Quick_Charge = 3073,
 	The_Black_Cleaver = 3071,
 	The_Black_Spear = 3599,

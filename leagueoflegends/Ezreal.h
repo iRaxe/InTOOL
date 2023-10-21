@@ -6,54 +6,81 @@ using namespace scripts;
 namespace EzrealConfig
 {
     namespace EzrealCombo {
-        CheckBox* UseQ;
-        CheckBox* UseW;
-        CheckBox* UseR;
+	    inline CheckBox* UseQ;
+        inline CheckBox* UseW;
+        inline CheckBox* UseR;
 
-        Slider* enemiesInRange;
-    	Slider* maxTargetDistance;
-	    KeyBind* manualCastUltimateKey;
+        inline Slider* enemiesInRange;
     }
 
     namespace EzrealHarass {
-        CheckBox* UseQ;
-        CheckBox* UseW;
-
-        Slider* minMana;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseW;
+        inline Slider* minMana;
     }
 
     namespace EzrealClear {
-        CheckBox* UseQ;
-        CheckBox* UseW;
-        Slider* minMana;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseW;
+        inline Slider* minMana;
     }
 
     namespace EzrealJungle {
-        CheckBox* UseQ;
-        CheckBox* UseW;
-        Slider* minMana;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseW;
+        inline Slider* minMana;
     }
 
     namespace EzrealLastHit {
-        CheckBox* UseQ;
-        Slider* minMana;
+        inline CheckBox* UseQ;
+        inline Slider* minMana;
+    }
+
+    namespace EzrealSpellsSettings {
+
+        inline CheckBox* saveMana;
+
+    	inline List* qCastMode;
+        inline Slider* qRange;
+        inline CheckBox* DrawQ;
+
+        inline List* wCastMode;
+        inline Slider* wRange;
+        inline CheckBox* DrawW;
+        
+        inline Slider* eRange;
+        inline CheckBox* DrawE;
+
+        inline List* targetMode;
+        inline KeyBind* rTapKey;
+        inline Slider* maxRDistance;
+        inline Slider* minRDistance;
+        
+        inline CheckBox* DrawIfReady;
     }
 
     namespace EzrealKillsteal {
-        CheckBox* UseQ;
-        CheckBox* UseE;
-        CheckBox* UseR;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseE;
+        inline CheckBox* UseR;
     }
 
     namespace EzrealAntiGapCloser {
-        CheckBox* UseE;
+        inline List* eMode;
+        inline CheckBox* UseE;
+        inline std::vector<Object*> whitelist;
     }
 
-    namespace EzrealDrawings {
-        CheckBox* DrawQ;
-        CheckBox* DrawW;
-        CheckBox* DrawIfReady;
+    namespace EzrealAntiMelee {
+        inline List* eMode;
+        inline CheckBox* UseE;
+        inline std::vector<Object*> whitelist;
     }
+
+    namespace EzrealFlee {
+        inline CheckBox* UseE;
+    }
+
 }
 
 namespace EzrealDamages
@@ -63,11 +90,6 @@ namespace EzrealDamages
         inline float dmgSkillArray[6] = { 0, 20, 45, 70, 95, 120 };
         inline float additionalPercentageAD = 1.30f;
         inline float additionalPercentageAP = 0.15f;
-
-        inline float range = 1200.0f;
-        inline float width = 120.0f;
-        inline float speed = 2000.0f;
-        inline float delay = 0.25f;
     }
 
     namespace WSpell
@@ -75,11 +97,6 @@ namespace EzrealDamages
         inline float dmgSkillArray[6] = { 0, 80, 135, 190, 245, 300 };
         inline float additionalPercentageAD = 0.60f;
         inline float additionalPercentageAP[6] = { 0, 0.70f, 0.75f, 0.80f, 0.85f, 0.90f };
-
-        inline float range = 1200.0f;
-        inline float width = 160.0f;
-        inline float speed = 1700.0f;
-        inline float delay = 0.25f;
     }
 
     namespace ESpell
@@ -87,8 +104,6 @@ namespace EzrealDamages
         inline float dmgSkillArray[6] = { 0, 80, 130, 180, 230, 280 };
         inline float additionalPercentageAD = 0.50f;
         inline float additionalPercentageAP = 0.75f;
-
-        inline float range = 475.0f;
     }
 
     namespace RSpell
@@ -97,9 +112,5 @@ namespace EzrealDamages
         inline float dmgSkillArrayMonster[6] = { -9999, 175, 250, 325 };
         inline float additionalPercentageAD = 0.85f;
         inline float additionalPercentageAP = 1.10f;
-
-        inline float width = 180.0f;
-        inline float speed = 2000.0f;
-        inline float delay = 0.25f;
     }
 }

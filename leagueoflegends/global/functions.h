@@ -19,6 +19,8 @@ namespace functions
 
 	Vector3 ReadVector3(QWORD offset);
 	void WriteVector3(QWORD offset, Vector3 vector);
+	void WriteVector2(QWORD offset, Vector2 vector);
+
 
 	Vector2 ReadVector2(QWORD offset);
 
@@ -46,9 +48,10 @@ namespace functions
 	Vector2 GetMinimapPos();
 	float GetMinimapSize();
 	Vector2 WorldToMinimap(Object* objectToShow);
+	Vector2 WorldToMinimap(Vector3 posToShow);
 	Vector3 GetBaseDrawPosition(Object* obj);
 	Vector2 GetHpBarPosition(Object* obj);
-
+	Object* GetObjectFromNetId(int netId);
 	Object* GetSelectedObject();
 	bool IsNotLocalPlayer(Object* obj);
 	int IsAttackingLocalPlayer(Object* obj);
@@ -80,6 +83,8 @@ namespace functions
 	bool CastSpell(int spellId, Object* Target);
 	bool CastSpell(int spellId);
 	bool CastSpell(int spellId, Vector3 pos);
+	bool ReleaseSpell(int spellId, Vector3 pos);
+
 	void OldCastSpell(int spellId, Vector3 pos);
 
 	bool CanSendInput();
@@ -88,4 +93,6 @@ namespace functions
 	void AttackObject(Vector3 objPos);
 
 	void MoveToMousePos();
+
+	bool MenuItemContains(const std::vector<Object*>& words, const std::string& targetWord);
 }

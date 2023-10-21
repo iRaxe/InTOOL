@@ -105,6 +105,7 @@ struct SkillShotDB
 	Skillshot EvelynnR;
 	Skillshot EzrealQ;
 	Skillshot EzrealW;
+	Skillshot EzrealE;
 	Skillshot EzrealR;
 	Skillshot FioraW;
 	Skillshot FizzR;
@@ -185,6 +186,9 @@ struct SkillShotDB
 	Skillshot NaafiriQ;
 	Skillshot NaafiriR;
 	Skillshot NautilusQ;
+	Skillshot NautilusW;
+	Skillshot NautilusE;
+	Skillshot NautilusR;
 	Skillshot NeekoQ;
 	Skillshot NeekoE;
 	Skillshot NidaleeQ;
@@ -270,6 +274,9 @@ struct SkillShotDB
 	Skillshot VarusQ;
 	Skillshot VarusE;
 	Skillshot VarusR;
+	Skillshot VayneQ;
+	Skillshot VayneE;
+	Skillshot VayneR;
 	Skillshot VeigarQ;
 	Skillshot VeigarW;
 	Skillshot VexQ;
@@ -283,6 +290,7 @@ struct SkillShotDB
 	Skillshot ViktorE;
 	Skillshot WarwickR;
 	Skillshot XayahQ;
+	Skillshot XerathQ;
 	Skillshot XerathW;
 	Skillshot XerathE;
 	Skillshot XerathR;
@@ -294,6 +302,10 @@ struct SkillShotDB
 	Skillshot YoneQ2;
 	Skillshot YoneW;
 	Skillshot YoneR;
+	Skillshot YorickQ;
+	Skillshot YorickW;
+	Skillshot YorickE;
+	Skillshot YorickR;
 	Skillshot ZacQ;
 	Skillshot ZedQ;
 	Skillshot ZeriQ;

@@ -54,6 +54,7 @@ namespace UPasta
 				namespace Status
 				{
 					Menu* StatusMenu;
+
 					void InitializeStatusMenu()
 					{
 						StatusMenu = OrbwalkerMenu->AddMenu("statusSection", "Status settings");
@@ -63,6 +64,7 @@ namespace UPasta
 						statusFastClearMode = StatusMenu->AddCheckBox("statusFastClearMode", "Enable FastClear mode", true);
 						statusLastHitMode = StatusMenu->AddCheckBox("statusLastHitMode", "Enable LastHit mode", true);
 						statusHarassMode = StatusMenu->AddCheckBox("statusHarassMode", "Enable Harass mode", true);
+						statusFleeMode = StatusMenu->AddCheckBox("statusFleeMode", "Enable Flee mode", true);
 
 						initializedStatusMenu = true;
 					}
@@ -75,10 +77,11 @@ namespace UPasta
 					{
 						KeyBindingsMenu = OrbwalkerMenu->AddMenu("keybindingsSection", "KeyBindings settings");
 						comboKey = KeyBindingsMenu->AddKeyBind("comboKey", "Combo Key", ' ', false, false);
-						laneClearKey = KeyBindingsMenu->AddKeyBind("laneClearKey", "LaneClear Key", 'V', false, false);
-						fastClearKey = KeyBindingsMenu->AddKeyBind("fastClearKey", "FastClear Key", 'X', false, false);
-						lastHitKey = KeyBindingsMenu->AddKeyBind("lastHitKey", "LastHit Key", 'Z', false, false);
 						harassKey = KeyBindingsMenu->AddKeyBind("harassKey", "Harass Key", 'C', false, false);
+						lastHitKey = KeyBindingsMenu->AddKeyBind("lastHitKey", "LastHit Key", 'X', false, false);
+						laneClearKey = KeyBindingsMenu->AddKeyBind("laneClearKey", "LaneClear Key", 'V', false, false);
+						fastClearKey = KeyBindingsMenu->AddKeyBind("fastClearKey", "FastClear Key", 'CTRL', false, false);
+						fleeKey = KeyBindingsMenu->AddKeyBind("fleeKey", "Flee Key", 'T', false, false);
 
 						initializedKeyBindingsMenu = true;
 					}
@@ -89,7 +92,7 @@ namespace UPasta
 			namespace Functions
 			{
 				float nextRngBuffer = 0.0f;
-				float gameTime = 0.0f;
+				float gameTime = 0;
 				float lastAttackTime = 0.0f;
 				QWORD lastSpellCastAddress = 0;
 				bool shouldWait = false;
@@ -114,19 +117,24 @@ namespace UPasta
 						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Harass;
 					if (Configs::KeyBindings::lastHitKey->Value && Configs::Status::statusLastHitMode->Value)
 						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Lasthit;
+					if (Configs::KeyBindings::fleeKey->Value && Configs::Status::statusFleeMode->Value)
+						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Flee;
 				}
 
 
 				void Update()
 				{
-					srand(static_cast <unsigned> (time(0)));
 					gameTime = functions::GetGameTime();
-
-					KeyChecks();
-					CheckActiveAttack();
-					StopOrbwalkCheck();
-					IsReloadingCheck();
+					__try { KeyChecks(); }
+					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> KEYCHECKS UPDATE"); }
+					__try { CheckActiveAttack(); }
+					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> CHECKATTIVEATTACK UPDATE"); }
+					__try { StopOrbwalkCheck(); }
+					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> STOPORBWALK UPDATE"); }
+					__try { IsReloadingCheck(); }
+					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> ISRELOADING UPDATE"); }
 					
+
 					/*if (Configs::KeyBindings::comboKey->Value)
 					{
 						Vector2 screenPos = functions::WorldToScreen(globals::localPlayer->GetPosition());
@@ -143,19 +151,29 @@ namespace UPasta
 						return;
 					}
 
+					/*if (globals::localPlayer->IsCastingSpell())
+						return;*/
+
 					switch (globals::scripts::orbwalker::orbwalkState)
 					{
 					case Attack:
-						States::Attack();
+						__try { States::Attack(); }
+						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> ATTACK UPDATE"); }
 						break;
 					case Clear:
-						States::Laneclear();
+						__try { States::Laneclear(); }
+						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> LANECLEAR UPDATE"); }
 						break;
 					case Harass:
-						States::Harass();
+						__try { States::Harass(); }
+						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> HARASS UPDATE"); }
 						break;
 					case Lasthit:
-						States::Lasthit();
+						__try { States::Lasthit(); }
+						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> LASTHIT UPDATE"); }
+					case Flee:
+						__try { Actions::Idle(); }
+						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> IDLE UPDATE"); }
 						break;
 					
 					}
@@ -165,7 +183,7 @@ namespace UPasta
 				void CheckActiveAttack()
 				{
 					auto spellCast = globals::localPlayer->GetActiveSpellCast();
-					if (spellCast)
+					if (spellCast != nullptr)
 					{
 						if ((spellCast->IsAutoAttack() ||
 							functions::IsAttackWindupSpell(spellCast->GetSpellId())) &&
@@ -211,7 +229,7 @@ namespace UPasta
 							if (minion->GetName() == "") continue;
 							if (!minion->IsValidTarget()) continue;
 							if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
-							if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange())) continue;
+							if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetAttackRange())) continue;
 							if (minion)
 							{
 								return
@@ -303,7 +321,13 @@ namespace UPasta
 							return;
 
 						if (Configs::Status::statusFollowMouse->Value)
+						{
+							SpellCast* spellCast = globals::localPlayer->GetActiveSpellCast();
+							if (spellCast && spellCast->GetSpellInfo()->GetSpellData()->GetName() == "XerathLocusOfPower2")
+								return;
+
 							functions::MoveToMousePos();
+						}
 
 						RefreshBuffer();
 					}
@@ -339,6 +363,7 @@ namespace UPasta
 						/*if (!CanDoAction())
 							return;*/
 						functions::CastSpell(spellId, pos);
+						RefreshBuffer();
 					}
 				}
 
@@ -348,7 +373,7 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
+							auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetAttackRange());
 							if (obj != nullptr)
 							{
 								Actions::AttackObject(obj);
@@ -363,34 +388,20 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							if (const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetRealAttackRange()))
+							const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetAttackRange());
+							const auto jungle = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetAttackRange());
+
+							if (turret != nullptr && turret->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetAttackRange())
 							{
 								Actions::AttackObject(turret);
-								return;
 							}
 
-							if (const auto inhibitor = TargetSelector::Functions::GetEnemyInhibitorInRange(globals::localPlayer->GetRealAttackRange()))
-							{
-								Actions::AttackInhib(inhibitor);
-								return;
-							}
-
-							if (const auto nexus = TargetSelector::Functions::GetEnemyNexusInRange(globals::localPlayer->GetRealAttackRange()))
-							{
-								if (nexus->GetMaxHealth() == 5500)
-								{
-									Actions::AttackInhib(nexus);
-									return;
-								}
-							}
-
-							if (const auto jungle = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange()))
+							else if (jungle != nullptr && jungle->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetAttackRange())
 							{
 								Actions::AttackObject(jungle);
-								return;
 							}
-
-							if (const auto minion = TargetSelector::Functions::GetMinionInRange(globals::localPlayer->GetRealAttackRange()))
+							
+							else 
 							{
 								//const int missileSpeed = GetAttackMissileSpeed();
 								for (int i = 0; i < globals::minionManager->GetListSize(); i++)
@@ -398,20 +409,16 @@ namespace UPasta
 									auto minion = globals::minionManager->GetIndex(i);
 									if (minion->IsAlive() && minion->IsVisible())
 									{
-										if (minion->GetName() == "") continue;
 										if (!minion->IsValidTarget()) continue;
-										if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
-										if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange())) continue;
+										if (!minion->IsMinion()) continue;
+										if (minion->GetDistanceTo(globals::localPlayer) > globals::localPlayer->GetAttackRange()) continue;
 
-										if (minion)
+										if (minion && minion->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetAttackRange())
 										{
-											float test = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
-											//float t = (globals::localPlayer->GetAttackDelay() * 1000) - 100 + Configs::Humanizer::windupDelay->Value / 2 + 1000 * max(0.0f, globals::localPlayer->GetDistanceTo(minion) - globals::localPlayer->GetBoundingRadius()) / missileSpeed;
 											const float minionHealth = minion->GetHealth() - Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
-
 											const auto attackDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
 
-											const auto turret = TargetSelector::Functions::GetAllyTurretInRange(globals::localPlayer->GetRealAttackRange());
+											const auto turret = TargetSelector::Functions::GetAllyTurretInRange(globals::localPlayer->GetAttackRange());
 											if (turret && turret->GetDistanceTo(minion) <= 900)
 											{
 												if (minion->GetHealth() > attackDamage)
@@ -454,7 +461,7 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							auto obj = UPasta::SDK::TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
+							auto obj = UPasta::SDK::TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetAttackRange());
 							if (obj != nullptr)
 							{
 								Actions::AttackObject(obj);
@@ -476,7 +483,7 @@ namespace UPasta
 								{
 									if (minion->GetName() == "") continue;
 									if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
-									if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange())) continue;
+									if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetAttackRange())) continue;
 
 									if (minion)
 									{

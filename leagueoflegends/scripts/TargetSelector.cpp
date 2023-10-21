@@ -48,7 +48,7 @@ namespace UPasta
 				std::unordered_map<std::string, unsigned int> PrioritiesMap = 
 				{	{ "Aatrox", 3 }, { "Ahri", 4 }, { "Akali", 4 },	{ "Akshan", 4 }, { "Alistar", 1 }, { "Amumu", 2 },
 					{ "Anivia", 4 }, { "Annie", 4 }, { "Aphelios", 5 },	{ "Ashe", 5 }, { "Aurelion", 5 }, { "Azir", 5 },
-					{ "Bard", 2 }, { "Belveth", 3 }, { "Blitzcrank", 1 }, { "Brand", 3 }, { "Braum", 1 }, { "Caitlyn", 5 },
+					{ "Bard", 2 }, { "Belveth", 3 }, { "Blitzcrank", 1 }, { "Brand", 3 },{ "Brerr", 3 }, { "Braum", 1 }, { "Caitlyn", 5 },
 					{ "Camille", 3 }, { "Cassiopeia", 5 }, { "Chogath", 1 }, { "Corki", 5 }, { "Darius", 2 }, { "Diana", 4 },
 					{ "DrMundo", 1 }, { "Draven", 5 }, { "Ekko", 3 }, { "Elise", 4 }, { "Evelynn", 4 }, { "Ezreal", 4 },
 					{ "Fiddlesticks", 4 }, { "Fiora", 3 }, { "Fizz", 4 }, { "Galio", 2 }, { "Gankplank", 5 }, { "Garen", 2 },
@@ -75,6 +75,26 @@ namespace UPasta
 					{ "Zeri", 5 }, { "Ziggs", 4 }, { "Zilean", 3 },	{ "Zoe", 3 }, { "Zyra", 3 }
 				};
 
+				std::unordered_map<std::string, bool> AntiGapcloserMap =
+				{   { "Aatrox", true }, { "Ahri", true }, { "Akali", true },	{ "Akshan", true },
+					{ "Alistar", true }, { "Amumu", true },{ "Aurelion", true }, { "Azir", true },
+					{ "Belveth", true }, { "Blitzcrank", true }, { "Brand", 3 }, { "Caitlyn", true },
+					{ "Camille", true }, { "Corki", true },{ "Diana", true },{ "Ekko", true },
+					{ "Ezreal", true },{ "Fiddlesticks", true },{ "Galio", true },{ "Gnar", true },
+					{ "Gragas", true }, { "Gwen", true }, { "Hecarim", true }, { "Irelia", true },
+					{ "KSante", true }, { "Kalista", true },{ "Kassadin", true }, { "Katarina", true },
+					{ "Kayn", true }, { "Khazix", true }, { "Leblanc", true }, { "LeeSin", true },
+					{ "Leona", true }, { "Lissandra", true }, { "Malphite", true },{ "Maokai", true },
+					{ "MasterYi", true },{ "Naafiri", true },{ "Nautilus", true },{ "Nilah", true },
+					{ "Nocturne", true },{ "Pantheon", true }, { "Poppy", true }, { "Pyke", true }, 
+					{ "RekSai", true }, { "Rell", true }, { "Renekton", true }, { "Rengar", true },
+					{ "Riven", true },  { "Samira", true }, { "Sejuani", true },	{ "Shaco", true },
+					{ "Shen", true },{ "Tahm", true }, { "Talon", true },{ "Tristana", true },
+					{ "Tryndamere", true },{ "Vi", true },	{ "Viego", true }, { "Wukong", true },
+					{ "Xayah", true },{ "Yasuo", true }, { "Yone", true }, { "Zac", true },
+					{ "Zed", true }
+				};
+
 				void Configs::InitializeComboTargets()
 				{
 					PopulateComboTargets();
@@ -93,7 +113,7 @@ namespace UPasta
 
 						for (auto enemy : Enemies)
 						{
-							auto iterator = PrioritiesMap.find(enemy->GetName());
+							auto iterator = PrioritiesMap.find(enemy->GetName().c_str());
 							TargetPrioritiesMenu->AddSlider(enemy->GetName().c_str(), enemy->GetName().c_str(), iterator != PrioritiesMap.end() ? iterator->second : 1, 1, 5, 1);
 						}
 
@@ -104,11 +124,12 @@ namespace UPasta
 									for (auto enemy : Enemies)
 									{
 										auto iterator = PrioritiesMap.find(enemy->GetName());
-										(*TargetPrioritiesMenu)[enemy->GetName()]->Cast<Slider*>()->Value = iterator != PrioritiesMap.end() ? iterator->second : 1;
+										(*TargetPrioritiesMenu)[enemy->GetName().c_str()]->Cast<Slider*>()->Value = iterator != PrioritiesMap.end() ? iterator->second : 1;
 										self->Value = false;
 									}
 								}
 							});
+						TSModes::Combo::Advanced::avoidAttackInvulnerable = TargetPrioritiesMenu->AddCheckBox("AvoidAttackInvulnerable", "Dont attack invulnerable targets", true);
 
 						TSModes::Combo::Advanced::attackSelectedTarget = TargetPrioritiesMenu->AddCheckBox("ForceSelectedTarget", "Force Selected Target", true);
 						TSModes::Combo::Advanced::attackOnlySelectedTarget = TargetPrioritiesMenu->AddCheckBox("AttackOnlySelectedTarget", "Attack only selected target");
@@ -188,7 +209,7 @@ namespace UPasta
 
 			namespace Functions
 			{
-				std::vector<Object*> Functions::GetMinionsInRange(float range)
+				std::vector<Object*> Functions::GetMinionsInRange(Vector3 pos, float range)
 				{
 					std::vector<Object*> validMinions; // Lista di oggetti validi
 
@@ -200,7 +221,7 @@ namespace UPasta
 							if (obj->GetName() == "") continue;
 							if (!obj->IsValidTarget()) continue;
 							if (obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
-							if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+							if (!obj->IsInRange(pos, range)) continue;
 							if (obj)
 							{
 								validMinions.push_back(obj);
@@ -213,6 +234,29 @@ namespace UPasta
 						validMinions.clear();
 
 					return validMinions;
+				}
+
+				std::vector<Object*> Functions::GetKillableMinionsInRange(Vector3 pos, float range, float damage)
+				{
+					std::vector<Object*> validTargets;
+
+					for (int i = 0; i < globals::minionManager->GetListSize(); i++)
+					{
+						auto obj = globals::minionManager->GetIndex(i);
+						if (!obj->IsValidTarget()) continue;
+						if (obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
+						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range))continue;
+						if (obj->GetHealth() > damage) continue;
+						if (obj)
+							validTargets.push_back(obj);
+					}
+
+					if (validTargets.size() >= 1)
+						return validTargets;
+					else
+						validTargets.clear();
+
+					return validTargets;
 				}
 
 				int Functions::GetMinionPriority(Object* minion)
@@ -294,7 +338,7 @@ namespace UPasta
 
 				Object* Functions::GetEnemyMinionInRange(float radius)
 				{
-					return GetMinion(GetMinionsInRange(radius),
+					return GetMinion(GetMinionsInRange(globals::localPlayer->GetPosition(), radius),
 						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? DamageType_Physical : DamageType_Magical);
 				}
 
@@ -350,7 +394,29 @@ namespace UPasta
 					return validMonsters;
 				}
 
-				std::vector<Object*> Functions::GetTargetsInRange(float range)
+				std::vector<Object*> Functions::GetTargetsInRange(Vector3 pos, float range)
+				{
+					std::vector<Object*> validTargets;
+
+					for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+					{
+						auto obj = globals::heroManager->GetIndex(i);
+						if (!obj->IsValidTarget()) continue;
+
+						if (!obj->IsInRange(pos, range))continue;
+						if (obj)
+							validTargets.push_back(obj);
+					}
+
+					if (validTargets.size() >= 1)
+						return validTargets;
+					else
+						validTargets.clear();
+
+					return validTargets;
+				}
+
+				std::vector<Object*> Functions::GetKillableTargetsInRange(Vector3 pos, float range, float damage)
 				{
 					std::vector<Object*> validTargets;
 
@@ -360,6 +426,7 @@ namespace UPasta
 						if (!obj->IsValidTarget()) continue;
 
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range))continue;
+						if (obj->GetHealth() > damage) continue;
 						if (obj)
 							validTargets.push_back(obj);
 					}
@@ -446,6 +513,9 @@ namespace UPasta
 						float highestPriority = 0.0f;
 						for (auto target : targets)
 						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto priority = GetReducedPriority(target) * (damageType == Magical ? Damage::CalculateMagicalDamage(globals::localPlayer, target, 100.0f) : Damage::CalculatePhysicalDamage(globals::localPlayer, target, 100.0f)) / target->GetHealth();
 							if (priority > highestPriority)
 							{
@@ -462,6 +532,9 @@ namespace UPasta
 						float leastHealth = FLT_MAX;
 						for (auto target : targets)
 						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto health = target->GetMaxHealth();
 							if (health < leastHealth)
 							{
@@ -478,6 +551,9 @@ namespace UPasta
 						float mostAttackDamage = 0.0f;
 						for (auto target : targets)
 						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto attackDamage = target->GetAttackDamage();
 							if (attackDamage > mostAttackDamage)
 							{
@@ -494,6 +570,9 @@ namespace UPasta
 						float mostAbilityPower = 0.0f;
 						for (auto target : targets)
 						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto abilityPower = target->GetAbilityPower();
 							if (abilityPower > mostAbilityPower)
 							{
@@ -510,6 +589,9 @@ namespace UPasta
 						float closest = FLT_MAX;
 						for (auto target : targets)
 						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto distance = globals::localPlayer->GetDistanceTo(target);
 							if (distance < closest)
 							{
@@ -526,6 +608,9 @@ namespace UPasta
 						int highestPriority = 0;
 						for (auto target : targets)
 						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto priority = GetPriority(target);
 							if (priority > highestPriority) {
 								hero = target;
@@ -541,6 +626,9 @@ namespace UPasta
 						float highestPriority = 0.0f;
 						for (auto target : targets)
 						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto priority = GetReducedPriority(target) * Damage::CalculatePhysicalDamage(globals::localPlayer, target, 100.0f) / target->GetMaxHealth();
 							if (priority > highestPriority)
 							{
@@ -555,7 +643,11 @@ namespace UPasta
 					{
 						Object* hero = nullptr;
 						float highestPriority = 0.0f;
-						for (auto target : targets) {
+						for (auto target : targets)
+						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto priority = GetReducedPriority(target) * Damage::CalculateMagicalDamage(globals::localPlayer, target, 100.0f) / target->GetMaxHealth();
 							if (priority > highestPriority) {
 								hero = target;
@@ -571,6 +663,9 @@ namespace UPasta
 						float closest = FLT_MAX;
 						for (auto target : targets)
 						{
+							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
+								continue;
+
 							auto distance = functions::GetMouseWorldPos().Distance(target->GetPosition());
 							if (distance < closest)
 							{
@@ -615,15 +710,23 @@ namespace UPasta
 
 				Object* Functions::GetEnemyChampionInRange(float radius)
 				{
-					return GetTarget(GetTargetsInRange(radius), 
+					return GetTarget(GetTargetsInRange(globals::localPlayer->GetPosition(), radius),
 						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? DamageType_Physical : DamageType_Magical);
 				}
 
-				Object* Functions::GetEnemyChampionInRange(float range, Skillshot skillshot)
+				Object* Functions::GetEnemyChampionInRange(Vector3 pos, float radius)
 				{
-					return  GetEnemyChampionInRange(range,
+					return GetTarget(GetTargetsInRange(pos, radius),
+						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? DamageType_Physical : DamageType_Magical);
+				}
+
+				Object* Functions::GetEnemyChampionInRange(float radius, Skillshot skillshot)
+				{
+					return  GetEnemyChampionInRange(radius,
 						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? DamageType_Physical : DamageType_Magical, skillshot);
 				}
+
+				
 
 				Object* Functions::GetEnemyNexusInRange(float range)
 				{
@@ -674,7 +777,7 @@ namespace UPasta
 					{
 						if (!obj->IsValidTarget()) continue;
 
-						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
 
 						if (obj)
 						{
@@ -695,8 +798,8 @@ namespace UPasta
 						if (!obj->IsVisible()) continue;
 						if (!obj->IsAlive()) continue;
 						if (!obj->IsAlly()) continue;
+						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
 
-						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
 
 						if (obj)
 						{
@@ -714,13 +817,11 @@ namespace UPasta
 					Object* best = nullptr;
 					for (Object* obj : *globals::minionManager)
 					{
-						if (obj->GetName() == "") continue;
-
 						if (!obj->IsValidTarget()) continue;
 
 						if (obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
 
-						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
 
 						if (ChooseSelectedObject(selectedObject, obj)) return obj;
 
@@ -810,6 +911,38 @@ namespace UPasta
 					return best;
 				}
 
+
+				Object* Functions::GetWardInRange(float range)
+				{
+					Object* selectedObject = functions::GetSelectedObject();
+					Object* best = nullptr;
+					for (Object* obj : *globals::minionManager)
+					{
+						if (obj->GetName() == "") continue;
+						if (!obj->IsValidTarget()) continue;
+						if (!obj->IsEnemy()) continue;
+						if (!obj->IsWard()) continue;
+						if (obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Ward) continue;
+						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+
+						if (ChooseSelectedObject(selectedObject, obj)) return obj;
+
+						if (!best)
+						{
+							best = obj;
+							continue;
+						}
+
+						if (best->GetDistanceTo(globals::localPlayer) > best->GetDistanceTo(globals::localPlayer))
+						{
+							best = obj;
+							continue;
+						}
+					}
+
+					return best;
+				}
+
 				Object* Functions::GetEnemyObjectInRange(float range)
 				{
 					Object* best = nullptr;
@@ -819,6 +952,53 @@ namespace UPasta
 						if (!obj->IsValidTarget()) continue;
 
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+
+						if (!best)
+						{
+							best = obj;
+							continue;
+						}
+					}
+
+					return best;
+				}
+
+				std::vector<Object*> Functions::GetObjectsInRange(Vector3 pos, std::string name, float range)
+				{
+					std::vector<Object*> validMinions;
+
+					for (int i = 0; i < globals::minionManager->GetListSize(); i++)
+					{
+						auto obj = globals::minionManager->GetIndex(i);
+						if (obj->IsAlive() && obj->IsVisible())
+						{
+							if (obj->GetName() == "") continue;
+							if (!obj->IsInRange(pos, range)) continue;
+							if (obj->GetName() != name) continue;
+
+							if (obj)
+							{
+								validMinions.push_back(obj);
+							}
+						}
+					}
+					if (validMinions.size() >= 1)
+						return validMinions;
+					else
+						validMinions.clear();
+
+					return validMinions;
+				}
+
+				Object* Functions::GetObjectInRange(std::string name, float range)
+				{
+					Object* best = nullptr;
+
+					for (Object* obj : *globals::minionManager)
+					{
+						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+
+						if (obj->GetName() != name) continue;
 
 						if (!best)
 						{
@@ -888,7 +1068,7 @@ namespace UPasta
 					{
 						Object* selectedObject = functions::GetSelectedObject();
 						if (selectedObject && selectedObject->IsValidTarget())
-							render::RenderArcWorld(selectedObject->GetPosition(), 10, selectedObject->GetRealAttackRange(), COLOR_BLUE, 1.0f, PI, globals::localPlayer->GetPosition(), true);
+							render::RenderArcWorld(selectedObject->GetPosition(), 10, selectedObject->GetAttackRange(), COLOR_BLUE, 1.0f, PI, globals::localPlayer->GetPosition(), true);
 					}
 					
 				}

@@ -4,9 +4,8 @@
 
 int InventorySlot::GetId()
 {
-	const auto item_id = reinterpret_cast<uintptr_t>(this) + oInventorySlotItemId;
-	const auto pointer = *reinterpret_cast<int*>(item_id);
-	return pointer;
+	const auto item_id = *(int*)(*(QWORD*)this + oInventorySlotItemId);
+	return item_id;
 }
 
 std::string InventorySlot::GetTexturePath()
@@ -22,10 +21,11 @@ std::string InventorySlot::GetTexturePath()
 
 std::string InventorySlot::GetName()
 {
-	const auto item_name = reinterpret_cast<uintptr_t>(this) + oInventorySlotItemName;
-	const auto pointer = *reinterpret_cast<char**>(item_name);
-	if (IsValidPtr(pointer))
-		return pointer;
+	const auto item_name = *(char**)(*(QWORD*)this + oInventorySlotItemName);
+	if (IsValidPtr(item_name))
+	{
+		return item_name;
+	}
 
 	LOG("GetName Doesnt work");
 	return "";
@@ -33,29 +33,56 @@ std::string InventorySlot::GetName()
 
 InventorySlot* ItemListObject::GetSlot()
 {
-	const auto item_slot = reinterpret_cast<uintptr_t>(this) + oInventorySlot;
-	const auto pointer_item_slot = *reinterpret_cast<uintptr_t*>(item_slot);
-	const auto pointer = reinterpret_cast<InventorySlot*>(pointer_item_slot);
-	if (IsValidPtr(pointer)) 
+	const auto pointer = (InventorySlot*)(*(QWORD*)this + oInventorySlot);
+
+	if (IsNotZeroPtr(*(QWORD*)pointer) && IsValidPtr(pointer))
 		return pointer;
 
 	LOG("GetSlot Doesnt work");
 	return nullptr;
 }
 
-InventorySlot* Object::GetInventorySlotById(int slotId)
+InventorySlot* HeroInventory::GetInventorySlot(int slotID)
 {
-	const auto hero_inventory = reinterpret_cast<QWORD>(this) + 0x4040;
-	const auto inventory_slot = *reinterpret_cast<QWORD*>(hero_inventory) + itemListObjectSize * slotId + oInventorySlotWrapper;
-	const auto pointer_to_slot = *reinterpret_cast<QWORD*>(inventory_slot);
-
-	if (auto list_obj = reinterpret_cast<ItemListObject*>(pointer_to_slot); IsValidPtr(list_obj))
+	const auto inventory_slot = (ItemListObject*)(*(QWORD*)this + (itemListObjectSize * slotID) + oInventorySlotWrapper);
+	if (IsNotZeroPtr(*(QWORD*)(inventory_slot)))
 	{
-		InventorySlot* wrapper = list_obj->GetSlot();
-		return wrapper;
+		InventorySlot* wrapper = inventory_slot->GetSlot();
+
+		if (IsNotZeroPtr(wrapper) && IsValidPtr(wrapper) && wrapper != nullptr)
+			return wrapper;
 	}
 
-	LOG("GetInventorySlotById Doesnt work");
+	//LOG("GetInventorySlotById Doesnt work");
+	return nullptr;
+}
+
+InventorySlot* HeroInventory::FindItemID(int itemID)
+{
+	for (auto i = 0; i < 7; i++)
+	{
+		InventorySlot* item2 = this->GetInventorySlot(i);
+		if (item2 == nullptr) return nullptr;
+		if (item2->GetId() == 0) return nullptr;
+
+		if (item2 != nullptr && item2->GetId() == itemID)
+		{
+			return item2;
+		}
+	}
+
+	return nullptr;
+}
+
+HeroInventory* Object::GetHeroInventory()
+{
+	const auto heroInventory = reinterpret_cast<HeroInventory*>(reinterpret_cast<QWORD>(this) + oObjItemManager);
+	if (IsNotZeroPtr(heroInventory) && IsValidPtr(heroInventory))
+	{
+		return heroInventory;
+	}
+
+	LOG("GetHeroInventory Doesnt work");
 	return nullptr;
 }
 
@@ -187,6 +214,12 @@ void SpellInput::SetUnkPos(Vector3 pos)
 	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputEndPos + sizeof(Vector3) * 2) = pos;
 }
 
+void SpellInput::SetReleasePos(Vector3 pos)
+{
+	auto mouseInstance = globals::moduleBase + oMouseInstance;
+	auto mouseScreenPosition = oMousePosition;
+}
+
 int Spell::GetLevel()
 {
 	return *(int*)((QWORD)this + oSpellSlotLevel);
@@ -250,6 +283,12 @@ SpellInfo* SpellCast::GetSpellInfo()
 {
 	return *(SpellInfo**)((QWORD)this + oActiveSpellCastSpellInfo);
 }
+
+SpellInfo* SpellCast::GetProcessSpellInfo()
+{
+	return *(SpellInfo**)((QWORD)this);
+}
+
 
 int SpellCast::GetSpellId()
 {
@@ -340,8 +379,8 @@ bool Object::IsVisible()
 
 bool Object::IsAlive()
 {
-	//return !functions::IsDead(this);
-	return !(*(int*)((QWORD)this + oObjAlive) % 2);
+	return !functions::IsDead(this);
+	//return !(*(int*)((QWORD)this + oObjAlive) % 2);
 }
 
 float Object::GetMana()
@@ -363,6 +402,11 @@ bool Object::IsTargetable()
 {
 	//return functions::IsTargetable(this);
 	return *(bool*)((QWORD)this + oObjTargetable);
+}
+
+bool Object::IsInvulnerable()
+{
+	return *(bool*)((QWORD)this + oObjIsInvulnerable);
 }
 
 bool Object::IsCursed()
@@ -508,6 +552,11 @@ float Object::GetScale()
 float Object::GetMovementSpeed()
 {
 	return *(float*)((QWORD)this + oObjMovementSpeed);
+}
+
+float Object::GetAttackSpeed()
+{
+	return *(float*)((QWORD)this + oObjAtkSpeedMulti);
 }
 
 float Object::GetLethality()
@@ -692,6 +741,11 @@ float Object::GetAttackWindup()
 	return _fnGetAttackWindup(this, 0x40);
 }
 
+bool Object::IsCastingSpell()
+{
+	auto spellCast = this->GetActiveSpellCast();
+	return spellCast != nullptr && !spellCast->IsAutoAttack();
+}
 bool Object::CanAttack()
 {
 	return this->GetActionState() & CharacterState::CanAttack;
@@ -730,6 +784,16 @@ bool Object::IsValidTarget()
 bool Object::IsRespawnMarker()
 {
 	return this->GetCharacterData()->GetObjectTypeHash() == ObjectType::RespawnMarker;
+}
+
+bool Object::IsMelee()
+{
+	return this->GetAttackRange() <= 325.0f;
+}
+
+bool Object::IsRanged()
+{
+	return this->GetAttackRange() > 325.0f;
 }
 
 bool Object::IsHero()
@@ -794,7 +858,13 @@ bool Object::IsEpicMonster()
 
 bool Object::IsTurret()
 {
+	//Doesnt work idk why 
 	return this->GetCharacterData()->GetObjectTypeHash() == ObjectType::Structure_Turret;
+}
+
+bool Object::IsBuilding()
+{
+	return functions::GetCollisionFlags(this->GetPosition()) == CollisionFlags::Tower;
 }
 
 float Object::CharGetAttackDamage()
@@ -854,7 +924,9 @@ bool Object::IsInAARange()
 bool Object::CanCastSpell(int slotId)
 {
 	auto spell = this->GetSpellBySlotId(slotId);
-	return this->CanCast() && functions::GetSpellState(slotId) == SpellState::IsReady;
+	return this->CanCast() && spell->IsReady() && spell->GetManaCost() <= this->GetMana();
+
+	//return this->CanCast() && functions::GetSpellState(slotId) == SpellState::IsReady;
 }
 
 Vector3 Object::GetServerPosition()

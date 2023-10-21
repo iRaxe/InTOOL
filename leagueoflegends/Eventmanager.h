@@ -23,6 +23,7 @@ namespace EventManager {
 		OnPlayAnimation,
 		OnFinishCast,
 		OnStopCast,
+		OnAfterAttack,
 		OnGapCloserSpell,
 		OnInterruptibleSpell,
 		OnNewPath,

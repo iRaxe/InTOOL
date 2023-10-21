@@ -7,6 +7,7 @@
 #define M_PI_F (float)M_PI
 #endif
 
+
 struct Vector2
 {
     float x, y;
@@ -124,6 +125,13 @@ struct Vector3
         return (*this + other) / 2;
     }
 
+
+    Vector3 ToGround() const
+    {
+        Vector3 result(this->x, 0, this->z);
+        return result;
+    }
+
     float Polar() const
     {
         if (this->Close(x, 0.f, 0.f))
@@ -187,6 +195,11 @@ struct Vector3
     Vector3 Perpendicular2() const
     {
         return { z,y,-x };
+    }
+
+    Vector3 Perpendicular3() const
+    {
+        return { z,-y,x };
     }
 
     Vector3 Rotate(Vector3 startPos, float theta)
@@ -313,7 +326,8 @@ enum OrbwalkState
     Attack,
     Clear,
     Harass,
-    Lasthit
+    Lasthit,
+    Flee
 };
 
 enum DamageType

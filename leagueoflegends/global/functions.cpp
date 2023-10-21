@@ -1,7 +1,10 @@
+#include "../Orbwalker.h"
 #include "../stdafx.h"
 
 namespace functions
 {
+	
+
 	float lastRefreshTime = 0.0f;
 	
 	void* spoof_trampoline = 0x0;
@@ -48,6 +51,12 @@ namespace functions
 		*(float*)(offset) = vector.x;
 		*(float*)(offset + 0x4) = vector.y;
 		*(float*)(offset + 0x8) = vector.z;
+	}
+
+	void WriteVector2(QWORD offset, Vector2 vector)
+	{
+		*(float*)(offset) = vector.x;
+		*(float*)(offset + 0x4) = vector.y;
 	}
 
 	void PrintChat(std::string text)
@@ -181,9 +190,20 @@ namespace functions
 
 	Vector2 WorldToMinimap(Object* objectToShow)
 	{
-		Vector3 objDrawPos = GetBaseDrawPosition(objectToShow);
-		Vector2 objMinimapDrawPos(objDrawPos.x, objDrawPos.z);
-		float scale_factor = GetMinimapSize() / 14800.0f;
+		const Vector3 objDrawPos = GetBaseDrawPosition(objectToShow);
+		const Vector2 objMinimapDrawPos(objDrawPos.x, objDrawPos.z);
+		const float scale_factor = GetMinimapSize() / 14800.0f;
+
+		const float minimap_x = (objMinimapDrawPos.x * scale_factor) + (GetMinimapPos().x - 12.0f);
+		const float minimap_y = (GetMinimapPos().y - 13.0f) + GetMinimapSize() - (objMinimapDrawPos.y * scale_factor);
+
+		return { minimap_x, minimap_y };
+	}
+
+	Vector2 WorldToMinimap(Vector3 posToShow)
+	{
+		const Vector2 objMinimapDrawPos(posToShow.x, posToShow.z);
+		const float scale_factor = GetMinimapSize() / 14800.0f;
 
 		const float minimap_x = (objMinimapDrawPos.x * scale_factor) + (GetMinimapPos().x - 12.0f);
 		const float minimap_y = (GetMinimapPos().y - 13.0f) + GetMinimapSize() - (objMinimapDrawPos.y * scale_factor);
@@ -218,6 +238,14 @@ namespace functions
 		return screenPos;
 	}
 
+	Object* GetObjectFromNetId(int netId)
+	{
+		typedef Object* (__fastcall* fnGetObjectFromNetId)(QWORD* a1, unsigned int netId);
+		fnGetObjectFromNetId _fnGetObjectFromNetId = (fnGetObjectFromNetId)(globals::moduleBase + oGetObjectFromNetId);
+
+		return _fnGetObjectFromNetId((QWORD*)(*(QWORD*)(globals::moduleBase + oGetObjectFromNetIdParam)), netId);
+	}
+
 	Object* GetSelectedObject()
 	{
 		typedef Object* (__fastcall* fnGetObjectFromNetId)(QWORD* a1, unsigned int netId);
@@ -226,7 +254,6 @@ namespace functions
 		QWORD* hudInstance = (QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance));
 		unsigned int targetNetId = *(unsigned int*)(*(QWORD*)((QWORD)hudInstance + oHudInstanceUserData) + oHudInstanceUserDataSelectedObjectNetId);
 		if (!targetNetId) return 0;
-
 		return _fnGetObjectFromNetId((QWORD*)(*(QWORD*)(globals::moduleBase + oGetObjectFromNetIdParam)), targetNetId);
 	}
 
@@ -469,6 +496,9 @@ namespace functions
 
 	bool CastSpell(int spellId, Object* Target)
 	{
+		if (UPasta::SDK::Orbwalker::Functions::shouldWait) return false;
+
+		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId);
 		Object* me = globals::localPlayer;
 		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
 		SpellInput* TargetInfo = spell->GetSpellInput();
@@ -495,6 +525,10 @@ namespace functions
 
 	bool CastSpell(int spellId)
 	{
+		if (UPasta::SDK::Orbwalker::Functions::shouldWait) return false;
+
+		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId);
+
 		Object* me = globals::localPlayer;
 		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
 		SpellInput* TargetInfo = spell->GetSpellInput();
@@ -521,6 +555,10 @@ namespace functions
 
 	bool CastSpell(int spellId, Vector3 pos)
 	{
+		if (UPasta::SDK::Orbwalker::Functions::shouldWait) return false;
+
+		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId);
+
 		Object* me = globals::localPlayer;
 		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
 		SpellInput* TargetInfo = spell->GetSpellInput();
@@ -545,9 +583,37 @@ namespace functions
 		return true;
 	}
 
+	bool ReleaseSpell(int spellId, Vector3 pos)
+	{
+		typedef char(__fastcall* HudReleaseSpellFn)(QWORD* spellLogic, QWORD* idc);
+		HudReleaseSpellFn _HudReleaseSpellFn = (HudReleaseSpellFn)(globals::moduleBase + oReleaseSpell);
+
+		if (spellId < 0 || spellId >= 14) return false;
+		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
+		SpellInput* TargetInfo = spell->GetSpellInput();
+		if (!TargetInfo) return false;
+
+		auto castScreenPosition = *(QWORD*)(globals::moduleBase + oMouseInstance) + oMousePosition;
+		auto mouseScreenPosition = Vector2(*(int*)castScreenPosition, *(int*)(castScreenPosition + 0x4));
+
+		if (pos.x || pos.y)
+		{
+			auto posw2s = WorldToScreen(pos);
+			*(int*)castScreenPosition = posw2s.x;
+			*(int*)(castScreenPosition + 0x4) = posw2s.y;
+		}
+
+		QWORD* InputLogic = *(QWORD**)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo);
+		spoof_call(spoof_trampoline, _HudReleaseSpellFn, InputLogic, (QWORD*)0);
+		*(int*)castScreenPosition = mouseScreenPosition.x;
+		*(int*)(castScreenPosition + 0x4) = mouseScreenPosition.y;
+
+		return true;
+	}
+
 	void OldCastSpell(int spellId, Vector3 pos)
 	{
-		EventManager::TriggerProcess(EventManager::EventType::OnCastSpell, spellId, pos);
+		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId, pos);
 
 		typedef bool(__fastcall* fnCastSpellWrapper)(QWORD* hudSpellInfo, QWORD* spellInfo);
 		fnCastSpellWrapper _fnCastSpellWrapper = (fnCastSpellWrapper)(globals::moduleBase + oCastSpellWrapper);
@@ -586,32 +652,43 @@ namespace functions
 
 	void AttackObject(Vector3 objPos)
 	{
-		if (!CanSendInput()) return;
+		if (!CanSendInput() || !objPos.IsValid()) return;
 
 		auto screenPos = WorldToScreen(objPos);
-		EventManager::TriggerProcess(EventManager::EventType::OnIssueOrder, objPos);
+		EventManager::TriggerProcess(EventManager::EventType::OnAfterAttack, objPos);
 
 		TryRightClick(screenPos);
 	}
 
 	void AttackObject(Object* obj)
 	{
-		if (!CanSendInput()) return;
+		if (!CanSendInput() || obj == nullptr) return;
 
 		Vector3 headPos = obj->GetPosition();
 		const float objectHeight = *(float*)(obj->GetCharacterData() + oObjCharDataDataSize) * obj->GetScale();
 		headPos.y += objectHeight - 50.0f;
 
 		auto screenPos = WorldToScreen(headPos);
-		EventManager::TriggerProcess(EventManager::EventType::OnIssueOrder, headPos);
+		EventManager::TriggerProcess(EventManager::EventType::OnAfterAttack, headPos);
 
 		TryRightClick(screenPos);
 	}
 
 	void MoveToMousePos()
 	{
-		if (!CanSendInput()) return;
+		if (!CanSendInput() || !GetMousePos().IsValid()) return;
 		IssueMove(GetMousePos());
+	}
+
+	bool MenuItemContains(const std::vector<Object*>& words, const std::string& targetWord) {
+		for (const auto word : words)
+		{
+			if (word->GetName() == targetWord)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 
