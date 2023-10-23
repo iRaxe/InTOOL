@@ -25,10 +25,10 @@ namespace UPasta {
 		void AddLine(Vector2 line1, Vector2 line2, float thickness = 1.0f, uintptr_t color = 0xFFFFFFFF);
 		void AddRectangle(Vector2 position, float width, float height, uintptr_t color = 0xFFFFFFFF);
 		void AddRectangle(Rect rectangle, uintptr_t color = 0xFFFFFFFF, float thickness = 1);
-		void AddRoundedRectangle(Rect rectangle, uintptr_t color = 0xFFFFFFFF, float thickness = 1, int rounding = 0, int roundSettings = ImDrawCornerFlags_All);
+		void AddRoundedRectangle(Rect rectangle, uintptr_t color = 0xFFFFFFFF, float thickness = 1, int rounding = 0, int roundSettings = ImDrawFlags_RoundCornersAll);
 		void AddRectangleFilled(Vector2 position, float width, float height, uintptr_t color = 0xFFFFFFFF);
 		void AddRectangleFilled(Rect rectangle, uintptr_t color = 0xFFFFFFFF);
-		void AddRoundedRectangleFilled(Rect rectangle, uintptr_t color = 0xFFFFFFFF, int rounding = 0, int roundSettings = ImDrawCornerFlags_All);
+		void AddRoundedRectangleFilled(Rect rectangle, uintptr_t color = 0xFFFFFFFF, int rounding = 0, int roundSettings = ImDrawFlags_RoundCornersAll);
 		void AddText(const char* text, float size, Vector2 position, uintptr_t color);
 		void AddText(float size, Vector2 position, uintptr_t color, const char* format, ...);
 		void AddText(const char* text, float size, Rect rectangle, uint32_t flags, uintptr_t color);

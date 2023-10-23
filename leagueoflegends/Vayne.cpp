@@ -318,6 +318,10 @@ public:
         Killsteal();
         AntiGapCloser();
         AntiMelee();
+        auto hash = buff_hash_real("VaYneE");
+        //000000001F62C086
+        //LOG("%s", functions::GetHexString(buff_hash_real(globals::localPlayer->GetName().c_str())));
+
     }
 
     void Attack() override

@@ -113,7 +113,7 @@ namespace UPasta
 	void Renderer::AddRectangle(Rect rectangle, uintptr_t color, float thickness)
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		window->DrawList->AddRect(ImVec2(rectangle.Position.x, rectangle.Position.y), ImVec2(rectangle.Position.x + rectangle.Width, rectangle.Position.y + rectangle.Height), color, 0, ImDrawCornerFlags_All, thickness);
+		window->DrawList->AddRect(ImVec2(rectangle.Position.x, rectangle.Position.y), ImVec2(rectangle.Position.x + rectangle.Width, rectangle.Position.y + rectangle.Height), color, 0, ImDrawFlags_RoundCornersAll, thickness);
 	}
 
 	void Renderer::AddRoundedRectangle(Rect rectangle, uintptr_t color, float thickness, int rounding,

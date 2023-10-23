@@ -162,9 +162,13 @@ namespace render
 					if (!buffEntry) return;
 
 					auto buff = buffEntry->GetBuff();
-					if (buff && buff->GetEndTime() >= functions::GetGameTime())
+					if (buff && buff->GetEndTime() >= functions::GetGameTime() && buff->GetStacks() > buff->GetStacksAlt())
 					{
-						RenderText(buff->GetName() + std::to_string(buff->GetStacksAlt()), (screenPos - Vector2(0.0f, 22.0f + baseDraw2)).ToImVec(), 18.0f, COLOR_WHITE, true);
+						RenderText("Buff Name:" + buff->GetName() 
+							+ " Buff Stacks: " + std::to_string(buff->GetStacks()) 
+							+ " Buff AltStacks: " + std::to_string(buff->GetStacksAlt()) 
+							+ " Hex: " + functions::GetHexString(buff_hash_real(buff->GetName().c_str())),
+								(screenPos - Vector2(0.0f, 22.0f + baseDraw2)).ToImVec(), 18.0f, COLOR_WHITE, true);
 						baseDraw2 += 22.0f;
 					}
 				}
@@ -177,21 +181,20 @@ namespace render
 					DrawEnemyListNames();
 				}
 
-				/*for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+				for (int i = 0; i < globals::heroManager->GetListSize(); i++)
 				{
 					auto obj = globals::heroManager->GetIndex(i);
 					if (obj->IsHero())
 					{
 						
-							DrawBuffNames(obj);
-						
+						DrawBuffNames(obj);
 
 						if (SETTINGS_BOOL("Drawings", "Draw Spells cooldown"))
 						{
 							//DrawCooldownBar(obj);
 						}
 					}
-				}*/
+				}
 			}
 		}
 

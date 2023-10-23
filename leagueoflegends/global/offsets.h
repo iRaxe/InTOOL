@@ -173,6 +173,7 @@
 #define oObjCharDataDataSize 0xC4
 #define oObjCharDataDataObjType 0x778 
 #define oObjCharDataDataObjTypeDetailed 0x20
+#define oObjCharDataDataHeroID 0x830
 
 #define oObjBuffManagerEntriesEnd 0x10
 #define oBuffEntryBuff 0x10

@@ -74,8 +74,8 @@ namespace UPasta {
 					auto black = IM_COL32(0, 0, 0, alpha);
 					auto width = 20.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->Tooltip).x;
 					auto tooltipRect = Rect(mousePos.x + 20, mousePos.y - Height * 0.5f, width, Height);
-					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawCornerFlags_All);
-					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawCornerFlags_All);
+					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawFlags_RoundCornersAll);
+					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawFlags_RoundCornersAll);
 					Renderer::AddText(this->Tooltip, 14.0f, Rect(tooltipRect.Position.x + 10.0f, tooltipRect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
 				}
 			}

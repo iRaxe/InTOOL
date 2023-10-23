@@ -1,6 +1,4 @@
 #pragma once
-
-#include "../itemsdatabase.h"
 #include "../stdafx.h"
 
 class LolString
@@ -51,7 +49,7 @@ private:
 class InventorySlot
 {
 public:
-    int GetId();
+    ItemsDatabase GetId();
     std::string GetTexturePath();
     std::string GetName();
 };
@@ -67,7 +65,7 @@ class HeroInventory
 {
 public:
     InventorySlot* GetInventorySlot(int slotId);
-    InventorySlot* FindItemID(int itemID);
+    InventorySlot* FindItemID(ItemsDatabase itemID);
 };
 
 class CharacterStackData
@@ -176,6 +174,7 @@ class CharacterData
 {
 public:
     float GetSize();
+    ChampionID GetHeroID();
     QWORD GetObjectTypeHash();
     QWORD GetObjectTypeHashDetailed();
 };
@@ -405,9 +404,9 @@ class ObjectManager
 public:
     uintptr_t* vtable;
     std::map<uintptr_t, Missile*> missile_map;
+    std::map<uintptr_t, Object*> units_map;
     int GetListSize();
     Object* GetIndex(int index);
-public:
     class iterator
     {
     private:

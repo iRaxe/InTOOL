@@ -132,7 +132,7 @@ namespace menu
 
 		const float widgetHeight = ImMax(labelSize.y, valueSize.y);
 
-		ImRect totalBoundingBox(currentWindow->DC.CursorPos, currentWindow->DC.CursorPos + ImVec2(widgetWidth, widgetHeight));
+		ImRect totalBoundingBox(currentWindow->DC.CursorPos, currentWindow->DC.CursorPos);
 
 		if (!ImGui::ItemAdd(totalBoundingBox, id))
 		{

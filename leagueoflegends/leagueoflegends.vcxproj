@@ -210,7 +210,6 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Info.h" />
     <ClInclude Include="InitializeEvents.h" />
-    <ClInclude Include="itemsdatabase.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="KeyBind.h" />
     <ClInclude Include="kiero\kiero.h" />
@@ -234,6 +233,7 @@
     <ClInclude Include="MenuRenderer.h" />
     <ClInclude Include="MenuSettings.h" />
     <ClInclude Include="menu\menu.h" />
+    <ClInclude Include="notification.h" />
     <ClInclude Include="OnProcessSpellCast.h" />
     <ClInclude Include="Orbwalker.h" />
     <ClInclude Include="Plugins.h" />
@@ -273,7 +273,6 @@
     <ClCompile Include="hooks\hooks.cpp" />
     <ClCompile Include="hooks\impl\impl.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
-    <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx9.cpp" />
@@ -283,7 +282,6 @@
     <ClCompile Include="imgui_settings.h" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
-    <ClCompile Include="itemsdatabase.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
     <ClCompile Include="kiero\minhook\src\buffer.c" />

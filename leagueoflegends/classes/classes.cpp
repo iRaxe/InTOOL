@@ -2,9 +2,9 @@
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 
-int InventorySlot::GetId()
+ItemsDatabase InventorySlot::GetId()
 {
-	const auto item_id = *(int*)(*(QWORD*)this + oInventorySlotItemId);
+	const auto item_id = *(ItemsDatabase*)(*(QWORD*)this + oInventorySlotItemId);
 	return item_id;
 }
 
@@ -57,13 +57,12 @@ InventorySlot* HeroInventory::GetInventorySlot(int slotID)
 	return nullptr;
 }
 
-InventorySlot* HeroInventory::FindItemID(int itemID)
+InventorySlot* HeroInventory::FindItemID(ItemsDatabase itemID)
 {
 	for (auto i = 0; i < 7; i++)
 	{
 		InventorySlot* item2 = this->GetInventorySlot(i);
 		if (item2 == nullptr) return nullptr;
-		if (item2->GetId() == 0) return nullptr;
 
 		if (item2 != nullptr && item2->GetId() == itemID)
 		{
@@ -157,6 +156,11 @@ std::vector<Vector3> AiManager::GetFutureSegments()
 float CharacterData::GetSize()
 {
 	return *(float*)((QWORD)this + oObjCharDataDataSize);
+}
+
+ChampionID CharacterData::GetHeroID()
+{
+	return *(ChampionID*)((QWORD)this + oObjCharDataDataHeroID);
 }
 
 QWORD CharacterData::GetObjectTypeHash()

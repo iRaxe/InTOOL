@@ -3,6 +3,7 @@
 #include "NewMenu.h"
 #include "MenuSettings.h"
 #include "MenuRenderer.h"
+#include "notification.h"
 
 namespace UPasta
 {
@@ -68,6 +69,17 @@ namespace UPasta
 				return;
 			}
 
+			if (ImGui::Button("Button", ImVec2(ImGui::GetContentRegionMax().x - GetStyle().WindowPadding.x, 40)))
+			{
+				auto number = 0;
+				if (number >= 4) number = 1; else number++;
+
+				if (number == 1) ImGui::Notification({ ImGuiToastType_Success, 4000, "The design of the notification was made by PAST OWL\nLeaked on 19.10.2023" });
+				if (number == 2) ImGui::Notification({ ImGuiToastType_Info, 4000, "The design of the notification was made by PAST OWL\nLeaked on 19.10.2023" });
+				if (number == 3) ImGui::Notification({ ImGuiToastType_Warning, 4000, "The design of the notification was made by PAST OWL\nLeaked on 19.10.2023" });
+				if (number == 4) ImGui::Notification({ ImGuiToastType_Error, 4000, "The design of the notification was made by PAST OWL\nLeaked on 19.10.2023" });
+			}
+
 			auto position = this->GetPosition();
 			auto rect = Rect(position.x, position.y, this->GetWidth(), MenuComponent::Height);
 			auto box = Rect(rect.Position.x + rect.Width - rect.Height, rect.Position.y, rect.Height, rect.Height);
@@ -93,8 +105,8 @@ namespace UPasta
 					auto black = IM_COL32(0, 0, 0, alpha);
 					auto width = 20.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->Tooltip).x;
 					auto tooltipRect = Rect(mousePos.x + 20, mousePos.y - Height * 0.5f, width, Height);
-					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawCornerFlags_All);
-					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawCornerFlags_All);
+					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawFlags_RoundCornersAll);
+					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawFlags_RoundCornersAll);
 					Renderer::AddText(this->Tooltip, 14.0f, Rect(tooltipRect.Position.x + 10.0f, tooltipRect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
 				}
 			}
