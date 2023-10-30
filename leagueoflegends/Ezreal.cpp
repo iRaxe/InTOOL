@@ -4,6 +4,7 @@
 #include "Orbwalker.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
+#include "Vayne.h"
 
 class EzrealModule : public ChampionModule
 {
@@ -71,8 +72,40 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
+
+    void OnPopuplateMenu() override
+    {
+
+    }
+
     void Init() override
     {
+        /*ADD_SETTING("Champion Settings", "Combo Settings", "Use Q", true);
+        ADD_SETTING("Champion Settings", "Combo Settings", "Use W", false);
+        ADD_SETTING("Champion Settings", "Combo Settings", "Use R", true);
+        ADD_SETTING_RANGE("Champion Settings", "Combo Settings", "Minimum Enemies", 2, 1, 5);
+
+        ADD_SETTING("Champion Settings", "Harass Settings", "Use Q", false);
+        ADD_SETTING("Champion Settings", "Harass Settings", "Use W", false);
+        ADD_SETTING_RANGE("Champion Settings", "Harass Settings", "Minimum Mana", 60, 1, 100);
+
+        ADD_SETTING("Champion Settings", "Laneclear Settings", "Use Q", false);
+        ADD_SETTING("Champion Settings", "Laneclear Settings", "Use W", false);
+        ADD_SETTING_RANGE("Champion Settings", "Laneclear Settings", "Minimum Mana", 60, 1, 100);
+
+        ADD_SETTING("Champion Settings", "Jungleclear Settings", "Use Q", false);
+        ADD_SETTING("Champion Settings", "Jungleclear Settings", "Use W", false);
+        ADD_SETTING_RANGE("Champion Settings", "Jungleclear Settings", "Minimum Mana", 60, 1, 100);
+
+        ADD_SETTING("Champion Settings", "Lasthit Settings", "Use Q", false);
+        ADD_SETTING_RANGE("Champion Settings", "Lasthit Settings", "Minimum Mana", 60, 1, 100);
+
+        ADD_SETTING("Champion Settings", "Killsteal Settings", "Use Q", true);
+        ADD_SETTING("Champion Settings", "Killsteal Settings", "Use E", false);
+        ADD_SETTING("Champion Settings", "Killsteal Settings", "Use R", true);
+        ADD_SETTING("Champion Settings", "LasthiasdAt Settings", "Use R", true);
+
+        ADD_SETTING("Champion Settings", "AntiGapCloser Settings", "Use E", false);*/
         const auto EzrealMenu = Menu::CreateMenu("vezEzreal", "vez.Ezreal");
 
         const auto combo = EzrealMenu->AddMenu("Combo Settings", "Combo Settings");
@@ -341,7 +374,7 @@ public:
         Killsteal();
         AntiGapCloser();
         AntiMelee();
-        
+
         if (EzrealConfig::EzrealSpellsSettings::rTapKey->Value == true && database.EzrealR.IsCastable())
         {
             switch (EzrealConfig::EzrealSpellsSettings::targetMode->Value)
@@ -395,6 +428,7 @@ public:
         //Laneclear
         if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() > 0)
         {
+           
             if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealClear::minMana->Value)) return;
 
             if (EzrealConfig::EzrealClear::UseQ->Value == true && database.EzrealQ.IsCastable())

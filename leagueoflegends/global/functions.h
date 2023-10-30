@@ -4,6 +4,15 @@ namespace functions
 {
 	extern void* spoof_trampoline;
 
+	template <typename ReturnType, typename... Args>
+	ReturnType call_function(uintptr_t func, Args... args);
+
+	template <size_t Index, typename ReturnType, typename... Args>
+	ReturnType call_virtual(void* instance, Args... args);
+
+	template <typename T, typename U>
+	T Read(U addr);
+
 	template<typename Function> Function CallVirtual(PVOID base, QWORD index)
 	{
 		QWORD** VTablePointer = (QWORD**)base;
@@ -13,7 +22,6 @@ namespace functions
 	}
 
 	void Init();
-
 	std::string GetHexString(QWORD hexNumber);
 	std::string CapitalizeFirstLetter(std::string str);
 
@@ -51,6 +59,7 @@ namespace functions
 	Vector2 WorldToMinimap(Vector3 posToShow);
 	Vector3 GetBaseDrawPosition(Object* obj);
 	Vector2 GetHpBarPosition(Object* obj);
+	Object* GetOwner(Object* obj);
 	Object* GetObjectFromNetId(int netId);
 	Object* GetSelectedObject();
 	bool IsNotLocalPlayer(Object* obj);

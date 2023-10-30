@@ -202,7 +202,7 @@ namespace UPasta
 					TSDrawings::drawRangedMinion = PrioritiesDrawMenu->AddCheckBox("drawRangedMinion", "Draw Ranged Minion priority", true);
 					TSDrawings::drawSiegeMinion = PrioritiesDrawMenu->AddCheckBox("drawSiegeMinion", "Draw Siege Minion priority", true);
 					TSDrawings::drawVoidMinion = PrioritiesDrawMenu->AddCheckBox("drawVoidMinion", "Draw Void Minion priority", true);
-					TSDrawings::drawSpecialObjects = PrioritiesDrawMenu->AddCheckBox("drawSpecialObjects", "Draw Special Objects Minion priority", true);
+					TSDrawings::drawSpecialObjects = PrioritiesDrawMenu->AddCheckBox("drawSpecialObjects", "Draw Special Objects priority", true);
 				}
 
 			}

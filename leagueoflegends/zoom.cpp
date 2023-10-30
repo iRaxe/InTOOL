@@ -42,8 +42,6 @@ void resetZoom()
 using namespace UPasta::SDK::Awareness;
 void startZoom()
 {
-
-	
 	//Crashes here
 	while (!globals::eject) //main loop
 	{

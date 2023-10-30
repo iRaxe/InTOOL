@@ -14,6 +14,7 @@ namespace settings
 		}
 		return os;
 	}
+	nlohmann::json json_data;
 
 	SettingsData data = {};
 	SettingsBounds bounds = {};
@@ -29,6 +30,45 @@ namespace settings
 				}
 				file << "\n";
 			}
+			file.close();
+		}
+	}
+
+	void Save2()
+	{
+		for (const auto& pair : checkboxStatus)
+		{
+			json_data[pair.first] = pair.second;
+		}
+
+		std::ofstream file("config2.json");
+		if (file.is_open())
+		{
+			file << json_data.dump(4); // L'argomento 4 indica l'indentazione per una formattazione migliore
+			file.close();
+		}
+	}
+
+	void Load2()
+	{
+		std::ifstream file("config2.json");
+		if (file.is_open())
+		{
+			file >> json_data;
+
+			for (const auto& pair : json_data.items())
+			{
+				if (checkboxStatus.find(pair.key()) != checkboxStatus.end())
+				{
+					checkboxStatus[pair.key()] = pair.value();
+				}
+
+				if (pair.value() == true)
+				{
+					LOG("FOUND %s", pair.key());
+				}
+			}
+
 			file.close();
 		}
 	}
@@ -92,9 +132,11 @@ namespace settings
 	SettingValue Get(std::string group, std::string key, SettingValue defaultValue)
 	{
 		auto groupIt = data.find(group);
-		if (groupIt != data.end()) {
+		if (groupIt != data.end()) 
+		{
 			auto keyIt = groupIt->second.find(key);
-			if (keyIt != groupIt->second.end()) {
+			if (keyIt != groupIt->second.end()) 
+			{
 				return keyIt->second;
 			}
 		}

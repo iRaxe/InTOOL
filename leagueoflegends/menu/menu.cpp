@@ -1,89 +1,45 @@
+#include "../Awareness.h"
 #include "../stdafx.h"
-#include "../NewMenu.h"
+#include "../NewMenu.h" // THIS IS U S E L E S S NO GOOD
 #include "../MenuRenderer.h"
+#include "menu.h"
 
 namespace menu
 {
-	static bool no_titlebar = false;
-	static bool no_border = true;
-	static bool no_resize = true;
-	static bool auto_resize = true;
-	static bool no_move = false;
-	static bool no_scrollbar = true;
-	static bool no_collapse = true;
-	static bool no_menu = true;
-	static bool start_pos_set = false;
 
-	ImGuiWindowFlags window_flags;
+	int sub_tabs = 0;
+	int active_tab = 0;
+	float tab_alpha = 0.f;
+	float tab_add;
+	int tabs = 0;
+	std::string activeSubTab = "Champion Settings";
 
-	float nextSaveTime = 0.0f;
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+	
+	ID3D11ShaderResourceView* platformLogo = nullptr;
+	ImGuiStyle* style;
+
+	float nextSaveTime = 10.0f;
 
 	void Init()
 	{
-		ImGuiStyle* style = &ImGui::GetStyle();
+		style = &ImGui::GetStyle();
+		style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 0);
+		style->WindowPadding = ImVec2(0.f, 0.f);
+		style->ScrollbarSize = 20.f;
+		style->ScrollbarRounding = 4.f;
+		style->ItemSpacing = ImVec2(20, 20);
+		style->FrameRounding = 4.f;
+		style->PopupRounding = 8.f;
+		style->ChildRounding = 4.f;
+		style->WindowRounding = 7.f;
+		globals::menuSize = ImVec2(980.0f, 300);
 
-		style->WindowPadding = ImVec2(12.0f, 14.0f);
-		style->WindowRounding = 0.0f;
-		style->FramePadding = ImVec2(10.0f, 4.0f);
-		style->FrameRounding = 0.0f;
-		style->ItemSpacing = ImVec2(12.0f, 16.0f);
-		style->ItemInnerSpacing = ImVec2(14.0f, 4.0f);
-		style->IndentSpacing = 0.0f;
-		style->ScrollbarSize = 12.0f;
-		style->ScrollbarRounding = 2.0f;
-		style->GrabMinSize = 4.0f;
-		style->GrabRounding = 0.0f;
-		style->WindowBorderSize = 0.0f;
-		style->PopupBorderSize = 1.0f;
-		style->GrabMinSize = 14.0f;
+		//globals::menuSize = ImVec2(980.0f, 300.0f);
 
-		style->Colors[ImGuiCol_Text] = ImVec4(0.85f, 0.85f, 0.88f, 1.00f);
-		style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
-		style->Colors[ImGuiCol_WindowBg] = ImVec4(0.05f, 0.05f, 0.07f, 0.70f);
-		style->Colors[ImGuiCol_PopupBg] = ImVec4(0.06f, 0.05f, 0.07f, 0.80f);
-		style->Colors[ImGuiCol_Border] = ImVec4(0.80f, 0.80f, 0.83f, 0.60f);
-		style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
-		style->Colors[ImGuiCol_FrameBg] = ImVec4(0.61f, 0.61f, 0.61f, 0.54f);
-		style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.85f, 0.85f, 0.85f, 0.54f);
-		style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.82f, 0.82f, 0.82f, 0.75f);
-		style->Colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-		style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
-		style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
-		style->Colors[ImGuiCol_MenuBarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-		style->Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-		style->Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
-		style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-		style->Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
-		style->Colors[ImGuiCol_CheckMark] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
-		style->Colors[ImGuiCol_SliderGrab] = ImVec4(0.42f, 1.0f, 0.93f, 0.75f);
-		style->Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.41f, 1.0f, 0.93f, 0.92f);
-		style->Colors[ImGuiCol_Button] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-		style->Colors[ImGuiCol_ButtonHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
-		style->Colors[ImGuiCol_ButtonActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-		style->Colors[ImGuiCol_Header] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-		style->Colors[ImGuiCol_HeaderHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-		style->Colors[ImGuiCol_HeaderActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
-		style->Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-		style->Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-		style->Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
-		style->Colors[ImGuiCol_PlotLines] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
-		style->Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
-		style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
-		style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
-		style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+		//globals::menuSize = ImVec2(1000.0f, 560.0f);
 
-		window_flags = 0;
-		if (no_titlebar)	window_flags |= ImGuiWindowFlags_NoTitleBar;
-		if (no_resize)		window_flags |= ImGuiWindowFlags_NoResize;
-		if (auto_resize)	window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
-		if (no_move)		window_flags |= ImGuiWindowFlags_NoMove;
-		if (no_scrollbar)	window_flags |= ImGuiWindowFlags_NoScrollbar;
-		if (no_collapse)	window_flags |= ImGuiWindowFlags_NoCollapse;
-		if (!no_menu)		window_flags |= ImGuiWindowFlags_MenuBar;
-
-		globals::menuSize = ImVec2(150.0f, 140.0f);
-
-		ImGui::SetNextWindowSize(globals::menuSize, ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(globals::menuSize);
 		ImGui::SetNextWindowPos(ImVec2(25, 25));
 
 		ImGui::GetIO().MouseDrawCursor = false;
@@ -159,63 +115,58 @@ namespace menu
 
 		return isPressed;
 	}
-
+	
 	void DrawMenu(std::pair<std::string, settings::SettingsGroup> group, std::pair<std::string, std::vector<std::string>> groupOrder)
 	{
 		std::string groupName = functions::CapitalizeFirstLetter(group.first);
-		if (ImGui::BeginMenu(groupName.c_str()))
+
+		int id = 0;
+		for (const auto& key : groupOrder.second)
 		{
-				int id = 0;
-				for (const auto& key : groupOrder.second)
+			auto it = group.second.find(key);
+			if (it != group.second.end())
+			{
+				std::pair<std::string, settings::SettingValue> setting = *it;
+
+				const std::string& key = setting.first;
+				const settings::SettingValue& value = setting.second;
+
+				if (std::holds_alternative<bool>(value))
 				{
-					auto it = group.second.find(key);
-					if (it != group.second.end())
-					{
-						std::pair<std::string, settings::SettingValue> setting = *it;
+					bool boolValue = std::get<bool>(value);
+					if (ImGui::Checkbox(key.c_str(), &boolValue))
+						SaveSoon();
+					settings::Set(group.first, setting.first, boolValue);
+				}
+				else if (std::holds_alternative<int>(value))
+				{
+					int intValue = std::get<int>(value);
+					const auto bounds = settings::GetBoundsInt(group.first, key, std::pair<int, int>(0, 1));
+					
+					if (ImGui::SliderInt(key.c_str(), &intValue, bounds.first, bounds.second, "%d"))
+						SaveSoon();
 
-						const std::string& key = setting.first;
-						const settings::SettingValue& value = setting.second;
+					settings::Set(group.first, setting.first, intValue);
+				}
+				else if (std::holds_alternative<float>(value))
+				{
+					float floatValue = std::get<float>(value);
+					const auto bounds = settings::GetBoundsFloat(group.first, key, std::pair<float, float>(0.0f, 1.0f));
 
-						if (std::holds_alternative<bool>(value))
-						{
-							bool boolValue = std::get<bool>(value);
-							if (CustomCheckbox(key.c_str(), &boolValue)) SaveSoon();
-							settings::Set(group.first, setting.first, boolValue);
-						}
-						else if (std::holds_alternative<int>(value))
-						{
-							int intValue = std::get<int>(value);
-							const auto bounds = settings::GetBoundsInt(group.first, key, std::pair<int, int>(0, 1));
+					if (ImGui::SliderFloat(("##" + key).c_str(), &floatValue, bounds.first, bounds.second, key.c_str())) 
+						SaveSoon();
 
-							if (ImGui::SliderInt(("##" + key).c_str(), &intValue, bounds.first, bounds.second, key.c_str())) SaveSoon();
-							ImGui::SameLine();
-							ImGui::Text("%.3f", intValue);
+					settings::Set(group.first, setting.first, floatValue);
+				}				
 
-							settings::Set(group.first, setting.first, intValue);
-						}
-						else if (std::holds_alternative<float>(value))
-						{
-							float floatValue = std::get<float>(value);
-							const auto bounds = settings::GetBoundsFloat(group.first, key, std::pair<float, float>(0.0f, 1.0f));
-
-							if (ImGui::SliderFloat(("##" + key).c_str(), &floatValue, bounds.first, bounds.second, key.c_str())) SaveSoon();
-							ImGui::SameLine();
-							ImGui::Text("%.3f", floatValue);
-
-							settings::Set(group.first, setting.first, floatValue);
-						}
-
-						if (!id && groupOrder.second.size() > 1 && key == SP_STRING("enabled"))
-						{
-							ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 2.0f);
-							ImGui::Separator();
-						}
-
-						++id;
-					}
+				if (!id && groupOrder.second.size() > 1 && key == SP_STRING("enabled"))
+				{
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 2.0f);
+					ImGui::Separator();
 				}
 
-				ImGui::EndMenu();
+				++id;
+			}
 		}
 
 		if (groupName == SP_STRING("Debug"))
@@ -225,45 +176,167 @@ namespace menu
 		}
 	}
 
+	void DynamicTabs()
+	{
+		std::set<std::string> seenGroups; // Set per tenere traccia dei gruppi visti
+
+		int counter = 1; // Contatore per tener traccia delle iterazioni
+
+		ImGui::SetCursorPos(ImVec2(300, 20));
+		ImGui::BeginGroup();
+		{
+			for (const auto& group : scripts::parentOrder)
+			{
+				// Verifica se il gruppo è già stato visto
+				if (seenGroups.find(group.first) != seenGroups.end())
+					continue;
+
+				// Il gruppo non si è ancora ripetuto
+				seenGroups.insert(group.first);
+				if (ImGui::SubTab(group.first.c_str(), counter == sub_tabs, ImVec2(120, 50)))
+				{
+					sub_tabs = counter;
+					activeSubTab = group.first.c_str();
+				}
+
+				counter++;
+			}
+		}
+		ImGui::EndGroup();
+	}
+
+
 	void DynamicSettings()
 	{
-		for (const auto& group : scripts::settingsOrder) 
+		std::set<std::string> seenGroups; // Set per tenere traccia dei gruppi visti
+		int counter = 1; // Contatore per tener traccia delle iterazioni
+		ImGui::SetCursorPos(ImVec2(280, 90));
+
+		auto it2 = scripts::parentToGroupMap.find(activeSubTab.c_str());
+		if (it2 == scripts::parentToGroupMap.end())
+			return;
+
+		const std::vector<std::string>& groups = it2->second;
+
+		for (const std::string& group2 : groups)
 		{
-			auto it = settings::data.find(group.first);
-			if (it != settings::data.end()) 
+			auto it = settings::data.find(group2.c_str());
+			if (it == settings::data.end())
+				continue;
+
+			// Trova la corrispondenza tra group2 e settingsOrder una volta
+			auto groupIt = std::find_if(scripts::settingsOrder.begin(),
+				scripts::settingsOrder.end(),
+				[&](const auto& group)
+				{
+					return group2.length() == group.first.length();
+				});
+
+			if (groupIt != scripts::settingsOrder.end() && seenGroups.find(group2) == seenGroups.end())
 			{
-				DrawMenu(*it, group);
+				seenGroups.insert(group2);
+
+				ImGui::BeginGroup();
+				{
+					ImGui::BeginChild(group2.c_str(), ImVec2(320, 190), true);
+					{
+						DrawMenu(*it, *groupIt);
+					}
+					ImGui::EndChild();
+				}
+				ImGui::EndGroup();
+				counter++;
+
+				if (counter % 2 == 0)
+					ImGui::SameLine();
+				else
+					ImGui::SetCursorPos(ImVec2(280, 90 + (counter / 2) * 210));
 			}
 		}
 	}
 
 	void Update()
 	{
-		ImGui::SetNextWindowSize(globals::menuSize, ImGuiCond_FirstUseEver);
-
+		ImGui::SetNextWindowSize(globals::menuSize);
 		if (globals::menuOpen)
 		{
-			ImGui::Begin("UCPasta", NULL, window_flags);
+			ImGui::Begin("UCPasta", &globals::menuOpen, window_flags);
 
+			const auto& p = ImGui::GetWindowPos();
+
+			const std::string mediaFolder = "C:\\UPorn\\Media";
+			static bool platformLogoLoaded = false;
+			const std::string platformLogoFile = mediaFolder + "\\logo.png";
+			if (platformLogo == nullptr && platformLogoLoaded == false)
+			{
+				UPasta::SDK::Awareness::Functions::EnemySidebar::LoadDX11ImageIfNeeded(platformLogoFile.c_str(), platformLogoLoaded, &platformLogo);
+				platformLogoLoaded = true;
+			}
+
+			ImGui::SetScrollX(0);
+			ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(0 + p.x, p.y), ImVec2(240 + p.x, 150 + p.y), ImColor(10, 10, 10, 240), 7.f);
+			ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(260 + p.x, p.y), ImVec2(960 + p.x, 1000 + p.y), ImColor(10, 10, 10, 240), 7.f);
+			ImGui::GetWindowDrawList()->AddRect(ImVec2(280 + p.x, +p.y + 20), ImVec2(940 + p.x, 70 + p.y), ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
+			render::RenderImage(platformLogo, ImVec2(0 + p.x, 10 + p.y), ImVec2(240 + p.x, 140 + p.y), COLOR_WHITE);
+
+			DynamicTabs();
+
+			tab_alpha = ImClamp(tab_alpha + (7.f * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
+			tab_add = ImClamp(tab_add + (std::round(350.f) * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
+			ImGui::SetCursorPos(ImVec2(280 - tab_alpha * 40, 88));
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, tab_alpha * style->Alpha);
 			DynamicSettings();
 
+			//scripts::champions::DoPopulateMenu();
+			ImGui::PopStyleVar();
+
 			ImGui::End();
+			//UPasta::Renderer::RenderFrame();
 		}
 
-		if (nextSaveTime && functions::GetGameTime() >= nextSaveTime)
-		{
-			settings::Save();
-			nextSaveTime = 0.0f;
-			LOG("Saved");
-		}
+		ImGui::Render();
+
+		
 	}
 
 	void Update2()
 	{
-		//ImGui::SetNextWindowSize(globals::menuSize, ImGuiCond_FirstUseEver);
-		//UPasta::Renderer::NewFrame();
-		UPasta::SDK::Menu::OnDraw();
+		ImGui::SetNextWindowSize(globals::menuSize);
+		if (globals::menuOpen)
+		{
+			ImGui::Begin("UCPasta", &globals::menuOpen, window_flags);
 
-		//UPasta::Renderer::RenderFrame();
+			const auto& p = ImGui::GetWindowPos();
+
+			const std::string mediaFolder = "C:\\UPorn\\Media";
+			static bool platformLogoLoaded = false;
+			const std::string platformLogoFile = mediaFolder + "\\logo.png";
+			if (platformLogo == nullptr && platformLogoLoaded == false)
+			{
+				UPasta::SDK::Awareness::Functions::EnemySidebar::LoadDX11ImageIfNeeded(platformLogoFile.c_str(), platformLogoLoaded, &platformLogo);
+				platformLogoLoaded = true;
+			}
+
+			//Draw Menu body
+			ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(0 + p.x, p.y), ImVec2(240 + p.x, 150 + p.y), ImColor(10, 10, 10, 240), 7.f);
+
+			//Draw Menu logo
+			render::RenderImage(platformLogo, ImVec2(0 + p.x, 10 + p.y), ImVec2(240 + p.x, 140 + p.y), COLOR_WHITE);
+
+			//Draw Menu tabs
+			UPasta::SDK::Menu::DrawTabs();
+
+			tab_alpha = ImClamp(tab_alpha + (7.f * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
+			tab_add = ImClamp(tab_add + (std::round(350.f) * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
+			ImGui::SetCursorPos(ImVec2(280 - tab_alpha * 40, 88));
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, tab_alpha * style->Alpha);
+
+			//scripts::champions::DoPopulateMenu();
+			ImGui::PopStyleVar();
+
+			ImGui::End();
+		}
+
+		ImGui::Render();
 	}
 }

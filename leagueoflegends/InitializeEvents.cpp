@@ -15,7 +15,6 @@ namespace UPasta
 
 				__try { EventManager::AddEventHandler(EventManager::EventType::OnDraw, render::scriptsrender::drawings::Update); }
 				__except (1) { LOG("[Event Handler - Add] Error in utilities drawings"); }
-
 			}
 
 			void Initialization::OnDraw()

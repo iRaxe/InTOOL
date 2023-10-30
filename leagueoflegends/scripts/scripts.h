@@ -4,14 +4,18 @@
 
 #include "../stdafx.h"
 
-#define ADD_SETTING(group, key, value) AddSetting(SP_STRING(group), SP_STRING(key), value)
-#define ADD_SETTING_RANGE(group, key, value, min, max) AddSetting(SP_STRING(group), SP_STRING(key), value, min, max)
+#define ADD_SETTING(parent, group, key, value) AddSetting(SP_STRING(parent), SP_STRING(group), SP_STRING(key), value)
+#define ADD_SETTING_RANGE(parent, group, key, value, min, max) AddSetting(SP_STRING(parent), SP_STRING(group), SP_STRING(key), value, min, max)
 
 namespace scripts
 {
+	extern std::vector<std::pair<std::string, std::vector<std::string>>> parentOrder;
+	extern std::map<std::string, std::vector<std::string>> parentToGroupMap;
 	extern std::vector<std::pair<std::string, std::vector<std::string>>> settingsOrder;
 
-	void AddSetting(std::string group, std::string key, settings::SettingValue value, settings::SettingValue min = 0, settings::SettingValue max = 1);
+	//void AddSetting(std::string group, std::string key, settings::SettingValue value, settings::SettingValue min = 0, settings::SettingValue max = 1);
+	void AddSetting(std::string parent, std::string group, std::string key, settings::SettingValue value, settings::SettingValue min = 0, settings::SettingValue max = 1);
+
 	void Init();
 	void Update();
 
@@ -50,6 +54,7 @@ namespace scripts
 		void RenderUpdate();
 		void DoBeforeAttack();
 		void DoCastSpell();
+		void DoPopulateMenu();
 
 	}
 

@@ -2,6 +2,7 @@
 #include "Awareness.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
+#include "variable.h"
 
 class VayneModule : public ChampionModule
 {
@@ -56,30 +57,78 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
+    void OnPopuplateMenu() override
+    {
+	    ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
+
+#pragma region First row
+        ImGui::SetCursorPos(ImVec2(280, 90));
+        ImGui::BeginGroup();
+        {
+            ImGui::BeginChild("Combo Settings", ImVec2(320, 190), true);
+            {
+                ImGui::Checkbox("Use SpellSlot Q", &VayneConfig::VayneCombo::UseQ);
+                ImGui::Checkbox("Use SpellSlot E", &VayneConfig::VayneCombo::UseE);
+                ImGui::Checkbox("Use SpellSlot R", &VayneConfig::VayneCombo::UseR);
+                ImGui::SliderInt("Minimum for R", &VayneConfig::VayneCombo::enemiesInRange, 1, 5, "%d");
+
+            }
+            ImGui::EndChild();
+        }
+        ImGui::EndGroup();
+
+        ImGui::SameLine();
+
+        ImGui::BeginGroup();
+        {
+            ImGui::BeginChild("Harass Settings", ImVec2(320, 160), true);
+            {
+                ImGui::Checkbox("Use SpellSlot Q", &VayneConfig::VayneHarass::UseQ);
+                ImGui::Checkbox("Use SpellSlot E", &VayneConfig::VayneHarass::UseE);
+                ImGui::SliderFloat("Minimum Mana", &VayneConfig::VayneHarass::minMana, 0.f, 1.f, "%.2f");
+            }
+            ImGui::EndChild();
+        }
+        ImGui::EndGroup();
+#pragma endregion
+
+#pragma region Second row
+        ImGui::SetCursorPos(ImVec2(280, 300));
+
+        ImGui::BeginGroup();
+        {
+            ImGui::BeginChild("Laneclear Settings", ImVec2(320, 130), true);
+            {
+                ImGui::Checkbox("Use SpellSlot Q", &VayneConfig::VayneClear::UseQ);
+                ImGui::SliderFloat("Minimum Mana", &VayneConfig::VayneClear::minMana, 0.f, 1.f, "%.2f");
+            }
+            ImGui::EndChild();
+        }
+        ImGui::EndGroup();
+
+        ImGui::SameLine();
+
+        ImGui::BeginGroup();
+        {
+            ImGui::BeginChild("Jungleclear Settings", ImVec2(320, 160), true);
+            {
+                ImGui::Checkbox("Use SpellSlot Q", &VayneConfig::VayneJungle::UseQ);
+                ImGui::Checkbox("Use SpellSlot E", &VayneConfig::VayneJungle::UseE);
+                ImGui::SliderFloat("Minimum Mana", &VayneConfig::VayneJungle::minMana, 0.f, 1.f, "%.2f");
+            }
+            ImGui::EndChild();
+        }
+        ImGui::EndGroup();
+
+        ImGui::SetCursorPos(ImVec2(280, 490));
+
+#pragma endregion
+
+    }
+
     void Init() override
     {
         const auto VayneMenu = Menu::CreateMenu("vezVayne", "vez.Vayne");
-
-        const auto combo = VayneMenu->AddMenu("Combo Settings", "Combo Settings");
-        VayneConfig::VayneCombo::UseQ = combo->AddCheckBox("Use Q", "Use SpellSlot Q", true);
-        VayneConfig::VayneCombo::UseE = combo->AddCheckBox("Use E", "Use SpellSlot E", true);
-        VayneConfig::VayneCombo::UseR = combo->AddCheckBox("Use R", "Use SpellSlot R", true);
-        VayneConfig::VayneCombo::enemiesInRange = combo->AddSlider("minEnemiesInRange", "Minimum enemies to use R", 2, 1, 5, 1);
-
-        const auto harassMenu = VayneMenu->AddMenu("Harass Settings", "Harass Settings");
-        VayneConfig::VayneHarass::UseQ = harassMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
-        VayneConfig::VayneHarass::UseE = harassMenu->AddCheckBox("Use E", "Use SpellSlot E", true);
-        VayneConfig::VayneHarass::minMana = harassMenu->AddSlider("minHarassMana", "Minimum Mana", 60, 1, 100, 5);
-
-        const auto clearMenu = VayneMenu->AddMenu("Clear Settings", "Clear Settings");
-        const auto laneClearMenu = clearMenu->AddMenu("Laneclear Settings", "Laneclear Settings");
-        VayneConfig::VayneClear::UseQ = laneClearMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
-        VayneConfig::VayneClear::minMana = laneClearMenu->AddSlider("minClearMana", "Minimum Mana", 60, 1, 100, 5);
-
-        const auto jungleMenu = clearMenu->AddMenu("Jungleclear Settings", "Jungleclear Settings");
-        VayneConfig::VayneJungle::UseQ = jungleMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
-        VayneConfig::VayneJungle::UseE = jungleMenu->AddCheckBox("Use E", "Use SpellSlot E", true);
-        VayneConfig::VayneJungle::minMana = jungleMenu->AddSlider("minClearMana", "Minimum Mana", 60, 1, 100, 5);
 
         const auto additionalMenu = VayneMenu->AddMenu("Additional Settings", "Additional Settings");
         const auto ksMenu = additionalMenu->AddMenu("Killsteal Settings", "Killsteal Settings");
@@ -310,6 +359,7 @@ public:
             RCastedTime = gameTime;
         }
     }
+  
 
     void Update() override
     {
@@ -326,20 +376,20 @@ public:
 
     void Attack() override
     {
-        if (VayneConfig::VayneCombo::UseR->Value == true && database.VayneR.IsCastable() && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), VayneConfig::VayneSpellsSettings::minRDistance->Value).size() >= VayneConfig::VayneCombo::enemiesInRange->Value)
+        if (VayneConfig::VayneCombo::UseR == true && database.VayneR.IsCastable() && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), VayneConfig::VayneSpellsSettings::minRDistance->Value).size() >= VayneConfig::VayneCombo::enemiesInRange)
         {
             if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(rRange()))
                 Vayne_UseR(rTarget);
         }
 
-        if (VayneConfig::VayneCombo::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
+        if (VayneConfig::VayneCombo::UseE == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
         {
             if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange()))
                 if (VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == true && Vayne_IsCondemnable(eTarget) || VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == false && !Vayne_IsCondemnable(eTarget))
                     Vayne_UseE(eTarget);
         }
 
-        if (VayneConfig::VayneCombo::UseQ->Value == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
+        if (VayneConfig::VayneCombo::UseQ == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
         {
             const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(aaRange());
             if (qTarget != nullptr && Vayne_CanCastQ(qTarget))
@@ -352,9 +402,9 @@ public:
         //Laneclear
         if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), aaRange()).size() > 0)
         {
-            if (!Vayne_HasEnoughMana(VayneConfig::VayneClear::minMana->Value)) return;
+            if (!Vayne_HasEnoughMana(VayneConfig::VayneClear::minMana)) return;
 
-            if (VayneConfig::VayneClear::UseQ->Value == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
+            if (VayneConfig::VayneClear::UseQ == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
             {
                 const auto qTarget = TargetSelector::Functions::GetEnemyMinionInRange(aaRange());
                 if (qTarget != nullptr && qTarget->GetHealth() < Vayne_dmgQ(qTarget))
@@ -365,15 +415,15 @@ public:
         //Jungleclear
         else if (TargetSelector::Functions::GetJungleMonstersInRange(aaRange()).size() > 0)
         {
-            if (!Vayne_HasEnoughMana(VayneConfig::VayneJungle::minMana->Value)) return;
+            if (!Vayne_HasEnoughMana(VayneConfig::VayneJungle::minMana)) return;
 
-            if (VayneConfig::VayneJungle::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
+            if (VayneConfig::VayneJungle::UseE == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
             {
                 if (const auto wTarget = TargetSelector::Functions::GetJungleInRange(eRange()))
                     Vayne_UseE(wTarget);
             }
 
-            if (VayneConfig::VayneJungle::UseQ->Value == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
+            if (VayneConfig::VayneJungle::UseQ == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
             {
                 const auto qTarget = TargetSelector::Functions::GetJungleInRange(aaRange());
                 if (qTarget != nullptr && Vayne_CanCastQ(qTarget))
@@ -385,17 +435,17 @@ public:
 
     void Harass() override
     {
-        if (!Vayne_HasEnoughMana(VayneConfig::VayneHarass::minMana->Value))
+        if (!Vayne_HasEnoughMana(VayneConfig::VayneHarass::minMana))
             return;
 
-        if (VayneConfig::VayneHarass::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
+        if (VayneConfig::VayneHarass::UseE == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
         {
             const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
             if (eTarget != nullptr && (VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == true && Vayne_IsCondemnable(eTarget) || VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == false && !Vayne_IsCondemnable(eTarget)))
                 Vayne_UseE(eTarget);
         }
 
-        if (VayneConfig::VayneHarass::UseQ->Value == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
+        if (VayneConfig::VayneHarass::UseQ == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
         {
             const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(aaRange());
             if (qTarget != nullptr && Vayne_CanCastQ(qTarget))
@@ -504,13 +554,13 @@ public:
                 const auto object = functions::GetSelectedObject();
                 if (object != nullptr && object->IsHero())
                 {
-                    if (VayneConfig::VayneCombo::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 1)
+                    if (VayneConfig::VayneCombo::UseE == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 1)
                     {
                         if (VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == true && Vayne_IsCondemnable(object) || VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == false && !Vayne_IsCondemnable(object))
                             Vayne_UseE(object);
                     }
 
-                    if (VayneConfig::VayneCombo::UseQ->Value == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1)
+                    if (VayneConfig::VayneCombo::UseQ == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1)
                     {
                         if (Vayne_CanCastQ(object))
                             Vayne_UseQ(object);
@@ -525,21 +575,21 @@ public:
                 {
 	                if (object->IsMinion())
 	                {
-                        if (VayneConfig::VayneClear::UseQ->Value == true && functions::GetSpellState(SpellIndex::Q) == 0  && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1  && object->GetHealth() < Vayne_dmgQ(object))
+                        if (VayneConfig::VayneClear::UseQ == true && functions::GetSpellState(SpellIndex::Q) == 0  && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1  && object->GetHealth() < Vayne_dmgQ(object))
                         {
-                            if (!Vayne_HasEnoughMana(VayneConfig::VayneClear::minMana->Value)) return;
+                            if (!Vayne_HasEnoughMana(VayneConfig::VayneClear::minMana)) return;
 
                             Vayne_UseQ(object);
                         }
 	                }
                     else if (object->IsJungle())
 	                {
-                        if (!Vayne_HasEnoughMana(VayneConfig::VayneJungle::minMana->Value)) return;
+                        if (!Vayne_HasEnoughMana(VayneConfig::VayneJungle::minMana)) return;
 
-                    	if (VayneConfig::VayneJungle::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 1)
+                    	if (VayneConfig::VayneJungle::UseE == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 1)
                     		Vayne_UseE(object);
 
-                        if (VayneConfig::VayneJungle::UseQ->Value == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1)
+                        if (VayneConfig::VayneJungle::UseQ == true && functions::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1)
                         {
                         	if (Vayne_CanCastQ(object))
                                 Vayne_UseQ(object);
@@ -555,16 +605,16 @@ public:
                 const auto object = functions::GetSelectedObject();
                 if (object != nullptr && object->IsHero())
                 {
-                    if (!Vayne_HasEnoughMana(VayneConfig::VayneHarass::minMana->Value))
+                    if (!Vayne_HasEnoughMana(VayneConfig::VayneHarass::minMana))
                         return;
 
-                    if (VayneConfig::VayneHarass::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 1)
+                    if (VayneConfig::VayneHarass::UseE == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 1)
                     {
                         if (VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == true && Vayne_IsCondemnable(object) || VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == false && !Vayne_IsCondemnable(object))
                             Vayne_UseE(object);
                     }
 
-                    if (VayneConfig::VayneHarass::UseQ->Value == true && functions::GetSpellState(SpellIndex::Q) == 0 && Vayne_CanCastQ(object) && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1)
+                    if (VayneConfig::VayneHarass::UseQ == true && functions::GetSpellState(SpellIndex::Q) == 0 && Vayne_CanCastQ(object) && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1)
                     {
 	                    Vayne_UseQ(object);
                     }
@@ -582,6 +632,7 @@ public:
 
     }
 
+    
     void Render() override
     {
 

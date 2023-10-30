@@ -263,12 +263,12 @@ namespace UPasta {
 			"Clear"
 		};
 
-		KeyBind::KeyBind(const char* name, const char* displayName, unsigned char key, bool defaultValue, bool isToggle, std::function<void(KeyBind*, bool)> callback) {
+		KeyBind::KeyBind(const char* name, const char* displayName, int key, bool defaultValue, int mode, std::function<void(KeyBind*, bool)> callback) {
 			strncpy(this->Name, name, sizeof(this->Name));
 			strncpy(this->DisplayName, displayName, sizeof(this->DisplayName));
 			this->Key = key;
 			this->Value = defaultValue;
-			this->IsToggle = isToggle;
+			this->Mode = mode;
 			this->Callback = callback;
 			this->Tooltip[0] = 0;
 		}
@@ -309,47 +309,10 @@ namespace UPasta {
 			return 10.0f + render::imFont->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, this->DisplayName).x + 5.0f + render::imFont->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, "[Down Arrow]").x + 3.0f + MenuComponent::Height;
 		}
 
-		void KeyBind::Draw() {
-			if (!this->Visible) {
-				return;
-			}
-
-			auto position = this->GetPosition();
-			auto rect = Rect(position.x, position.y, this->GetWidth(), MenuComponent::Height);
-			auto box = Rect(rect.Position.x + rect.Width - rect.Height, rect.Position.y, rect.Height, rect.Height);
-
-			Renderer::AddRectangleFilled(rect, IM_COL32(0, 0, 0, MenuSettings::BackgroundOpacity));
-			Renderer::AddRectangle(rect, IM_COL32(0, 0, 0, MenuSettings::BackgroundOpacity));
-			if (this->Interacting) {
-				Renderer::AddText("Press a new key", 14.0f, Rect(rect.Position.x + 10.0f, rect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
-			}
-			else {
-				Renderer::AddText(this->DisplayName, 14.0f, Rect(rect.Position.x + 10.0f, rect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
-				Renderer::AddText(14.0f, Rect(rect.Position.x, rect.Position.y, box.Position.x - rect.Position.x - 3.0f, rect.Height), DT_VCENTER | DT_RIGHT, IM_COL32(255, 0, 0, 255), "[%s]", VirtualKeys[this->Key - 1]);
-			}
-			Renderer::AddRectangleFilled(box, this->Value ? IM_COL32(160, 0, 0, 255) : IM_COL32(37, 37, 37, 255));
-			Renderer::AddRectangle(box, IM_COL32(0, 0, 0, 255));
-			Renderer::AddText(this->Value ? "ON" : "OFF", 14.0f, box, DT_CENTER | DT_VCENTER, IM_COL32(255, 255, 255, 255));
-
-			//TODO
-			if (this->Tooltip[0] != 0)
-			{
-				auto textWidth = 10.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->DisplayName).x;
-				auto mousePos = functions::GetMousePos();
-				auto iconRect = Rect(rect.Position.x + textWidth + 5, rect.Position.y + Height * 0.5f - 10.0f, 20, 20);
-				Renderer::AddText("(?)", 16.0f, iconRect, DT_VCENTER, IM_COL32(255, 30, 30, 255));
-
-				if (iconRect.Contains(mousePos))
-				{
-					auto alpha = min(MenuSettings::BackgroundOpacity + 70, 255);
-					auto black = IM_COL32(0, 0, 0, alpha);
-					auto width = 20.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->Tooltip).x;
-					auto tooltipRect = Rect(mousePos.x + 20, mousePos.y - Height * 0.5f, width, Height);
-					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawFlags_RoundCornersAll);
-					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawFlags_RoundCornersAll);
-					Renderer::AddText(this->Tooltip, 14.0f, Rect(tooltipRect.Position.x + 10.0f, tooltipRect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
-				}
-			}
+		void KeyBind::Draw()
+		{
+			//HOLD 0 || TOGGLE 1 || ALWAYS 2
+			ImGui::Keybind(this->DisplayName, &this->Key, &this->Mode);
 		}
 
 		void KeyBind::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos) {
@@ -364,14 +327,14 @@ namespace UPasta {
 			}
 
 			if (wparam == this->Key && !this->Interacting) {
-				if (msg == WM_KEYDOWN && !this->IsToggle && !this->Value) {
+				if (msg == WM_KEYDOWN && this->Mode == 0 && !this->Value) {
 					this->Value = true;
 					if (this->Callback) {
 						this->Callback(this, this->Value);
 					}
 				}
 				else if (msg == WM_KEYUP) {
-					if (this->IsToggle) {
+					if (this->Mode == 1) {
 						this->Value = !this->Value;
 					}
 					else {

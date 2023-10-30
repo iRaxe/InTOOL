@@ -4,6 +4,7 @@
 #include "../../NewMenu.h"
 #include "../../zoom.h"
 #include "../../Orbwalker.h"
+#include "../../imgui_freetype.h"
 
 namespace hooks
 {
@@ -29,11 +30,14 @@ namespace hooks
 			functions::Init();
 			menu::InitNewMenu();
 			render::Init();
+
 			scripts::Init();
 			settings::Load();
+			settings::Load2();
+			//menu::Init();
+
 			UPasta::SDK::ListManager::Functions::Initialize();
 
-			//menu::Init();
 			
 			//Once loaded, this is called for init all things okay that should be it hopefully the new ceraetd threads will be hidden 
 			//HookOnProcessSpellCast();
@@ -44,6 +48,7 @@ namespace hooks
 				globals::windowWidth = (float)abs(windowRect.right - windowRect.left);
 				globals::windowHeight = (float)abs(windowRect.bottom - windowRect.top);
 			}
+
 
 			functions::PrintChat(CHAT_COLOR("#72ff72", "Loooool now u are going to get rekt"));
 			globals::hookResponse = true;
@@ -62,10 +67,12 @@ namespace hooks
 			__try { render::Update(); }
 			__except (1) { LOG("ERROR IN RENDER UPDATE"); }
 
+			/*__try { menu::Update(); }
+			__except (1) { LOG("ERROR IN MENU UPDATE"); }*/
+
 			__try { menu::Update2(); }
 			__except (1) { LOG("ERROR IN MENU UPDATE"); }
 
-			//menu::Update();			
 		}
 
 		bool KeyChecks()
@@ -100,9 +107,11 @@ namespace hooks
 		HWND windowDX = nullptr;
 		WNDPROC o_wndProcDX;
 
+
 		LRESULT __stdcall wndProcDX(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			UPasta::SDK::Menu::OnWndProc(uMsg, wParam);
+
 			if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 				return true;
 
@@ -140,7 +149,6 @@ namespace hooks
 				ImGui::CreateContext();
 				ImGuiIO& io = ImGui::GetIO(); (void)io;
 				io.IniFilename = "window.ini";
-				io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 				io.Fonts->AddFontFromFileTTF(SP_STRING("C:\\Windows\\Fonts\\Arial.ttf"), 14);
 				globals::pDeviceDX9var = pDevice;
 
@@ -177,7 +185,7 @@ namespace hooks
 			
 			Updates();
 
-			ImGui::EndFrame();
+			//ImGui::EndFrame();
 			ImGui::Render();
 			ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
@@ -188,13 +196,14 @@ namespace hooks
 		ID3D11Device* pDeviceDX11 = nullptr;
 		ID3D11DeviceContext* pContextDX11 = nullptr;
 		ID3D11RenderTargetView* mainRenderTargetViewDX11;
-
+		
 		HRESULT __stdcall presentDX11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 		{
 			if (!_init)
 			{
 				if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&pDeviceDX11)))
 				{
+					
 					pDeviceDX11->GetImmediateContext(&pContextDX11);
 					DXGI_SWAP_CHAIN_DESC sd;
 					pSwapChain->GetDesc(&sd);
@@ -205,14 +214,17 @@ namespace hooks
 					pDeviceDX11->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetViewDX11);
 					pBackBuffer->Release();
 					o_wndProcDX = (WNDPROC)SetWindowLongPtr(windowDX, GWLP_WNDPROC, (LONG_PTR)wndProcDX);
-
 					IMGUI_CHECKVERSION();
-					ImGui::CreateContext();
+					ImGui::CreateContext(); //is the only one i have
 					ImGuiIO& io = ImGui::GetIO(); (void)io;
+					ImFontConfig cfg;
+					cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_ForceAutoHint | ImGuiFreeTypeBuilderFlags_LightHinting | ImGuiFreeTypeBuilderFlags_LoadColor;
+
 					io.IniFilename = "window.ini";
 					io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 					io.Fonts->AddFontFromFileTTF(SP_STRING("C:\\Windows\\Fonts\\Arial.ttf"), 14);
 
+					//noo no this
 					DXGI_SWAP_CHAIN_DESC desc;
 					pSwapChain->GetDesc(&desc);
 
@@ -223,16 +235,12 @@ namespace hooks
 					device->GetImmediateContext(&context);
 
 					globals::pDeviceDX11var = device;
-					
-
 
 					ImGui_ImplWin32_Init(windowDX);
 					ImGui_ImplDX11_Init(device, context);
-
 					Inits();
 
 					_init = true;
-					
 
 				}
 				else

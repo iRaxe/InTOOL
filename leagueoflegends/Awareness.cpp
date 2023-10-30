@@ -326,12 +326,12 @@ namespace UPasta
 
 				namespace Radius
 				{
-
 					void InitializeRadiusMenu()
 					{
 						const auto RadiusMenu = AwarenessMenu->AddMenu("utilityRadius", "Drawings Settings");
 						status = RadiusMenu->AddCheckBox("status", "Enable radius drawings", true);
 						drawMode = RadiusMenu->AddList("drawMode", "Draw Mode", std::vector<std::string>{"Circle", "Arc"}, 0);
+
 
 						const auto DrawingsToShowMenu = RadiusMenu->AddMenu("DrawingsToShowMenu", "Drawings To Show");
 
@@ -801,7 +801,7 @@ namespace UPasta
 
 					static void ShowSidebar(bool* p_open)
 					{
-						ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize;
+						ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize;
 						if (Configs::EnemySidebar::locked->Value == true)	window_flags |= ImGuiWindowFlags_NoMove;
 						if (ImGui::Begin("Hero awareness", p_open, window_flags))
 						{ 
@@ -809,12 +809,12 @@ namespace UPasta
 							ImVec2 p2 = ImGui::GetCursorScreenPos();
 							float size = Configs::EnemySidebar::hudSize->Value / 100.0f;
 							float spacing = 0.0f;
-							ImGui::BeginChild(
+							ImGui::BeginChildOld(
 								"Test", 
 								Configs::EnemySidebar::orientation->Value ? 
 								ImVec2(champListSize * ((200 + spacing) * size), 200 * size) : 
 								ImVec2(200 * size, champListSize * ((200 + spacing) * size)), 
-								false);
+								false, window_flags);
 
 							for (int i = 1; i < champListSize; i++)
 							{
@@ -1065,7 +1065,7 @@ namespace UPasta
 
 						shouldInject = Configs::Zoom::status->Value;
 
-						shouldWrite = Configs::Zoom::status3D->Value;
+						shouldWrite = Configs::Zoom::status3D->Value ;
 
 						useKeyboard = Configs::Zoom::statusKeyboard->Value;
 
@@ -1080,7 +1080,7 @@ namespace UPasta
 					{
 						AssignValues();
 
-						if (shouldWrite)
+						if (Configs::Zoom::status3D->Value && !globals::menuOpen)
 						{
 							gameTime = functions::GetGameTime();
 

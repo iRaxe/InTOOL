@@ -271,6 +271,7 @@ public:
     int GetStacks();
 public:
     int GetMaxStacks();
+    bool isActive();
 };
 
 class BuffEntry

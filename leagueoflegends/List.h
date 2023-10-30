@@ -6,10 +6,10 @@ namespace UPasta {
 	namespace SDK {
 		class List : public MenuComponent {
 		public:
-			List(const char* name, const char* displayName, std::vector<std::string> items, unsigned int defaultIndex, std::function<void(List*, unsigned int)> callback);
+			List(const char* name, const char* displayName, std::vector<std::string> items, int defaultIndex, std::function<void(List*, unsigned int)> callback);
 
 			std::vector<std::string> Items;
-			unsigned int Value;
+			int Value;
 			std::function<void(List*, unsigned int)> Callback;
 
 			void AddTooltip(const char* tooltip);

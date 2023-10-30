@@ -58,45 +58,9 @@ namespace UPasta
 		}
 
 		void Slider::Draw() {
-			if (!this->Visible) {
-				return;
-			}
-
-			auto position = this->GetPosition();
-			auto rect = Rect(position.x, position.y, this->GetWidth(), MenuComponent::Height);
-			auto percentage = ((float)(this->Value - this->MinimumValue) / (this->MaximumValue - this->MinimumValue));
-
-			if (this->Value != this->MinimumValue) {
-				Renderer::AddRectangleFilled(Rect(rect.Position.x, rect.Position.y, rect.Width * percentage, rect.Height), IM_COL32(160, 0, 0, MenuSettings::BackgroundOpacity));
-			}
-			if (this->Value != this->MaximumValue) {
-				Renderer::AddRectangleFilled(Rect(rect.Position.x + rect.Width * percentage, rect.Position.y, rect.Width * (1 - percentage), rect.Height), IM_COL32(0, 0, 0, MenuSettings::BackgroundOpacity));
-			}
-
-			Renderer::AddRectangle(rect, IM_COL32(0, 0, 0, 160));
-			Renderer::AddLine(Vector2(rect.Position.x + rect.Width * percentage, rect.Position.y), Vector2(rect.Position.x + rect.Width * percentage, rect.Position.y + rect.Height), 2.0f, IM_COL32(255, 0, 0, 255));
-			Renderer::AddText(this->DisplayName, 14.0f, Rect(rect.Position.x + 10.0f, rect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
-			Renderer::AddText(14.0f, Rect(rect.Position.x, rect.Position.y, rect.Width - 5.0f, rect.Height), DT_RIGHT | DT_VCENTER, IM_COL32(255, 255, 255, 255), "%d", this->Value);
-
-			//TODO
-			if (this->Tooltip[0] != 0)
-			{
-				auto textWidth = 10.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->DisplayName).x;
-				auto mousePos = functions::GetMousePos();
-				auto iconRect = Rect(rect.Position.x + textWidth + 5, rect.Position.y + Height * 0.5f - 10.0f, 20, 20);
-				Renderer::AddText("(?)", 16.0f, iconRect, DT_VCENTER, IM_COL32(255, 30, 30, 255));
-
-				if (iconRect.Contains(mousePos))
-				{
-					auto alpha = min(MenuSettings::BackgroundOpacity + 70, 255);
-					auto black = IM_COL32(0, 0, 0, alpha);
-					auto width = 20.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->Tooltip).x;
-					auto tooltipRect = Rect(mousePos.x + 20, mousePos.y - Height * 0.5f, width, Height);
-					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawFlags_RoundCornersAll);
-					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawFlags_RoundCornersAll);
-					Renderer::AddText(this->Tooltip, 14.0f, Rect(tooltipRect.Position.x + 10.0f, tooltipRect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
-				}
-			}
+			
+			ImGui::SliderInt(this->DisplayName, &this->Value, this->MinimumValue, this->MaximumValue);
+			
 		}
 
 		void Slider::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos) {

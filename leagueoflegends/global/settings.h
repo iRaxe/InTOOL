@@ -15,11 +15,14 @@ namespace settings
 	typedef std::variant<std::pair<int, int>, std::pair<float, float>> SettingBoundsValue;
 	typedef std::map<std::string, SettingBoundsValue> SettingsBoundsGroup;
 	typedef std::map<std::string, SettingsBoundsGroup> SettingsBounds;
-
+	inline std::map<std::string, bool> checkboxStatus; // Utilizziamo una mappa per archiviare gli stati dei checkbox
 	extern SettingsData data;
 
 	void Load();
+	void Load2();
 	void Save();
+	void Save2();
+
 
 	SettingValue Get(std::string group, std::string key, SettingValue defaultValue);
 	bool GetBool(std::string group, std::string key);

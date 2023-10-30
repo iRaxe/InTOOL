@@ -38,7 +38,7 @@ namespace UPasta
 	}
 
 	void Renderer::NewFrame() {
-		ImGui_ImplDX9_NewFrame();
+		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}
@@ -46,7 +46,7 @@ namespace UPasta
 	void Renderer::RenderFrame()
 	{
 		ImGui::Render();
-		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 
 
@@ -107,7 +107,7 @@ namespace UPasta
 	void Renderer::AddRectangle(Vector2 position, float width, float height, uintptr_t color)
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		window->DrawList->AddRect(*(ImVec2*)&position, ImVec2(position.x + width, position.y + height), color);
+		window->DrawList->AddRect(*(ImVec2*)&position, ImVec2(position.x + width, position.y + height), color, 4.f);
 	}
 
 	void Renderer::AddRectangle(Rect rectangle, uintptr_t color, float thickness)
@@ -126,7 +126,7 @@ namespace UPasta
 	void Renderer::AddRectangleFilled(Vector2 position, float width, float height, uintptr_t color)
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		window->DrawList->AddRectFilled(*(ImVec2*)&position, ImVec2(position.x + width, position.y + height), color);
+		window->DrawList->AddRectFilled(*(ImVec2*)&position, ImVec2(position.x + width, position.y + height), color, 4.f);
 	}
 
 	void Renderer::AddRectangleFilled(Rect rectangle, uintptr_t color)

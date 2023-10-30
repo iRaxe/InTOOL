@@ -92,6 +92,9 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
     <TargetName>Spaghetti</TargetName>
+    <IncludePath>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\Freetype\include;$(IncludePath);C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\SDK LIB\Include</IncludePath>
+    <ExternalIncludePath>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\SDK LIB\Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\Freetype\win64;$(LibraryPath);C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\SDK LIB\Lib\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -160,8 +163,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;FIRSTINTERNALHACK_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\Freetype\include;C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -178,10 +180,12 @@
     <ClInclude Include="Ashe.h" />
     <ClInclude Include="auth.hpp" />
     <ClInclude Include="Awareness.h" />
+    <ClInclude Include="background.h" />
     <ClInclude Include="Checkbox.h" />
     <ClInclude Include="classes\classes.h" />
     <ClInclude Include="clipper.h" />
     <ClInclude Include="clipper.hpp" />
+    <ClInclude Include="Colorpicker.h" />
     <ClInclude Include="customimages.h" />
     <ClInclude Include="Damage.h" />
     <ClInclude Include="DestroyEvents.h" />
@@ -199,6 +203,7 @@
     <ClInclude Include="global\utils.h" />
     <ClInclude Include="hooks\hooks.h" />
     <ClInclude Include="hooks\impl\impl.h" />
+    <ClInclude Include="icon_font.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -208,6 +213,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="imgui_freetype.h" />
     <ClInclude Include="Info.h" />
     <ClInclude Include="InitializeEvents.h" />
     <ClInclude Include="json.hpp" />
@@ -240,6 +246,8 @@
     <ClInclude Include="PluginTemplate.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="render\render.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="roboto_font.h" />
     <ClInclude Include="scripts\championmodule.h" />
     <ClInclude Include="scripts\scripts.h" />
     <ClInclude Include="scripts\skillshotdatabase.h" />
@@ -251,6 +259,7 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TargetSelector.h" />
+    <ClInclude Include="variable.h" />
     <ClInclude Include="Vayne.h" />
     <ClInclude Include="VMTHook.h" />
     <ClInclude Include="Xerath.h" />
@@ -262,6 +271,7 @@
     <ClCompile Include="Awareness.cpp" />
     <ClCompile Include="Checkbox.cpp" />
     <ClCompile Include="classes\classes.cpp" />
+    <ClCompile Include="Colorpicker.cpp" />
     <ClCompile Include="Damage.cpp" />
     <ClCompile Include="DestroyEvents.cpp" />
     <ClCompile Include="EventManager.cpp" />
@@ -327,13 +337,22 @@
     <MASM Include="mem\spoofer.asm" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="..\..\..\..\..\Desktop\New folder\black menu\Freetype\win64\freetype.lib" />
     <Library Include="library_x64.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="imgui\imgui.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="leagueoflegends.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" />
     <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
     <Import Project="..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets" Condition="Exists('..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" />
+    <Import Project="..\packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets" Condition="Exists('..\packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets')" />
+    <Import Project="..\packages\freetype.2.8.0.1\build\native\freetype.targets" Condition="Exists('..\packages\freetype.2.8.0.1\build\native\freetype.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -342,5 +361,7 @@
     <Error Condition="!Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets'))" />
+    <Error Condition="!Exists('..\packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\freetype.2.8.0.1\build\native\freetype.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype.2.8.0.1\build\native\freetype.targets'))" />
   </Target>
 </Project>

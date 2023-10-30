@@ -176,7 +176,7 @@ namespace render
 
 			void Update()
 			{
-				if (SETTINGS_BOOL("Drawings", "Draw EnemyList"))
+				/*if (SETTINGS_BOOL("Drawings", "Draw EnemyList"))
 				{
 					DrawEnemyListNames();
 				}
@@ -194,7 +194,7 @@ namespace render
 							//DrawCooldownBar(obj);
 						}
 					}
-				}
+				}*/
 			}
 		}
 

@@ -161,6 +161,9 @@
     <Filter Include="Menu\New New Menu\Notification">
       <UniqueIdentifier>{0c59187d-68b5-4f3c-9b34-b96216cedd0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Menu\New Menu\Components\ColorPicker">
+      <UniqueIdentifier>{0c768865-ead9-485f-9a21-b090f9bacb1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -398,6 +401,25 @@
     <ClInclude Include="notification.h">
       <Filter>Menu\New New Menu\Notification</Filter>
     </ClInclude>
+    <ClInclude Include="imgui_freetype.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="icon_font.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="background.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="roboto_font.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="variable.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Colorpicker.h">
+      <Filter>Menu\New Menu\Components\ColorPicker</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -581,6 +603,9 @@
     <ClCompile Include="imgui_settings.h">
       <Filter>Menu\New New Menu\Notification</Filter>
     </ClCompile>
+    <ClCompile Include="Colorpicker.cpp">
+      <Filter>Menu\New Menu\Components\ColorPicker</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -594,5 +619,16 @@
     <Library Include="library_x64.lib">
       <Filter>KeyAuth\Header Files</Filter>
     </Library>
+    <Library Include="..\..\..\..\..\Desktop\New folder\black menu\Freetype\win64\freetype.lib">
+      <Filter>IMGui</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="imgui\imgui.natvis">
+      <Filter>IMGui</Filter>
+    </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="leagueoflegends.rc" />
   </ItemGroup>
 </Project>

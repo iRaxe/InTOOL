@@ -143,6 +143,7 @@ namespace UPasta::SDK::Awareness
             inline bool initializedRadiusMenu;
             void Initialize();
             void InitializeRadiusMenu();
+            inline float color_edit0[4] = { 255 / 255.f, 77 / 255.f, 77 / 255.f, 200 / 255.f };
 
             inline CheckBox* status;
             inline List* drawMode;

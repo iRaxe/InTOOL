@@ -308,7 +308,7 @@ std::string Buff::GetName()
 {
 	QWORD* namePtr = (QWORD*)(*(QWORD*)((QWORD)this + oBuffNamePtr));
 	if (!IsValidPtr(namePtr)) return "";
-	return (char*)((QWORD)namePtr + oBuffNamePtrName);
+	return *(char**)((QWORD)namePtr + oBuffNamePtrName);
 }
 
 float Buff::GetStartTime()
@@ -334,6 +334,11 @@ int Buff::GetStacks()
 int Buff::GetMaxStacks()
 {
 	return max(this->GetStacksAlt(), this->GetStacks());
+}
+
+bool Buff::isActive()
+{
+	return *(BYTE*)(this + oBuffStacksAlt) && *(int64_t*)(this + oBuffNamePtr) || *(BYTE*)(this + 0x88);
 }
 
 Buff* BuffEntry::GetBuff()

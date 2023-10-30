@@ -46,6 +46,11 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
+    void OnPopuplateMenu() override
+    {
+
+    }
+
     void Init() override
     {
         const auto NautilusMenu = Menu::CreateMenu("vezNautilus", "vez.Nautilus");

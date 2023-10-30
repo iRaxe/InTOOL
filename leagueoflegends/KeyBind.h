@@ -6,10 +6,10 @@ namespace UPasta {
 	namespace SDK {
 		class KeyBind : public MenuComponent {
 		public:
-			KeyBind(const char* name, const char* displayName, unsigned char key, bool defaultValue, bool isToggle, std::function<void(KeyBind*, bool)> callback);
+			KeyBind(const char* name, const char* displayName, int key, bool defaultValue, int mode, std::function<void(KeyBind*, bool)> callback);
 
-			unsigned char Key;
-			bool IsToggle;
+			int Key;
+			int Mode;
 			bool Value;
 			std::function<void(KeyBind*, bool)> Callback;
 

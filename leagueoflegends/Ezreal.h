@@ -5,6 +5,7 @@ using namespace scripts;
 
 namespace EzrealConfig
 {
+    void SaveJsonFile();
     namespace EzrealCombo {
 	    inline CheckBox* UseQ;
         inline CheckBox* UseW;

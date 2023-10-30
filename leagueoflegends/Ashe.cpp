@@ -91,6 +91,11 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
+    void OnPopuplateMenu() override
+    {
+
+    }
+
     void Init() override
     {
         const auto AsheMenu = Menu::CreateMenu("vezAshe", "vez.Ashe");

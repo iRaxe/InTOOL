@@ -2,6 +2,7 @@
 
 #include "MenuComponent.h"
 #include "CheckBox.h" 
+#include "Colorpicker.h"
 #include "Info.h"
 #include "Keybind.h"
 #include "List.h"
@@ -24,7 +25,8 @@ namespace UPasta {
 
 			static void Initialize();
 			static void Dispose();
-			static void OnDraw();
+			static void DrawTabs();
+			void DrawTabContent() const;
 			static void OnWndProc(UINT msg, WPARAM wparam);
 			static Menu* CreateMenu(const char* name, const char* displayName);
 
@@ -33,6 +35,7 @@ namespace UPasta {
 
 			Menu* AddMenu(const char* name, const char* displayName);
 			CheckBox* AddCheckBox(const char* name, const char* displayName, bool defaultValue = false, std::function<void(CheckBox*, bool)> callback = nullptr);
+			ColorPicker* AddColorPicker(const char* name, const char* displayName, float col[4], std::function<void(ColorPicker*, bool)> callback = nullptr);
 			Info* AddInfo(const char* name, const char* displayName);
 			KeyBind* AddKeyBind(const char* name, const char* displayName, unsigned char key, bool defaultValue = false, bool isToggle = false, std::function<void(KeyBind*, bool)> callback = nullptr);
 			List* AddList(const char* name, const char* displayName, std::vector<std::string> items, unsigned int defaultIndex = 0, std::function<void(List*, unsigned int)> callback = nullptr);
@@ -43,9 +46,12 @@ namespace UPasta {
 			void AddTooltip(const char* tooltip);
 			void GetSave(json& j);
 			Vector2 GetPosition();
+			int GetIndex();
 			float GetWidth();
 			float NeededWidth();
 			void Draw();
+			void DrawChild() const;
+
 			void WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos);
 
 			MenuComponent* operator[](std::string key);

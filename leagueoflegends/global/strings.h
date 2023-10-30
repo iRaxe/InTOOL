@@ -31,6 +31,20 @@
 #define MINION_SUPER_RED std::string("SRU_ChaosMinionSuper")
 #define MINION_SENNA_SOUL std::string("SennaSoul")
 
+#define BLUEWARD std::string("BlueTrinket")
+#define YELLOWWARD std::string("YellowTrinket")
+#define JAMMERDEVICE std::string("JammerDevice")
+
+#define PLANTVISION std::string("SRU_Plant_Vision")
+#define PLANTSATCHEL std::string("SRU_Plant_Satchel")
+#define PLANTHEALTH std::string("SRU_Plant_Health")
+
+#define JINXTRAP std::string("Jinx_Mine")
+#define JHINTRAP std::string("JhinTrap")
+#define CAITLYNTRAP std::string("CaitlynTrap")
+#define TEEMOSHROOM std::string("TeemoMushroom")
+#define SHACOBOX std::string("ShacoBox")
+
 // Example: spell_hash("ZeriR");
 #define buff_hash(str) (std::integral_constant<std::uint32_t, hash_fnv1a_ignorecase(str)>::value)
 #define buff_hash_real hash_fnv1a_ignorecase

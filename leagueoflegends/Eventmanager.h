@@ -2,6 +2,7 @@
 #include <vector>
 namespace EventManager {
 	enum class EventType {
+		OnInject,
 		OnDraw,
 		OnWndProc,
 		OnPresent,

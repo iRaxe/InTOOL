@@ -7,19 +7,59 @@ namespace scripts
 	static float gameTime = 0.0f;
 	static float nextRngBuffer = 0.0f;
 
+	std::vector<std::pair<std::string, std::vector<std::string>>> parentOrder = {};
+	std::map<std::string, std::vector<std::string>> parentToGroupMap;
+
+
 	std::vector<std::pair<std::string, std::vector<std::string>>> settingsOrder = {};
 
-	void AddSetting(std::string group, std::string key, settings::SettingValue value, settings::SettingValue min, settings::SettingValue max)
+	void AddSetting(std::string parent, std::string group, std::string key, settings::SettingValue value, settings::SettingValue min, settings::SettingValue max)
+	{
+		std::pair<std::string, std::vector<std::string>>* groupData = nullptr;
+
+		for (auto& pair : settingsOrder)
+		{
+			if (pair.first == group)
+			{
+				parentToGroupMap[parent.c_str()].push_back(group.c_str());
+				groupData = &pair;
+			}
+		}
+		
+
+		if (groupData)
+		{
+			groupData->second.push_back(key);
+		}
+		else {
+			parentOrder.push_back({ parent, {group} });
+			settingsOrder.push_back({ group, {key} });
+		}
+		
+
+		settings::Get(group, key, value);
+
+		if (std::holds_alternative<int>(value))
+			settings::AddBounds(group, key, std::get<int>(min), std::get<int>(max));
+		if (std::holds_alternative<float>(value))
+			settings::AddBounds(group, key, std::get<float>(min), std::get<float>(max));
+
+		
+	}
+
+	/*void AddSetting(std::string parent, std::string group, std::string key, settings::SettingValue value, settings::SettingValue min, settings::SettingValue max)
 	{
 		std::pair<std::string, std::vector<std::string>>* groupData = nullptr;
 		for (auto& pair : settingsOrder)
 			if (pair.first == group)
 				groupData = &pair;
 
-		if (groupData) {
+		if (groupData)
+		{
 			groupData->second.push_back(key);
 		}
 		else {
+			parentOrder.push_back({ parent, {group} });
 			settingsOrder.push_back({ group, {key} });
 		}
 
@@ -29,7 +69,7 @@ namespace scripts
 			settings::AddBounds(group, key, std::get<int>(min), std::get<int>(max));
 		if (std::holds_alternative<float>(value))
 			settings::AddBounds(group, key, std::get<float>(min), std::get<float>(max));
-	}
+	}*/
 
 	void Init()
 	{
@@ -60,10 +100,10 @@ namespace scripts
 	{
 		void Init()
 		{
-			ADD_SETTING("Drawings", "Draw AA Range", false);
-			ADD_SETTING("Drawings", "Draw EnemyList", false);
-			ADD_SETTING("Drawings", "Draw BuffList", false);
-			ADD_SETTING("Drawings", "Draw Spells cooldown", false);
+			ADD_SETTING("Utilities Settings", "Drawings", "Draw AA Range", false);
+			ADD_SETTING("Utilities Settings", "Drawings", "Draw EnemyList", false);
+			ADD_SETTING("Utilities Settings", "Drawings", "Draw BuffList", false);
+			ADD_SETTING("Utilities Settings", "Drawings", "Draw Spells cooldown", false);
 		}
 	}
 
@@ -71,10 +111,10 @@ namespace scripts
 	{
 		void Init()
 		{
-			ADD_SETTING("debug", "draw object data", false);
-			ADD_SETTING("debug", "draw bounding radius", false);
-			ADD_SETTING("debug", "draw cursor world", false);
-			ADD_SETTING("debug", "draw player paths", false);
+			ADD_SETTING("Utilities Settings", "debug", "draw object data", false);
+			ADD_SETTING("Utilities Settings", "debug", "draw bounding radius", false);
+			ADD_SETTING("Utilities Settings", "debug", "draw cursor world", false);
+			ADD_SETTING("Utilities Settings", "debug", "draw player paths", false);
 		}
 	}
 
@@ -138,6 +178,14 @@ namespace scripts
 				return;
 
 			activeChampModule->OnCastSpell();
+		}
+
+		void DoPopulateMenu()
+		{
+			if (!activeChampModule)
+				return;
+
+			activeChampModule->OnPopuplateMenu();
 		}
 	}
 }

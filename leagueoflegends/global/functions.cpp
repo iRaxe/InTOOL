@@ -14,6 +14,34 @@ namespace functions
 		spoof_trampoline = (void*)mem::ScanModInternal((char*)"\xFF\x23", (char*)"xx", (char*)globals::moduleBase);
 	}
 
+	template <typename T, typename U>
+	T Read(U addr) {
+		return *reinterpret_cast<T*>((uintptr_t)addr);
+	}
+
+	template <typename ReturnType, typename... Args>
+	ReturnType call_function(uintptr_t func, Args... args) {
+		using func_t = ReturnType(__fastcall*)(Args...);
+		return spoof_call(spoof_trampoline, (func_t)func, std::forward<Args>(args)...);
+	}
+
+	template <size_t Index, typename ReturnType, typename... Args>
+	ReturnType call_virtual(void* instance, Args... args) {
+		using fn = ReturnType(__fastcall*)(void*, Args...);
+		auto function = (*static_cast<fn**>(instance))[Index];
+		return function(instance, std::forward<Args>(args)...);
+	}
+	template <typename Type>
+	Type RPM(const QWORD address)
+	{
+		if (!address)
+			return Type();
+
+		Type buffer;
+
+		return NT_SUCCESS(ReadProcessMemory(GetCurrentProcess(), (LPVOID)address, &buffer, sizeof(Type), NULL)) ? buffer : Type();
+	};
+
 	std::string GetHexString(QWORD hexNumber)
 	{
 		std::stringstream ss;
@@ -61,12 +89,10 @@ namespace functions
 
 	void PrintChat(std::string text)
 	{
-		typedef void(__thiscall* fnPrintChat)(QWORD* chatClient, const char* message, int colorId);
-		fnPrintChat _fnSendChat = (fnPrintChat)(globals::moduleBase + oPrintChat);
 		std::string timeMarkString = "[" + ConvertTime(GetGameTime()) + "] ";
 		std::string coloredTimeMarkString = CHAT_COLOR_DT("#7ce9ff", timeMarkString);
 		std::string formattedText = coloredTimeMarkString + text;
-		_fnSendChat((QWORD*)(*(QWORD*)(globals::moduleBase + oChatInstance)), formattedText.c_str(), 4);
+		call_function<void>(RVA(oPrintChat), RVA(oChatClient), formattedText.c_str(), 4);
 	}
 
 	void PrintChat(int number)
@@ -86,20 +112,17 @@ namespace functions
 
 	std::string GetServerIP()
 	{
-		auto test = *(char**)(*(QWORD*)(globals::moduleBase + oGameMap) + 0x140);
+		auto bho = Read<char*>((Read<uintptr_t>(RVA(oGameMap)) + 0x140));
+		auto funziona = *(char**)(*(QWORD*)(globals::moduleBase + oGameMap) + 0x140);
 
 		char nameobj[18];
 		memcpy(nameobj, reinterpret_cast<void*>(*(reinterpret_cast<QWORD*>(globals::moduleBase + oGameMap) + 0x140)), sizeof(nameobj));
-		//ServerInfo va bene
-		//LOG("%s", test);
-		return test;
-
-
+		return funziona;
 	}
 
 	float GetGameTime()
 	{
-		return *(float*)(globals::moduleBase + oGameTime);
+		return Read<float>(RVA(oGameTime));
 	}
 
 	int GetGameTick()
@@ -129,7 +152,7 @@ namespace functions
 
 	bool IsChatOpen()
 	{
-		return *(bool*)(*(QWORD*)(globals::moduleBase + oChatClient) + oChatClientChatOpen);
+		return Read<bool>(Read<uintptr_t>(RVA(oChatClient)) + oChatClientChatOpen);
 	}
 
 	Vector2 GetMousePos()
@@ -142,16 +165,13 @@ namespace functions
 
 	Vector3 GetMouseWorldPos()
 	{
-		return ReadVector3((QWORD)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceInput) + oHudInstanceInputMouseWorldPos));
+		return ReadVector3(Read<uintptr_t>(Read<uintptr_t>(RVA(oHudInstance)) + oHudInstanceInput) + oHudInstanceInputMouseWorldPos);
 	}
 
 	Vector2 WorldToScreen(Vector3 in)
 	{
-		typedef bool(__fastcall* fnWorldToScreen)(QWORD* viewport, Vector3* in, Vector3* out);
-		fnWorldToScreen _fnWorldToScreen = (fnWorldToScreen)(globals::moduleBase + oWorldToScreen);
-		QWORD* viewport = *(QWORD**)(globals::moduleBase + oViewport);
 		Vector3 out;
-		_fnWorldToScreen((QWORD*)((QWORD)viewport + oViewportW2S), &in, &out);
+		call_function<uintptr_t>(RVA(oWorldToScreen), Read<uintptr_t>(RVA(oViewport)) + oViewportW2S, &in, &out);
 		return Vector2(out.x, out.y);
 	}
 
@@ -164,28 +184,14 @@ namespace functions
 		return _fnpointHeight(in.x, in.z, &World_y);
 	}
 
-	template <typename Type>
-	Type RPM(const QWORD address)
-	{
-		if (!address)
-			return Type();
-
-		Type buffer;
-
-		return NT_SUCCESS(ReadProcessMemory(GetCurrentProcess(), (LPVOID)address, &buffer, sizeof(Type), NULL)) ? buffer : Type();
-	};
-
-
-	//0xD901B0		
-
 	Vector2 GetMinimapPos()
 	{
-		return ReadVector2((QWORD)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oMinimapObject) + MinimapObjectHud) + MinimapHudPos));
+		return ReadVector2(Read<uintptr_t>(Read<uintptr_t>(RVA(oMinimapObject)) + MinimapObjectHud) + MinimapHudPos);
 	}
 
 	float GetMinimapSize()
 	{
-		return *(float*)((QWORD)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oMinimapObject) + MinimapObjectHud) + MinimapHudSize));
+		return Read<float>(Read<uintptr_t>(Read<uintptr_t>(RVA(oMinimapObject)) + MinimapObjectHud) + MinimapHudSize);
 	}
 
 	Vector2 WorldToMinimap(Object* objectToShow)
@@ -214,78 +220,67 @@ namespace functions
 
 	Vector3 GetBaseDrawPosition(Object* obj)
 	{
-		typedef bool(__fastcall* fnGetBaseDrawPosition)(QWORD* obj, Vector3* out);
-		fnGetBaseDrawPosition _fnGetBaseDrawPosition = (fnGetBaseDrawPosition)(globals::moduleBase + oGetBaseDrawPosition);
 		Vector3 out;
-		_fnGetBaseDrawPosition((QWORD*)obj, &out);
+		call_function<bool>(RVA(oGetBaseDrawPosition), (QWORD*)obj, &out);
 		return out;
 	}
 	
 	Vector2 GetHpBarPosition(Object* obj)
 	{
 		Vector3 hpBarPos = obj->GetPosition();
-		const float hpBarHeight = *(float*)(obj->GetCharacterData() + oObjCharDataDataSize) * obj->GetScale();
+		const float hpBarHeight = Read<float>(obj->GetCharacterData() + oObjCharDataDataSize) * obj->GetScale();
 		hpBarPos.y += hpBarHeight;
 
 		auto screenPos = WorldToScreen(hpBarPos);
-		const auto zoomInstance = *(QWORD*)(globals::moduleBase + oZoomInstance);
-		const float maxZoom = *(float*)(zoomInstance + oZoomInstanceMaxZoom);
-		float currentZoom = *(float*)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceCamera) + oHudInstanceCameraZoom);
-		float zoomDelta = maxZoom / currentZoom;
+		const float maxZoom = Read<float>(Read<uintptr_t>(RVA(oZoomInstance)) + oZoomInstanceMaxZoom);
+		const float currentZoom = Read<float>(Read<uintptr_t>(Read<uintptr_t>(RVA(oHudInstance)) + oHudInstanceCamera) + oHudInstanceCameraZoom);
+		const float zoomDelta = maxZoom / currentZoom;
 
 		screenPos.y -= (((globals::windowHeight) * 0.00083333335f * zoomDelta) * hpBarHeight);
 		
 		return screenPos;
 	}
 
+	Object* GetOwner(Object* obj)
+	{
+		return call_function<Object*>(RVA(fGetOwner), obj);
+	}
+
 	Object* GetObjectFromNetId(int netId)
 	{
-		typedef Object* (__fastcall* fnGetObjectFromNetId)(QWORD* a1, unsigned int netId);
-		fnGetObjectFromNetId _fnGetObjectFromNetId = (fnGetObjectFromNetId)(globals::moduleBase + oGetObjectFromNetId);
-
-		return _fnGetObjectFromNetId((QWORD*)(*(QWORD*)(globals::moduleBase + oGetObjectFromNetIdParam)), netId);
+		return call_function<Object*>(RVA(oGetObjectFromNetId), Read<uintptr_t>(RVA(oGetObjectFromNetIdParam)), netId);
 	}
 
 	Object* GetSelectedObject()
 	{
-		typedef Object* (__fastcall* fnGetObjectFromNetId)(QWORD* a1, unsigned int netId);
-		fnGetObjectFromNetId _fnGetObjectFromNetId = (fnGetObjectFromNetId)(globals::moduleBase + oGetObjectFromNetId);
+		const auto targetNetId = Read<unsigned int>(Read<uintptr_t>(Read<uintptr_t>(RVA(oHudInstance)) + oHudInstanceUserData) + oHudInstanceUserDataSelectedObjectNetId);
+		if (!targetNetId)
+			return nullptr;
 
-		QWORD* hudInstance = (QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance));
-		unsigned int targetNetId = *(unsigned int*)(*(QWORD*)((QWORD)hudInstance + oHudInstanceUserData) + oHudInstanceUserDataSelectedObjectNetId);
-		if (!targetNetId) return 0;
-		return _fnGetObjectFromNetId((QWORD*)(*(QWORD*)(globals::moduleBase + oGetObjectFromNetIdParam)), targetNetId);
+		return call_function<Object*>(RVA(oGetObjectFromNetId), Read<uintptr_t>(RVA(oGetObjectFromNetIdParam)), targetNetId);
 	}
 
 	unsigned int GetCollisionFlags(Vector3 pos)
 	{
-		typedef unsigned int(__fastcall* fnGetCollisionFlags)(Vector3 pos);
-		fnGetCollisionFlags _fnGetCollisionFlags = (fnGetCollisionFlags)(globals::moduleBase + oGetCollisionFlags);
-
-		return _fnGetCollisionFlags(pos);
+		return call_function<unsigned int>(RVA(oGetCollisionFlags), pos);
 	}
 
 	float GetRespawnTimer(Object* obj)
 	{
-		typedef float(__fastcall* fnGetRespawnTimer)(Object* obj);
-		fnGetRespawnTimer _fnGetRespawnTimer = (fnGetRespawnTimer)(globals::moduleBase + fGetRespawnTimeRemaining);
-		return _fnGetRespawnTimer(obj);
+		return call_function<float>(RVA(fGetRespawnTimeRemaining), obj);
 	}
+
 
 	int GetSpellState(int slotId)
 	{
 		// Ready = 0 || NotAvailable = 4 || Supressed = 8 || NotLearned = 12 || Disabled = 16 || Processing = 24 || Cooldown = 32 || NoMana = 64 || Unknown = 96
-		typedef int(__fastcall* fnGetSpellState)(void*, int, const QWORD&);
-		fnGetSpellState _fnGetSpellState = (fnGetSpellState)(globals::moduleBase + fGetSpellState);
-		return _fnGetSpellState(globals::localPlayer + oObjSpellBook, slotId, NULL);
+		return call_function<int>(RVA(fGetSpellState), globals::localPlayer + oObjSpellBook, slotId, NULL);
 	}
 
 	float GetSpellRange(int level)
 	{
-		typedef float(__fastcall* fnGetSpellRange)(int level);
-		//Not working, need find spellDataSpellRange 
-		fnGetSpellRange _fnGetSpellRange = (fnGetSpellRange)(globals::moduleBase + fGetSpellRange);
-		return _fnGetSpellRange(level);
+		//Not working, need find spellDataSpellRange oppure provare a passare spellboox o spellslot
+		return call_function<float>(RVA(fGetSpellRange), globals::localPlayer + oObjSpellBook, 0, NULL);
 	}
 
 	QWORD GetZoomAddress()
@@ -295,114 +290,67 @@ namespace functions
 
 	bool IsNotLocalPlayer(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsNotLocalPlayer)(Object* obj);
-		fnIsNotLocalPlayer _fnIsNotLocalPlayer = (fnIsNotLocalPlayer)(globals::moduleBase + fIsNotLocalPlayer);
-
-		return _fnIsNotLocalPlayer(obj);
+		return call_function<bool>(RVA(fIsNotLocalPlayer), obj);
 	}
-
-	/*bool IsAttackingLocalPlayer(Object* obj)
-	{
-		typedef bool(__fastcall* fnIsAttackingLocalPlayer)(Object* obj);
-		fnIsAttackingLocalPlayer _fnIsAttackingLocalPlayer = (fnIsAttackingLocalPlayer)(globals::moduleBase + fIsAttackingLocalPlayer);
-
-		return _fnIsAttackingLocalPlayer(obj);
-	}*/
 
 	bool IsAlive(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsAlive)(Object* obj);
-		fnIsAlive _fnIsAlive = (fnIsAlive)(globals::moduleBase + fIsAlive);
-
-		return _fnIsAlive(obj);
+		return call_function<bool>(RVA(fIsAlive), obj);
 	}
 
 	bool IsHero(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsHero)(Object* obj);
-		fnIsHero _fnIsHero = (fnIsHero)(globals::moduleBase + fIsHero);
-
-		return _fnIsHero(obj);
+		return call_function<bool>(RVA(fIsHero), obj);
 	}
 
 	bool IsMinion(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsMinion)(Object* obj);
-		fnIsMinion _fnIsMinion = (fnIsMinion)(globals::moduleBase + fIsMinion);
-
-		return _fnIsMinion(obj);
+		return call_function<bool>(RVA(fIsMinion), obj);
 	}
 
 	bool IsTurret(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsTurret)(Object* obj);
-		fnIsTurret _fnIsTurret = (fnIsTurret)(globals::moduleBase + fIsTurret);
-
-		return _fnIsTurret(obj);
+		return call_function<bool>(RVA(fIsTurret), obj);
 	}
 
 	bool IsMissile(Missile* obj)
 	{
-		typedef bool(__fastcall* fnIsMissile)(Missile* obj);
-		fnIsMissile _fnIsMissile = (fnIsMissile)(globals::moduleBase + fIsMissile);
-
-		return _fnIsMissile(obj);
+		return call_function<bool>(RVA(fIsMissile), obj);
 	}
 
 	bool IsInhibitor(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsInhibitor)(Object* obj);
-		fnIsInhibitor _fnIsInhibitor = (fnIsInhibitor)(globals::moduleBase + fIsInhibitor);
-
-		return _fnIsInhibitor(obj);
+		return call_function<bool>(RVA(fIsInhibitor), obj);
 	}
 
 	bool IsNexus(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsNexus)(Object* obj);
-		fnIsNexus _fnIsNexus = (fnIsNexus)(globals::moduleBase + fIsNexus);
-
-		return _fnIsNexus(obj);
+		return call_function<bool>(RVA(fIsNexus), obj);
 	}
 
 	bool IsDead(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsDead)(Object* obj);
-		fnIsDead _fnIsDead = (fnIsDead)(globals::moduleBase + fIsDead);
-
-		return _fnIsDead(obj);
+		return call_function<bool>(RVA(fIsDead), obj);
 	}
 
 	bool IsCanSee(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsCanSee)(Object* obj);
-		fnIsCanSee _fnIsCanSee = (fnIsCanSee)(globals::moduleBase + fIsCanSee);
-
-		return _fnIsCanSee(obj);
+		return call_function<bool>(RVA(fIsCanSee), obj);
 	}
 
 	bool IsTargetable(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsTargetable)(Object* obj);
-		fnIsTargetable _fnIsTargetable = (fnIsTargetable)(globals::moduleBase + fIsTargetable);
-
-		return _fnIsTargetable(obj);
+		return call_function<bool>(RVA(fIsTargetable), obj);
 	}
 
 	bool IsVisible(Object* obj)
 	{
-		typedef bool(__fastcall* fnIsVisible)(Object* obj);
-		fnIsVisible _fnIsVisible = (fnIsVisible)(globals::moduleBase + fIsVisible);
-
-		return _fnIsVisible(obj);
+		return call_function<bool>(RVA(fIsVisible), obj);
 	}
 
 	bool IsVisible(Missile* obj)
 	{
-		typedef bool(__fastcall* fnIsVisible)(Missile* obj);
-		fnIsVisible _fnIsVisible = (fnIsVisible)(globals::moduleBase + fIsVisible);
-
-		return _fnIsVisible(obj);
+		return call_function<bool>(RVA(fIsVisible), obj);
 	}
 
 	bool IsBrush(Vector3 pos)
@@ -432,15 +380,12 @@ namespace functions
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = 0.0f;
 		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = 0x0;
 
-		typedef bool(__fastcall* fnTryRightClick)(QWORD* player, unsigned int* params);
-		fnTryRightClick _fnTryRightClick = (fnTryRightClick)(globals::moduleBase + oTryRightClick);
-
 		unsigned int* params = new unsigned int[20];
 		params[17] = (int)pos.x;
 		params[18] = (int)pos.y;
 		params[19] = 2;
 
-		spoof_call(spoof_trampoline, _fnTryRightClick, (QWORD*)globals::localPlayer, params);
+		call_function<bool>(RVA(oTryRightClick), (QWORD*)globals::localPlayer, params);
 
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
 		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
@@ -449,54 +394,25 @@ namespace functions
 
 	void IssueClick(Vector2 pos)
 	{
-		typedef bool(__fastcall* fnIssueClick)(uintptr_t*, int, unsigned int, int, unsigned int, unsigned int, int);
-		fnIssueClick _fnIssueClick = (fnIssueClick)(globals::moduleBase + oIssueClick);
-
 		unsigned int* params = new unsigned int[20];
 		params[17] = (int)pos.x;
 		params[18] = (int)pos.y;
 		params[19] = 2;
 
-		_fnIssueClick((uintptr_t*)globals::localPlayer,params[19], 0, 0, params[17], params[18], 0);
+		call_function<bool>(RVA(oIssueClick), (QWORD*)globals::localPlayer, params[19], 0, 0, params[17], params[18], 0);
 	}
-
-	/*void IssueClick(Vector2 pos)
-	{
-		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1);
-		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2);
-		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck);
-
-		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = 0.0f;
-		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = 0.0f;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = 0x0;
-
-		typedef bool(__fastcall* fnIssueClick)(QWORD* player, unsigned int* params);
-		fnIssueClick _fnIssueClick = (fnIssueClick)(globals::moduleBase + oIssueClick);
-		unsigned int* params = new unsigned int[20];
-		params[17] = (int)pos.x;
-		params[18] = (int)pos.y;
-		params[19] = 2;
-
-		spoof_call(spoof_trampoline, _fnIssueClick, (QWORD*)globals::localPlayer, params);
-
-		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
-		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = check;
-	}*/
 
 	void IssueMove(Vector2 pos)
 	{
 		EventManager::TriggerProcess(EventManager::EventType::OnIssueMove, pos);
 
-		typedef bool(__fastcall* fnIssueMove)(QWORD* hudInput, int screenX, int screenY, bool isAttackMove, int zeroOrOne, int order);
-		fnIssueMove _fnIssueMove = (fnIssueMove)(globals::moduleBase + oIssueMove);
-
-		spoof_call(spoof_trampoline, _fnIssueMove, (QWORD*)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceInput)), (int)pos.x, (int)pos.y, false, 0, 0);
+		call_function<bool>(RVA(oIssueMove), (QWORD*)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceInput)), (int)pos.x, (int)pos.y, false, 0, 0);
 	}
 
 	bool CastSpell(int spellId, Object* Target)
 	{
-		if (UPasta::SDK::Orbwalker::Functions::shouldWait) return false;
+		if (UPasta::SDK::Orbwalker::Functions::shouldWait) 
+			return false;
 
 		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId);
 		Object* me = globals::localPlayer;
@@ -513,12 +429,9 @@ namespace functions
 		TargetInfo->SetEndPos(Target->GetPosition());
 		TargetInfo->SetClickedPos(Target->GetPosition());
 		TargetInfo->SetUnkPos(Target->GetPosition());
-
-		typedef void(__fastcall* HudCastSpellFn)(uintptr_t* HudInput, SpellInfo* SpellData);
-		HudCastSpellFn _HudCastSpellFn = (HudCastSpellFn)(globals::moduleBase + oCastSpellWrapper);
 		SpellInfo* spellInfo = spell->GetSpellInfo();
 
-		_HudCastSpellFn(InputLogic, spellInfo);
+		call_function<void>(RVA(oCastSpellWrapper), InputLogic, spellInfo);
 
 		return true;
 	}
@@ -543,12 +456,10 @@ namespace functions
 		TargetInfo->SetEndPos(me->GetPosition());
 		TargetInfo->SetClickedPos(me->GetPosition());
 		TargetInfo->SetUnkPos(me->GetPosition());
-
-		typedef void(__fastcall* HudCastSpellFn)(uintptr_t* HudInput, SpellInfo* SpellData);
-		HudCastSpellFn _HudCastSpellFn = (HudCastSpellFn)(globals::moduleBase + oCastSpellWrapper);
 		SpellInfo* spellInfo = spell->GetSpellInfo();
 
-		_HudCastSpellFn(InputLogic, spellInfo);
+		call_function<void>(RVA(oCastSpellWrapper), InputLogic, spellInfo);
+
 
 		return true;
 	}
@@ -573,13 +484,9 @@ namespace functions
 		TargetInfo->SetEndPos(pos);
 		TargetInfo->SetClickedPos(pos);
 		TargetInfo->SetUnkPos(pos);
-
-		typedef void(__fastcall* HudCastSpellFn)(uintptr_t* HudInput, SpellInfo* SpellData);
-		HudCastSpellFn _HudCastSpellFn = (HudCastSpellFn)(globals::moduleBase + oCastSpellWrapper);
 		SpellInfo* spellInfo = spell->GetSpellInfo();
 
-		_HudCastSpellFn(InputLogic, spellInfo);
-
+		call_function<void>(RVA(oCastSpellWrapper), InputLogic, spellInfo);
 		return true;
 	}
 

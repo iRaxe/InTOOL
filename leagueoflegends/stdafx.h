@@ -68,7 +68,7 @@
 
 #include "json.hpp"
 using json = nlohmann::json;
-#define RVA(address) (globals::moduleBase + address)
+#define RVA(address) (QWORD)(globals::moduleBase + address)
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #define M_PI_F (float)M_PI
