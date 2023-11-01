@@ -343,6 +343,50 @@ namespace render
 		}
 	}
 
+	void RenderWardRange(const Vector3& position, const ImColor& color, const float& range, bool brushes)
+	{
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+		float a = (float)((color >> 24) & 0xff);
+		float r = (float)((color >> 16) & 0xff);
+		float g = (float)((color >> 8) & 0xff);
+		float b = (float)((color) & 0xff);
+
+		// todo, improve this so it doesnt count only own brush
+		if (brushes)
+		{
+			if (functions::IsBrush(position))
+				brushes = false;
+		}
+
+		int numPoints = 30;
+		static ImVec2 points[30];
+
+		const float step = 6.2831f / numPoints;
+		float theta = 0.f;
+
+		for (int i = 0; i < numPoints; i++, theta += step)
+		{
+			Vector3 p = Vector3(0.f, 0.f, 0.f);
+
+			for (float step2 = 20.f; step2 <= range; step2 += 20.f)
+			{
+				Vector3 p2 = Vector3(position.x + (step2 * cos(theta)), position.y, position.z - (step2 * sin(theta)));
+				if (functions::IsWall(p2) || step2 == range || (brushes && functions::IsBrush(p2)))
+				{
+					p = p2;
+					break;
+				}
+			}
+			const ImVec2 screenSpace = functions::WorldToScreen(p).ToImVec();
+			points[i].x = screenSpace.x;
+			points[i].y = screenSpace.y;
+		}
+
+		points[numPoints] = points[0];
+		window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, 1.0f);
+	}
+
 	/*void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height)
 	{
 		ImGuiWindow* window = ImGui::GetCurrentWindow();

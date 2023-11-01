@@ -85,6 +85,17 @@ namespace UPasta::SDK::Awareness
                     void InitializeJungleImages();
                 }
 
+                namespace WardIcons
+                {
+                    inline ID3D11ShaderResourceView* blueWardTextureIcon;
+                    inline ID3D11ShaderResourceView* controlWardTextureIcon;
+                    inline ID3D11ShaderResourceView* yellowWardTextureIcon;
+                    inline ID3D11ShaderResourceView* shacoBoxTextureIcon;
+                    
+                    void InitializeJungleImages();
+                }
+
+
             }
 
             inline bool initializedTextures;
@@ -122,6 +133,11 @@ namespace UPasta::SDK::Awareness
             inline CheckBox* showLastPosition;
             inline CheckBox* showPosGuesser;
         	inline CheckBox* showLastPositionMiniMap;
+
+        	inline CheckBox* statusWardTracker;
+            inline CheckBox* showWardPosition;
+            inline CheckBox* showWardTimer;
+            inline CheckBox* showWardRange;
         }
 
         namespace EnemySidebar
@@ -205,6 +221,7 @@ namespace UPasta::SDK::Awareness
                                                            1680.f, 1780.f, 1880.f };
 
             void DrawTracker();
+            void DrawWardsTracker();
             void DrawCooldownBar(Object* obj);
             void DrawPlayerPaths(Object* obj);
             void ShowLastEnemyPosition(Object* obj, int index);

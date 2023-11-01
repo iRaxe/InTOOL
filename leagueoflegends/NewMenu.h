@@ -26,7 +26,9 @@ namespace UPasta {
 			static void Initialize();
 			static void Dispose();
 			static void DrawTabs();
-			void DrawTabContent() const;
+			void DrawSubTab();
+
+			void DrawTabContent(float offsetY = 0.0f) const;
 			static void OnWndProc(UINT msg, WPARAM wparam);
 			static Menu* CreateMenu(const char* name, const char* displayName);
 

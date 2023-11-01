@@ -79,7 +79,7 @@ namespace UPasta {
 				}
 			}
 
-			auto menu = Menu::CreateMenu("Core settings", "Core settings");
+			auto menu = Menu::CreateMenu("Menu settings", "  Menu\nSettings");
 
 			auto menuSettings = menu->AddMenu("MainSettings", "Main Background Colors");
 			menuSettings->AddColorPicker("background_image", "Logo Color", (float*)&colors::background::background_image);
@@ -144,6 +144,15 @@ namespace UPasta {
 			menuSettings8->AddColorPicker("keybindStandardText", "Text Color", (float*)&colors::keybind::key_text);
 			menuSettings8->AddColorPicker("keybindColor", "Key Color", (float*)&colors::keybind::key_rect);
 			menuSettings8->AddColorPicker("keybindKeyBorder", "Key Border Color", (float*)&colors::keybind::key_outline);
+
+			auto menuSettings9 = menu->AddMenu("ButtonSettings", "Buttons Styling");
+			menuSettings9->AddColorPicker("buttonBackground", "Background Color", (float*)&colors::button::background);
+			menuSettings9->AddColorPicker("buttonHoverBackground", "Hover Color", (float*)&colors::button::background_hov);
+			menuSettings9->AddColorPicker("buttonActiveBackground", "Active Color", (float*)&colors::button::background_active);
+			menuSettings9->AddColorPicker("buttonText", "Text Color", (float*)&colors::button::text);
+			menuSettings9->AddColorPicker("buttonHoverText", "Hover Text", (float*)&colors::button::text_hov);
+			menuSettings9->AddColorPicker("buttonActiveText", "Active Text", (float*)&colors::button::text_hov);
+
 		}
 
 		void Menu::Dispose()
@@ -165,6 +174,8 @@ namespace UPasta {
 			}
 		}
 		Menu* activeMenu = nullptr;
+		Menu* activeSubMenu = nullptr;
+
 		//ImGui::GetColorU32(colors::background::border)
 
 		void Menu::OnWndProc(UINT msg, WPARAM wparam)
@@ -368,40 +379,146 @@ namespace UPasta {
 		float Menu::NeededWidth() {
 			return 10.0f + render::imFont->CalcTextSizeA(16, FLT_MAX, 0.0f, this->DisplayName).x + 5.0f + MenuComponent::Height * 0.45f;
 		}
-		ImVec2 menu_size = { 900, 400 };
+		float taboffset;
+		static int subCounter = 1;
+		std::map<std::string, Menu*> subMenuMap;
+		std::map<std::string, Menu*> tabContent;
+		std::map<std::string, Menu*> menuMap;
+		
+		void PopulateMenuMap(Menu* test)
+		{
+			for (const auto child : test->Children)
+			{
+				if (!child->Children.empty())
+				{
+					subMenuMap[child->DisplayName] = child;
+
+					for (auto child2 : child->Children)
+					{
+						if (!child2->Children.empty())
+							subMenuMap[child2->DisplayName] = child2;
+					}
+				}
+				else
+				{
+					tabContent[child->DisplayName] = child;
+
+					menuMap[child->DisplayName] = child;
+				}
+			}
+		}
 
 		void Menu::DrawTabs()
 		{
 			if (!MenuSettings::DrawMenu)
 				return;
 
-			int counter = 1;
 			const auto& p = ImGui::GetWindowPos();
-			const ImVec2 startPos(260 + p.x, p.y);
-			const ImVec2 endPos(1290 + p.x, 90 + p.y);
-			const ImVec2 borderStart(280 + p.x, p.y + 20);
-			const ImVec2 borderEnd(1270 + p.x, 70 + p.y);
+			const ImVec2 startPos(p.x + 60.0f, p.y);
+			const ImVec2 endPos(240.0f + p.x, 460.0f + p.y);
+			const ImVec2 borderStart(80.0f + p.x, p.y + 20.0f);
+			const ImVec2 borderEnd(220.0f + p.x, 440.0f + p.y);
 
-			ImGui::GetWindowDrawList()->AddRectFilled(startPos, endPos,ImGui::GetColorU32(colors::background::background_1), 7.f);
-			ImGui::GetWindowDrawList()->AddRect(borderStart, borderEnd, ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
+			auto* drawList = ImGui::GetWindowDrawList();
+			drawList->AddRectFilled(startPos, endPos, ImGui::GetColorU32(colors::background::background_1), 7.f);
+			drawList->AddRect(borderStart, borderEnd, ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
 
-			ImGui::SetCursorPos(ImVec2(300, 20));
+			const std::string mediaFolder = "C:\\UPorn\\Media";
+			static bool platformLogoLoaded = false;
+			const std::string platformLogoFile = mediaFolder + "\\logo.png";
+
+			if (platformLogo == nullptr && !platformLogoLoaded)
+			{
+				Awareness::Functions::EnemySidebar::LoadDX11ImageIfNeeded(platformLogoFile.c_str(), platformLogoLoaded, &platformLogo);
+				platformLogoLoaded = true;
+			}
+
+			render::RenderImage(platformLogo, ImVec2(80.0f + p.x, 30 + p.y), ImVec2(220 + p.x, 150 + p.y), COLOR_WHITE);
+
+			int counter = 1;
 
 			for (auto menu : RootMenus)
 			{
-				if (ImGui::SubTab(menu->DisplayName, counter == sub_tabs, ImVec2(menu->GetWidth(), 50)))
+				ImGui::SetCursorPos(ImVec2(100.0f, 110 + (50.0f * counter)));
+
+				if (ImGui::Tab(menu->GetIndex(), menu->Name, menu->DisplayName, menu->DisplayName, ImVec2(menu->GetWidth() - 80.0f, 40.0f)))
 				{
-					sub_tabs = counter;
+					tabs = counter;
 					activeMenu = menu;
+					activeSubMenu = nullptr;
+					subMenuMap.clear();
+					tabContent.clear();
+					menuMap.clear();
+					PopulateMenuMap(menu);
+
+					taboffset = 0;
 				}
+
 				counter++;
 			}
 
 			if (activeMenu != nullptr)
-				activeMenu->DrawTabContent();
+			{
+				if (!activeMenu->Children.empty())
+				{
+					if (!subMenuMap.empty())
+					{
+						activeMenu->DrawSubTab();
+					}
+				}
+
+				if (!menuMap.empty() && activeSubMenu == nullptr)
+				{
+					activeMenu->DrawTabContent(taboffset);
+				}
+			}
 		}
-		
-		void Menu::DrawTabContent() const
+
+		void Menu::DrawSubTab()
+		{
+			if (!MenuSettings::DrawMenu)
+				return;
+
+			const auto& p = ImGui::GetWindowPos();
+			const ImVec2 startPos2(260 + p.x, p.y);
+			const ImVec2 endPos2(1290 + p.x, 90 + p.y);
+			const ImVec2 borderStart2(280 + p.x, p.y + 20);
+			const ImVec2 borderEnd2(1270 + p.x, 70 + p.y);
+			auto* drawList = ImGui::GetWindowDrawList();
+
+			drawList->AddRectFilled(startPos2, endPos2, ImGui::GetColorU32(colors::background::background_1), 7.f);
+			drawList->AddRect(borderStart2, borderEnd2, ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
+			ImGui::SetCursorPosX(320.0f);
+
+			for (const auto& pair : subMenuMap)
+			{
+				std::string nome_menu = pair.first;  // Ottieni la chiave (il nome del menu)
+				Menu* menu = pair.second;           // Ottieni il puntatore al menu
+				if (taboffset == 0)
+					taboffset = 110.0f;
+
+				ImGui::SetCursorPosY(20.0f);
+				if (ImGui::SubTab(menu->DisplayName, subCounter == sub_tabs, ImVec2(menu->GetWidth(), 50.0f)))
+				{
+					sub_tabs = subCounter;
+					tabContent.clear();
+					activeSubMenu = menu;
+					PopulateMenuMap(menu);
+				}
+
+				subCounter++;
+			}
+
+			if (activeSubMenu != nullptr)
+			{
+				const float contentHeight = activeSubMenu->Children.size() > 6 ? 680.0f : activeSubMenu->Children.size() > 3 ? 480.0f : 280.0f;
+				taboffset = 110.0f + contentHeight;
+
+				activeSubMenu->DrawTabContent(110.0f);
+			}
+		}
+
+		void Menu::DrawTabContent(float offsetY) const
 		{
 			if (!MenuSettings::DrawMenu)
 				return;
@@ -409,31 +526,37 @@ namespace UPasta {
 			if (!this->Children.empty())
 			{
 				const auto& p = ImGui::GetWindowPos();
-				const float tabStartY = 110 + p.y;
+				const float tabStartY = offsetY + p.y;
 				constexpr float contentOffset = 20.0f;
-				const float contentHeight = this->Children.size() > 6 ? 660.0f : this->Children.size() > 3 ? 460.0f : 260.0f;
+				int counter = 0;
 				const ImVec2 contentStart(260 + p.x, tabStartY);
 				const ImVec2 borderStart(contentStart.x + contentOffset, contentStart.y + contentOffset);
 
+				const float contentHeight = tabContent.size() > 6 ? 660.0f : tabContent.size() > 3 ? 460.0f : 260.0f;
 				const ImVec2 contentEnd(1290 + p.x, tabStartY + contentHeight);
 				const ImVec2 borderEnd(contentEnd.x - contentOffset, contentEnd.y - contentOffset);
 
 				ImGui::GetWindowDrawList()->AddRectFilled(contentStart, contentEnd, ImGui::GetColorU32(colors::background::background), 7.f);
 				ImGui::GetWindowDrawList()->AddRect(borderStart, borderEnd, ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
-				
-				ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 150.0f));
-				
+
+				ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 40.0f + offsetY));
+
 				for (const auto child : this->Children)
 				{
-					child->DrawChild();
-					if (child->GetIndex() < 3 || child->GetIndex() > 3 && child->GetIndex() < 6 || child->GetIndex() > 6)
-						ImGui::SameLine();
-					else if (child->GetIndex() == 3)
-						ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 350.0f));
-					else if (child->GetIndex() == 6)
-						ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 550.0f));
+					if (subMenuMap.find(child->DisplayName) != subMenuMap.end())
+						continue;
 
+					child->DrawChild();
+					counter++;
+
+					if (counter < 3 || counter > 3 && counter < 6 || counter > 6)
+						ImGui::SameLine();
+					else if (counter == 3)
+						ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 240.0f + offsetY));
+					else if (counter == 6)
+						ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 440.0f + offsetY));
 				}
+
 			}
 		}
 
@@ -461,64 +584,8 @@ namespace UPasta {
 
 		void Menu::Draw()
 		{
-			/*
-			if (!this->Children.empty())
-			{
-				for (auto child : this->Children)
-				{
-					child->DrawChild();
-				}
-			}
-			*/
+			
 		}
-
-		/*void Menu::Draw()
-		{
-			auto position = this->GetPosition();
-			auto rect = Rect(position.x, position.y, this->GetWidth(), MenuComponent::Height);
-
-			Renderer::AddRectangleFilled(rect, this->Interacting ? IM_COL32(160, 0, 0, MenuSettings::BackgroundOpacity) : IM_COL32(0, 0, 0, MenuSettings::BackgroundOpacity));
-			Renderer::AddRectangle(rect, IM_COL32(0, 0, 0, MenuSettings::BackgroundOpacity));
-			Renderer::AddText(this->DisplayName, 14.0f, Rect(rect.Position.x + 10.0f, rect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
-			ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 150.0f));
-			if (!this->Children.empty() || !this->Components.empty()) {
-				auto p1 = Vector2(rect.Position.x + rect.Width - (int)(rect.Height * 0.2f), rect.Position.y + (int)(rect.Height * 0.5f));
-				auto p2 = Vector2(rect.Position.x + rect.Width - (int)(rect.Height * 0.45f), rect.Position.y + (int)(rect.Height * 0.65f));
-				auto p3 = Vector2(rect.Position.x + rect.Width - (int)(rect.Height * 0.45f), rect.Position.y + (int)(rect.Height * 0.35f));
-
-				Renderer::AddTriangleFilled(p1, p2, p3, this->Interacting ? IM_COL32(255, 0, 0, 255) : IM_COL32(255, 255, 255, 255));
-
-				for (auto child : this->Children) 
-				{
-					child->DrawChild(this->Children.size());
-				}
-
-				for (auto component : this->Components) 
-				{
-					component->Draw();
-				}
-			}
-
-			//TODO
-			if (this->Tooltip[0] != 0)
-			{
-				auto textWidth = 10.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->DisplayName).x;
-				auto mousePos = functions::GetMousePos();
-				auto iconRect = Rect(rect.Position.x + textWidth + 5, rect.Position.y + Height * 0.5f - 10.0f, 20, 20);
-				Renderer::AddText("(?)", 16.0f, iconRect, DT_VCENTER, IM_COL32(255, 30, 30, 255));
-
-				if (iconRect.Contains(mousePos))
-				{
-					auto alpha = min(MenuSettings::BackgroundOpacity + 70, 255);
-					auto black = IM_COL32(0, 0, 0, alpha);
-					auto width = 20.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->Tooltip).x;
-					auto tooltipRect = Rect(mousePos.x + 20, mousePos.y - Height * 0.5f, width, Height);
-					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawFlags_RoundCornersAll);
-					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawFlags_RoundCornersAll);
-					Renderer::AddText(this->Tooltip, 14.0f, Rect(tooltipRect.Position.x + 10.0f, tooltipRect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
-				}
-			}
-		}*/
 
 		void Menu::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos)
 		{

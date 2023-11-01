@@ -2,6 +2,7 @@
 #include "../imgui/imgui.h"
 #define COLOR_WHITE 0xffffffff
 #define COLOR_BLACK 0xff000000
+#define COLOR_YELLOW 0xFFFFFF00
 #define COLOR_RED 0xffff1f1f
 #define COLOR_GREEN 0xff0c9d00
 #define COLOR_BLUE 0xff7ea6ff
@@ -55,7 +56,6 @@ namespace colors {
 		inline ImVec4 text_active = ImColor(255, 255, 255, 255);
 		inline ImVec4 text_hov = ImColor(24, 0, 255, 255);
 		inline ImVec4 text = ImColor(255, 255, 255, 255);
-
 	}
 
 	namespace checkbox {

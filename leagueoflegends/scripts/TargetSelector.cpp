@@ -12,7 +12,7 @@ namespace UPasta
 				Menu* TSMenu;
 				void Configs::Initialize()
 				{
-					TSMenu = Menu::CreateMenu("TargetSelector", "vez.TargetSelector");
+					TSMenu = Menu::CreateMenu("TargetSelector", "TargetSelector");
 
 					__try { InitializeComboTargets(); }
 					__except (1) { LOG("[TS MENU] Error in initializing combo targets"); }
@@ -209,6 +209,58 @@ namespace UPasta
 
 			namespace Functions
 			{
+				std::vector<Object*> Functions::GetWardsInRange(Vector3 pos, float range)
+				{
+					std::vector<Object*> validWards; // Lista di oggetti validi
+
+					for (int i = 0; i < globals::minionManager->GetListSize(); i++)
+					{
+						auto obj = globals::minionManager->GetIndex(i);
+						if (obj->IsAlive())
+						{
+							if (obj->GetName() == "") continue;
+							if (!obj->IsWard()) continue;
+							if (!obj->IsEnemy()) continue;
+
+							if (!obj->IsInRange(pos, range)) continue;
+							if (obj)
+							{
+								validWards.push_back(obj);
+							}
+						}
+					}
+					if (validWards.size() >= 1)
+						return validWards;
+					else
+						validWards.clear();
+
+					return validWards;
+				}
+
+				Object* Functions::GetWard(std::vector<Object*> validWards, Vector3 pos)
+				{
+					switch (validWards.size())
+					{
+					case 0:
+						return nullptr;
+					case 1:
+						return validWards[0];
+					}
+
+					Object* hero = nullptr;
+					float highestDistance = 0.0f;
+					for (auto ward : validWards)
+					{
+						auto distance = pos.Distance(ward->GetPosition());
+						if (distance > highestDistance)
+						{
+							hero = ward;
+							highestDistance = distance;
+						}
+					}
+					return hero;
+				}
+
 				std::vector<Object*> Functions::GetMinionsInRange(Vector3 pos, float range)
 				{
 					std::vector<Object*> validMinions; // Lista di oggetti validi
@@ -920,9 +972,7 @@ namespace UPasta
 					{
 						if (obj->GetName() == "") continue;
 						if (!obj->IsValidTarget()) continue;
-						if (!obj->IsEnemy()) continue;
 						if (!obj->IsWard()) continue;
-						if (obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Ward) continue;
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
 
 						if (ChooseSelectedObject(selectedObject, obj)) return obj;

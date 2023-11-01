@@ -13,7 +13,7 @@ namespace UPasta
 				Menu* OrbwalkerMenu;
 				void Initialize()
 				{
-					OrbwalkerMenu = Menu::CreateMenu("vez.Orbwalker", "vez.Orbwalker");
+					OrbwalkerMenu = Menu::CreateMenu("vez.Orbwalker", "Orbwalker");
 					status = OrbwalkerMenu->AddCheckBox("status", "Enable Orbwalker", true);
 					initializedOrbwalkerMenu = true;
 

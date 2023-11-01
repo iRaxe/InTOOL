@@ -119,6 +119,9 @@ namespace UPasta::SDK::TargetSelector
 
     namespace Functions
 	{
+        std::vector<Object*> GetWardsInRange(Vector3 pos, float range);
+        Object* GetWard(std::vector<Object*> validWards, Vector3 pos);
+
         std::vector<Object*> GetMinionsInRange(Vector3 pos, float range);
         std::vector<Object*> GetKillableMinionsInRange(Vector3 pos, float range, float damage);
         int GetMinionPriority(Object* minion);

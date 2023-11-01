@@ -35,10 +35,6 @@ namespace menu
 		style->WindowRounding = 7.f;
 		globals::menuSize = ImVec2(980.0f, 300);
 
-		//globals::menuSize = ImVec2(980.0f, 300.0f);
-
-		//globals::menuSize = ImVec2(1000.0f, 560.0f);
-
 		ImGui::SetNextWindowSize(globals::menuSize);
 		ImGui::SetNextWindowPos(ImVec2(25, 25));
 
@@ -51,7 +47,7 @@ namespace menu
 	void InitNewMenu()
 	{
 		ImGui::GetIO().MouseDrawCursor = false;
-		globals::menuSize = ImVec2(1980, 1020);
+		globals::menuSize = ImVec2(1980, 1280);
 		UPasta::SDK::Menu::Initialize();
 		LOG("Menu initialized");
 	}
@@ -305,38 +301,17 @@ namespace menu
 		if (globals::menuOpen)
 		{
 			ImGui::Begin("UCPasta", &globals::menuOpen, window_flags);
-
-			const auto& p = ImGui::GetWindowPos();
-
-			const std::string mediaFolder = "C:\\UPorn\\Media";
-			static bool platformLogoLoaded = false;
-			const std::string platformLogoFile = mediaFolder + "\\logo.png";
-			if (platformLogo == nullptr && platformLogoLoaded == false)
 			{
-				UPasta::SDK::Awareness::Functions::EnemySidebar::LoadDX11ImageIfNeeded(platformLogoFile.c_str(), platformLogoLoaded, &platformLogo);
-				platformLogoLoaded = true;
+				const auto& p = ImGui::GetWindowPos();
+
+				UPasta::SDK::Menu::DrawTabs();
+
+				tab_alpha = ImClamp(tab_alpha + (7.f * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
+				tab_add = ImClamp(tab_add + (std::round(350.f) * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
+				ImGui::SetCursorPos(ImVec2(280 - tab_alpha * 40, 88));
 			}
-
-			//Draw Menu body
-			ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(0 + p.x, p.y), ImVec2(240 + p.x, 150 + p.y), ImColor(10, 10, 10, 240), 7.f);
-
-			//Draw Menu logo
-			render::RenderImage(platformLogo, ImVec2(0 + p.x, 10 + p.y), ImVec2(240 + p.x, 140 + p.y), COLOR_WHITE);
-
-			//Draw Menu tabs
-			UPasta::SDK::Menu::DrawTabs();
-
-			tab_alpha = ImClamp(tab_alpha + (7.f * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
-			tab_add = ImClamp(tab_add + (std::round(350.f) * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
-			ImGui::SetCursorPos(ImVec2(280 - tab_alpha * 40, 88));
-			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, tab_alpha * style->Alpha);
-
-			//scripts::champions::DoPopulateMenu();
-			ImGui::PopStyleVar();
-
 			ImGui::End();
 		}
 
-		ImGui::Render();
 	}
 }

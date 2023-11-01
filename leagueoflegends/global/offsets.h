@@ -2,18 +2,18 @@
 
 // Functions
 #define oGetBaseDrawPosition 0x204C70 // E8 ? ? ? ? EB 06 49 8B 06 Stesso sub della sig OK
-#define oWorldToScreen 0xE36FC0 // 48 83 EC 38 49 8B C0  Sub sopra a tutto OK
-#define oTryRightClick 0x8A6A30 // 48 89 5C 24 ? 57 48 83 EC 50 48 8B D9 0F 29 74 24 ? 48 8B 0D ? ? ? ? Sub sopra a tutto OK
-#define oIssueClick  0x8BC880 // 44 88 44 24 ? 48 89 4C 24 ? 55
-#define oIssueMove  0x8A5E10 // 48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B F1 41 0F B6 F9 
-#define oCastSpellWrapper 0x8B15E0 // E8 ? ? ? ? 48 8B 53 08 48 8B 42 60
-#define oReleaseSpell 0x889F90 // 48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 40 8B DA 48 8B F9 
-#define oPrintChat 0x85EAF0 // E8 ? ? ? ? 4C 8B C3 B2 01 Stesso sub della sig OK
+#define oWorldToScreen 0xE36BA0 // 48 83 EC 38 49 8B C0  Sub sopra a tutto OK
+#define oTryRightClick 0x8A6610 // 48 89 5C 24 ? 57 48 83 EC 50 48 8B D9 0F 29 74 24 ? 48 8B 0D ? ? ? ? Sub sopra a tutto OK
+#define oIssueClick  0x8BC460 // 44 88 44 24 ? 48 89 4C 24 ? 55
+#define oIssueMove  0x8A59F0 // 48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B F1 41 0F B6 F9 
+#define oCastSpellWrapper 0x8B11C0 // E8 ? ? ? ? 48 8B 53 08 48 8B 42 60
+#define oReleaseSpell 0x889B70 // 48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 40 8B DA 48 8B F9 
+#define oPrintChat 0x85E6D0 // E8 ? ? ? ? 4C 8B C3 B2 01 Stesso sub della sig OK
 #define oGetBoundingRadius 0x2021C0 // E8 ? ? ? ? 0F 28 F8 48 8B D6 Stesso sub della sig FORSE TROVATO
-#define oGetAttackDelay 0x3A2D30 // F3 0F 10 89 ? ? ? ? E9 ? ? ? ?
-#define oGetAttackWindup 0x3A2C30 // E8 ? ? ? ? 49 8B CE F3 0F 11 83 ? ? ? ? Stesso sub della sig OK
-#define oGetObjectFromNetId 0x3A6260 // 4C 8B C1 85 D2 74 1B Sub sopra a tutto OK
-#define oGetCollisionFlags 0xDAD650 // 48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A Stesso sub della sig FORSE TROVATO
+#define oGetAttackDelay 0x3A2910 // F3 0F 10 89 ? ? ? ? E9 ? ? ? ? SUB SOPRA, NON JMP
+#define oGetAttackWindup 0x3A2810 // E8 ? ? ? ? 49 8B CE F3 0F 11 83 ? ? ? ? Stesso sub della sig OK
+#define oGetObjectFromNetId 0x3A5E40 // 4C 8B C1 85 D2 74 1B Sub sopra a tutto OK
+#define oGetCollisionFlags 0xDAD230 // 48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A Stesso sub della sig FORSE TROVATO
 #define oCharacterDataStackUpdate 0x18A450 // E8 ? ? ? ? 80 BD ? ? ? ? ? 74 0D Stesso sub della sig
 
 #define fIsNotLocalPlayer  0x210B00 // 33 C0 48 3B 0D ? ? ? ? 
@@ -28,64 +28,66 @@
 #define fIsObjectType 0x211F00 //0F B6 41 48 4C 8B C9 Sub sopra a tutto
 #define fIsDead 0x211100 // E8 ? ? ? ? 0F B6 F0 EB 17 Sub sopra a tutto è un int
 #define fIsCanSee  0x25E3D0 // 40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 90 ? ? ? ? 84 C0 75 19 Sub sopra a tutto è un int
-#define fIsNotWall  0xDB3760 // E8 ? ? ? ? 34 01 44 3A F0
-#define fGetPing 0x920950 // E8 ? ? ? ? 8B F8 39 03 Sub sopra a tutto
-#define fRenderUsualSuspects 0x619230 // 48 8B C4 48 89 58 18 89
-#define fIsTargetable  0xA236F0 // 40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 84 C0 74 41 DA TROVARE, COMPLETAMENTE MORTO
+#define fIsNotWall  0xDB3340 // E8 ? ? ? ? 34 01 44 3A F0
+#define fGetPing 0x920530 // E8 ? ? ? ? 8B F8 39 03 Sub sopra a tutto
+#define fRenderUsualSuspects 0x618E10 // 48 8B C4 48 89 58 18 89
+#define fIsTargetable  0xA31C90 // 40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 84 C0 74 41 DA TROVARE, COMPLETAMENTE MORTO
 #define fIsVisible  0x2134A0 //48 89 5C 24 ? 56 48 83 EC 20 8B 91 ? ? ? ? 
-#define fGetSpellSlot 0x895240 // E8 ? ? ? ? 83 F8 FF 74 0A
-#define fGetSpellState 0x6EFDE0 // E8 ? ? ? ? 48 8B CE 44 8B F8
-#define fGetSpellRange 0x6A2870 // E8 ? ? ? ? 0F 28 F8 41 8B 47 18
-#define fGetStatTotal 0x6A2870 // E8 ? ? ? ? 0F 28 F8 41 8B 47 18
+#define fGetSpellSlot 0x894E20 // E8 ? ? ? ? 83 F8 FF 74 0A
+#define fGetSpellState 0x6EF9C0 // E8 ? ? ? ? 48 8B CE 44 8B F8
+#define fGetSpellRange 0x6A2450 // E8 ? ? ? ? 0F 28 F8 41 8B 47 18
+#define fGetStatTotal 0x6A2450 // E8 ? ? ? ? 0F 28 F8 41 8B 47 18
 #define fGetOwner 0x2047D0 // E8 ? ? ? ? 4C 3B F8 0F 94 C0
 #define fGetOwnerPlayer  0x2081E0 //E8 ? ? ? ? 40 38 30 75 24
 
-#define fGetHeightAtPosition 0xDB78E0 //E8 ? ? ? ? F3 0F 10 45 ? B0 01
+#define fGetHeightAtPosition 0xDB74C0//E8 ? ? ? ? F3 0F 10 45 ? B0 01
 
 // Events not needed now
-#define fOnCreateObject  0x3BAFF0  // E8 ? ? ? ? 48 8B 3D ? ? ? ? 8B 9E ? ? ? ? 
-#define fOnDeleteObject  0x3A43F0  // E8 ? ? ? ? 4D 8D 6F 1C
-#define fOnStartSpellCast 0x712BA0 // 40 53 48 83 EC 30 4C 8B 0A 
+#define fOnCreateObject  0x3BABD0  // E8 ? ? ? ? 48 8B 3D ? ? ? ? 8B 9E ? ? ? ? 
+#define fOnDeleteObject  0x3A3FD0  // E8 ? ? ? ? 4D 8D 6F 1C
+#define fOnStartSpellCast 0x712780 // 40 53 48 83 EC 30 4C 8B 0A 
 #define fOnProcessSpell 0x15C430 // 48 89 5C 24 ? 55 56 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 44 8B 05 ? ? ? ? 
 #define fOnProcessSpellIndex 0x1198 // 48 81 C1 ? ? ? ? 48 8B 01 FF 90 ? ? ? ? 48 83 7B ? ? 72 03 48 8B 1B 4C 8B C3 https://www.unknowncheats.me/forum/3750580-post9420.html
-#define fOnStopSpellCast 0x712F00 // 44 88 4C 24 20 4C 89 44 24 18 88 DWORD64
-#define fOnSpellImpact 0x225D00 //VECCHIO FUNZIONANTE 13.20 0x701D90 48 89 5C 24 10 48 89 6C 24 18 57 41 54 41 55 41 56 41 57 48 81 QWORD* __fastcall Spell::SpellbookClient::OnSpellImpact(Spell::SpellbookClient* a1, const Spell::SpellCastInfo *a2) https://streamable.com/x4e7ib https://streamable.com/xuvq05 https://www.unknowncheats.me/forum/3755876-post9525.html
+#define fOnStopSpellCast 0x712AE0 // 44 88 4C 24 20 4C 89 44 24 18 88 DWORD64
+#define fOnSpellImpact 0x70A0C0 //VECCHIO FUNZIONANTE 13.20 0x701D90 48 89 5C 24 10 48 89 6C 24 18 57 41 54 41 55 41 56 41 57 48 81 QWORD* __fastcall Spell::SpellbookClient::OnSpellImpact(Spell::SpellbookClient* a1, const Spell::SpellCastInfo *a2) https://streamable.com/x4e7ib https://streamable.com/xuvq05 https://www.unknowncheats.me/forum/3755876-post9525.html
 #define fGetRespawnTimeRemaining  0x208DE0 //40 53 48 83 EC 20 48 8B D9 48 81 C1 ? ? ? ? E8 ? ? ? ? 0F B6 83 ? ? ? ?
 #define fShopActions 0x0 //40 55 53 56 41 56 41 57 48 8D 6C
-#define fGetCircleIconPortrait 0x18EA90 //E8 ? ? ? ? 4C 3B F8 0F 94 C0
-#define fBuildNavPath 0xDA97F0 // 48 8B C4 48 89 58 10 55 56 57 41 54 41 55 41 56 41 57 48 8D
-#define fSmoothPath  0x8F89C0 // 40 53 55 41 56 48 83 EC 50 48
+#define fGetCircleIconPortrait 0x2047D0 //E8 ? ? ? ? 4C 3B F8 0F 94 C0
+#define fBuildNavPath 0xDA93D0 // 48 8B C4 48 89 58 10 55 56 57 41 54 41 55 41 56 41 57 48 8D
+#define fSmoothPath  0x8F85A0// 40 53 55 41 56 48 83 EC 50 48
 #define fBuyItem  0x0 //40 55 53 56 41 56 41 57 48 8D 6C 24 ? 48 81 EC
 #define fSellItem  0x0 //40 57 48 83 EC 20 8B FA E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 48 89 5C 24 13.17 hotfix worka DA RITROVARE
 #define fUndoItem  0x0 //48 89 5C 24 ? 57 48 83 EC 30 48 8B F9 48 8B 49 08 48 8B 01 FF 90 ? ? ? ? 48 85 C0 74 15 48 8B 4F 08 48 8B 01
 
 // Variables
-#define oGameState 0x21DD2F0 // 48 8D 4D D7 48 8B 05 ? ? ? ?
+#define oGameState 0x21DC2F0 // 48 8D 4D D7 48 8B 05 ? ? ? ?
 #define oGameMap 0x1A74D0 // E8 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 48 8D 8D ? ? ? ? 
 #define oLobbyName 0x38
 #define oServerIP 0x140
 
-#define oSpoofGadget 0xD79E60 // E8 ? ? ? ? 44 8B 40 10
-#define oGameTime 0x21E4948 // F3 0F 5C 35 ? ? ? ? 0F 28 F8 Stessa qword della sig OK
-#define oLocalPlayer 0x21F6AC0 // 48 8B 05 ? ? ? ? 4C 8B D2 4C 8B C1 Stessa qword della sig OK
+#define oSpoofGadget 0xD79A40 // E8 ? ? ? ? 44 8B 40 10
+#define oGameTime 0x21E3948 // F3 0F 5C 35 ? ? ? ? 0F 28 F8 Stessa qword della sig OK
+#define oLocalPlayer 0x21F5AC0 // 48 8B 05 ? ? ? ? 4C 8B D2 4C 8B C1 Stessa qword della sig OK
 
-//TUTTO IL RESTO DA CHECK 
-#define oHudInstance 0x21DA230 // 48 8B 0D ? ? ? ? 8B 57 10 OK
-#define oMouseInstance 0x21DD278 //48 8B 0D ? ? ? ? 48 83 C1 20 E9 ? ? ? ?
-#define oZoomInstance 0x21E2E38 // 48 8B 05 ? ? ? ? 48 8B 5C 24 ? 48 89 47 70 OK
-#define oChatClient 0x21F6C60 // 41 FF D1 48 8B 0D ? ? ? ? 0F B6 D8 
-#define oChatInstance 0x21DD4E0 // 75 78 48 8B 1D ? ? ? ? 
-#define oViewport 0x21DD270 // 48 8B 3D ? ? ? ? FF 90 ? ? ? ? OK
-#define oObjManager 0x21DA220 // 48 8B 0D ? ? ? ? E8 ? ? ? ? 33 ED 48 8B F8 OK
-#define oGetObjectFromNetIdParam 0x21DA220 // 48 8B 0D ? ? ? ? E8 ? ? ? ? 33 ED 48 8B F8 stesso di objmanager OK
-#define oBuildingsManager 0x21DD2B8 // 4C 8B 05 ?? ?? ?? ?? 49 8B 78 08 41 8B 40 10 48 8D 0C C7 48 3B F9 73 49
-#define oMinimapObject 0x21E9DF0 // 48 8B 1D ? ? ? ? 48 85 DB 74 22 OK
-#define oMissilesList 0x21F6BC0 // 48 8B 0D ? ? ? ? 48 8D 54 24 ? E8 ? ? ? ? 48 8B 7C 24 ? https://www.unknowncheats.me/forum/league-of-legends/310587-league-legends-reversal-structs-offsets-478.html https://www.unknowncheats.me/forum/league-of-legends/434211-reading-missiles-externally.html
-#define oAttackableList 0x21DA380// EB CE 48 8B 82 ? ? ? ?  Stessa qword FORSE TROVATO
-#define oHeroList 0x21DA340 // 48 8B 05 ? ? ? ? 45 33 E4 0F 57 C0
-#define oMinionsList 0x21DD2B0 // 48 89 0D ? ? ? ? 48 8D 05 ? ? ? ? 33 D2 48 89 01 48 8D 05 ? ? ? ? 
-#define oTurretsList 0x21E3BC0 // E8 ? ? ? ? 48 8B C8 EB 03 48 8B CB 
-#define oInhibitorList 0x21F6DB8 // 48 8B 05 ? ? ? ? 48 89 7C 24 50
+#define oShopGUI 0x21F5A90 // 75 4B 48 8B 0D ? ? ? ? 48 85 C9
+#define ShopIsOpen 0xC
+
+#define oHudInstance 0x21D9230 // 48 8B 0D ? ? ? ? 8B 57 10 OK
+#define oMouseInstance 0x21DC278 //48 8B 0D ? ? ? ? 48 83 C1 20 E9 ? ? ? ?
+#define oZoomInstance 0x21E1E38 // 48 8B 05 ? ? ? ? 48 8B 5C 24 ? 48 89 47 70 OK
+#define oChatClient 0x21F5C60 // 41 FF D1 48 8B 0D ? ? ? ? 0F B6 D8 
+#define oChatInstance 0x21DC4E0 // 75 78 48 8B 1D ? ? ? ? 
+#define oViewport 0x21DC270 // 48 8B 3D ? ? ? ? FF 90 ? ? ? ? OK
+#define oObjManager 0x21D9220 // 48 8B 0D ? ? ? ? E8 ? ? ? ? 33 ED 48 8B F8 OK
+#define oGetObjectFromNetIdParam 0x21D9220 // 48 8B 0D ? ? ? ? E8 ? ? ? ? 33 ED 48 8B F8 stesso di objmanager OK
+#define oBuildingsManager 0x21DC2B0 // 4C 8B 05 ?? ?? ?? ?? 49 8B 78 08 41 8B 40 10 48 8D 0C C7 48 3B F9 73 49
+#define oMinimapObject 0x21E8DF0 // 48 8B 1D ? ? ? ? 48 85 DB 74 22 OK
+#define oMissilesList 0x21F5BC0 // 48 8B 0D ? ? ? ? 48 8D 54 24 ? E8 ? ? ? ? 48 8B 7C 24 ? https://www.unknowncheats.me/forum/league-of-legends/310587-league-legends-reversal-structs-offsets-478.html https://www.unknowncheats.me/forum/league-of-legends/434211-reading-missiles-externally.html
+#define oAttackableList 0x21D9380// EB CE 48 8B 82 ? ? ? ?  Stessa qword FORSE TROVATO
+#define oHeroList 0x21D9340 // 48 8B 05 ? ? ? ? 45 33 E4 0F 57 C0
+#define oMinionsList 0x21DC2B0 // 48 89 0D ? ? ? ? 48 8D 05 ? ? ? ? 33 D2 48 89 01 48 8D 05 ? ? ? ? 
+#define oTurretsList 0x21E2BC0 // 48 8B 1D ? ? ? ? 48 8B 5B 28
+#define oInhibitorList 0x21F5DB8 // 48 8B 05 ? ? ? ? 48 89 7C 24 50
 
 // Structs
 #define oMousePosition 0x0C 

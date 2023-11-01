@@ -98,7 +98,7 @@ public:
 
     void Init() override
     {
-        const auto AsheMenu = Menu::CreateMenu("vezAshe", "vez.Ashe");
+        const auto AsheMenu = Menu::CreateMenu("vezAshe", "Champion\n  Settings");
 
         const auto combo = AsheMenu->AddMenu("Combo Settings", "Combo Settings");
         AsheConfig::AsheCombo::UseQ = combo->AddCheckBox("Use Q", "Use SpellSlot Q", true);
@@ -136,17 +136,15 @@ public:
         AsheConfig::AsheAntiGapCloser::UseW = antiGapMenu->AddCheckBox("Use W", "Use SpellSlot W", false);
         AsheConfig::AsheAntiGapCloser::UseR = antiGapMenu->AddCheckBox("Use R", "Use SpellSlot R", false);
 
-        const auto antiGapwhitelistMenu = antiGapMenu->AddMenu("Whitelist Settings", "Whitelist");
-
         const auto antiMeleeMenu = additionalMenu->AddMenu("AntiMelee Settings", "AntiMelee Settings");
         AsheConfig::AsheAntiMelee::UseW = antiMeleeMenu->AddCheckBox("Use W", "Use SpellSlot W", false);
-        const auto antiMeleewhitelistMenu = antiMeleeMenu->AddMenu("Whitelist Settings", "Whitelist");
+
         for (int i = 0; i < globals::heroManager->GetListSize(); i++)
         {
             auto obj = globals::heroManager->GetIndex(i);
             if (obj != nullptr && obj->IsEnemy())
             {
-                const auto antiGap_checkbox = antiGapwhitelistMenu->AddCheckBox(obj->GetName().c_str(),
+                const auto antiGap_checkbox = antiGapMenu->AddCheckBox(obj->GetName().c_str(),
                     obj->GetName().c_str(),
                     true,
                     [obj](const CheckBox* self, bool newValue)
@@ -168,7 +166,7 @@ public:
                 }
 
                 if (!obj->IsMelee()) continue;
-                const auto antiMelee_checkbox = antiMeleewhitelistMenu->AddCheckBox(obj->GetName().c_str(),
+                const auto antiMelee_checkbox = antiMeleeMenu->AddCheckBox(obj->GetName().c_str(),
                     obj->GetName().c_str(),
                     true,
                     [obj]
@@ -210,10 +208,10 @@ public:
         AsheConfig::AsheSpellsSettings::DrawW = wSpellMenu->AddCheckBox("Draw W", "Draw Range", true);
 
         const auto rSpellMenu = spellsMenu->AddMenu("SpellSlot R Settings", "SpellSlot R");
-        AsheConfig::AsheSpellsSettings::targetMode = rSpellMenu->AddList("targetMode", "Target Selector Mode", std::vector<std::string>{"Inherit", "Near Mouse", "Near Champion"}, 0);
+        AsheConfig::AsheSpellsSettings::targetMode = rSpellMenu->AddList("targetMode", "Target Mode", std::vector<std::string>{"Inherit", "Near Mouse", "Near Champion"}, 0);
         AsheConfig::AsheSpellsSettings::rTapKey = rSpellMenu->AddKeyBind("rTapKey", "Aim SpellSlot R Key", VK_CONTROL, false, false);
-        AsheConfig::AsheSpellsSettings::minRDistance = rSpellMenu->AddSlider("minRDistance", "SpellSlot R Minimum Fire Distance", 1000, 100, database.AsheR.GetRange(), 100);
-        AsheConfig::AsheSpellsSettings::maxRDistance = rSpellMenu->AddSlider("maxRDistance", "SpellSlot R Maximum Fire Distance", 3000, 100, database.AsheR.GetRange(), 100);
+        AsheConfig::AsheSpellsSettings::minRDistance = rSpellMenu->AddSlider("minRDistance", "Minimum Distance", 1000, 100, database.AsheR.GetRange(), 100);
+        AsheConfig::AsheSpellsSettings::maxRDistance = rSpellMenu->AddSlider("maxRDistance", "Maximum Distance", 3000, 100, database.AsheR.GetRange(), 100);
 
         AsheConfig::AsheSpellsSettings::DrawIfReady = spellsMenu->AddCheckBox("DrawIfReady", "Draw SpellSlots Only If Ready", true);
     }

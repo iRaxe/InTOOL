@@ -1165,16 +1165,13 @@ bool ImGui::Tab(bool selected, const char* label, const char* text_label, const 
 	else
 		it_anim->second.text_1 = ImLerp(it_anim->second.text_1, ImColor(255, 255, 255), g.IO.DeltaTime * 6.f);
 
-    RenderFrame(bb.Min + ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating + 5), bb.Max - ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating - 5), GetColorU32(it_anim->second.background), true, 4.f);
+    //RenderFrame(bb.Min + ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating + 5), bb.Max - ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating - 5), GetColorU32(it_anim->second.background), true, 4.f);
+    GetForegroundDrawList()->AddRect(bb.Min + ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating + 5), bb.Max - ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating - 5), GetColorU32(it_anim->second.background), 4.f, ImDrawFlags_RoundCornersAll, 1.f);
 
-    PushStyleColor(ImGuiCol_Text, GetColorU32(it_anim->second.text));
-//    PushFont(icons);
-    //RenderTextClipped(bb.Min - ImVec2(13, 16), bb.Max, label, NULL, &label_size, style.ButtonTextAlign, &bb);
-    //PopFont();
-    PopStyleColor();
-
-
-    GetForegroundDrawList()->AddText(ImVec2(bb.Min.x + (size_arg.x - CalcTextSize(text_label).x) / 2, bb.Max.y - CalcTextSize(text_label).y - (size.y - CalcTextSize(text_label).y) / 2 + 18), GetColorU32(it_anim->second.text_1), text_label);
+	if (std::strchr(text_label, '\n'))
+        GetForegroundDrawList()->AddText(ImVec2(bb.Min.x + (size_arg.x - CalcTextSize(text_label).x) / 2, bb.Max.y - (size_arg.y - CalcTextSize(text_label).y + 45) / 2), GetColorU32(it_anim->second.text), text_label);
+    else 
+		GetForegroundDrawList()->AddText(ImVec2(bb.Min.x + (size_arg.x - CalcTextSize(text_label).x) / 2, bb.Max.y - (size_arg.y - CalcTextSize(text_label).y + 18) / 2), GetColorU32(it_anim->second.text), text_label);
 
 
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
@@ -1942,7 +1939,7 @@ void ImGui::SeparatorEx(ImGuiSeparatorFlags flags)
             return;
 
         // Draw
-        window->DrawList->AddLine(ImVec2(bb.Min.x, bb.Min.y), ImVec2(bb.Min.x, bb.Max.y), GetColorU32(ImGuiCol_Separator));
+        window->DrawList->AddLine(ImVec2(bb.Min.x, bb.Min.y), ImVec2(bb.Min.x, bb.Max.y), GetColorU32(COLOR_WHITE));
         if (g.LogEnabled)
             LogText(" |");
     }
@@ -1976,7 +1973,7 @@ void ImGui::SeparatorEx(ImGuiSeparatorFlags flags)
         if (item_visible)
         {
             // Draw
-            window->DrawList->AddLine(bb.Min, ImVec2(bb.Max.x, bb.Min.y), GetColorU32(ImGuiCol_Separator));
+            window->DrawList->AddLine(ImVec2(bb.Min.x + 10.0f, bb.Min.y), ImVec2(bb.Max.x, bb.Min.y), GetColorU32(colors::background::border));
             if (g.LogEnabled)
                 LogRenderedText(&bb.Min, "--------------------------------\n");
 

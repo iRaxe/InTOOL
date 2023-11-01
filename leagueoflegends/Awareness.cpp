@@ -239,6 +239,36 @@ namespace UPasta
 							}
 						}
 
+						namespace WardIcons
+						{
+							static bool WardImagesLoaded = false;
+							void InitializeWardImages()
+							{
+								if (!WardImagesLoaded)
+								{
+									const std::string jungleFolder = "C:\\UPorn\\Media\\Troys";
+
+									static bool blueWardIconLoaded = false;
+									const std::string blueWardIconFile = jungleFolder + "\\BlueWard.png";
+									Functions::EnemySidebar::LoadDX11ImageIfNeeded(blueWardIconFile.c_str(), blueWardIconLoaded, &blueWardTextureIcon);
+
+									static bool controlWardIconLoaded = false;
+									const std::string controlWardIconFile = jungleFolder + "\\ControlWard.png";
+									Functions::EnemySidebar::LoadDX11ImageIfNeeded(controlWardIconFile.c_str(), controlWardIconLoaded, &controlWardTextureIcon);
+
+									static bool yellowWardIconLoaded = false;
+									const std::string yellowWardIconFile = jungleFolder + "\\YellowWard.png";
+									Functions::EnemySidebar::LoadDX11ImageIfNeeded(yellowWardIconFile.c_str(), yellowWardIconLoaded, &yellowWardTextureIcon);
+
+									static bool shacoBoxIconLoaded = false;
+									const std::string shacoBoxIconFile = jungleFolder + "\\ShacoBox.png";
+									Functions::EnemySidebar::LoadDX11ImageIfNeeded(shacoBoxIconFile.c_str(), shacoBoxIconLoaded, &shacoBoxTextureIcon);
+
+									WardImagesLoaded = true;
+								}
+							}
+						}
+
 					}
 
 					void InitializeTextures()
@@ -253,6 +283,8 @@ namespace UPasta
 								__try { DX11::JungleIcons::InitializeJungleImages(); }
 								__except (1) { LOG("[AWARENESS - JUNGLE TRACKER] Error in initializing jungle images"); }
 
+								__try { DX11::WardIcons::InitializeWardImages(); }
+								__except (1) { LOG("[AWARENESS - JUNGLE TRACKER] Error in initializing ward images"); }
 								initializedTextures = true;
 							}
 						}
@@ -270,15 +302,13 @@ namespace UPasta
 				Menu* AwarenessMenu;
 				void Initialize()
 				{
-					AwarenessMenu = Menu::CreateMenu("Awareness", "vez.Awareness");
+					AwarenessMenu = Menu::CreateMenu("Awareness", "Awareness");
 					initializedAwarenessMenu = true;
 				}
 
 				Menu* TrackerMenu;
 				namespace EnemyTracker
 				{
-					
-
 					void InitializeTrackerMenu()
 					{
 						TrackerMenu = AwarenessMenu->AddMenu("TrackerDrawings", "Tracker Drawings");
@@ -304,6 +334,12 @@ namespace UPasta
 						showLastPosition = LastPosMenu->AddCheckBox("showLastPosition", "Show last position", true);
 						showPosGuesser = LastPosMenu->AddCheckBox("showPosGuesser", "Show position guesser circle", true);
 						showLastPositionMiniMap = LastPosMenu->AddCheckBox("showLastPositionMiniMap", "Show last position on minimap", true);
+
+						const auto WardPosMenu = TrackerMenu->AddMenu("WardMenu", "Ward Position Tracker");
+						statusWardTracker = WardPosMenu->AddCheckBox("statusWardTracker", "Enable the ward tracker", true);
+						showWardPosition = WardPosMenu->AddCheckBox("showWardPosition", "Show ward position", true);
+						showWardTimer = WardPosMenu->AddCheckBox("showWardTimer", "Show ward timer", true);
+						showWardRange = WardPosMenu->AddCheckBox("showWardRange", "Show ward range", true);
 
 						initializedTrackerMenu = true;
 					}
@@ -433,17 +469,19 @@ namespace UPasta
 						}
 					}
 
-
 					void Update()
 					{
 						if (Configs::EnemyTracker::initializedTrackerMenu)
 						{
-							DrawLastHitDamage();
+							
+							if (Configs::EnemyTracker::showDamagePrediction->Value == true)
+								DrawLastHitDamage();
 
 							if (Configs::EnemyTracker::status->Value == true)
-							{
 								DrawTracker();
-							}
+
+							if (Configs::EnemyTracker::statusWardTracker->Value == true)
+								DrawWardsTracker();
 						}
 					}
 
@@ -493,6 +531,55 @@ namespace UPasta
 									ShowLastEnemyPosition(obj, i);
 								}
 								
+							}
+						}
+					}
+
+					void DrawWardsTracker()
+					{
+						const auto wardsList = TargetSelector::Functions::GetWardsInRange(globals::localPlayer->GetPosition(), 1100.0f);
+
+						for (const auto ward : wardsList)
+						{
+							if (ward == nullptr)
+								continue;
+
+							Vector3 objDrawPos = functions::GetBaseDrawPosition(ward);
+							Vector2 objPos = functions::WorldToScreen(objDrawPos);
+							const ImVec2 objMapVec = objPos.ToImVec();
+
+							if (Configs::EnemyTracker::showWardRange->Value)
+							{
+								ImColor wardColor = COLOR_DARK_TRANSPARENT;
+
+								if (ward->GetName() == BLUEWARD)
+									wardColor = COLOR_BLUE;
+								else if (ward->GetName() == YELLOWWARD || ward->GetName() == SIGHTWWARD)
+									wardColor = COLOR_YELLOW;
+								else if (ward->GetName() == JAMMERDEVICE)
+									wardColor = COLOR_PURPLE;
+
+								render::RenderWardRange(objDrawPos, wardColor);
+							}
+
+							if (Configs::EnemyTracker::showWardPosition->Value)
+							{
+								const auto wardIconMin = ImVec2(objMapVec.x - 25.0f, objMapVec.y + 10.0f);
+								const auto wardIconMax = ImVec2(objMapVec.x + 25.0f, objMapVec.y + 60.0f);
+
+								if (ward->GetName() == BLUEWARD)
+									render::RenderImage(Resources::JungleTracker::DX11::WardIcons::blueWardTextureIcon, wardIconMin, wardIconMax, COLOR_WHITE);
+								else if (ward->GetName() == YELLOWWARD || ward->GetName() == SIGHTWWARD)
+									render::RenderImage(Resources::JungleTracker::DX11::WardIcons::yellowWardTextureIcon, wardIconMin, wardIconMax, COLOR_WHITE);
+								else if (ward->GetName() == JAMMERDEVICE)
+									render::RenderImage(Resources::JungleTracker::DX11::WardIcons::controlWardTextureIcon, wardIconMin, wardIconMax, COLOR_WHITE);
+
+								render::RenderCircleFilled(ImVec2(objMapVec.x, objMapVec.y + 35.0f), 25, COLOR_DARK_TRANSPARENT, 0);
+							}
+
+							if (Configs::EnemyTracker::showWardTimer->Value && ward->GetName() != JAMMERDEVICE && ward->GetName() != BLUEWARD)
+							{
+								render::RenderText(functions::ConvertTime(ward->GetMana()), ImVec2(objMapVec.x - 5.0f, objMapVec.y), 24, COLOR_RED, true);
 							}
 						}
 					}
@@ -570,32 +657,34 @@ namespace UPasta
 
 					void DrawPlayerPaths(Object* obj)
 					{
-						auto path = obj->GetAiManager()->GetFutureSegments();
-						int countSegments = (int)path.size();
-						if (countSegments)
-						{
-							for (int i = -1; i < countSegments - 1; i++)
-							{
-								Vector2 screenPos1 = functions::WorldToScreen((i < 0) ? obj->GetPosition() : path[i]);
-								ImVec2 screenPos1Vec = screenPos1.ToImVec();
+						const auto path = obj->GetAiManager()->GetFutureSegments();
+						const int countSegments = static_cast<int>(path.size());
 
-								Vector2 screenPos2 = functions::WorldToScreen(path[i + 1]);
-								ImVec2 screenPos2Vec = screenPos2.ToImVec();
-								render::RenderLine(screenPos1Vec, screenPos2Vec, COLOR_WHITE, 1.0f);
-							}
+						if (countSegments <= 0)
+							return;
+
+						ImVec2 lastScreenPos = functions::WorldToScreen(obj->GetPosition()).ToImVec();
+
+						for (int i = 0; i < countSegments; i++)
+						{
+							const ImVec2 currentScreenPos = functions::WorldToScreen(path[i]).ToImVec();
+
+							render::RenderLine(lastScreenPos, currentScreenPos, COLOR_WHITE, 1.0f);
+
+							lastScreenPos = currentScreenPos;
 						}
 					}
 
 					void drawLastPosCircle(Object* obj, Vector3 pos1, Vector3 pos2, float distanza, float gametime)
 					{
-						if (Configs::EnemyTracker::showPosGuesser->Value == false)
+						if (!Configs::EnemyTracker::showPosGuesser->Value)
 							return;
 
 						const float castTime = functions::GetGameTime() - gametime;
 						const float velocita = obj->GetMovementSpeed();
-						auto spostamento = velocita * castTime;
-						const auto objPosAfter = pos1.Extend(pos2, spostamento);
-						auto rangeSpostamento = min(pos1.Distance(objPosAfter), distanza);
+						const float spostamento = velocita * castTime;
+						const Vector3 objPosAfter = pos1.Extend(pos2, spostamento);
+						const float rangeSpostamento = min(pos1.Distance(objPosAfter), distanza);
 						render::RenderCircleWorld(pos1, Configs::Radius::qualityDraw->Value, rangeSpostamento, COLOR_DARK_TRANSPARENT, 1.0f);
 					}
 
@@ -606,48 +695,35 @@ namespace UPasta
 						std::unordered_map<uint64_t, Vector3>& previous_endpath,
 						std::unordered_map<uint64_t, float>& hidden_time)
 					{
-						float time;
-						Vector3 lastPos;
 						// If hero is not visible
 						if (!hero->IsVisible())
 						{
-							// Check if hero was previously visible or if their distance from their previous position is bigger than 1 distance
-							const bool was_previously_visible = previous_visibility.find(hero->GetNetId()) != previous_visibility.end() && previous_visibility[hero->GetNetId()];
-							const auto it = previous_position.find(hero->GetNetId());
-							const auto was_previous_position = it != previous_position.end() ? it->second : hero->GetPosition();
-							const auto was_previous_endpath = previous_endpath.find(hero->GetNetId());
-							const auto was_previous_endpath_position = was_previous_endpath != previous_position.end() ? was_previous_endpath->second : it->second;
+							const auto netId = hero->GetNetId();
 
-							if (was_previously_visible || was_previous_position.Distance(hero->GetPosition()) > hiding_threshold_distance) 
+							// Check if hero was previously visible or if their distance from their previous position is bigger than 1 distance
+							const bool was_previously_visible = previous_visibility[netId];
+							const auto it = previous_position.find(netId);
+							const auto was_previous_position = it != previous_position.end() ? it->second : hero->GetPosition();
+							const auto was_previous_endpath = previous_endpath.find(netId);
+							const auto was_previous_endpath_position = was_previous_endpath != previous_endpath.end() ? was_previous_endpath->second : it->second;
+
+							if (was_previously_visible || was_previous_position.Distance(hero->GetPosition()) > hiding_threshold_distance)
 							{
 								// If hero was previously visible or if they moved further away than 1 from their previous position, update the time they have been hidden
-								hidden_time[hero->GetNetId()] = functions::GetGameTime();
-								time = functions::GetGameTime();
+								hidden_time[netId] = functions::GetGameTime();
 
-							}
-							else {
-
-								// If hero has not moved or was previously hidden, return the previous time they were hidden
-								const auto it_time = hidden_time.find(hero->GetNetId());
-								const float was_previous_time = it_time != hidden_time.end() ? it_time->second : functions::GetGameTime();
-								time = was_previous_time;
+								// Draw a circle to show the last hidden position
 								const auto distanzaSpostamento = was_previous_position.Distance(was_previous_endpath_position);
-								drawLastPosCircle(hero, was_previous_position, was_previous_endpath_position, distanzaSpostamento,  time);
+								drawLastPosCircle(hero, was_previous_position, was_previous_endpath_position, distanzaSpostamento, hidden_time[netId]);
 							}
+
+							// Return the time they have been hidden
+							return hidden_time[netId];
 						}
 						else {
-
 							// If hero is visible, set time hidden to 0
-							time = 0;							
+							return 0;
 						}
-
-						// Update hero's previous visibility and position
-						previous_visibility[hero->GetNetId()] = hero->IsVisible();
-						previous_position[hero->GetNetId()] = hero->GetPosition();
-						previous_endpath[hero->GetNetId()] = hero->GetAiManager()->GetPathEnd();
-
-						// Return time hero has been hidden
-						return time;
 					}
 
 					std::unordered_map<uint64_t, bool> previous_visibility;
@@ -656,88 +732,87 @@ namespace UPasta
 					std::unordered_map<uint64_t, float> hidden_time;
 					void ShowLastEnemyPosition(Object* obj, int index)
 					{
+						const auto objNetId = obj->GetNetId();
+						const auto itPos = previous_position.find(objNetId);
+						const auto wasPreviousPosition = (itPos != previous_position.end()) ? itPos->second : obj->GetPosition();
+
 						float timeHidden = time_hidden(obj, previous_visibility, previous_position, previous_endpath, hidden_time);
-						if (timeHidden > 0)
+						auto time = functions::ConvertTime(functions::GetGameTime() - timeHidden);
+
+						const auto heroIcons = Resources::EnemySidebar::DX11::HeroIcons::textureArray;
+						const float minimapSize = functions::GetMinimapSize();
+						const float scaleFactor = 35 * ((minimapSize - 192) / 193);
+						const float defScale = max(25.46f, scaleFactor);
+
+						const auto objMinimapPos = functions::WorldToMinimap(obj);
+						const auto pMiniMap = objMinimapPos.ToImVec();
+						const auto heroIconCenter = ImVec2(pMiniMap.x + (defScale / 2), pMiniMap.y + (defScale / 2));
+
+						if (Configs::EnemyTracker::showLastPosition->Value)
 						{
-							auto time = functions::ConvertTime(functions::GetGameTime() - timeHidden);
-							const auto& heroIcons = Resources::EnemySidebar::DX11::HeroIcons::textureArray;
-							if (Configs::EnemyTracker::showLastPosition->Value == true)
-							{
-								const auto it = previous_position.find(obj->GetNetId());
-								const auto was_previous_position = it != previous_position.end() ? it->second : obj->GetPosition();
-								Vector2 objPos = functions::WorldToScreen(was_previous_position);
-								ImVec2 pWorldPos = objPos.ToImVec();
-								ImVec2 heroWorldIconMin = ImVec2(pWorldPos.x - 25, pWorldPos.y - 25);
-								ImVec2 heroWorldIconCenter = ImVec2(pWorldPos.x, pWorldPos.y);
-								ImVec2 heroWorldIconMax = ImVec2(pWorldPos.x + 25, pWorldPos.y + 25);
-								render::RenderImage(heroIcons[index], heroWorldIconMin, heroWorldIconMax, COLOR_WHITE);
-								render::RenderCircleFilled(heroWorldIconCenter, 25, COLOR_DARK_TRANSPARENT, 0);
-								render::RenderText(time, ImVec2(heroWorldIconCenter.x - 6, heroWorldIconCenter.y), 25, COLOR_RED, true);
-							}
+							Vector2 objPos = functions::WorldToScreen(wasPreviousPosition);
+							ImVec2 pWorldPos = objPos.ToImVec();
+							ImVec2 heroWorldIconCenter = ImVec2(pWorldPos.x, pWorldPos.y);
 
-							if (Configs::EnemyTracker::showLastPositionMiniMap->Value == true)
-							{
-								const float minimap_size = functions::GetMinimapSize();
-								const float scale_factor = 35 * ((minimap_size - 192) / 193);
-								const float def_scale = max(25.46, scale_factor);
+							render::RenderImage(heroIcons[index], ImVec2(pWorldPos.x - 25, pWorldPos.y - 25), ImVec2(pWorldPos.x + 25, pWorldPos.y + 25), COLOR_WHITE);
+							render::RenderCircleFilled(heroWorldIconCenter, 25, COLOR_DARK_TRANSPARENT, 0);
+							render::RenderText(time, ImVec2(heroWorldIconCenter.x - 6, heroWorldIconCenter.y), 25, COLOR_RED, true);
+						}
 
-								const auto objMinimapPos = functions::WorldToMinimap(obj);
-								const auto pMiniMap = objMinimapPos.ToImVec();
-								const auto heroIconMin = ImVec2(pMiniMap.x, pMiniMap.y);
-								const auto heroIconCenter = ImVec2(pMiniMap.x + (def_scale / 2), pMiniMap.y + (def_scale / 2));
-								const auto heroIconMax = ImVec2(pMiniMap.x + def_scale, pMiniMap.y + def_scale);
+						if (Configs::EnemyTracker::showLastPositionMiniMap->Value)
+						{
+							const auto heroIconMin = ImVec2(pMiniMap.x, pMiniMap.y);
+							const auto heroIconMax = ImVec2(pMiniMap.x + defScale, pMiniMap.y + defScale);
 
-								render::RenderImage(heroIcons[index], heroIconMin, heroIconMax, COLOR_WHITE);
-								render::RenderCircleFilled(heroIconCenter, def_scale / 2, COLOR_DARK_TRANSPARENT, 0);
-								render::RenderCircle(heroIconCenter, def_scale / 2, COLOR_RED, 1.0f, 0);
-							}
+							render::RenderImage(heroIcons[index], heroIconMin, heroIconMax, COLOR_WHITE);
+							render::RenderCircleFilled(heroIconCenter, defScale / 2, COLOR_DARK_TRANSPARENT, 0);
+							render::RenderCircle(heroIconCenter, defScale / 2, COLOR_RED, 1.0f, 0);
 						}
 					}
-
-					
+									
 
 					void DrawLastHitDamage()
 					{
-
-						if (Configs::EnemyTracker::showDamagePrediction->Value == false) 
+						if (!Configs::EnemyTracker::showDamagePrediction->Value)
 							return;
+
+						const auto localPlayer = globals::localPlayer;
 
 						for (int i = 0; i < globals::minionManager->GetListSize(); i++)
 						{
 							auto obj = globals::minionManager->GetIndex(i);
-							if (!obj->IsValidTarget()) continue;
+							if (!obj || !obj->IsValidTarget() || obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane)
+								continue;
 
-							if (obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
-							if (obj != nullptr)
+							constexpr float barWidth = 100.0f;
+							constexpr float yOffset = 5.5f;
+							constexpr float xOffset = -barWidth / 3.3f;
+
+							const Vector2 screenPos = functions::GetHpBarPosition(obj);
+							const float objHealthPercent = obj->GetPercentHealth();
+							const float hpBarWidthLimit = screenPos.x + xOffset + ((60 * objHealthPercent) / 100);
+
+							const Vector2 outerBorderAngle3 = Vector2(screenPos.x + xOffset, screenPos.y - yOffset);
+							const Vector2 outerBorderAngle4 = Vector2(hpBarWidthLimit, screenPos.y - yOffset + 3.5);
+
+							const float damage = Damage::CalculateAutoAttackDamage(localPlayer, obj);
+							const bool canKill = damage > obj->GetHealth();
+
+							render::RenderRectFilled(outerBorderAngle3.ToImVec(), outerBorderAngle4.ToImVec(), canKill ? COLOR_GREEN : COLOR_RED, 0.0f, 0);
+
+							const float aaNeeded = ceil(obj->GetHealth() / damage);
+							const float partWidth = (outerBorderAngle4.x - outerBorderAngle3.x) / aaNeeded;
+
+							for (int i2 = 1; i2 < aaNeeded; i2++)
 							{
-								const float barWidth = 100.0f;
-								const float yOffset = 5.5f;
-								const float xOffset = -barWidth / 3.3f;
-
-								const float objHealthPercent = obj->GetPercentHealth();
-								const Vector2 screenPos = functions::GetHpBarPosition(obj);
-
-								const float damage = Damage::CalculateAutoAttackDamage(globals::localPlayer, obj);
-								const float hpBarWidthLimit = screenPos.x + xOffset + ((60 * objHealthPercent) / 100);
-
-								const Vector2 outerBorderAngle3 = Vector2(screenPos.x + xOffset, screenPos.y - yOffset);
-								const Vector2 outerBorderAngle4 = Vector2(hpBarWidthLimit, screenPos.y - yOffset + 3.5);
-								render::RenderRectFilled(outerBorderAngle3.ToImVec(), outerBorderAngle4.ToImVec(), damage > obj->GetHealth() ? COLOR_GREEN : COLOR_RED, 0.0f, 0);
-
-								const float aaNeeded = ceil(obj->GetHealth() / damage);
-								const float partWidth = (outerBorderAngle4.x - outerBorderAngle3.x) / aaNeeded;
-
-								for (int i = 1; i < aaNeeded; i++)
-								{
-									float xPosition = outerBorderAngle3.x + i * partWidth;
-									Vector2 startPoint = Vector2(xPosition, outerBorderAngle3.y);
-									Vector2 endPoint = Vector2(xPosition, outerBorderAngle4.y);
-									render::RenderLine(startPoint.ToImVec(), endPoint.ToImVec(), COLOR_BLACK, 1.0f);
-								}
-
-								if (Configs::EnemyTracker::showKillableStatus->Value == true)
-									Radius::DrawRadius(obj->GetPosition(), 60.0f, (damage > obj->GetHealth()) ? COLOR_GREEN : COLOR_RED, 1.0f);
+								const float xPosition = outerBorderAngle3.x + i2 * partWidth;
+								Vector2 startPoint = Vector2(xPosition, outerBorderAngle3.y);
+								Vector2 endPoint = Vector2(xPosition, outerBorderAngle4.y);
+								render::RenderLine(startPoint.ToImVec(), endPoint.ToImVec(), COLOR_BLACK, 1.0f);
 							}
+
+							if (Configs::EnemyTracker::showKillableStatus->Value)
+								Radius::DrawRadius(obj->GetPosition(), 60.0f, canKill ? COLOR_GREEN : COLOR_RED, 1.0f);
 						}
 					}
 				}
@@ -802,23 +877,28 @@ namespace UPasta
 					static void ShowSidebar(bool* p_open)
 					{
 						ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize;
-						if (Configs::EnemySidebar::locked->Value == true)	window_flags |= ImGuiWindowFlags_NoMove;
+						if (Configs::EnemySidebar::locked->Value) window_flags |= ImGuiWindowFlags_NoMove;
+
 						if (ImGui::Begin("Hero awareness", p_open, window_flags))
-						{ 
-							int champListSize = globals::heroManager->GetListSize();
-							ImVec2 p2 = ImGui::GetCursorScreenPos();
-							float size = Configs::EnemySidebar::hudSize->Value / 100.0f;
+						{
+							const auto heroManager = globals::heroManager;
+							const int champListSize = heroManager->GetListSize();
+							const float size = Configs::EnemySidebar::hudSize->Value / 100.0f;
 							float spacing = 0.0f;
+							ImVec2 p2 = ImGui::GetCursorScreenPos();
+							const auto& heroIcons = Resources::EnemySidebar::DX11::HeroIcons::textureArray;
+
 							ImGui::BeginChildOld(
-								"Test", 
-								Configs::EnemySidebar::orientation->Value ? 
-								ImVec2(champListSize * ((200 + spacing) * size), 200 * size) : 
-								ImVec2(200 * size, champListSize * ((200 + spacing) * size)), 
+								"Test",
+								Configs::EnemySidebar::orientation->Value ?
+								ImVec2(champListSize * ((200 + spacing) * size), 200 * size) :
+								ImVec2(200 * size, champListSize * ((200 + spacing) * size)),
 								false, window_flags);
 
 							for (int i = 1; i < champListSize; i++)
 							{
-								auto obj = globals::heroManager->GetIndex(i);
+								auto obj = heroManager->GetIndex(i);
+
 								if (obj->GetName() == "PracticeTool_TargetDummy" || obj->IsAlly())
 									continue;
 
@@ -826,18 +906,19 @@ namespace UPasta
 								ImVec2 heroIconMin = ImVec2(p.x + 40 * size, p.y + 30 * size);
 								ImVec2 heroIconMax = ImVec2(p.x + 170 * size, p.y + 150 * size);
 
-								const auto& heroIcons = Resources::EnemySidebar::DX11::HeroIcons::textureArray;
 								render::RenderImage(heroIcons[i], heroIconMin, heroIconMax, COLOR_WHITE);
 
 								if (!obj->IsAlive())
 								{
-									render::RenderCircleFilled(ImVec2(p.x + 105 * size, p.y + 85 * size), 58 * size, COLOR_DARK_TRANSPARENT, 0);
+									ImVec2 circleCenter = ImVec2(p.x + 105 * size, p.y + 85 * size);
+									float circleRadius = 58 * size;
+									render::RenderCircleFilled(circleCenter, circleRadius, COLOR_DARK_TRANSPARENT, 0);
 									float respawnTime = functions::GetRespawnTimer(obj) + 1;
-									render::RenderText(functions::ConvertTime(respawnTime), ImVec2(p.x + 100 * size, p.y + 50 * size), 24 * size, COLOR_RED, true);
+									ImVec2 respawnTextPos = ImVec2(p.x + 100 * size, p.y + 50 * size);
+									render::RenderText(functions::ConvertTime(respawnTime), respawnTextPos, 24 * size, COLOR_RED, true);
 								}
 
-								float altezzaIntera = 140.00f * size;
-
+								float altezzaIntera = 140.0f * size;
 								float progresso = EnemyTracker::calcolaProgresso(obj->GetExperience(), obj->GetLevel());
 								float altezzaDaTogliere = 100 - progresso;
 								float altezzaTotale = altezzaIntera * (altezzaDaTogliere / 100);
@@ -845,7 +926,7 @@ namespace UPasta
 								ImVec2 hudExpMin = ImVec2(p.x + 130 * size, p.y + altezzaTotale + 14 * size);
 								ImVec2 hudExpMax = ImVec2(p.x + 195 * size, p.y + altezzaIntera);
 								const auto& hudHpBar = Resources::EnemySidebar::DX11::HudDesign::hudHpBar;
-								ImGui::GetWindowDrawList()->AddImage(hudHpBar, hudExpMin, hudExpMax, { 0.0f, altezzaDaTogliere /100 }, { 1.0f, 1.0f }, COLOR_WHITE);
+								ImGui::GetWindowDrawList()->AddImage(hudHpBar, hudExpMin, hudExpMax, { 0.0f, altezzaDaTogliere / 100 }, { 1.0f, 1.0f }, COLOR_WHITE);
 
 								float altezzaDaTogliere2 = 100 - obj->GetPercentMana();
 								float altezzaTotale2 = altezzaIntera * (altezzaDaTogliere2 / 100);
@@ -873,6 +954,7 @@ namespace UPasta
 
 								ImVec2 SummLevelPos = ImVec2(p.x + 146 * size, p.y + 114 * size);
 								render::RenderText(std::to_string(obj->GetLevel()), SummLevelPos, 20 * size, COLOR_WHITE, true);
+
 								spacing += 200;
 							}
 
@@ -885,13 +967,10 @@ namespace UPasta
 					void Initialize()
 					{
 						if (!Resources::EnemySidebar::initializedTextures)
-						{
 							Resources::EnemySidebar::InitializeTextures();
-						}
+
 						if (Resources::EnemySidebar::initializedTextures && !Configs::EnemySidebar::initializedSidebarMenu)
-						{
 							Configs::EnemySidebar::InitializeSidebarMenu();
-						}
 					}
 
 					void Update()
@@ -921,24 +1000,6 @@ namespace UPasta
 								auto startPos = missile->GetSpellStartPos().ToGround();
 								auto endPos = missile->GetSpellEndPos().ToGround();
 								auto missilePos = missile->GetSpellPos().ToGround();
-
-								/*auto Direction = (endPos - startPos).Normalized();
-								auto Perpendicular = Direction.Perpendicular();
-
-								auto idk(startPos + Perpendicular * 70 - Direction);
-								auto idk2(startPos - Perpendicular * 70 - Direction);
-								auto idk3(endPos - Perpendicular * 70 - Direction);
-								auto idk4(endPos + Perpendicular * 70 - Direction);
-
-								auto screenPosition1 = functions::WorldToScreen(idk).ToImVec();
-								auto screenPosition2 = functions::WorldToScreen(idk2).ToImVec();
-
-								auto screenPosition3 = functions::WorldToScreen(idk3).ToImVec();
-								auto screenPosition4 = functions::WorldToScreen(idk4).ToImVec();
-
-								render::RenderLine(screenPosition1, screenPosition4, COLOR_WHITE, 1.0f);
-								render::RenderLine(screenPosition2, screenPosition3, COLOR_WHITE, 1.0f);*/
-
 								Geometry::Polygon poly = Geometry::Rectangle(startPos, endPos, 70.f).ToPolygon();
 								render::RenderPolygon(poly, 0xFFFFFFFF, 1.0f);
 
@@ -1123,14 +1184,10 @@ namespace UPasta
 					void Initialize()
 					{
 						if (!Resources::JungleTracker::initializedTextures)
-						{
 							Resources::JungleTracker::InitializeTextures();
-						}
 
 						if (Resources::JungleTracker::initializedTextures && !Configs::JungleTracker::initializedJungleTrackerMenu)
-						{
 							Configs::JungleTracker::InitializeJungleTrackerMenu();
-						}
 					}
 
 					void Update()

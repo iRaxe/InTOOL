@@ -22,6 +22,7 @@ namespace functions
 	}
 
 	void Init();
+	bool isShopOpen();
 	std::string GetHexString(QWORD hexNumber);
 	std::string CapitalizeFirstLetter(std::string str);
 

@@ -33,6 +33,9 @@
 
 #define BLUEWARD std::string("BlueTrinket")
 #define YELLOWWARD std::string("YellowTrinket")
+#define SIGHTWWARD std::string("SightWard")
+
+
 #define JAMMERDEVICE std::string("JammerDevice")
 
 #define PLANTVISION std::string("SRU_Plant_Vision")

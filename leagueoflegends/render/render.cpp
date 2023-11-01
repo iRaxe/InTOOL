@@ -158,6 +158,7 @@ namespace render
 
 				for (int i = 0; i < obj->GetBuffListSize(); i++)
 				{
+
 					auto buffEntry = obj->GetBuffManager()->GetBuffEntryByIndex(i);
 					if (!buffEntry) return;
 
@@ -176,17 +177,17 @@ namespace render
 
 			void Update()
 			{
-				/*if (SETTINGS_BOOL("Drawings", "Draw EnemyList"))
+				if (SETTINGS_BOOL("Drawings", "Draw EnemyList"))
 				{
 					DrawEnemyListNames();
 				}
 
-				for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+				/*for (int i = 0; i < globals::heroManager->GetListSize(); i++)
 				{
 					auto obj = globals::heroManager->GetIndex(i);
 					if (obj->IsHero())
 					{
-						
+
 						DrawBuffNames(obj);
 
 						if (SETTINGS_BOOL("Drawings", "Draw Spells cooldown"))

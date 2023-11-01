@@ -5305,7 +5305,7 @@ bool ImGui::BeginChild(const char* str_id, const ImVec2& size_arg, bool border, 
 
     PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(15, 15));
     PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 13));
-    return BeginChildEx(str_id, window->GetID(str_id), size_arg, border, extra_flags | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    return BeginChildEx(str_id, window->GetID(str_id), size_arg, border, extra_flags | ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiInputTextFlags_NoHorizontalScroll );
 }
 
 bool ImGui::BeginChild(ImGuiID id, const ImVec2& size_arg, bool border, ImGuiWindowFlags extra_flags)
@@ -5885,11 +5885,6 @@ void ImGui::RenderWindowDecorations(ImGuiWindow* window, const ImRect& title_bar
                 bg_col = (bg_col & ~IM_COL32_A_MASK) | (IM_F32_TO_INT8_SAT(alpha) << IM_COL32_A_SHIFT);
             window->DrawList->AddRectFilled(window->Pos + ImVec2(0, window->TitleBarHeight()), window->Pos + window->Size, bg_col, window_rounding, (flags & ImGuiWindowFlags_NoTitleBar) ? 0 : ImDrawFlags_RoundCornersBottom);
         }
-
-        // Draw window shadow
-        if (style.WindowShadowSize > 0.0f && (!(flags & ImGuiWindowFlags_ChildWindow) || (flags & ImGuiWindowFlags_Popup)))
-            if (style.Colors[ImGuiCol_WindowShadow].w > 0.0f)
-                RenderWindowShadow(window);
 
         // Title bar
         if (!(flags & ImGuiWindowFlags_NoTitleBar))
@@ -8643,7 +8638,7 @@ void ImGui::UpdateMouseWheel()
         if (!(window->Flags & ImGuiWindowFlags_NoScrollWithMouse) && !(window->Flags & ImGuiWindowFlags_NoMouseInputs))
         {
             bool do_scroll[2] = { wheel.x != 0.0f && window->ScrollMax.x != 0.0f, wheel.y != 0.0f && window->ScrollMax.y != 0.0f };
-            if (do_scroll[ImGuiAxis_X] && do_scroll[ImGuiAxis_Y])
+            /*if (do_scroll[ImGuiAxis_X] && do_scroll[ImGuiAxis_Y])
                 do_scroll[(g.WheelingAxisAvg.x > g.WheelingAxisAvg.y) ? ImGuiAxis_Y : ImGuiAxis_X] = false;
             if (do_scroll[ImGuiAxis_X])
             {
@@ -8651,7 +8646,7 @@ void ImGui::UpdateMouseWheel()
                 float max_step = window->InnerRect.GetWidth() * 0.67f;
                 float scroll_step = ImFloor(ImMin(2 * window->CalcFontSize(), max_step));
                 SetScrollX(window, window->Scroll.x - wheel.x * scroll_step);
-            }
+            }*/
             if (do_scroll[ImGuiAxis_Y])
             {
                 LockWheelingWindow(window, wheel.y);
@@ -11222,7 +11217,7 @@ static void ImGui::NavUpdate()
         if (window->DC.NavLayersActiveMask == 0x00 && window->DC.NavHasScroll && move_dir != ImGuiDir_None)
         {
             if (move_dir == ImGuiDir_Left || move_dir == ImGuiDir_Right)
-                SetScrollX(window, ImFloor(window->Scroll.x + ((move_dir == ImGuiDir_Left) ? -1.0f : +1.0f) * scroll_speed));
+                //SetScrollX(window, ImFloor(window->Scroll.x + ((move_dir == ImGuiDir_Left) ? -1.0f : +1.0f) * scroll_speed));
             if (move_dir == ImGuiDir_Up || move_dir == ImGuiDir_Down)
                 SetScrollY(window, ImFloor(window->Scroll.y + ((move_dir == ImGuiDir_Up) ? -1.0f : +1.0f) * scroll_speed));
         }
@@ -11234,7 +11229,7 @@ static void ImGui::NavUpdate()
             const ImVec2 scroll_dir = GetKeyMagnitude2d(ImGuiKey_GamepadLStickLeft, ImGuiKey_GamepadLStickRight, ImGuiKey_GamepadLStickUp, ImGuiKey_GamepadLStickDown);
             const float tweak_factor = IsKeyDown(ImGuiKey_NavGamepadTweakSlow) ? 1.0f / 10.0f : IsKeyDown(ImGuiKey_NavGamepadTweakFast) ? 10.0f : 1.0f;
             if (scroll_dir.x != 0.0f && window->ScrollbarX)
-                SetScrollX(window, ImFloor(window->Scroll.x + scroll_dir.x * scroll_speed * tweak_factor));
+                //SetScrollX(window, ImFloor(window->Scroll.x + scroll_dir.x * scroll_speed * tweak_factor));
             if (scroll_dir.y != 0.0f)
                 SetScrollY(window, ImFloor(window->Scroll.y + scroll_dir.y * scroll_speed * tweak_factor));
         }

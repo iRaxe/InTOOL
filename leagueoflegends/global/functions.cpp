@@ -3,8 +3,6 @@
 
 namespace functions
 {
-	
-
 	float lastRefreshTime = 0.0f;
 	
 	void* spoof_trampoline = 0x0;
@@ -41,6 +39,13 @@ namespace functions
 
 		return NT_SUCCESS(ReadProcessMemory(GetCurrentProcess(), (LPVOID)address, &buffer, sizeof(Type), NULL)) ? buffer : Type();
 	};
+
+	bool isShopOpen()
+	{
+		//[<League of Legends.exe> + oMenuGUI] + ShopIsOpen
+
+		return functions::Read<bool>(RVA(oShopGUI)), ShopIsOpen;
+	}
 
 	std::string GetHexString(QWORD hexNumber)
 	{
