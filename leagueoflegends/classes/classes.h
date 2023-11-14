@@ -66,6 +66,34 @@ class HeroInventory
 public:
     InventorySlot* GetInventorySlot(int slotId);
     InventorySlot* FindItemID(ItemsDatabase itemID);
+    std::vector<InventorySlot*> ItemsList();
+};
+
+class Perk
+{
+public:
+    PerkID GetId();
+    std::string GetName();
+    std::string GetRawName();
+    std::string GetRawDescription();
+};
+
+class Perks
+{
+public:
+    Perk* GetPerkByIndex(int index);
+};
+
+class Cooldown
+{
+public:
+	float GetBaseCooldown();
+};
+
+class CooldownArray
+{
+public:
+	Cooldown* GetArrayIndex(int index);
 };
 
 class CharacterStackData
@@ -185,13 +213,10 @@ public:
 	std::string GetName();
     Vector3 GetSpellEndPos();
     float GetManaCostByLevel(int level);
+	CooldownArray* GetCooldownArray();
 };
 
-class SpellInfo
-{
-public:
-	SpellData* GetSpellData();
-};
+
 
 class Missiles
 {
@@ -210,6 +235,7 @@ public:
     bool IsAutoAttack();
     std::string GetSpellName();
 
+    int Resource;
 };
 
 class Missile
@@ -220,6 +246,17 @@ public:
     Vector3 GetSpellStartPos();
     Vector3 GetSpellPos();
     Vector3 GetSpellEndPos();
+};
+
+class SpellInfo
+{
+public:
+    SpellData* GetSpellData();
+    Vector3 EndPosition;
+    Vector3 StartPosition;
+    uintptr_t SpellIndex;
+    MissileData* BasicAttackSpellData;
+    int SourceNetworkID;
 };
 
 class SpellInput
@@ -265,6 +302,7 @@ class Buff
 {
 public:
     std::string GetName();
+    BuffType GetType();
     float GetStartTime();
     float GetEndTime();
     int GetStacksAlt();
@@ -291,6 +329,15 @@ struct KappaManager
 public:
     uintptr_t* vtable;
     std::map<uintptr_t, Missile*> missile_map;
+};
+
+template <class T>
+struct ManagerTemplate
+{
+    uintptr_t VTable;
+    T** list;
+    uint32_t length;
+    uint32_t capacity;
 };
 
 class Object
@@ -340,16 +387,18 @@ public:
     float GetMagicPenetrationMulti();
     float GetTotalMagicPenetration();
     float GetAttackRange();
-    std::string GetName();
-    MissileData* MissileMgr();
+	float GetAbilityHaste();
+	std::string GetName();
     BuffManager* GetBuffManager();
     QWORD* GetBuffManagerEntriesEnd();
     SpellCast* GetActiveSpellCast();
 	Spell* GetSpellBySlotId(int slotId);
-    Missile* GetMissileByIndex();
+	Missile* GetMissileByIndex();
     CharacterData* GetCharacterData();
     AiManager* GetAiManager();
+	CombatType GetCombatType();
 	HeroInventory* GetHeroInventory();
+	Perks* GetHeroPerks();
 
 public:
     float GetBoundingRadius();
@@ -393,8 +442,11 @@ public:
 	bool IsInAARange();
     bool CanCastSpell(int slotId);
     Vector3 GetServerPosition();
+    bool HasBuff(const char* buffname);
     int GetBuffListSize();
     Buff* GetBuffByName(std::string name);
+	Buff* GetBuffByType(BuffType type);
+
 public:
     CharacterDataStack* GetCharacterDataStack();
     CharacterStateIntermediate* GetCharacterStateIntermediate();

@@ -125,8 +125,8 @@ void Skillshot::PopulateSpellsDB()
 	database.EliseE = SkillshotManager::RegisterSpell(SP_STRING("Elise"), SpellIndex::E, Skillshot(1075, 55, 1600, 0.25, SkillshotType::SkillshotLine, {}));
 	database.EvelynnQ = SkillshotManager::RegisterSpell(SP_STRING("Evelynn"), SpellIndex::Q, Skillshot(800, 60, 2400, 0.25, SkillshotType::SkillshotLine, {}));
 	database.EvelynnR = SkillshotManager::RegisterSpell(SP_STRING("Evelynn"), SpellIndex::R, Skillshot(450, 180, FLT_MAX, 0.35, SkillshotType::SkillshotCone, {}));
-	database.EzrealQ = SkillshotManager::RegisterSpell(SP_STRING("Ezreal"), SpellIndex::Q, Skillshot(1200, 60, 2000, 0.25, SkillshotType::SkillshotLine, { CollidableObjects::Objects }));
-	database.EzrealW = SkillshotManager::RegisterSpell(SP_STRING("Ezreal"), SpellIndex::W, Skillshot(1200, 60, 1700, 0.25, SkillshotType::SkillshotLine, {}));
+	database.EzrealQ = SkillshotManager::RegisterSpell(SP_STRING("Ezreal"), SpellIndex::Q, Skillshot(1100, 60, 2000, 0.25, SkillshotType::SkillshotLine, { CollidableObjects::Objects }));
+	database.EzrealW = SkillshotManager::RegisterSpell(SP_STRING("Ezreal"), SpellIndex::W, Skillshot(1100, 60, 1700, 0.25, SkillshotType::SkillshotLine, {}));
 	database.EzrealE = SkillshotManager::RegisterSpell(SP_STRING("Ezreal"), SpellIndex::E, Skillshot(750, 60, 2000, 0.25, SkillshotType::SkillshotNone, {}));
 	database.EzrealR = SkillshotManager::RegisterSpell(SP_STRING("Ezreal"), SpellIndex::R, Skillshot(12500, 160, 2000, 1, SkillshotType::SkillshotLine, {}));
 	database.FioraW = SkillshotManager::RegisterSpell(SP_STRING("Fiora"), SpellIndex::W, Skillshot(750, 70, 3200, 0.75, SkillshotType::SkillshotLine, {}));
@@ -164,7 +164,10 @@ void Skillshot::PopulateSpellsDB()
 	database.JinxW = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), SpellIndex::W, Skillshot(1450, 60, 3300, 0.6, SkillshotType::SkillshotLine, {}));
 	database.JinxE = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), SpellIndex::E, Skillshot(900, 120, 1100, 1.5, SkillshotType::SkillshotCone, {}));
 	database.JinxR = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), SpellIndex::R, Skillshot(12500, 140, 1700, 0.6, SkillshotType::SkillshotLine, {}));
-	database.KaisaW = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), SpellIndex::W, Skillshot(3000, 100, 1750, 0.4, SkillshotType::SkillshotLine, {}));
+	database.KaisaQ = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), SpellIndex::Q, Skillshot(600, 600, FLT_MAX, 0.4, SkillshotType::SkillshotNone, {}));
+	database.KaisaW = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), SpellIndex::W, Skillshot(3000, 100, 1750, 0.4, SkillshotType::SkillshotLine, {CollidableObjects::Objects}));
+	database.KaisaE = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), SpellIndex::E, Skillshot(1000, 1000, 1750, 1.2, SkillshotType::SkillshotNone, {}));
+	database.KaisaR = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), SpellIndex::R, Skillshot(globals::localPlayer->GetSpellBySlotId(SpellSlot_R)->GetLevel() == 3 ? 3000 : globals::localPlayer->GetSpellBySlotId(SpellSlot_R)->GetLevel() == 2 ? 2250 : 1500, 525, 1750, 0.4, SkillshotType::SkillshotNone, {}));
 	database.KalistaQ = SkillshotManager::RegisterSpell(SP_STRING("Kalista"), SpellIndex::Q, Skillshot(1150, 40, 2400, 0.25, SkillshotType::SkillshotLine, {}));
 	database.KarmaQ = SkillshotManager::RegisterSpell(SP_STRING("Karma"), SpellIndex::Q, Skillshot(950, 60, 1700, 0.25, SkillshotType::SkillshotLine, {}));
 	database.KarmaQ2 = SkillshotManager::RegisterSpell(SP_STRING("Karma"), SpellIndex::Q, Skillshot(950, 80, 1700, 0.25, SkillshotType::SkillshotLine, {}));
@@ -285,8 +288,10 @@ void Skillshot::PopulateSpellsDB()
 	database.TaliyahE = SkillshotManager::RegisterSpell(SP_STRING("Taliyah"), SpellIndex::E, Skillshot(800, 0, 2000, 0.45, SkillshotType::SkillshotCone, {}));
 	database.TaliyahR = SkillshotManager::RegisterSpell(SP_STRING("Taliyah"), SpellIndex::R, Skillshot(3000, 120, 1700, 1, SkillshotType::SkillshotLine, {}));
 	database.TalonW = SkillshotManager::RegisterSpell(SP_STRING("Talon"), SpellIndex::W, Skillshot(650, 75, 2500, 0.25, SkillshotType::SkillshotCone, {}));
-	database.ThreshQ = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), SpellIndex::Q, Skillshot(1100, 70, 1900, 0.5, SkillshotType::SkillshotLine, {}));
-	database.ThreshE = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), SpellIndex::E, Skillshot(500, 110, FLT_MAX, 0.389, SkillshotType::SkillshotCone, {}));
+	database.ThreshQ = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), SpellIndex::Q, Skillshot(1100, 70, 1900, 0.5, SkillshotType::SkillshotLine, { CollidableObjects::Objects }));
+	database.ThreshW = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), SpellIndex::W, Skillshot(950, 150, 1900, 0.5, SkillshotType::SkillshotLine, {}));
+	database.ThreshE = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), SpellIndex::E, Skillshot(500, 110, 2000, 0.389, SkillshotType::SkillshotLine, {}));
+	database.ThreshR = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), SpellIndex::R, Skillshot(470, 470, 1900, 0.45, SkillshotType::SkillshotCircle, {}));
 	database.TristanaW = SkillshotManager::RegisterSpell(SP_STRING("Tristana"), SpellIndex::W, Skillshot(900, 300, 1100, 0.25, SkillshotType::SkillshotCircle, {}));
 	database.TryndamereE = SkillshotManager::RegisterSpell(SP_STRING("Tryndamere"), SpellIndex::E, Skillshot(660, 225, 1300, 0, SkillshotType::SkillshotLine, {}));
 	database.TwistedFateQ = SkillshotManager::RegisterSpell(SP_STRING("TwistedFate"), SpellIndex::Q, Skillshot(1450, 40, 1000, 0.25, SkillshotType::SkillshotCone, {}));

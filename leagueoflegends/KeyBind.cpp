@@ -312,7 +312,7 @@ namespace UPasta {
 		void KeyBind::Draw()
 		{
 			//HOLD 0 || TOGGLE 1 || ALWAYS 2
-			ImGui::Keybind(this->DisplayName, &this->Key, &this->Mode);
+			ImGui::Keybind(SP_STRING(this->DisplayName), &this->Key, &this->Mode);
 		}
 
 		void KeyBind::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos) {

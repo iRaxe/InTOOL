@@ -164,6 +164,18 @@
     <Filter Include="Menu\New Menu\Components\ColorPicker">
       <UniqueIdentifier>{0c768865-ead9-485f-9a21-b090f9bacb1b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Champions\Thresh">
+      <UniqueIdentifier>{53c5a4df-c29e-4818-b038-c69345f481c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Evade">
+      <UniqueIdentifier>{0f8cf5f5-761f-4f29-a821-ac7fb25d25e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Evade\Correti">
+      <UniqueIdentifier>{7ec0faf7-da67-432f-96b5-a4232177d6e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Kaisa">
+      <UniqueIdentifier>{2009609e-7b66-4a82-bda2-176615a42195}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -370,7 +382,6 @@
     <ClInclude Include="Geometry.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="clipper.h" />
     <ClInclude Include="ListManager.h">
       <Filter>Scripts\Utilities\Lists Management</Filter>
     </ClInclude>
@@ -419,6 +430,25 @@
     </ClInclude>
     <ClInclude Include="Colorpicker.h">
       <Filter>Menu\New Menu\Components\ColorPicker</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_notify.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="fa_solid_900.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="font_awesome_5.h">
+      <Filter>IMGui</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthPrediction.h">
+      <Filter>Scripts\Utilities\Damage Calculator</Filter>
+    </ClInclude>
+    <ClInclude Include="Thresh.h">
+      <Filter>Scripts\Champions\Thresh</Filter>
+    </ClInclude>
+    <ClInclude Include="clipper.h" />
+    <ClInclude Include="Kaisa.h">
+      <Filter>Scripts\Champions\Kaisa</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -605,6 +635,18 @@
     </ClCompile>
     <ClCompile Include="Colorpicker.cpp">
       <Filter>Menu\New Menu\Components\ColorPicker</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthPrediction.cpp">
+      <Filter>Scripts\Utilities\Damage Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="Thresh.cpp">
+      <Filter>Scripts\Champions\Thresh</Filter>
+    </ClCompile>
+    <ClCompile Include="clipper.cpp">
+      <Filter>Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Kaisa.cpp">
+      <Filter>Scripts\Champions\Kaisa</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

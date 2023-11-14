@@ -23,25 +23,64 @@ namespace menu
 
 	void Init()
 	{
-		style = &ImGui::GetStyle();
-		style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 0);
-		style->WindowPadding = ImVec2(0.f, 0.f);
-		style->ScrollbarSize = 20.f;
-		style->ScrollbarRounding = 4.f;
-		style->ItemSpacing = ImVec2(20, 20);
-		style->FrameRounding = 4.f;
-		style->PopupRounding = 8.f;
-		style->ChildRounding = 4.f;
-		style->WindowRounding = 7.f;
-		globals::menuSize = ImVec2(980.0f, 300);
+		ImGuiStyle* style = &ImGui::GetStyle();
 
-		ImGui::SetNextWindowSize(globals::menuSize);
-		ImGui::SetNextWindowPos(ImVec2(25, 25));
+		style->WindowPadding = ImVec2(12.0f, 14.0f);
+		style->WindowRounding = 0.0f;
+		style->FramePadding = ImVec2(10.0f, 4.0f);
+		style->FrameRounding = 0.0f;
+		style->ItemSpacing = ImVec2(12.0f, 16.0f);
+		style->ItemInnerSpacing = ImVec2(14.0f, 4.0f);
+		style->IndentSpacing = 0.0f;
+		style->ScrollbarSize = 4.0f;
+		style->ScrollbarRounding = 2.0f;
+		style->GrabMinSize = 4.0f;
+		style->GrabRounding = 0.0f;
+		style->WindowBorderSize = 0.0f;
+		style->PopupBorderSize = 1.0f;
+		style->GrabMinSize = 14.0f;
+
+		style->Colors[ImGuiCol_Text] = ImVec4(0.85f, 0.85f, 0.88f, 1.00f);
+		style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+		style->Colors[ImGuiCol_PopupBg] = ImVec4(0.06f, 0.05f, 0.07f, 0.80f);
+		style->Colors[ImGuiCol_Border] = ImVec4(0.80f, 0.80f, 0.83f, 0.60f);
+		style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
+		style->Colors[ImGuiCol_FrameBg] = ImVec4(0.61f, 0.61f, 0.61f, 0.54f);
+		style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.85f, 0.85f, 0.85f, 0.54f);
+		style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.82f, 0.82f, 0.82f, 0.75f);
+		style->Colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
+		style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+		style->Colors[ImGuiCol_MenuBarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+		style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_CheckMark] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+		style->Colors[ImGuiCol_SliderGrab] = ImVec4(0.42f, 1.0f, 0.93f, 0.75f);
+		style->Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.41f, 1.0f, 0.93f, 0.92f);
+		style->Colors[ImGuiCol_Button] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_ButtonHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+		style->Colors[ImGuiCol_ButtonActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_Header] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_HeaderHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_HeaderActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		style->Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_PlotLines] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+		style->Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+		style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+		style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+		style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+
+		globals::menuSize = ImVec2(3000, 1280);
+
+		ImGui::SetNextWindowSize(globals::menuSize, ImGuiCond_FirstUseEver);
 
 		ImGui::GetIO().MouseDrawCursor = false;
-
+		UPasta::SDK::Menu::Initialize();
 		LOG("Menu initialized");
-
 	}
 
 	void InitNewMenu()
@@ -201,7 +240,6 @@ namespace menu
 		ImGui::EndGroup();
 	}
 
-
 	void DynamicSettings()
 	{
 		std::set<std::string> seenGroups; // Set per tenere traccia dei gruppi visti
@@ -253,46 +291,16 @@ namespace menu
 
 	void Update()
 	{
-		ImGui::SetNextWindowSize(globals::menuSize);
+		ImGui::SetNextWindowSize(globals::menuSize, ImGuiCond_FirstUseEver);
+
 		if (globals::menuOpen)
 		{
-			ImGui::Begin("UCPasta", &globals::menuOpen, window_flags);
+			ImGui::Begin("menu", &globals::menuOpen, window_flags);
 
-			const auto& p = ImGui::GetWindowPos();
-
-			const std::string mediaFolder = "C:\\UPorn\\Media";
-			static bool platformLogoLoaded = false;
-			const std::string platformLogoFile = mediaFolder + "\\logo.png";
-			if (platformLogo == nullptr && platformLogoLoaded == false)
-			{
-				UPasta::SDK::Awareness::Functions::EnemySidebar::LoadDX11ImageIfNeeded(platformLogoFile.c_str(), platformLogoLoaded, &platformLogo);
-				platformLogoLoaded = true;
-			}
-
-			ImGui::SetScrollX(0);
-			ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(0 + p.x, p.y), ImVec2(240 + p.x, 150 + p.y), ImColor(10, 10, 10, 240), 7.f);
-			ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(260 + p.x, p.y), ImVec2(960 + p.x, 1000 + p.y), ImColor(10, 10, 10, 240), 7.f);
-			ImGui::GetWindowDrawList()->AddRect(ImVec2(280 + p.x, +p.y + 20), ImVec2(940 + p.x, 70 + p.y), ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
-			render::RenderImage(platformLogo, ImVec2(0 + p.x, 10 + p.y), ImVec2(240 + p.x, 140 + p.y), COLOR_WHITE);
-
-			DynamicTabs();
-
-			tab_alpha = ImClamp(tab_alpha + (7.f * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
-			tab_add = ImClamp(tab_add + (std::round(350.f) * ImGui::GetIO().DeltaTime * (tabs == active_tab ? 1.f : -1.f)), 0.f, 1.f);
-			ImGui::SetCursorPos(ImVec2(280 - tab_alpha * 40, 88));
-			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, tab_alpha * style->Alpha);
-			DynamicSettings();
-
-			//scripts::champions::DoPopulateMenu();
-			ImGui::PopStyleVar();
+			UPasta::SDK::Menu::DrawTabs();
 
 			ImGui::End();
-			//UPasta::Renderer::RenderFrame();
 		}
-
-		ImGui::Render();
-
-		
 	}
 
 	void Update2()

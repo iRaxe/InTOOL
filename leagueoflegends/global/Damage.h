@@ -5,6 +5,14 @@ namespace UPasta
 {
 	namespace SDK
 	{
+		enum DamageType
+		{
+			DamageType_Physical,
+			DamageType_Magical,
+			DamageType_True,
+			DamageType_Adaptive
+		};
+
 		struct DamageModifierResult {
 			float Flat = 0.0f;
 			float Percent = 0.0f;
@@ -18,7 +26,6 @@ namespace UPasta
 
 		namespace Damage
 		{
-			float CalculateSkillDamage(SpellIndex spellIndex, Object* pEnemy, const std::vector<float>& dmgSkillArray, DamageType dmgType, float additionalPercentageAP = 0.0f, float additionalPercentageAD = 0.0f);
 			float CalculateAutoAttackDamage(Object* source, Object* target);
 			float CalculatePhysicalDamage(Object* source, Object* target, float amount);
 			float CalculateMagicalDamage(Object* source, Object* target, float amount);

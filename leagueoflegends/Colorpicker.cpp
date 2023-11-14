@@ -77,7 +77,7 @@ namespace UPasta
         bool multibox = false;
         void ColorPicker::Draw()
         {
-            CheckPicker(this->DisplayName,this->Name, &multibox, this->RGBA);
+            CheckPicker(SP_STRING(this->DisplayName), SP_STRING(this->Name), &multibox, this->RGBA);
         }
 
         void ColorPicker::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos)

@@ -68,7 +68,14 @@
 
 #include "json.hpp"
 using json = nlohmann::json;
-#define RVA(address) (QWORD)(globals::moduleBase + address)
+#define RVA(address) (uintptr_t)(globals::moduleBase + address)
+#define DEFINE_RVA(address) ((uintptr_t)((uintptr_t)globals::moduleBase + (uintptr_t)address)
+#define CLASS_GETTER(returnType, name, offset) \
+[[nodiscard]] inline returnType name() const noexcept \
+{ \
+	return *reinterpret_cast<returnType*>(std::uintptr_t(this) + offset); \
+}
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #define M_PI_F (float)M_PI

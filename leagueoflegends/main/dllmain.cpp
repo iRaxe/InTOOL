@@ -175,7 +175,7 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 
 	while (true)
 	{
-		float* gameTimePtr = (float*)(globals::moduleBase + oGameTime);
+		float* gameTimePtr = (float*)(globals::moduleBase + UPasta::Offsets::Instance::Game::GameTime);
 		if (IsValidPtr(gameTimePtr) && *gameTimePtr > 3.0f) break;
 		Sleep(300);
 	}
@@ -202,7 +202,7 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 	while (!globals::eject)
 	{
 		Sleep(5);
-		if (!globals::hookResponse && GetAsyncKeyState(VK_DELETE))
+		if (!globals::hookResponse && GetAsyncKeyState(VK_DELETE) || functions::GetGameState() == Paused)
 			globals::eject = true;
 	}
 

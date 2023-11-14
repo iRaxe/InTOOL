@@ -142,7 +142,10 @@ struct SkillShotDB
 	Skillshot JinxW;
 	Skillshot JinxE;
 	Skillshot JinxR;
+	Skillshot KaisaQ;
 	Skillshot KaisaW;
+	Skillshot KaisaE;
+	Skillshot KaisaR;
 	Skillshot KalistaQ;
 	Skillshot KarmaQ;
 	Skillshot KarmaQ2;
@@ -264,7 +267,9 @@ struct SkillShotDB
 	Skillshot TaliyahR;
 	Skillshot TalonW;
 	Skillshot ThreshQ;
+	Skillshot ThreshW;
 	Skillshot ThreshE;
+	Skillshot ThreshR;
 	Skillshot TristanaW;
 	Skillshot TryndamereE;
 	Skillshot TwistedFateQ;

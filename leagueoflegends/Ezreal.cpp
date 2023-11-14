@@ -1,10 +1,7 @@
 #include "Ezreal.h"
-
 #include "Awareness.h"
-#include "Orbwalker.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
-#include "Vayne.h"
 
 class EzrealModule : public ChampionModule
 {
@@ -73,39 +70,14 @@ public:
     }
 
 
-    void OnPopuplateMenu() override
+    void OnPopuplateMenu()
     {
 
     }
 
-    void Init() override
+    void Init()
     {
-        /*ADD_SETTING("Champion Settings", "Combo Settings", "Use Q", true);
-        ADD_SETTING("Champion Settings", "Combo Settings", "Use W", false);
-        ADD_SETTING("Champion Settings", "Combo Settings", "Use R", true);
-        ADD_SETTING_RANGE("Champion Settings", "Combo Settings", "Minimum Enemies", 2, 1, 5);
 
-        ADD_SETTING("Champion Settings", "Harass Settings", "Use Q", false);
-        ADD_SETTING("Champion Settings", "Harass Settings", "Use W", false);
-        ADD_SETTING_RANGE("Champion Settings", "Harass Settings", "Minimum Mana", 60, 1, 100);
-
-        ADD_SETTING("Champion Settings", "Laneclear Settings", "Use Q", false);
-        ADD_SETTING("Champion Settings", "Laneclear Settings", "Use W", false);
-        ADD_SETTING_RANGE("Champion Settings", "Laneclear Settings", "Minimum Mana", 60, 1, 100);
-
-        ADD_SETTING("Champion Settings", "Jungleclear Settings", "Use Q", false);
-        ADD_SETTING("Champion Settings", "Jungleclear Settings", "Use W", false);
-        ADD_SETTING_RANGE("Champion Settings", "Jungleclear Settings", "Minimum Mana", 60, 1, 100);
-
-        ADD_SETTING("Champion Settings", "Lasthit Settings", "Use Q", false);
-        ADD_SETTING_RANGE("Champion Settings", "Lasthit Settings", "Minimum Mana", 60, 1, 100);
-
-        ADD_SETTING("Champion Settings", "Killsteal Settings", "Use Q", true);
-        ADD_SETTING("Champion Settings", "Killsteal Settings", "Use E", false);
-        ADD_SETTING("Champion Settings", "Killsteal Settings", "Use R", true);
-        ADD_SETTING("Champion Settings", "LasthiasdAt Settings", "Use R", true);
-
-        ADD_SETTING("Champion Settings", "AntiGapCloser Settings", "Use E", false);*/
         const auto EzrealMenu = Menu::CreateMenu("vezEzreal", "vez.Ezreal");
 
         const auto combo = EzrealMenu->AddMenu("Combo Settings", "Combo Settings");
@@ -314,8 +286,8 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < qRange() && isTimeToCastQ())
         {
-            prediction::PredictionOutput qPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealQ, qPrediction))
+            scripts::prediction::PredictionOutput qPrediction;
+            if (scripts::prediction::GetPrediction(globals::localPlayer, pEnemy, database.EzrealQ, qPrediction))
             {
                 functions::CastSpell(SpellIndex::Q, qPrediction.position);
                 QCastedTime = gameTime;
@@ -330,8 +302,8 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < wRange() && isTimeToCastW())
         {
-            prediction::PredictionOutput wPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealW, wPrediction))
+            scripts::prediction::PredictionOutput wPrediction;
+            if (scripts::prediction::GetPrediction(globals::localPlayer, pEnemy, database.EzrealW, wPrediction))
             {
                 functions::CastSpell(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
@@ -358,8 +330,8 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < rRange() && isTimeToCastR())
         {
-            prediction::PredictionOutput rPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealR, rPrediction))
+            scripts::prediction::PredictionOutput rPrediction;
+            if (scripts::prediction::GetPrediction(globals::localPlayer, pEnemy, database.EzrealR, rPrediction))
             {
                 functions::CastSpell(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
@@ -367,7 +339,7 @@ public:
         }
     }
 
-    void Update() override
+    void Update()
     {
         gameTime = functions::GetGameTime();
 
@@ -402,7 +374,7 @@ public:
         }*/
     }
 
-    void Attack() override
+    void Attack()
     {
         if (EzrealConfig::EzrealCombo::UseR->Value == true && database.EzrealR.IsCastable() && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), EzrealConfig::EzrealSpellsSettings::minRDistance->Value).size() >= EzrealConfig::EzrealCombo::enemiesInRange->Value)
         {
@@ -423,12 +395,12 @@ public:
         }
     }
 
-    void Clear() override
+    void Clear()
     {
         //Laneclear
         if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() > 0)
         {
-           
+
             if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealClear::minMana->Value)) return;
 
             if (EzrealConfig::EzrealClear::UseQ->Value == true && database.EzrealQ.IsCastable())
@@ -460,7 +432,7 @@ public:
     }
 
 
-    void Harass() override
+    void Harass()
     {
         if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealHarass::minMana->Value))
             return;
@@ -478,7 +450,7 @@ public:
         }
     }
 
-    void Lasthit() override
+    void Lasthit()
     {
         if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealLastHit::minMana->Value))
             return;
@@ -491,7 +463,7 @@ public:
         }
     }
 
-    void Flee() override
+    void Flee()
     {
         if (EzrealConfig::EzrealFlee::UseE->Value == true && database.EzrealE.IsCastable())
         {
@@ -577,7 +549,7 @@ public:
     }
 
     //Events
-    void OnBeforeAttack() override
+    void OnBeforeAttack()
     {
         __try {
             //Combo mode
@@ -588,12 +560,12 @@ public:
                 {
                     if (EzrealConfig::EzrealCombo::UseW->Value == true && database.EzrealW.IsCastable() && EzrealConfig::EzrealSpellsSettings::wCastMode->Value == 1)
                     {
-                    	Ezreal_UseW(object);
+                        Ezreal_UseW(object);
                     }
 
                     if (EzrealConfig::EzrealCombo::UseQ->Value == true && database.EzrealQ.IsCastable() && EzrealConfig::EzrealSpellsSettings::qCastMode->Value == 1)
                     {
-                    	Ezreal_UseQ(object);
+                        Ezreal_UseQ(object);
                     }
                 }
             }
@@ -605,7 +577,7 @@ public:
                 {
                     if (EzrealConfig::EzrealClear::UseW->Value == true && database.EzrealW.IsCastable() && Ezreal_HasEnoughMana(EzrealConfig::EzrealClear::minMana->Value))
                     {
-                    	Ezreal_UseW(object);
+                        Ezreal_UseW(object);
                     }
                 }
             }
@@ -620,16 +592,16 @@ public:
 
                     if (EzrealConfig::EzrealHarass::UseW->Value == true && database.EzrealW.IsCastable() && EzrealConfig::EzrealSpellsSettings::wCastMode->Value == 1)
                     {
-                    	Ezreal_UseW(object);
+                        Ezreal_UseW(object);
                     }
 
                     if (EzrealConfig::EzrealHarass::UseQ->Value == true && database.EzrealQ.IsCastable() && EzrealConfig::EzrealSpellsSettings::qCastMode->Value == 1)
                     {
-                    	Ezreal_UseQ(object);
+                        Ezreal_UseQ(object);
                     }
                 }
             }
-            
+
         }
         __except (1)
         {
@@ -637,12 +609,12 @@ public:
         }
     }
 
-    void OnCastSpell() override
+    void OnCastSpell()
     {
 
     }
 
-    void Render() override
+    void Render()
     {
         __try {
             if (EzrealConfig::EzrealSpellsSettings::DrawQ->Value == true && (EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == true && database.EzrealQ.IsCastable() || EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == false))

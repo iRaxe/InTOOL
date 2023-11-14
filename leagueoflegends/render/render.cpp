@@ -22,7 +22,6 @@ namespace render
 		imFont = io.Fonts->AddFontDefault();
 		UPasta::SDK::Awareness::Functions::Initialize();
 		initAngles();
-		
 	}
 
 	void Update()
@@ -65,9 +64,6 @@ namespace render
 
 				__try { AddEventHandler(EventManager::EventType::OnDraw, drawings::Update); }
 				__except (1) { LOG("[Event Handler - Add] Error in utilities drawings"); }
-
-				__try { AddEventHandler(EventManager::EventType::OnDraw, UPasta::SDK::Awareness::Functions::Update); }
-				__except (1) { LOG("[Event Handler - Add] Error in awareness drawings"); }
 
 				__try { AddEventHandler(EventManager::EventType::OnDraw, UPasta::SDK::Awareness::Functions::Update); }
 				__except (1) { LOG("[Event Handler - Add] Error in awareness drawings"); }
@@ -158,46 +154,79 @@ namespace render
 
 				for (int i = 0; i < obj->GetBuffListSize(); i++)
 				{
-
 					auto buffEntry = obj->GetBuffManager()->GetBuffEntryByIndex(i);
 					if (!buffEntry) return;
 
 					auto buff = buffEntry->GetBuff();
-					if (buff && buff->GetEndTime() >= functions::GetGameTime() && buff->GetStacks() > buff->GetStacksAlt())
+
+					RenderText("Buff Name:" + buff->GetName()
+						+ " Buff Stacks: " + std::to_string(buff->GetStacks())
+						+ " Buff AltStacks: " + std::to_string(buff->GetStacksAlt())
+						+ " Hex: " + functions::GetHexString(RealNameInHash(buff->GetName().c_str())),
+						(screenPos - Vector2(0.0f, 22.0f + baseDraw2)).ToImVec(), 18.0f, COLOR_WHITE, true);
+					baseDraw2 += 22.0f;
+
+				}
+			}
+			void test()
+			{
+				QWORD tempAllObject = globals::moduleBase + UPasta::Offsets::Instance::Lists::ObjManager;
+				QWORD dw0 = *(QWORD*)tempAllObject;
+				if (!dw0)
+					return;
+
+				QWORD dw1 = *(QWORD*)(dw0 + 0x18);
+				if (!dw1)
+					return;
+
+				QWORD dw2 = *(QWORD*)(dw0 + 0x20);
+				if (!dw2)
+					return;
+
+				int countAllObj = (dw2 - dw1) / 8;
+				if (!countAllObj)
+					return;
+
+				int jCount = 0;
+				for (int k = 0; k < countAllObj; ++k)
+				{
+					QWORD dw3 = *(QWORD*)(dw1 + 8 * k);
+					if (dw3 == 0)
+						continue;
+
+					if ((BYTE)dw3 & 1)
+						continue;
+
+					Object* object = (Object*)dw3;
+					if (IsValidPtr(object) && IsNotZeroPtr(object) && object)
 					{
-						RenderText("Buff Name:" + buff->GetName() 
-							+ " Buff Stacks: " + std::to_string(buff->GetStacks()) 
-							+ " Buff AltStacks: " + std::to_string(buff->GetStacksAlt()) 
-							+ " Hex: " + functions::GetHexString(buff_hash_real(buff->GetName().c_str())),
-								(screenPos - Vector2(0.0f, 22.0f + baseDraw2)).ToImVec(), 18.0f, COLOR_WHITE, true);
-						baseDraw2 += 22.0f;
+						char* name = *reinterpret_cast<char**>(reinterpret_cast<QWORD>(object) + 0x60);
+						if (IsValidPtr(name) && IsNotZeroPtr(name) && name)
+							if (strstr(name, ".troy") != nullptr)
+							{
+								RenderCircleWorld(object->GetPosition(), 30, 200, COLOR_WHITE, 1.0f, false, false);
+								RenderText(name, functions::WorldToScreen(object->GetPosition()).ToImVec(), 24, COLOR_WHITE, true);
+							}
+
 					}
 				}
 			}
 
 			void Update()
 			{
+
+				//test();
+
 				if (SETTINGS_BOOL("Drawings", "Draw EnemyList"))
 				{
 					DrawEnemyListNames();
 				}
-
-				/*for (int i = 0; i < globals::heroManager->GetListSize(); i++)
-				{
-					auto obj = globals::heroManager->GetIndex(i);
-					if (obj->IsHero())
-					{
-
-						DrawBuffNames(obj);
-
-						if (SETTINGS_BOOL("Drawings", "Draw Spells cooldown"))
-						{
-							//DrawCooldownBar(obj);
-						}
-					}
-				}*/
+			
 			}
 		}
+
+		
+		
 
 		namespace debug
 		{
@@ -214,17 +243,17 @@ namespace render
 
 			void DrawObjectData()
 			{
+				for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+				{
+					auto obj = globals::heroManager->GetIndex(i);
+					drawings::DrawBuffNames(obj);
+
+				}
 				/*auto minion = Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
 				if (minion)
 				{
 					RenderText(minion->GetName(), functions::WorldToScreen(minion->GetPosition()).ToImVec(), 18.0f, COLOR_WHITE, true);
 				}*/
-				for (int i = 0; i < globals::buildingsManager->GetListSize(); i++)
-				{
-					auto obj = globals::buildingsManager->GetIndex(i);
-					if (obj->IsVisible())
-						DrawData(obj, i);
-				}
 
 				/*for (int i = 0; i < globals::minionManager->GetListSize(); i++)
 				{
@@ -233,12 +262,7 @@ namespace render
 						DrawData(obj, i);
 				}
 
-				for (int i = 0; i < globals::heroManager->GetListSize(); i++)
-				{
-					auto obj = globals::heroManager->GetIndex(i);
-					//if (obj->IsValidTarget())
-						DrawData(obj, i);
-				}
+				
 
 				for (int i = 0; i < globals::turretManager->GetListSize(); i++)
 				{
@@ -316,7 +340,7 @@ namespace render
 				//DrawObjectData();
 				if (SETTINGS_BOOL("debug", "draw object data"))  
 				{
-					DrawObjectData();
+					//DrawObjectData();
 					//EventManager::AddEventHandler(EventManager::EventType::OnDraw, DrawObjectData);
 				}
 				//DrawPlayerPaths();

@@ -35,12 +35,12 @@ namespace render
 	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height = false, bool glow = false);
 	void RenderWardRange(const Vector3& position, const ImColor& color, const float& range = 1100.f, bool brushes = true);
 	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls);
-	void RenderPolygon(const Geometry::Polygon poly, const uintptr_t color, float thickness);
-	void RenderFilledPolygon(const Geometry::Polygon poly, uintptr_t color);
+	void RenderPolygon(const Geometry::Polygon& poly, const uintptr_t color, float thickness);
+	void RenderFilledPolygon(const Geometry::Polygon& poly, uintptr_t color);
 	float AngleBetween3point(const Vector3& vec_3d, const Vector3& pos_ext, const Vector3& current_pos);
 	void DrawArc(const Vector3& worldPos, float radius, float thickness, const uintptr_t color, int numSegments, float startAngle, float endAngle);
 	void initAngles();
-	void setQuality(const uint32_t quality);
+	void setQuality();
 
 	void Init();
 	void Update();

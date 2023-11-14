@@ -1,341 +1,463 @@
 #pragma once
+namespace UPasta
+{
+	namespace Offsets
+	{
+		namespace Instance
+		{
+			constexpr inline uintptr_t SpoofGadget = 0xD8C410;								//E8 ? ? ? ? 44 8B 40 10
+			constexpr inline uintptr_t LocalPlayer = 0x220C7D8;								//48 8B 05 ? ? ? ? 4C 8B D2 4C 8B C1
 
-// Functions
-#define oGetBaseDrawPosition 0x204C70 // E8 ? ? ? ? EB 06 49 8B 06 Stesso sub della sig OK
-#define oWorldToScreen 0xE36BA0 // 48 83 EC 38 49 8B C0  Sub sopra a tutto OK
-#define oTryRightClick 0x8A6610 // 48 89 5C 24 ? 57 48 83 EC 50 48 8B D9 0F 29 74 24 ? 48 8B 0D ? ? ? ? Sub sopra a tutto OK
-#define oIssueClick  0x8BC460 // 44 88 44 24 ? 48 89 4C 24 ? 55
-#define oIssueMove  0x8A59F0 // 48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B F1 41 0F B6 F9 
-#define oCastSpellWrapper 0x8B11C0 // E8 ? ? ? ? 48 8B 53 08 48 8B 42 60
-#define oReleaseSpell 0x889B70 // 48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 40 8B DA 48 8B F9 
-#define oPrintChat 0x85E6D0 // E8 ? ? ? ? 4C 8B C3 B2 01 Stesso sub della sig OK
-#define oGetBoundingRadius 0x2021C0 // E8 ? ? ? ? 0F 28 F8 48 8B D6 Stesso sub della sig FORSE TROVATO
-#define oGetAttackDelay 0x3A2910 // F3 0F 10 89 ? ? ? ? E9 ? ? ? ? SUB SOPRA, NON JMP
-#define oGetAttackWindup 0x3A2810 // E8 ? ? ? ? 49 8B CE F3 0F 11 83 ? ? ? ? Stesso sub della sig OK
-#define oGetObjectFromNetId 0x3A5E40 // 4C 8B C1 85 D2 74 1B Sub sopra a tutto OK
-#define oGetCollisionFlags 0xDAD230 // 48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A Stesso sub della sig FORSE TROVATO
-#define oCharacterDataStackUpdate 0x18A450 // E8 ? ? ? ? 80 BD ? ? ? ? ? 74 0D Stesso sub della sig
+			namespace Game	{
+				constexpr inline uintptr_t GameTime = 0x21FA3A8;							//F3 0F 5C 35 ? ? ? ? 0F 28 F8
+				constexpr inline uintptr_t GameState = 0x21F2CC0;							//48 8D 4D D7 48 8B 05 ? ? ? ?
 
-#define fIsNotLocalPlayer  0x210B00 // 33 C0 48 3B 0D ? ? ? ? 
-#define fIsAttackingLocalPlayer  0x2125A0 // 5B C3 CC CC CC CC CC 48 8D 91 ? ? ? ? SUB SOTTO (QUESTO E' SOLO UN RIFERIMENTO)
-#define fIsAlive 0x24E2A0 //E8 ? ? ? ? 84 C0 74 35 48 8D 8F ? ? ? ? 
-#define fIsHero 0x2664B0 //E8 ? ? ? ? 84 C0 48 0F 45 F3 Sub sopra a tutto
-#define fIsMinion 0x266510 //E8 ? ? ? ? 48 8B 0B F3 0F 10 41 ? Sub sopra a tutto
-#define fIsTurret 0x266660 //E8 ? ? ? ? 84 C0 74 56 48 8B 06 Sub sopra a tutto
-#define fIsMissile 0x266540 //E8 ? ? ? ? 84 C0 74 0C 48 8B 17 Sub sopra a tutto
-#define fIsInhibitor 0x2663F0  //E8 ? ? ? ? 84 C0 75 0C 33 D2 Sub sopra a tutto
-#define fIsNexus 0x266430 //E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? F3 0F 10 44 24 ? 48 8D 54 24 ? Sub sopra a tutto
-#define fIsObjectType 0x211F00 //0F B6 41 48 4C 8B C9 Sub sopra a tutto
-#define fIsDead 0x211100 // E8 ? ? ? ? 0F B6 F0 EB 17 Sub sopra a tutto è un int
-#define fIsCanSee  0x25E3D0 // 40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 90 ? ? ? ? 84 C0 75 19 Sub sopra a tutto è un int
-#define fIsNotWall  0xDB3340 // E8 ? ? ? ? 34 01 44 3A F0
-#define fGetPing 0x920530 // E8 ? ? ? ? 8B F8 39 03 Sub sopra a tutto
-#define fRenderUsualSuspects 0x618E10 // 48 8B C4 48 89 58 18 89
-#define fIsTargetable  0xA31C90 // 40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 84 C0 74 41 DA TROVARE, COMPLETAMENTE MORTO
-#define fIsVisible  0x2134A0 //48 89 5C 24 ? 56 48 83 EC 20 8B 91 ? ? ? ? 
-#define fGetSpellSlot 0x894E20 // E8 ? ? ? ? 83 F8 FF 74 0A
-#define fGetSpellState 0x6EF9C0 // E8 ? ? ? ? 48 8B CE 44 8B F8
-#define fGetSpellRange 0x6A2450 // E8 ? ? ? ? 0F 28 F8 41 8B 47 18
-#define fGetStatTotal 0x6A2450 // E8 ? ? ? ? 0F 28 F8 41 8B 47 18
-#define fGetOwner 0x2047D0 // E8 ? ? ? ? 4C 3B F8 0F 94 C0
-#define fGetOwnerPlayer  0x2081E0 //E8 ? ? ? ? 40 38 30 75 24
+				namespace MapInfo {
+					constexpr inline uintptr_t GameMap = 0x1A7E50;							//E8 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 48 8D 8D ? ? ? ? 
+					constexpr inline uintptr_t LobbyName = 0x38;								
+					constexpr inline uintptr_t PlayerIP = 0x140;								
+				}
 
-#define fGetHeightAtPosition 0xDB74C0//E8 ? ? ? ? F3 0F 10 45 ? B0 01
+			}
+			
+			namespace Lists {
+				constexpr inline uintptr_t ObjManager = 0x21EFC00;							//48 8B 0D ? ? ? ? E8 ? ? ? ? 33 ED 48 8B F8
+				constexpr inline uintptr_t ManagerList = 0x8;								//E8 ? ? ? ? E9 ? ? ? ? 80 FA 05
+				constexpr inline uintptr_t ManagerListSize = 0x10;							
 
-// Events not needed now
-#define fOnCreateObject  0x3BABD0  // E8 ? ? ? ? 48 8B 3D ? ? ? ? 8B 9E ? ? ? ? 
-#define fOnDeleteObject  0x3A3FD0  // E8 ? ? ? ? 4D 8D 6F 1C
-#define fOnStartSpellCast 0x712780 // 40 53 48 83 EC 30 4C 8B 0A 
-#define fOnProcessSpell 0x15C430 // 48 89 5C 24 ? 55 56 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 44 8B 05 ? ? ? ? 
-#define fOnProcessSpellIndex 0x1198 // 48 81 C1 ? ? ? ? 48 8B 01 FF 90 ? ? ? ? 48 83 7B ? ? 72 03 48 8B 1B 4C 8B C3 https://www.unknowncheats.me/forum/3750580-post9420.html
-#define fOnStopSpellCast 0x712AE0 // 44 88 4C 24 20 4C 89 44 24 18 88 DWORD64
-#define fOnSpellImpact 0x70A0C0 //VECCHIO FUNZIONANTE 13.20 0x701D90 48 89 5C 24 10 48 89 6C 24 18 57 41 54 41 55 41 56 41 57 48 81 QWORD* __fastcall Spell::SpellbookClient::OnSpellImpact(Spell::SpellbookClient* a1, const Spell::SpellCastInfo *a2) https://streamable.com/x4e7ib https://streamable.com/xuvq05 https://www.unknowncheats.me/forum/3755876-post9525.html
-#define fGetRespawnTimeRemaining  0x208DE0 //40 53 48 83 EC 20 48 8B D9 48 81 C1 ? ? ? ? E8 ? ? ? ? 0F B6 83 ? ? ? ?
-#define fShopActions 0x0 //40 55 53 56 41 56 41 57 48 8D 6C
-#define fGetCircleIconPortrait 0x2047D0 //E8 ? ? ? ? 4C 3B F8 0F 94 C0
-#define fBuildNavPath 0xDA93D0 // 48 8B C4 48 89 58 10 55 56 57 41 54 41 55 41 56 41 57 48 8D
-#define fSmoothPath  0x8F85A0// 40 53 55 41 56 48 83 EC 50 48
-#define fBuyItem  0x0 //40 55 53 56 41 56 41 57 48 8D 6C 24 ? 48 81 EC
-#define fSellItem  0x0 //40 57 48 83 EC 20 8B FA E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 48 89 5C 24 13.17 hotfix worka DA RITROVARE
-#define fUndoItem  0x0 //48 89 5C 24 ? 57 48 83 EC 30 48 8B F9 48 8B 49 08 48 8B 01 FF 90 ? ? ? ? 48 85 C0 74 15 48 8B 4F 08 48 8B 01
+				constexpr inline uintptr_t HeroList = 0x21EFD20;							//48 8B 05 ? ? ? ? 45 33 E4 0F 57 C0
+				constexpr inline uintptr_t AttackableList = 0x21EFD60;						//EB CE 48 8B 82 ? ? ? ?
+				constexpr inline uintptr_t MinionList = 0x21F2C80;							//48 8B 0D ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? 48 8B C8
+				constexpr inline uintptr_t TurretList = 0x21F9620;							//48 8B 1D ? ? ? ? 48 8B 5B 28
+				constexpr inline uintptr_t InhibList = 0x220CAB8;							//48 8B 05 ? ? ? ? 48 89 7C 24 ? 48 8B 58 08
+				constexpr inline uintptr_t MissileList = 0x220C8C0;							//48 8B 0D ? ? ? ? 48 8D 54 24 ? E8 ? ? ? ? 48 8B 7C 24 ?
+			}
 
-// Variables
-#define oGameState 0x21DC2F0 // 48 8D 4D D7 48 8B 05 ? ? ? ?
-#define oGameMap 0x1A74D0 // E8 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 48 8D 8D ? ? ? ? 
-#define oLobbyName 0x38
-#define oServerIP 0x140
+			namespace HUD	{
 
-#define oSpoofGadget 0xD79A40 // E8 ? ? ? ? 44 8B 40 10
-#define oGameTime 0x21E3948 // F3 0F 5C 35 ? ? ? ? 0F 28 F8 Stessa qword della sig OK
-#define oLocalPlayer 0x21F5AC0 // 48 8B 05 ? ? ? ? 4C 8B D2 4C 8B C1 Stessa qword della sig OK
+				constexpr inline uintptr_t HudInstance = 0x21EFC10;							//48 8B 0D ? ? ? ? 8B 57 10
+				constexpr inline uintptr_t Input = 0x28;
+				constexpr inline uintptr_t UserData = 0x60;
+				constexpr inline uintptr_t UserDataSelectedNetId = 0x28;
+				constexpr inline uintptr_t SpellInfo = 0x68;
 
-#define oShopGUI 0x21F5A90 // 75 4B 48 8B 0D ? ? ? ? 48 85 C9
-#define ShopIsOpen 0xC
+				namespace Mouse {
+					constexpr inline uintptr_t Instance = 0x21F2C48;						//48 8B 0D ? ? ? ? 48 83 C1 20 E9 ? ? ? ?
+					constexpr inline uintptr_t Position = 0x0C;								//E9 ? ? ? ? 48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ?
+					constexpr inline uintptr_t UnderMouse = 0x21F2E78;						//48 8B 05 ? ? ? ? 48 8B F9 33 C9 48 8B DA
 
-#define oHudInstance 0x21D9230 // 48 8B 0D ? ? ? ? 8B 57 10 OK
-#define oMouseInstance 0x21DC278 //48 8B 0D ? ? ? ? 48 83 C1 20 E9 ? ? ? ?
-#define oZoomInstance 0x21E1E38 // 48 8B 05 ? ? ? ? 48 8B 5C 24 ? 48 89 47 70 OK
-#define oChatClient 0x21F5C60 // 41 FF D1 48 8B 0D ? ? ? ? 0F B6 D8 
-#define oChatInstance 0x21DC4E0 // 75 78 48 8B 1D ? ? ? ? 
-#define oViewport 0x21DC270 // 48 8B 3D ? ? ? ? FF 90 ? ? ? ? OK
-#define oObjManager 0x21D9220 // 48 8B 0D ? ? ? ? E8 ? ? ? ? 33 ED 48 8B F8 OK
-#define oGetObjectFromNetIdParam 0x21D9220 // 48 8B 0D ? ? ? ? E8 ? ? ? ? 33 ED 48 8B F8 stesso di objmanager OK
-#define oBuildingsManager 0x21DC2B0 // 4C 8B 05 ?? ?? ?? ?? 49 8B 78 08 41 8B 40 10 48 8D 0C C7 48 3B F9 73 49
-#define oMinimapObject 0x21E8DF0 // 48 8B 1D ? ? ? ? 48 85 DB 74 22 OK
-#define oMissilesList 0x21F5BC0 // 48 8B 0D ? ? ? ? 48 8D 54 24 ? E8 ? ? ? ? 48 8B 7C 24 ? https://www.unknowncheats.me/forum/league-of-legends/310587-league-legends-reversal-structs-offsets-478.html https://www.unknowncheats.me/forum/league-of-legends/434211-reading-missiles-externally.html
-#define oAttackableList 0x21D9380// EB CE 48 8B 82 ? ? ? ?  Stessa qword FORSE TROVATO
-#define oHeroList 0x21D9340 // 48 8B 05 ? ? ? ? 45 33 E4 0F 57 C0
-#define oMinionsList 0x21DC2B0 // 48 89 0D ? ? ? ? 48 8D 05 ? ? ? ? 33 D2 48 89 01 48 8D 05 ? ? ? ? 
-#define oTurretsList 0x21E2BC0 // 48 8B 1D ? ? ? ? 48 8B 5B 28
-#define oInhibitorList 0x21F5DB8 // 48 8B 05 ? ? ? ? 48 89 7C 24 50
+					constexpr inline uintptr_t InputMouseWorldPos = 0x20;					
+				}
 
-// Structs
-#define oMousePosition 0x0C 
+				namespace Camera	{
+					constexpr inline uintptr_t Instance = 0x21F88C8;						//48 8B 05 ? ? ? ? 48 8B 5C 24 ? 48 89 47 70
+					constexpr inline uintptr_t Camera = 0x18;						
+					constexpr inline uintptr_t Value = 0x2B8;						
+					constexpr inline uintptr_t Limit = 0x28;						
+				}
 
-#define oManagerList 0x8
-#define oManagerListSize 0x10
+				namespace Chat {
+					constexpr inline uintptr_t Instance = 0x21F2EB0;						//75 78 48 8B 1D ? ? ? ? 
+					constexpr inline uintptr_t Client = 0x220C960;							//48 8B 05 ? ? ? ? 88 90 ? ? ? ? C3
+					constexpr inline uintptr_t IsOpen = 0xC90;							
+				}
 
-#define oViewportW2S 0x270
+				namespace Shop {
+					constexpr inline uintptr_t Instance = 0x21F2EB0;						//75 4B 48 8B 0D ? ? ? ? 48 85 C9 DA TROVARE
+					constexpr inline uintptr_t IsOpen = 0xC;							
+				}
 
-#define oHudInstanceCamera 0x18
-#define oHudInstanceInput 0x28
-#define oHudInstanceUserData 0x60
-#define oHudInstanceSpellInfo 0x68
+				namespace Minimap {
+					constexpr inline uintptr_t Instance = 0x21FF7F0;						//48 8B 1D ? ? ? ? 48 85 DB 74 22
+					constexpr inline uintptr_t HudInstance = 0x320;
+					constexpr inline uintptr_t Position = 0x60;
+					constexpr inline uintptr_t Size = 0x68;
+					//https://www.unknowncheats.me/forum/3727406-post9100.html i need this shit
+				}
 
-#define oHudInstanceCameraZoom 0x2B8
+				namespace Viewport {
+					constexpr inline uintptr_t ViewProjMatrices = 0x2255C90;				//48 8D 0D ? ? ? ? 0F 10 00
+					constexpr inline uintptr_t ViewPort = 0x21F2C40;						//48 8B 3D ? ? ? ? FF 90 ? ? ? ?
+					constexpr inline uintptr_t W2S = 0x270;							
+				}
+			}
 
-#define oHudInstanceInputMouseWorldPos 0x20
+			constexpr inline uintptr_t PingNet = 0x21EFBF0;									//48 8B 05 ? ? ? ? 4C 8B CA 48 8B D9
+		}
 
-#define oHudInstanceUserDataSelectedObjectNetId 0x28
+		namespace Functions
+		{
+			namespace Drawings {
+				constexpr inline uintptr_t GetBaseDrawPosition = 0x205B70;					//E8 ? ? ? ? EB 06 49 8B 06
+				constexpr inline uintptr_t WorldToScreen = 0xE49C20;						//E8 ? ? ? ? 49 8D 97 ? ? ? ? 4C 8D 45 D8
+				constexpr inline uintptr_t GetCollisionFlags = 0xDBFD60;					//48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A
+			}
 
-#define oZoomInstanceMaxZoom 0x28
+			namespace Orders {
+				constexpr inline uintptr_t IssueClick = 0x8C4C80;							//45 33 C0 E8 ? ? ? ? 48 83 C4 48
+				constexpr inline uintptr_t IssueRClick = 0x8AEEB0;							//48 89 5C 24 ? 57 48 83 EC 50 48 8B D9 0F 29 74 24 ? 48 8B 0D ? ? ? ?
+				constexpr inline uintptr_t IssueMove = 0x8AE290;							//48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B F1 41 0F B6 F9
+				constexpr inline uintptr_t BuildNavPath = 0xDBBEF0;							//48 8B C4 48 89 58 10 55 56 57 41 54 41 55 41 56 41 57 48 8D
+				constexpr inline uintptr_t BuildSmoothPath = 0x900EA0;						//40 53 55 41 56 48 83 EC 50 48
+			}
 
-#define oChatClientChatOpen 0xC90
+			namespace HUD {
 
-//structs
-#define oObjNetId 0x10
-#define oObjTeam 0x3C
-#define oObjIssueClickFloatCheck1 0x84
-#define oObjIssueClickFloatCheck2 0x88
-#define oObjIssueClickCheck 0xD4 
-#define oObjPosition 0x220
-#define oObjVisible 0x320
-#define oObjAlive 0x338
+				namespace Chat {
+					constexpr inline uintptr_t PrintChat = 0x862CE0;						//E8 ? ? ? ? 4C 8B C3 B2 01
+				}
 
-#define oObjMana 0x350
-#define oObjMaxMana 0x368
+				constexpr inline uintptr_t GetCircleIconPortrait = 0x2056D0;				//E8 ? ? ? ? 4C 3B F8 0F 94 C0
+				constexpr inline uintptr_t GetPing = 0x49D160;								//E8 ? ? ? ? 8B F8 39 03
+				constexpr inline uintptr_t SendPing = 0x195F80;								//E8 ? ? ? ? 48 8B 8B ? ? ? ? 44 89 B9 ? ? ? ?
 
-#define oObjAmmo 0x3F8
-#define oObjMaxAmmo 0x410
+				constexpr inline uintptr_t RenderUsualSuspects = 0x60DC20;					//48 8B C4 48 89 58 18 89
 
-#define oObjIsInvulnerable 0x500
-#define oObjTargetable 0xEC0
+				constexpr inline uintptr_t GetHeightAtPosition = 0xDCA190;					//E8 ? ? ? ? F3 0F 10 45 ? B0 01
+				constexpr inline uintptr_t IsNotWall = 0xDC6010;							//E8 ? ? ? ? 34 01 44 3A F0
 
-#define oObjHealth 0x1068
-#define oObjMaxHealth 0x1080
-#define oObjBonusHealth 0x15C8
-#define oObjHealthRegen 0x16B8
+			}
 
-#define oObjArmor 0x16A4
-#define oObjBonusArmor 0x16A8
-#define oObjArmorPen 0X1590
-#define oObjectShield 0x10C8 
-#define oObjectPhysicalShield 0x10F0
+			namespace Stats {
+				constexpr inline uintptr_t HasBuff = 0x20DFC0;								//48 89 5C 24 ? 57 48 83 EC 20 48 8B 01 41 8B D8
+				constexpr inline uintptr_t GetStatTotal = 0x6A0E90;							//E8 ? ? ? ? 0F 28 F8 41 8B 47 18
+				constexpr inline uintptr_t GetOwner = 0x18F2C0;								//E8 ? ? ? ? 4C 3B F8 0F 94 C0
+				constexpr inline uintptr_t GetOwnerPlayer = 0x2090E0;						//E8 ? ? ? ? 40 38 30 75 24
 
-#define oObjMagicResist 0x16AC
-#define oObjBonusMagicResist 0x16B0
-#define oObjMagicPen 0x1594
-#define oObjMagicPenMulti 0x11D0
-#define oObjectMagicalShield 0x1108
+				constexpr inline uintptr_t GetAttackDelay = 0x3A3BD0;						//F3 0F 10 89 ? ? ? ? E9 ? ? ? ?
+				constexpr inline uintptr_t GetAttackCastDelay = 0x3A3AD0;					//E8 ? ? ? ? 48 8B CE F3 0F 11 83 ? ? ? ?
+				constexpr inline uintptr_t GetBoundingRadius = 0x2030C0;					//E8 ? ? ? ? 0F 28 F8 48 8B D6
+				constexpr inline uintptr_t GetObjectFromNetID = 0x3A7110;					//4C 8B C1 85 D2 74 1B
 
-#define oObjActionState 0x13D0
+				constexpr inline uintptr_t IsNotLocalPlayer = 0x211C30;						//33 C0 48 3B 0D ? ? ? ? 
+				constexpr inline uintptr_t IsAttackingLocalPlayer = 0x2136D0;				//5B C3 CC CC CC CC CC 48 8D 91 ? ? ? ? SUB SOTTO (QUESTO E' SOLO UN RIFERIMENTO)
+				constexpr inline uintptr_t IsObjectType = 0x213030;							//0F B6 41 48 4C 8B C9
+				constexpr inline uintptr_t IsCanSee = 0x25FA80;								//40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 90 ? ? ? ? 84 C0 75 19
+				constexpr inline uintptr_t IsVisible = 0x2145D0;							//48 89 5C 24 ? 56 48 83 EC 20 8B 91 ? ? ? ?
+				constexpr inline uintptr_t IsTargetable = 0xA3C150;							//40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 84 C0 74 41
+				constexpr inline uintptr_t IsAlive = 0x24F870;								//E8 ? ? ? ? 84 C0 74 35 48 8D 8F ? ? ? ?
+				constexpr inline uintptr_t IsDead = 0x212230;								//E8 ? ? ? ? 0F B6 F0 EB 17
+				constexpr inline uintptr_t IsHero = 0x267B10;								//E8 ? ? ? ? 84 C0 48 0F 45 F3
+				constexpr inline uintptr_t IsMinion = 0x267B70;								//E8 ? ? ? ? 48 8B 0B F3 0F 10 41 ?
+				constexpr inline uintptr_t IsTurret = 0x267CC0;								//E8 ? ? ? ? 84 C0 74 56 48 8B 06
+				constexpr inline uintptr_t IsMissile = 0x267BA0;							//E8 ? ? ? ? 84 C0 74 0C 48 8B 17
+				constexpr inline uintptr_t IsInhibitor = 0x267A50;							//E8 ? ? ? ? 84 C0 75 0C 33 D2
+				constexpr inline uintptr_t IsNexus = 0x267A90;								//E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? F3 0F 10 44 24 ? 48 8D 54 24 ?
+			}
 
-#define oObjLethality 0x15A8
+			namespace Spells {
+				constexpr inline uintptr_t HudCastSpell = 0x8B9AF0;							//E8 ? ? ? ? 48 8B 53 08 48 8B 42 60
+				constexpr inline uintptr_t NewCastSpell = 0x8A16C0;							//E8 ? ? ? ? 83 7B 4C 00 75 3D
+				constexpr inline uintptr_t ReleaseSpell = 0x891A50;							//48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 40 8B DA 48 8B F9
 
-#define oObjBonusAttackDamage 0x15E8
-#define oObjBaseAttackDamage 0x167C
-#define oObjScale 0x1694
+				constexpr inline uintptr_t GetSpellBook = 0xD63FA0;							//48 83 EC 28 4C 8B 41 08 44 8B CA ERA E8 ? ? ? ? 49 8B 5D 68 4C 8B F0 
+				constexpr inline uintptr_t GetSpellSlot = 0x89D410;							//E8 ? ? ? ? 83 F8 FF 74 0A
+				constexpr inline uintptr_t GetSpellState = 0x6F6140;						//E8 ? ? ? ? 48 8B CE 44 8B F8
+				constexpr inline uintptr_t GetSpellRange = 0x6A0E90;						//E8 ? ? ? ? 0F 28 F8 41 8B 47 18
 
-#define oObjAbilityPower 0x15F8
-#define oObjLevel 0x3FD0
-#define oObjExperience 0x3FB8
+			}
 
-#define oObjMovementSpeed 0x16BC
-#define oObjAttackRange 0x16C4
-#define oObjAtkSpeedMulti 0x1B98
-#define oObjAbilityHaste  0x14A8
+			namespace Skin {
+				constexpr inline uintptr_t CharacterDataStackUpdate = 0x18AC80;				//E8 ? ? ? ? 80 BD ? ? ? ? ? 74 0D
+			}
 
-#define oObjBuffManager 0x27D8 
-#define oObjSpellBook 0x2A00 //E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? 48 8B 0D ? ? ? ? 48 81 C1 ? ? ? ?
-#define oObjActiveSpellCast 0x2A38
+			namespace Shop	{
+				//ShopActions 40 55 53 56 41 56 41 57 48 8D 6C
+				constexpr inline uintptr_t BuyItem = 0x1F05C0;								//40 55 53 56 41 56 41 57 48 8D 6C 24 ? 48 81 EC
+				constexpr inline uintptr_t SellItem = 0x0;									//40 57 48 83 EC 20 8B FA E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 48 89 5C 24 13.17 hotfix worka DA RITROVARE
+				constexpr inline uintptr_t UndoAction = 0x251A80;							//48 89 5C 24 ? 57 48 83 EC 30 48 8B F9 48 8B 49 08 48 8B 01 FF 90 ? ? ? ? 48 85 C0 74 15 48 8B 4F 08 48 8B 01
 
-#define oObjName 0x35E8
-#define oObjCharacterDataStack 0x35C0
-#define oObjAiManager 0x3700 // https://www.unknowncheats.me/forum/3735791-post9262.html
+			}
+		}
 
-#define oObjCharData 0x3530
-#define oObjCharDataData 0x28
-#define oObjCharDataDataSize 0xC4
-#define oObjCharDataDataObjType 0x778 
-#define oObjCharDataDataObjTypeDetailed 0x20
-#define oObjCharDataDataHeroID 0x830
+		namespace Events
+		{
+			namespace Objects	{
+				constexpr inline uintptr_t OnCreateObject = 0x3BC8F0;						//E8 ? ? ? ? 48 8B 3D ? ? ? ? 8B 9E ? ? ? ? 
+				constexpr inline uintptr_t OnDeleteObject = 0x3A5290;						//E8 ? ? ? ? 48 8B 73 50
+				constexpr inline uintptr_t GetRespawnTimeRemaining = 0x209CF0;				//40 53 48 83 EC 20 48 8B D9 48 81 C1 ? ? ? ? E8 ? ? ? ? 0F B6 83 ? ? ? ?
+			}
 
-#define oObjBuffManagerEntriesEnd 0x10
-#define oBuffEntryBuff 0x10
-#define oBuffType 0x8
-#define oBuffNamePtr 0x10
-#define oBuffStartTime 0x18
-#define oBuffEndTime 0x1C
-#define oBuffStacksAlt 0x38
-#define oBuffStacks 0x8C
-#define oBuffNamePtrName 0x8
+			namespace Spellcast {
+				constexpr inline uintptr_t OnStart = 0x719B70;								//40 53 48 83 EC 30 4C 8B 0A  
+				constexpr inline uintptr_t OnProcess = 0x161EE0;							//48 89 5C 24 ? 55 56 57 48 83 EC 70 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 44 8B 05 ? ? ? ? 
+				constexpr inline uintptr_t ProcessIndex = 0x11B8;							//48 81 C1 ? ? ? ? 48 8B 01 FF 90 ? ? ? ? 48 83 7B ? ? 72 03 48 8B 1B 4C 8B C3 
+				constexpr inline uintptr_t OnImpact = 0x710CD0;								//48 89 5C 24 10 48 89 6C 24 18 57 41 54 41 55 41 56 41 57 48 81 QWORD* __fastcall Spell::SpellbookClient::OnSpellImpact(Spell::SpellbookClient* a1, const Spell::SpellCastInfo *a2) https://streamable.com/x4e7ib https://streamable.com/xuvq05 https://www.unknowncheats.me/forum/3755876-post9525.html
+				constexpr inline uintptr_t OnStop = 0x719ED0;								//44 88 4C 24 20 4C 89 44 24 18 88 
+			}
+		}
 
-#define oObjSpellBookSpellSlot 0x6D0
+		namespace GameObject
+		{
+			constexpr inline uintptr_t IssueClickFloatCheck1 = 0x84;
+			constexpr inline uintptr_t IssueClickFloatCheck2 = 0x88;
+			constexpr inline uintptr_t IssueClickCheck = 0xD4;
 
-#define oSpellSlotLevel 0x28
-#define oSpellSlotCooldown 0x30
-#define oSpellSlotStacks 0x5C
-#define oSpellSlotTotalCooldown 0x74
-#define oSpellSlotSpellInput 0x128
-#define oSpellSlotSpellInfo 0x130
-#define oSpellSlotSpellCharges 0x5C
-#define oSpellSlotSpellTimeCharges 0x74
+			constexpr inline uintptr_t Index = 0x10;
+			constexpr inline uintptr_t Name = 0x60;
+			constexpr inline uintptr_t AiName = 0x3628;
+			constexpr inline uintptr_t Experience = 0x4010;
+			constexpr inline uintptr_t Level = 0x4028;
+			constexpr inline uintptr_t Team = 0x3C;
+			constexpr inline uintptr_t Alive = 0x358;
 
-#define oSpellInputTargetNetId 0x14
-#define oSpellInputStartPos 0x18
-#define oSpellInputEndPos 0x24
-#define oSpellInfoSpellData 0x60
+			constexpr inline uintptr_t BaseAtk = 0x16B4;
+			constexpr inline uintptr_t BonusAtk = 0x1620;//0x1AE0
 
-#define oSpellDataSpellName 0x80
-#define oSpellDataManaCost 0x600
+			constexpr inline uintptr_t Crit = 0x1CC0;
+			constexpr inline uintptr_t CritMulti = 0x1C78;
 
-#define oActiveSpellCastSpellInfo 0x8
-#define oActiveSpellCastSpellType 0x10
-#define oActiveSpellCastSpellId 0x124
+			constexpr inline uintptr_t AbilityPower = 0x15E8;
 
-#define oObjAiManagerManager 0x10
-#define oObjAiManagerManagerTargetPosition 0x14
-#define oObjAiManagerManagerIsMoving 0x2BC
-#define oObjAiManagerManagerCurrentSegment 0x2C0
-#define oObjAiManagerManagerPathStart 0x2D0
-#define oObjAiManagerManagerPathEnd 0x2DC
-#define oObjAiManagerManagerSegments 0x2E8
-#define oObjAiManagerManagerSegmentsCount 0x2F0
-#define oObjAiManagerManagerDashSpeed 0x300
-#define oObjAiManagerManagerIsDashing 0x324
-#define oObjAiManagerManagerPosition 0x414
+			constexpr inline uintptr_t Armor = 0x16DC;
+			constexpr inline uintptr_t BonusArmor = 0x16e0;
+			constexpr inline uintptr_t MagicRes = 0x16E4;
+			constexpr inline uintptr_t BonusMagicRes = 0x16E8;
 
-#define oPlayerName 0x0 //https://www.unknowncheats.me/forum/league-of-legends/310587-league-legends-reversal-structs-offsets-483.html
+			constexpr inline uintptr_t Shield = 0x10E8;
+			constexpr inline uintptr_t PhysicalShield = 0x1100;
+			constexpr inline uintptr_t MagicalShield = 0x1118;
 
-#define UnderMouseObject 0x21DD4A8  // 48 8B 05 ? ? ? ? 48 8B F9 33 C9 48 8B DA
+			constexpr inline uintptr_t ArmorPen = 0x15C8;
+			constexpr inline uintptr_t MagicPen = 0x15CC;
+			constexpr inline uintptr_t MagicPenMulti = 0x11D0;
 
-// For Missile
-#define oMissileSpellInfo 0x2E8
+			constexpr inline uintptr_t BonusAtkSpeed = 0x164C;
+			constexpr inline uintptr_t AtkSpeedMulti = 0x1668;
 
-#define oMissileSpellName 0x28
-#define oMissileSpellNameLength 0x38
-#define oMissileSpellNameMaxLength 0x48
+			constexpr inline uintptr_t AbilityHaste = 0x14E0; //0x1A38
 
-#define oMissileName 0x118
-#define oMissileNameLength 0x128
-#define oMissileNameMaxLength 0x148
+			constexpr inline uintptr_t MoveSpeed = 0x16F4;
+			constexpr inline uintptr_t Scale = 0x16CC;
+
+			constexpr inline uintptr_t Health = 0x1088;
+			constexpr inline uintptr_t MaxHealth = 0x10A0;
+			constexpr inline uintptr_t BonusHealth = 0x15C8; //non sicuro
+			constexpr inline uintptr_t LifeRegen = 0x16F0;
+
+			constexpr inline uintptr_t CombatType = 0x26A8;
+
+			constexpr inline uintptr_t Mana = 0x370;
+			constexpr inline uintptr_t MaxMana = 0x388;
+
+			constexpr inline uintptr_t Ammo = 0x3F8;
+			constexpr inline uintptr_t MaxAmmo = 0x410;
+
+			constexpr inline uintptr_t MagicPenetration = 0x1584;
+			constexpr inline uintptr_t Lethality = 0x15E0;
+			constexpr inline uintptr_t AttackRange = 0x16FC;
+
+			constexpr inline uintptr_t Position = 0x220;
+			constexpr inline uintptr_t Visibility = 0x340;
+			constexpr inline uintptr_t Targetable = 0xEE0;
+			constexpr inline uintptr_t State = 0x1408;
+			constexpr inline uintptr_t Invulnerability = 0x520;
+
+			constexpr inline uintptr_t SpellBook = 0x2A38; //E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? 48 8B 0D ? ? ? ? 48 81 C1 ? ? ? ?
+
+			namespace ActiveCast {
+				constexpr inline uintptr_t ActiveCast = 0x2A70; //E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? 48 8B 0D ? ? ? ? 48 81 C1 ? ? ? ?
+				constexpr inline uintptr_t Info = 0x8;
+				constexpr inline uintptr_t Type = 0x8;
+				constexpr inline uintptr_t SpellID = 0x124;
+			}
+
+			namespace CharData	{
+				constexpr inline uintptr_t Instance = 0x3570;
+				constexpr inline uintptr_t Array = 0x28;
+				constexpr inline uintptr_t Size = 0xC4;
+				constexpr inline uintptr_t Type = 0x778;
+				constexpr inline uintptr_t TypeDetailed = 0x20;
+				constexpr inline uintptr_t HeroID = 0x830;
+			}
+
+			namespace CharacterStateIntermediate
+			{
+				constexpr inline uintptr_t CharacterStateIntermediateStruct = 0x187560; //E8 ? ? ? ? 48 8B BB ? ? ? ? 4C 8D 0D ? ? ? ? 4C 8D 83 ? ? ? ? 48 8B D3 49 8B CF
+				constexpr inline uintptr_t oCharacterStateIntermediate = 0x1A20;
+				constexpr inline uintptr_t oAbilityHasteMod = 0x18;
+				constexpr inline uintptr_t oPercentCooldownCapMod = 0x30;
+				constexpr inline uintptr_t oPassiveCooldownEndTime = 0x48;
+				constexpr inline uintptr_t oPassiveCooldownTotalTime = 0x60;
+				constexpr inline uintptr_t oFlatPhysicalDamageMod = 0xC0;
+				constexpr inline uintptr_t oPercentPhysicalDamageMod = 0xD8;
+				constexpr inline uintptr_t oPercentBonusPhysicalDamageMod = 0xF0;
+				constexpr inline uintptr_t oPercentBasePhysicalDamageAsFlatBonusMod = 0x108;
+				constexpr inline uintptr_t oFlatMagicDamageMod = 0x120;
+				constexpr inline uintptr_t oPercentMagicDamageMod = 0x138;
+				constexpr inline uintptr_t oGetPercentDamageToBarracksMinionMod = 0x1A9C;
+				constexpr inline uintptr_t oGetFlatDamageReductionFromBarracksMinionMod = 0x1AB4; //4D 8D 86 ? ? ? ? 49 8B D6 48 8B CD
+				constexpr inline uintptr_t oFlatMagicReduction = 0x150;
+				constexpr inline uintptr_t oPercentMagicReduction = 0x168;
+				constexpr inline uintptr_t oFlatCastRangeMod = 0x180;
+				constexpr inline uintptr_t oAttackSpeedMod = 0x198;
+				constexpr inline uintptr_t oPercentAttackSpeedMod = 0x1B0;
+				constexpr inline uintptr_t oPercentMultiplicativeAttackSpeedMod = 0x1C8;
+				constexpr inline uintptr_t oBaseAttackDamage = 0x1E0;
+				constexpr inline uintptr_t oBaseAttackDamageSansPercentScale = 0x1F8;
+				constexpr inline uintptr_t oFlatBaseAttackDamageMod = 0x210;
+				constexpr inline uintptr_t oPercentBaseAttackDamageMod = 0x228;
+				constexpr inline uintptr_t oBaseAbilityDamage = 0x240;
+				constexpr inline uintptr_t oCritDamageMultiplier = 0x258;
+				constexpr inline uintptr_t oScaleSkinCoef = 0x270;
+				constexpr inline uintptr_t oDodge = 0x288;
+				constexpr inline uintptr_t oCritPercent = 0x2A0;
+				constexpr inline uintptr_t oFlatBaseHPPoolMod = 0x2B8;
+				constexpr inline uintptr_t oArmor = 0x2D0;
+				constexpr inline uintptr_t oBonusArmor = 0x2E8;
+				constexpr inline uintptr_t oSpellBlock = 0x300;
+				constexpr inline uintptr_t oBonusSpellBlock = 0x318;
+				constexpr inline uintptr_t oHPRegenRate = 0x330;
+				constexpr inline uintptr_t oBaseHPRegenRate = 0x348;
+				constexpr inline uintptr_t oMoveSpeed = 0x360;
+				constexpr inline uintptr_t oAttackRange = 0x390;
+				constexpr inline uintptr_t oFlatBubbleRadiusMod = 0x3A8;
+				constexpr inline uintptr_t oPercentBubbleRadiusMod = 0x3C0;
+				constexpr inline uintptr_t oFlatArmorPenetration = 0x3D8;
+				constexpr inline uintptr_t oPhysicalLethality = 0x3F0;
+				constexpr inline uintptr_t oPercentArmorPenetration = 0x408;
+				constexpr inline uintptr_t oPercentBonusArmorPenetration = 0x420;
+				constexpr inline uintptr_t oPercentCritBonusArmorPenetration = 0x438;
+				constexpr inline uintptr_t oPercentCritTotalArmorPenetration = 0x450;
+				constexpr inline uintptr_t oFlatMagicPenetration = 0x468;
+				constexpr inline uintptr_t oMagicLethality = 0x480;
+				constexpr inline uintptr_t oPercentMagicPenetration = 0x498;
+				constexpr inline uintptr_t oPercentBonusMagicPenetration = 0x4B0;
+				constexpr inline uintptr_t oPercentLifeStealMod = 0x4C8;
+				constexpr inline uintptr_t oPercentSpellVampMod = 0x4E0;
+				constexpr inline uintptr_t oPercentOmnivampMod = 0x4F8;
+				constexpr inline uintptr_t oPercentPhysicalVamp = 0x510;
+				constexpr inline uintptr_t oPathfindingRadiusMod = 0x528;
+				constexpr inline uintptr_t oPercentCCReduction = 0x540;
+				constexpr inline uintptr_t oPercentEXPBonus = 0x558;
+				constexpr inline uintptr_t oFlatBaseArmorMod = 0x570;
+				constexpr inline uintptr_t oFlatBaseSpellBlockMod = 0x588;
+				constexpr inline uintptr_t oPrimaryARBaseRegenRateRep = 0x5B8;
+				constexpr inline uintptr_t oSecondaryARRegenRateRep = 0x5D0;
+				constexpr inline uintptr_t oSecondaryARBaseRegenRateRep = 0x5E8;
+			}
+
+			namespace AIManager
+			{
+				constexpr inline uintptr_t AiManager = 0x3740; // https://www.unknowncheats.me/forum/3735791-post9262.html
+				constexpr inline uintptr_t Manager = 0x10;
+				constexpr inline uintptr_t ServerPosition = 0x414;
+				constexpr inline uintptr_t TargetPos = 0x14;
+				constexpr inline uintptr_t DashSpeed = 0x300;
+
+				namespace Path
+				{
+					constexpr inline uintptr_t IsMoving = 0x2BC;
+					constexpr inline uintptr_t IsDashing = 0x324;
+					constexpr inline uintptr_t Segments = 0x2E8;
+					constexpr inline uintptr_t CurrentSegment = 0x2C0;
+					constexpr inline uintptr_t SegmentsCount = 0x2F0;
+					constexpr inline uintptr_t PathStart = 0x2D0;
+					constexpr inline uintptr_t PathEnd = 0x2DC;
+				}
+			}
+
+			namespace Perks
+			{
+				constexpr inline uintptr_t Manager = 0x4680;
+				constexpr inline uintptr_t Size = 0x90;
+				constexpr inline uintptr_t PerkID = 0x8;
+				constexpr inline uintptr_t PerkName = 0x10;
+				constexpr inline uintptr_t PerkRawName = 0x20;
+				constexpr inline uintptr_t PerkRawDescription = 0x30;
+			}
+		}
+
+		namespace Inventory {
+			//https://www.unknowncheats.me/forum/3881148-post10893.html
+			constexpr inline uintptr_t Gold = 0x10;
+			constexpr inline uintptr_t ItemSlot = 0x20;
+			constexpr inline uintptr_t BaseItem = 0x10;
+			constexpr inline uintptr_t ItemInfo = 0x38;
+			constexpr inline uintptr_t ItemId = 0x9C;
+		}
+
+		namespace ItemManager
+		{
+			//E8 ? ? ? ? 48 8B F8 EB 02 33 FF 48 8D 4B 30  DA VEDERE
+			constexpr inline uintptr_t Instance = 0x40A0;
+			constexpr inline uintptr_t List = 0x20;
+			constexpr inline uintptr_t Size = 0x20;
+			constexpr inline uintptr_t Wrapper = 0x10;
+			constexpr inline uintptr_t ItemSlot = 0x20;
+			constexpr inline uintptr_t InventorySlot = 0x38;
+			constexpr inline uintptr_t ItemId = 0x9C;
+			constexpr inline uintptr_t ItemTexturePath = 0x4F0;
+			constexpr inline uintptr_t ItemName = 0x530;
+		}
+
+		namespace SpellSlot {
+			constexpr inline uintptr_t SpellBookSpellSlot = 0x6D0;
+
+			constexpr inline uintptr_t Name = 0x80;
+			constexpr inline uintptr_t Level = 0x28;
+			constexpr inline uintptr_t Cooldown = 0x30;
+			constexpr inline uintptr_t TotalCooldown = 0x74; // Oppure time charged
+			constexpr inline uintptr_t Stacks = 0x5C;
+			namespace Input	{
+				constexpr inline uintptr_t SpellInput = 0x128;
+				constexpr inline uintptr_t TargetNetID = 0x14;
+				constexpr inline uintptr_t StartPos = 0x18;
+				constexpr inline uintptr_t EndPos = 0x24;
+			}
+
+			namespace Info {
+				constexpr inline uintptr_t SpellInfo = 0x130;
+				constexpr inline uintptr_t Data = 0x60;
+				constexpr inline uintptr_t DataName = 0x80;
+				constexpr inline uintptr_t DataManaCost = 0x604;
+			}
+
+		}
+
+		namespace Buff {
+			constexpr inline uintptr_t BuffManager = 0x2810;
+			constexpr inline uintptr_t BuffNamePtr = 0x10;
+			constexpr inline uintptr_t BuffName = 0x8;
+
+			constexpr inline uintptr_t BuffEntry = 0x10;
+			constexpr inline uintptr_t BuffType = 0x8;
+			constexpr inline uintptr_t BuffEntryBuffStartTime = 0x18;
+			constexpr inline uintptr_t BuffEntryBuffEndTime = 0x1C;
+			constexpr inline uintptr_t BuffEntryBuffCount = 0x8C;
+			constexpr inline uintptr_t BuffEntryBuffCountAlt = 0x38;
+			constexpr inline uintptr_t BuffEntriesEnd = 0x10;
+		}
+
+		namespace Missile {
+			constexpr inline uintptr_t Index = 0x28; // Lui aveva 0x60
+
+			constexpr inline uintptr_t SpellName = 0x28; // Lui aveva 0x60
+			constexpr inline uintptr_t SpellNameLength = 0x38; 
+			constexpr inline uintptr_t SpellNameMaxLength = 0x60;
+
+			constexpr inline uintptr_t MissileName = 0x28;
+			constexpr inline uintptr_t MissileNameLength = 0x38; 
+			constexpr inline uintptr_t MissileNameMaxLength = 0x60;
+
+			constexpr inline uintptr_t Speed = 0x88;
+			constexpr inline uintptr_t Position = 0x104;
+			constexpr inline uintptr_t SrcIdx = 0x370;
+			constexpr inline uintptr_t DestIdx = 0x3C8;
+			constexpr inline uintptr_t DestCheck = 0x320;
+
+			constexpr inline uintptr_t StartPosition = 0x38C;
+			constexpr inline uintptr_t EndPosition = 0x398;
+
+			namespace SpellInfo {
+				constexpr inline uintptr_t SpellInfo = 0x2E8;
+				constexpr inline uintptr_t SpellName = 0x28;
+				constexpr inline uintptr_t MissileName = 0x118;
+			}
+			constexpr inline uintptr_t SpellCast = 0x250;
+
+		}
+	}
+}
 
 
-#define oMissileMapCount 0X10
-#define oMissileMapRoot 0x8
-#define oMissileMapKey 0x20
-#define oMissileMapVal 0x28
-
-#define oMissileSpeed 0x88
-
-#define oMissileSrcIdx 0x370
-#define oMissileDestIdx 0x3C8
-#define oMissileDestCheck 0x320
-#define oMissileStartPos 0x38C
-#define oMissilePos 0x104
-#define oMissileEndPos 0x398
-#define oObjMissileSpellCast 0x250
-
-#define MinimapObjectHud 0x320
-#define MinimapHudPos 0x60
-#define MinimapHudSize 0x68
-//https://www.unknowncheats.me/forum/3727406-post9100.html i need this shit
-
-//CharacterStateIntermediate
-#define CharacterStateIntermediateStruct 0x187560 //E8 ? ? ? ? 48 8B BB ? ? ? ? 4C 8D 0D ? ? ? ? 4C 8D 83 ? ? ? ? 48 8B D3 49 8B CF
-#define oCharacterStateIntermediate 0x19E8 
-#define oAbilityHasteMod 0x18
-#define oPercentCooldownCapMod 0x30
-#define oPassiveCooldownEndTime 0x48
-#define oPassiveCooldownTotalTime 0x60
-#define oFlatPhysicalDamageMod 0xC0
-#define oPercentPhysicalDamageMod 0xD8
-#define oPercentBonusPhysicalDamageMod 0xF0
-#define oPercentBasePhysicalDamageAsFlatBonusMod 0x108
-#define oFlatMagicDamageMod 0x120
-#define oPercentMagicDamageMod 0x138
-#define oGetPercentDamageToBarracksMinionMod 0x1A50
-#define oGetFlatDamageReductionFromBarracksMinionMod 0x1A68
-#define oFlatMagicReduction 0x150
-#define oPercentMagicReduction 0x168
-#define oFlatCastRangeMod 0x180
-#define oAttackSpeedMod 0x198
-#define oPercentAttackSpeedMod 0x1B0
-#define oPercentMultiplicativeAttackSpeedMod 0x1C8
-#define oBaseAttackDamage 0x1E0
-#define oBaseAttackDamageSansPercentScale 0x1F8
-#define oFlatBaseAttackDamageMod 0x210
-#define oPercentBaseAttackDamageMod 0x228
-#define oBaseAbilityDamage 0x240
-#define oCritDamageMultiplier 0x258
-#define oScaleSkinCoef 0x270
-#define oDodge 0x288
-#define oCritPercent 0x2A0
-#define oFlatBaseHPPoolMod 0x2B8
-#define oArmor 0x2D0
-#define oBonusArmor 0x2E8
-#define oSpellBlock 0x300
-#define oBonusSpellBlock 0x318
-#define oHPRegenRate 0x330
-#define oBaseHPRegenRate 0x348
-#define oMoveSpeed 0x360
-#define oAttackRange 0x390
-#define oFlatBubbleRadiusMod 0x3A8
-#define oPercentBubbleRadiusMod 0x3C0
-#define oFlatArmorPenetration 0x3D8
-#define oPhysicalLethality 0x3F0
-#define oPercentArmorPenetration 0x408
-#define oPercentBonusArmorPenetration 0x420
-#define oPercentCritBonusArmorPenetration 0x438
-#define oPercentCritTotalArmorPenetration 0x450
-#define oFlatMagicPenetration 0x468
-#define oMagicLethality 0x480
-#define oPercentMagicPenetration 0x498
-#define oPercentBonusMagicPenetration 0x4B0
-#define oPercentLifeStealMod 0x4C8
-#define oPercentSpellVampMod 0x4E0
-#define oPercentOmnivampMod 0x4F8
-#define oPercentPhysicalVamp 0x510
-#define oPathfindingRadiusMod 0x528
-#define oPercentCCReduction 0x540
-#define oPercentEXPBonus 0x558
-#define oFlatBaseArmorMod 0x570
-#define oFlatBaseSpellBlockMod 0x588
-#define oPrimaryARBaseRegenRateRep 0x5B8
-#define oSecondaryARRegenRateRep 0x5D0
-#define oSecondaryARBaseRegenRateRep 0x5E8
-
-//Items managament
-#define oObjItemManager 0x4048
-
-#define oItemManagerList 0x20
- 
-#define itemListObjectSize 0x20
-
-#define oInventorySlotWrapper 0x10
-
-#define oInventorySlot 0x38
-
-#define oInventorySlotItemId 0x9C
-#define oInventorySlotItemTexturePath 0x4E8
-#define oInventorySlotItemName 0x528

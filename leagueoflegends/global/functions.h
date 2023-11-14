@@ -13,6 +13,9 @@ namespace functions
 	template <typename T, typename U>
 	T Read(U addr);
 
+	template <typename T>
+	T getCooldownData(const std::string& playerNameToFind, const std::string& spellNameToFind);
+
 	template<typename Function> Function CallVirtual(PVOID base, QWORD index)
 	{
 		QWORD** VTablePointer = (QWORD**)base;
@@ -39,10 +42,10 @@ namespace functions
 	void PrintChat(float number);
 	void PrintChat(void* address);
 
+	GameState GetGameState();
 	std::string GetServerIP();
 	float GetGameTime();
-	int GetGameTick();
-	std::string ConvertTime(float seconds);
+	int GetGameTick();	std::string ConvertTime(float seconds);
 
 	bool IsGameFocused();
 	bool IsChatOpen();
@@ -63,6 +66,8 @@ namespace functions
 	Object* GetOwner(Object* obj);
 	Object* GetObjectFromNetId(int netId);
 	Object* GetSelectedObject();
+	Object* GetPlayerPointer(const std::string& playerNameToFind);
+
 	bool IsNotLocalPlayer(Object* obj);
 	int IsAttackingLocalPlayer(Object* obj);
 	bool IsAlive(Object* obj);
@@ -78,10 +83,11 @@ namespace functions
 	bool IsVisible(Object* obj);
 	bool IsVisible(Missile* obj);
 
+	void SendPing(int pingType, Vector3 pos);
 	unsigned int GetCollisionFlags(Vector3 pos);
 	float GetRespawnTimer(Object* obj);
 	int GetSpellState(int slotId);
-	float GetSpellRange(int slotid);
+	float GetSpellRange(Spell* spellID);
 	QWORD GetZoomAddress();
 	bool IsBrush(Vector3 pos);
 	bool IsWall(Vector3 pos);

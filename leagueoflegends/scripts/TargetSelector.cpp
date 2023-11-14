@@ -230,7 +230,7 @@ namespace UPasta
 						}
 					}
 					if (validWards.size() >= 1)
-						return validWards;
+						return validWards; 
 					else
 						validWards.clear();
 
@@ -298,7 +298,7 @@ namespace UPasta
 						if (!obj->IsValidTarget()) continue;
 						if (obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range))continue;
-						if (obj->GetHealth() > damage) continue;
+						if (obj->GetHealth()  > damage) continue;
 						if (obj)
 							validTargets.push_back(obj);
 					}
@@ -391,7 +391,16 @@ namespace UPasta
 				Object* Functions::GetEnemyMinionInRange(float radius)
 				{
 					return GetMinion(GetMinionsInRange(globals::localPlayer->GetPosition(), radius),
-						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? DamageType_Physical : DamageType_Magical);
+						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? Physical : Magical);
+				}
+
+					
+				Object* Functions::GetKillableEnemyMinionInRange(float radius)
+				{
+					for (auto killableMinion : GetKillableMinionsInRange(globals::localPlayer->GetPosition(), radius, Physical))
+						return killableMinion;
+
+					return nullptr;
 				}
 
 				std::vector<Object*> Functions::GetJungleMonstersInRange(float range)
@@ -763,19 +772,19 @@ namespace UPasta
 				Object* Functions::GetEnemyChampionInRange(float radius)
 				{
 					return GetTarget(GetTargetsInRange(globals::localPlayer->GetPosition(), radius),
-						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? DamageType_Physical : DamageType_Magical);
+						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? Physical : Magical);
 				}
 
 				Object* Functions::GetEnemyChampionInRange(Vector3 pos, float radius)
 				{
 					return GetTarget(GetTargetsInRange(pos, radius),
-						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? DamageType_Physical : DamageType_Magical);
+						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? Physical : Magical);
 				}
 
 				Object* Functions::GetEnemyChampionInRange(float radius, Skillshot skillshot)
 				{
 					return  GetEnemyChampionInRange(radius,
-						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? DamageType_Physical : DamageType_Magical, skillshot);
+						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? Physical : Magical, skillshot);
 				}
 
 				
@@ -1101,6 +1110,24 @@ namespace UPasta
 						}
 
 						if (best->GetDistanceTo(globals::localPlayer) > best->GetDistanceTo(globals::localPlayer)) {
+							best = obj;
+							continue;
+						}
+					}
+
+					return best;
+				}
+
+				Object* Functions::GetAllyChampionInRange(float range)
+				{
+					Object* best = nullptr;
+					for (Object* obj : *globals::heroManager)
+					{
+						if (!obj->IsAlly()) continue;
+
+						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+
+						if (!best) {
 							best = obj;
 							continue;
 						}

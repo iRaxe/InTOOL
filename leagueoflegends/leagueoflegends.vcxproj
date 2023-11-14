@@ -190,6 +190,8 @@
     <ClInclude Include="Damage.h" />
     <ClInclude Include="DestroyEvents.h" />
     <ClInclude Include="Ezreal.h" />
+    <ClInclude Include="fa_solid_900.h" />
+    <ClInclude Include="font_awesome_5.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="global\colors.h" />
     <ClInclude Include="global\functions.h" />
@@ -201,6 +203,7 @@
     <ClInclude Include="global\structs.h" />
     <ClInclude Include="global\targetver.h" />
     <ClInclude Include="global\utils.h" />
+    <ClInclude Include="HealthPrediction.h" />
     <ClInclude Include="hooks\hooks.h" />
     <ClInclude Include="hooks\impl\impl.h" />
     <ClInclude Include="icon_font.h" />
@@ -214,9 +217,11 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="imgui_freetype.h" />
+    <ClInclude Include="imgui_notify.h" />
     <ClInclude Include="Info.h" />
     <ClInclude Include="InitializeEvents.h" />
     <ClInclude Include="json.hpp" />
+    <ClInclude Include="Kaisa.h" />
     <ClInclude Include="KeyBind.h" />
     <ClInclude Include="kiero\kiero.h" />
     <ClInclude Include="kiero\minhook\include\MinHook.h" />
@@ -259,6 +264,7 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TargetSelector.h" />
+    <ClInclude Include="Thresh.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="Vayne.h" />
     <ClInclude Include="VMTHook.h" />
@@ -271,6 +277,7 @@
     <ClCompile Include="Awareness.cpp" />
     <ClCompile Include="Checkbox.cpp" />
     <ClCompile Include="classes\classes.cpp" />
+    <ClCompile Include="clipper.cpp" />
     <ClCompile Include="Colorpicker.cpp" />
     <ClCompile Include="Damage.cpp" />
     <ClCompile Include="DestroyEvents.cpp" />
@@ -280,6 +287,7 @@
     <ClCompile Include="global\functions.cpp" />
     <ClCompile Include="global\globals.cpp" />
     <ClCompile Include="global\settings.cpp" />
+    <ClCompile Include="HealthPrediction.cpp" />
     <ClCompile Include="hooks\hooks.cpp" />
     <ClCompile Include="hooks\impl\impl.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -292,6 +300,7 @@
     <ClCompile Include="imgui_settings.h" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
+    <ClCompile Include="Kaisa.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
     <ClCompile Include="kiero\minhook\src\buffer.c" />
@@ -324,6 +333,7 @@
     <ClCompile Include="scripts\TargetSelector.cpp" />
     <ClCompile Include="Slider.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Thresh.cpp" />
     <ClCompile Include="Vayne.cpp" />
     <ClCompile Include="VMTHook.cpp" />
     <ClCompile Include="Xerath.cpp" />

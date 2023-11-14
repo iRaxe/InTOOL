@@ -43,11 +43,6 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-    void OnPopuplateMenu() override
-    {
-
-    }
-
     void Init() override
     {
         const auto XerathMenu = Menu::CreateMenu("vezXerath", "vez.Xerath");

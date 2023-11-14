@@ -49,14 +49,18 @@
 #define SHACOBOX std::string("ShacoBox")
 
 // Example: spell_hash("ZeriR");
-#define buff_hash(str) (std::integral_constant<std::uint32_t, hash_fnv1a_ignorecase(str)>::value)
-#define buff_hash_real hash_fnv1a_ignorecase
+#define NameInHash(str) (std::integral_constant<std::uint32_t, hash_fnv1a_ignorecase(str)>::value)
+#define RealNameInHash hash_fnv1a_ignorecase
 #define spell_hash(str) (std::integral_constant<std::uint32_t, hash_elf_ignorecase(str)>::value)
 #define spell_hash_real hash_elf_ignorecase
 
 #define character_hash(str) (std::integral_constant<std::uint32_t, hash_sdbm_ignorecase(str)>::value)
 
 #define translation_hash(str) (std::integral_constant<std::uint64_t, translation_hash_64_runtime(str)>::value)
+
+static std::vector<float> arrayToVector(const float* begin, const float* end) {
+	return std::vector<float>(begin, end);
+}
 
 constexpr std::uint8_t char_to_lower(std::uint8_t input)
 {

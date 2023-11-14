@@ -1166,12 +1166,9 @@ bool ImGui::Tab(bool selected, const char* label, const char* text_label, const 
 		it_anim->second.text_1 = ImLerp(it_anim->second.text_1, ImColor(255, 255, 255), g.IO.DeltaTime * 6.f);
 
     //RenderFrame(bb.Min + ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating + 5), bb.Max - ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating - 5), GetColorU32(it_anim->second.background), true, 4.f);
-    GetForegroundDrawList()->AddRect(bb.Min + ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating + 5), bb.Max - ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating - 5), GetColorU32(it_anim->second.background), 4.f, ImDrawFlags_RoundCornersAll, 1.f);
+   // GetForegroundDrawList()->AddRect(bb.Min + ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating + 5), bb.Max - ImVec2(it_anim->second.inflating - 5, it_anim->second.inflating - 5), GetColorU32(it_anim->second.background), 4.f, ImDrawFlags_RoundCornersAll, 1.f);
 
-	if (std::strchr(text_label, '\n'))
-        GetForegroundDrawList()->AddText(ImVec2(bb.Min.x + (size_arg.x - CalcTextSize(text_label).x) / 2, bb.Max.y - (size_arg.y - CalcTextSize(text_label).y + 45) / 2), GetColorU32(it_anim->second.text), text_label);
-    else 
-		GetForegroundDrawList()->AddText(ImVec2(bb.Min.x + (size_arg.x - CalcTextSize(text_label).x) / 2, bb.Max.y - (size_arg.y - CalcTextSize(text_label).y + 18) / 2), GetColorU32(it_anim->second.text), text_label);
+	GetForegroundDrawList()->AddText(ImVec2(bb.Min.x + (size_arg.x - CalcTextSize(text_label).x) / 2, bb.Max.y - (size_arg.y - CalcTextSize(text_label).y + 18) / 2), GetColorU32(it_anim->second.text), text_label);
 
 
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);

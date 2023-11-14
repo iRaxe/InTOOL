@@ -22,9 +22,6 @@ namespace globals
 	extern ObjectManager* turretManager;
 	extern ObjectManager* inhibitorsManager;
 	extern ObjectManager* missileManager;
-
-
-	extern ObjectManager* buildingsManager;
 	extern ObjectManager* attackableManager;
 
 

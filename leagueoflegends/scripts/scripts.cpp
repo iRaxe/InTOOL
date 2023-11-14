@@ -179,13 +179,5 @@ namespace scripts
 
 			activeChampModule->OnCastSpell();
 		}
-
-		void DoPopulateMenu()
-		{
-			if (!activeChampModule)
-				return;
-
-			activeChampModule->OnPopuplateMenu();
-		}
 	}
 }

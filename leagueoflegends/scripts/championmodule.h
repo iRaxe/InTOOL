@@ -6,7 +6,6 @@ class ChampionModule
 {
 public:
 	virtual ~ChampionModule() {}
-	virtual void OnPopuplateMenu() = 0;
 	virtual void Init() = 0;
 	virtual void Update() = 0;
 	virtual void Attack() = 0;

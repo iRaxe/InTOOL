@@ -5,6 +5,7 @@
 #include "../../zoom.h"
 #include "../../Orbwalker.h"
 #include "../../imgui_freetype.h"
+#include "../../imgui_notify.h"
 
 namespace hooks
 {
@@ -16,31 +17,30 @@ namespace hooks
 
 		void Inits()
 		{
-			globals::localPlayer = *(Object**)(globals::moduleBase + oLocalPlayer);
-			globals::heroManager = *(ObjectManager**)(globals::moduleBase + oHeroList);
-			globals::minionManager = *(ObjectManager**)(globals::moduleBase + oMinionsList);
-			globals::turretManager = *(ObjectManager**)(globals::moduleBase + oTurretsList);
-			globals::inhibitorsManager = *(ObjectManager**)(globals::moduleBase + oInhibitorList);
-			globals::buildingsManager = *(ObjectManager**)(globals::moduleBase + oBuildingsManager);
-			globals::attackableManager = *(ObjectManager**)(globals::moduleBase + oAttackableList);
-			globals::objManager = *(ObjectManager**)(globals::moduleBase + oObjManager);
-			globals::missileManager = *(ObjectManager**)(globals::moduleBase + oMissilesList);
+			globals::localPlayer = *(Object**)(globals::moduleBase + UPasta::Offsets::Instance::LocalPlayer);
+			globals::heroManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::HeroList);
+			globals::minionManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::MinionList);
+			globals::turretManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::TurretList);
+			globals::inhibitorsManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::InhibList);
+			globals::attackableManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::AttackableList);
+			globals::objManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::ObjManager);
+			globals::missileManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::MissileList);
 
 			Skillshot::PopulateSpellsDB();
 			functions::Init();
-			menu::InitNewMenu();
+			//menu::InitNewMenu();
+			menu::Init();
 			render::Init();
 
 			scripts::Init();
 			settings::Load();
 			settings::Load2();
-			//menu::Init();
 
 			UPasta::SDK::ListManager::Functions::Initialize();
 
 			
 			//Once loaded, this is called for init all things okay that should be it hopefully the new ceraetd threads will be hidden 
-			//HookOnProcessSpellCast();
+			HookOnProcessSpellCast();
 			
 			RECT windowRect;
 			if (GetWindowRect(windowDX, &windowRect))
@@ -58,6 +58,7 @@ namespace hooks
 
 		void Updates()
 		{
+
 			__try { UPasta::SDK::ListManager::Functions::Refresh(); }
 			__except (1) { LOG("ERROR IN LISTMANAGER UPDATE"); }
 
@@ -67,11 +68,11 @@ namespace hooks
 			__try { render::Update(); }
 			__except (1) { LOG("ERROR IN RENDER UPDATE"); }
 
-			/*__try { menu::Update(); }
-			__except (1) { LOG("ERROR IN MENU UPDATE"); }*/
-
-			__try { menu::Update2(); }
+			__try { menu::Update(); }
 			__except (1) { LOG("ERROR IN MENU UPDATE"); }
+
+			/*__try { menu::Update2(); }
+			__except (1) { LOG("ERROR IN MENU UPDATE"); }*/
 
 		}
 
@@ -81,7 +82,7 @@ namespace hooks
 			{
 				settings::Save();
 				UPasta::SDK::Menu::Dispose();
-				//UnHookOnProcessSpellCast();
+				UnHookOnProcessSpellCast();
 				globals::eject = true;
 
 				functions::PrintChat(CHAT_COLOR("#ff5b5b", "Looooooooooooooooooool"));
@@ -276,6 +277,7 @@ namespace hooks
 
 			ImGui::EndFrame();
 			ImGui::Render();
+
 			pContextDX11->OMSetRenderTargets(1, &mainRenderTargetViewDX11, NULL);
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

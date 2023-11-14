@@ -1,3 +1,6 @@
+#include <stdbool.h>
+
+#include "../ListManager.h"
 #include "../Orbwalker.h"
 #include "../stdafx.h"
 
@@ -40,11 +43,57 @@ namespace functions
 		return NT_SUCCESS(ReadProcessMemory(GetCurrentProcess(), (LPVOID)address, &buffer, sizeof(Type), NULL)) ? buffer : Type();
 	};
 
+	template <>
+	std::vector<int> getCooldownData<std::vector<int>>(const std::string& playerNameToFind, const std::string& spellNameToFind) {
+		for (const auto& playerData : UPasta::SDK::ListManager::Functions::playerSpells) {
+			if (playerData.first == playerNameToFind) {
+				for (const auto& spellData : playerData.second) {
+					for (const auto& spell : spellData.second) {
+						if (spell.first == spellNameToFind) {
+							return spell.second;
+						}
+					}
+				}
+			}
+		}
+		return std::vector<int>();
+	}
+
+	template <>
+	std::string getCooldownData<std::string>(const std::string& playerNameToFind, const std::string& spellNameToFind) {
+		for (const auto& playerData : UPasta::SDK::ListManager::Functions::playerSpells) {
+			for (const auto& spellData : playerData.second) {
+				for (const auto& spell : spellData.second) {
+					if (spell.first == spellNameToFind) {
+						return playerData.first;
+					}
+				}
+			}
+		}
+		return "";
+	}
+
+	template <>
+	int getCooldownData<int>(const std::string& playerNameToFind, const std::string& spellNameToFind) {
+		for (const auto& playerData : UPasta::SDK::ListManager::Functions::playerSpells) {
+			if (playerData.first == playerNameToFind) {
+				for (const auto& spellData : playerData.second) {
+					for (const auto& spell : spellData.second) {
+						if (spell.first == spellNameToFind) {
+							return spellData.first;
+						}
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
 	bool isShopOpen()
 	{
 		//[<League of Legends.exe> + oMenuGUI] + ShopIsOpen
 
-		return functions::Read<bool>(RVA(oShopGUI)), ShopIsOpen;
+		return functions::Read<bool>(RVA(UPasta::Offsets::Instance::HUD::Shop::Instance)), UPasta::Offsets::Instance::HUD::Shop::IsOpen;
 	}
 
 	std::string GetHexString(QWORD hexNumber)
@@ -97,7 +146,7 @@ namespace functions
 		std::string timeMarkString = "[" + ConvertTime(GetGameTime()) + "] ";
 		std::string coloredTimeMarkString = CHAT_COLOR_DT("#7ce9ff", timeMarkString);
 		std::string formattedText = coloredTimeMarkString + text;
-		call_function<void>(RVA(oPrintChat), RVA(oChatClient), formattedText.c_str(), 4);
+		call_function<void>(RVA(UPasta::Offsets::Functions::HUD::Chat::PrintChat), RVA(UPasta::Offsets::Instance::HUD::Chat::Client), formattedText.c_str(), 4);
 	}
 
 	void PrintChat(int number)
@@ -115,19 +164,24 @@ namespace functions
 		PrintChat(GetHexString((QWORD)address));
 	}
 
+	GameState GetGameState() {
+		auto addr = Read<uintptr_t>(RVA(UPasta::Offsets::Instance::Game::GameState));
+		return addr ? Read<GameState>(addr + 0xC) : Loading;
+	}
+
 	std::string GetServerIP()
 	{
-		auto bho = Read<char*>((Read<uintptr_t>(RVA(oGameMap)) + 0x140));
-		auto funziona = *(char**)(*(QWORD*)(globals::moduleBase + oGameMap) + 0x140);
+		auto bho = Read<char*>((Read<uintptr_t>(RVA(UPasta::Offsets::Instance::Game::MapInfo::GameMap)) + 0x140));
+		auto funziona = *(char**)(*(QWORD*)(globals::moduleBase + UPasta::Offsets::Instance::Game::MapInfo::GameMap) + 0x140);
 
 		char nameobj[18];
-		memcpy(nameobj, reinterpret_cast<void*>(*(reinterpret_cast<QWORD*>(globals::moduleBase + oGameMap) + 0x140)), sizeof(nameobj));
+		memcpy(nameobj, reinterpret_cast<void*>(*(reinterpret_cast<QWORD*>(globals::moduleBase + UPasta::Offsets::Instance::Game::MapInfo::GameMap) + 0x140)), sizeof(nameobj));
 		return funziona;
 	}
 
 	float GetGameTime()
 	{
-		return Read<float>(RVA(oGameTime));
+		return Read<float>(RVA(UPasta::Offsets::Instance::Game::GameTime));
 	}
 
 	int GetGameTick()
@@ -157,7 +211,7 @@ namespace functions
 
 	bool IsChatOpen()
 	{
-		return Read<bool>(Read<uintptr_t>(RVA(oChatClient)) + oChatClientChatOpen);
+		return Read<bool>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::Chat::Client)) + UPasta::Offsets::Instance::HUD::Chat::IsOpen);
 	}
 
 	Vector2 GetMousePos()
@@ -170,13 +224,13 @@ namespace functions
 
 	Vector3 GetMouseWorldPos()
 	{
-		return ReadVector3(Read<uintptr_t>(Read<uintptr_t>(RVA(oHudInstance)) + oHudInstanceInput) + oHudInstanceInputMouseWorldPos);
+		return ReadVector3(Read<uintptr_t>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::HudInstance)) + UPasta::Offsets::Instance::HUD::Input) + UPasta::Offsets::Instance::HUD::Mouse::InputMouseWorldPos);
 	}
 
 	Vector2 WorldToScreen(Vector3 in)
 	{
 		Vector3 out;
-		call_function<uintptr_t>(RVA(oWorldToScreen), Read<uintptr_t>(RVA(oViewport)) + oViewportW2S, &in, &out);
+		call_function<uintptr_t>(RVA(UPasta::Offsets::Functions::Drawings::WorldToScreen), Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::Viewport::ViewPort)) + UPasta::Offsets::Instance::HUD::Viewport::W2S, &in, &out);
 		return Vector2(out.x, out.y);
 	}
 
@@ -184,19 +238,19 @@ namespace functions
 	{
 		float World_y;
 		typedef float(__fastcall* fnpointHeight)(float, float, float*);
-		fnpointHeight _fnpointHeight = reinterpret_cast<fnpointHeight>(globals::moduleBase + fGetHeightAtPosition);
+		fnpointHeight _fnpointHeight = reinterpret_cast<fnpointHeight>(globals::moduleBase + UPasta::Offsets::Functions::HUD::GetHeightAtPosition);
 		_fnpointHeight(in.x, in.z, &World_y);
 		return _fnpointHeight(in.x, in.z, &World_y);
 	}
 
 	Vector2 GetMinimapPos()
 	{
-		return ReadVector2(Read<uintptr_t>(Read<uintptr_t>(RVA(oMinimapObject)) + MinimapObjectHud) + MinimapHudPos);
+		return ReadVector2(Read<uintptr_t>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::Minimap::Instance)) + UPasta::Offsets::Instance::HUD::Minimap::HudInstance) + UPasta::Offsets::Instance::HUD::Minimap::Position);
 	}
 
 	float GetMinimapSize()
 	{
-		return Read<float>(Read<uintptr_t>(Read<uintptr_t>(RVA(oMinimapObject)) + MinimapObjectHud) + MinimapHudSize);
+		return Read<float>(Read<uintptr_t>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::Minimap::Instance)) + UPasta::Offsets::Instance::HUD::Minimap::HudInstance) + UPasta::Offsets::Instance::HUD::Minimap::Size);
 	}
 
 	Vector2 WorldToMinimap(Object* objectToShow)
@@ -226,19 +280,19 @@ namespace functions
 	Vector3 GetBaseDrawPosition(Object* obj)
 	{
 		Vector3 out;
-		call_function<bool>(RVA(oGetBaseDrawPosition), (QWORD*)obj, &out);
+		call_function<bool>(RVA(UPasta::Offsets::Functions::Drawings::GetBaseDrawPosition), (QWORD*)obj, &out);
 		return out;
 	}
 	
 	Vector2 GetHpBarPosition(Object* obj)
 	{
 		Vector3 hpBarPos = obj->GetPosition();
-		const float hpBarHeight = Read<float>(obj->GetCharacterData() + oObjCharDataDataSize) * obj->GetScale();
+		const float hpBarHeight = Read<float>(obj->GetCharacterData() + UPasta::Offsets::GameObject::CharData::Size) * obj->GetScale();
 		hpBarPos.y += hpBarHeight;
 
 		auto screenPos = WorldToScreen(hpBarPos);
-		const float maxZoom = Read<float>(Read<uintptr_t>(RVA(oZoomInstance)) + oZoomInstanceMaxZoom);
-		const float currentZoom = Read<float>(Read<uintptr_t>(Read<uintptr_t>(RVA(oHudInstance)) + oHudInstanceCamera) + oHudInstanceCameraZoom);
+		const float maxZoom = Read<float>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::Camera::Instance)) + UPasta::Offsets::Instance::HUD::Camera::Limit);
+		const float currentZoom = Read<float>(Read<uintptr_t>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::HudInstance)) + UPasta::Offsets::Instance::HUD::Camera::Camera) + UPasta::Offsets::Instance::HUD::Camera::Value);
 		const float zoomDelta = maxZoom / currentZoom;
 
 		screenPos.y -= (((globals::windowHeight) * 0.00083333335f * zoomDelta) * hpBarHeight);
@@ -246,116 +300,138 @@ namespace functions
 		return screenPos;
 	}
 
+	Object* GetPlayerPointer(const std::string& playerNameToFind)
+	{
+		for (Object* obj : *globals::heroManager)
+		{
+			//if (obj->IsAlly()) continue;
+			if (obj->GetName() == playerNameToFind)
+				return obj;
+		}
+		return nullptr;
+	}
+
 	Object* GetOwner(Object* obj)
 	{
-		return call_function<Object*>(RVA(fGetOwner), obj);
+		return call_function<Object*>(RVA(UPasta::Offsets::Functions::Stats::GetOwner), obj);
 	}
 
 	Object* GetObjectFromNetId(int netId)
 	{
-		return call_function<Object*>(RVA(oGetObjectFromNetId), Read<uintptr_t>(RVA(oGetObjectFromNetIdParam)), netId);
+		return call_function<Object*>(RVA(UPasta::Offsets::Functions::Stats::GetObjectFromNetID), Read<uintptr_t>(RVA(UPasta::Offsets::Instance::Lists::ObjManager)), netId);
 	}
 
 	Object* GetSelectedObject()
 	{
-		const auto targetNetId = Read<unsigned int>(Read<uintptr_t>(Read<uintptr_t>(RVA(oHudInstance)) + oHudInstanceUserData) + oHudInstanceUserDataSelectedObjectNetId);
+		const auto targetNetId = Read<unsigned int>(Read<uintptr_t>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::HudInstance)) + UPasta::Offsets::Instance::HUD::UserData) + UPasta::Offsets::Instance::HUD::UserDataSelectedNetId);
 		if (!targetNetId)
 			return nullptr;
 
-		return call_function<Object*>(RVA(oGetObjectFromNetId), Read<uintptr_t>(RVA(oGetObjectFromNetIdParam)), targetNetId);
+
+		return call_function<Object*>(RVA(UPasta::Offsets::Functions::Stats::GetObjectFromNetID), Read<uintptr_t>(RVA(UPasta::Offsets::Instance::Lists::ObjManager)), targetNetId);
+	}
+
+	void SendPing(int pingType, Vector3 pos)
+	{
+		call_function<void>(RVA(UPasta::Offsets::Functions::HUD::SendPing), pingType, &pos);
 	}
 
 	unsigned int GetCollisionFlags(Vector3 pos)
 	{
-		return call_function<unsigned int>(RVA(oGetCollisionFlags), pos);
+		return call_function<unsigned int>(RVA(UPasta::Offsets::Functions::Drawings::GetCollisionFlags), pos);
 	}
 
 	float GetRespawnTimer(Object* obj)
 	{
-		return call_function<float>(RVA(fGetRespawnTimeRemaining), obj);
+		return call_function<float>(RVA(UPasta::Offsets::Events::Objects::GetRespawnTimeRemaining), obj);
 	}
 
+	int GetSpellSlot(Object* hero, SpellInfo* spellInfo)
+	{
+		return call_function<int>(RVA(UPasta::Offsets::Functions::Spells::GetSpellSlot), hero, spellInfo);
+	}
 
 	int GetSpellState(int slotId)
 	{
 		// Ready = 0 || NotAvailable = 4 || Supressed = 8 || NotLearned = 12 || Disabled = 16 || Processing = 24 || Cooldown = 32 || NoMana = 64 || Unknown = 96
-		return call_function<int>(RVA(fGetSpellState), globals::localPlayer + oObjSpellBook, slotId, NULL);
+		typedef int(__fastcall* fnGetSpellState)(void*, int, const QWORD&);
+		fnGetSpellState _fnGetSpellState = (fnGetSpellState)(globals::moduleBase + UPasta::Offsets::Functions::Spells::GetSpellState);
+		return _fnGetSpellState(globals::localPlayer + UPasta::Offsets::GameObject::SpellBook, slotId, NULL);
 	}
 
-	float GetSpellRange(int level)
+	float GetSpellRange(Spell* spellID)
 	{
-		//Not working, need find spellDataSpellRange oppure provare a passare spellboox o spellslot
-		return call_function<float>(RVA(fGetSpellRange), globals::localPlayer + oObjSpellBook, 0, NULL);
+		return call_function<float>(RVA(UPasta::Offsets::Functions::Spells::GetSpellRange), spellID);
 	}
 
 	QWORD GetZoomAddress()
 	{
-		return (*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceCamera) + 0x2B0);
+		return (*(QWORD*)(*(QWORD*)(globals::moduleBase + UPasta::Offsets::Instance::HUD::HudInstance) + UPasta::Offsets::Instance::HUD::Camera::Camera) + 0x2B0);
 	}
 
 	bool IsNotLocalPlayer(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsNotLocalPlayer), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsNotLocalPlayer), obj);
 	}
 
 	bool IsAlive(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsAlive), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsAlive), obj);
 	}
 
 	bool IsHero(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsHero), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsHero), obj);
 	}
 
 	bool IsMinion(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsMinion), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsMinion), obj);
 	}
 
 	bool IsTurret(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsTurret), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsTurret), obj);
 	}
 
 	bool IsMissile(Missile* obj)
 	{
-		return call_function<bool>(RVA(fIsMissile), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsMissile), obj);
 	}
 
 	bool IsInhibitor(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsInhibitor), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsInhibitor), obj);
 	}
 
 	bool IsNexus(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsNexus), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsNexus), obj);
 	}
 
 	bool IsDead(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsDead), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsDead), obj);
 	}
 
 	bool IsCanSee(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsCanSee), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsCanSee), obj);
 	}
 
 	bool IsTargetable(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsTargetable), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsTargetable), obj);
 	}
 
 	bool IsVisible(Object* obj)
 	{
-		return call_function<bool>(RVA(fIsVisible), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsVisible), obj);
 	}
 
 	bool IsVisible(Missile* obj)
 	{
-		return call_function<bool>(RVA(fIsVisible), obj);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsVisible), obj);
 	}
 
 	bool IsBrush(Vector3 pos)
@@ -375,26 +451,28 @@ namespace functions
 
 	void TryRightClick(Vector2 pos)
 	{
-		EventManager::TriggerProcess(EventManager::EventType::OnIssueOrder, pos);
+		TriggerProcess(EventManager::EventType::OnBeforeAttack);
 
-		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1);
-		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2);
-		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck);
+		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickFloatCheck1);
+		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickFloatCheck2);
+		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickCheck);
 
-		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = 0.0f;
-		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = 0.0f;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = 0x0;
+		*(float*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickFloatCheck1) = 0.0f;
+		*(float*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickFloatCheck2) = 0.0f;
+		*(DWORD*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickCheck) = 0x0;
 
 		unsigned int* params = new unsigned int[20];
 		params[17] = (int)pos.x;
 		params[18] = (int)pos.y;
 		params[19] = 2;
 
-		call_function<bool>(RVA(oTryRightClick), (QWORD*)globals::localPlayer, params);
+		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueRClick), (QWORD*)globals::localPlayer, params);
 
-		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck1) = floatCheck1;
-		*(float*)((QWORD)globals::localPlayer + oObjIssueClickFloatCheck2) = floatCheck2;
-		*(DWORD*)((QWORD)globals::localPlayer + oObjIssueClickCheck) = check;
+		*(float*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickFloatCheck1) = floatCheck1;
+		*(float*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickFloatCheck2) = floatCheck2;
+		*(DWORD*)((QWORD)globals::localPlayer + UPasta::Offsets::GameObject::IssueClickCheck) = check;
+		TriggerProcess(EventManager::EventType::OnAfterAttack);
+
 	}
 
 	void IssueClick(Vector2 pos)
@@ -404,157 +482,135 @@ namespace functions
 		params[18] = (int)pos.y;
 		params[19] = 2;
 
-		call_function<bool>(RVA(oIssueClick), (QWORD*)globals::localPlayer, params[19], 0, 0, params[17], params[18], 0);
+		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueClick), (QWORD*)globals::localPlayer, params[19], 0, 0, params[17], params[18], 0);
 	}
 
 	void IssueMove(Vector2 pos)
 	{
-		EventManager::TriggerProcess(EventManager::EventType::OnIssueMove, pos);
-
-		call_function<bool>(RVA(oIssueMove), (QWORD*)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceInput)), (int)pos.x, (int)pos.y, false, 0, 0);
+		TriggerProcess(EventManager::EventType::OnIssueMove, pos);
+		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueMove), (QWORD*)(*(QWORD*)(*(QWORD*)(globals::moduleBase + UPasta::Offsets::Instance::HUD::HudInstance) + UPasta::Offsets::Instance::HUD::Input)), (int)pos.x, (int)pos.y, false, 0, 0);
 	}
 
-	bool CastSpell(int spellId, Object* Target)
-	{
-		if (UPasta::SDK::Orbwalker::Functions::shouldWait) 
-			return false;
+	bool IsSpellSlotValid(int spellId) {
+		return spellId >= 0 && spellId < 14;
+	}
 
-		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId);
-		Object* me = globals::localPlayer;
-		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
-		SpellInput* TargetInfo = spell->GetSpellInput();
+	uintptr_t GetInputLogic() {
+		return Read<uintptr_t>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::HudInstance)) + UPasta::Offsets::Instance::HUD::SpellInfo);
+	}
 
-		if (!TargetInfo || !Target) return false;
-		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo);
+	uintptr_t GetMouseInstance()	{
+		return Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::Mouse::Instance)) + UPasta::Offsets::Instance::HUD::Mouse::Position;
+	}
 
-		// set spell position
-		TargetInfo->SetCaster(me->GetNetId());
-		TargetInfo->SetTarget(Target->GetNetId());
-		TargetInfo->SetStartPos(me->GetPosition());
-		TargetInfo->SetEndPos(Target->GetPosition());
-		TargetInfo->SetClickedPos(Target->GetPosition());
-		TargetInfo->SetUnkPos(Target->GetPosition());
-		SpellInfo* spellInfo = spell->GetSpellInfo();
+	Vector2 GetMouseInstancePosition() {
+		const auto castScreenPosition = GetMouseInstance();
+		return Vector2(*(int*)castScreenPosition, *(int*)(castScreenPosition + 0x4));
+	}
 
-		call_function<void>(RVA(oCastSpellWrapper), InputLogic, spellInfo);
+	void UpdateMouseInstancePosition(Vector2 newPosition) {
+		const auto castScreenPosition = GetMouseInstance();
+
+		*(int*)(castScreenPosition) = newPosition.x;
+		*(int*)(castScreenPosition + 0x4) = newPosition.y;
+	}
+
+	bool CastSpellLogic(int spellId,kCastType castType, Vector2 originalMousePosition) {
+		const auto InputLogic = GetInputLogic();
+		call_function<void>(RVA(UPasta::Offsets::Functions::Spells::NewCastSpell), InputLogic, spellId, castType, 0);
+		UpdateMouseInstancePosition(originalMousePosition);
+		TriggerProcess(EventManager::EventType::OnCastSpell);
 
 		return true;
+	}
+
+	bool CastSpell(int spellId, Object* Target) {
+		if (UPasta::SDK::Orbwalker::Functions::shouldWait || !IsSpellSlotValid(spellId))
+			return false;
+
+		Object* me = globals::localPlayer;
+		Spell* spell = me->GetSpellBySlotId(spellId);
+		if (!spell || !spell->GetSpellInput() || !Target)
+			return false;
+
+		const auto mouseScreenPosition = GetMouseInstancePosition();
+
+		if (Target->GetServerPosition().x || Target->GetServerPosition().y) {
+			const auto posw2s = WorldToScreen(Target->GetServerPosition());
+			UpdateMouseInstancePosition(posw2s);
+		}
+
+		return CastSpellLogic(spellId, SmartCast, mouseScreenPosition);
 	}
 
 	bool CastSpell(int spellId)
 	{
-		if (UPasta::SDK::Orbwalker::Functions::shouldWait) return false;
-
-		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId);
+		if (UPasta::SDK::Orbwalker::Functions::shouldWait || !IsSpellSlotValid(spellId))
+			return false;
 
 		Object* me = globals::localPlayer;
-		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
-		SpellInput* TargetInfo = spell->GetSpellInput();
+		Spell* spell = me->GetSpellBySlotId(spellId);
+		if (!spell || !spell->GetSpellInput())
+			return false;
 
-		if (!TargetInfo) return false;
-		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo);
+		const auto mouseScreenPosition = GetMouseInstancePosition();
 
-		// set spell position
-		TargetInfo->SetCaster(me->GetNetId());
-		TargetInfo->SetTarget(0);
-		TargetInfo->SetStartPos(me->GetPosition());
-		TargetInfo->SetEndPos(me->GetPosition());
-		TargetInfo->SetClickedPos(me->GetPosition());
-		TargetInfo->SetUnkPos(me->GetPosition());
-		SpellInfo* spellInfo = spell->GetSpellInfo();
+		if (me->GetServerPosition().x || me->GetServerPosition().y)
+		{
+			const auto posw2s = WorldToScreen(me->GetServerPosition());
+			UpdateMouseInstancePosition(posw2s);
+		}
 
-		call_function<void>(RVA(oCastSpellWrapper), InputLogic, spellInfo);
+		return CastSpellLogic(spellId, SelfCast, mouseScreenPosition);
 
-
-		return true;
 	}
 
 	bool CastSpell(int spellId, Vector3 pos)
 	{
-		if (UPasta::SDK::Orbwalker::Functions::shouldWait) return false;
-
-		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId);
+		if (UPasta::SDK::Orbwalker::Functions::shouldWait || !IsSpellSlotValid(spellId))
+			return false;
 
 		Object* me = globals::localPlayer;
-		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
-		SpellInput* TargetInfo = spell->GetSpellInput();
+		Spell* spell = me->GetSpellBySlotId(spellId);
+		if (!spell || !spell->GetSpellInput() || !pos.IsValid())
+			return false;
 
-		if (!TargetInfo) return false;
-		uintptr_t* InputLogic = *(uintptr_t**)(*(uintptr_t*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo);
+		const auto mouseScreenPosition = GetMouseInstancePosition();
+		if (pos.x || pos.y)
+		{
+			const auto posw2s = WorldToScreen(pos);
+			UpdateMouseInstancePosition(posw2s);
+		}
 
-		// set spell position
-		TargetInfo->SetCaster(me->GetNetId());
-		TargetInfo->SetTarget(0);
-		TargetInfo->SetStartPos(pos);
-		TargetInfo->SetEndPos(pos);
-		TargetInfo->SetClickedPos(pos);
-		TargetInfo->SetUnkPos(pos);
-		SpellInfo* spellInfo = spell->GetSpellInfo();
+		return CastSpellLogic(spellId, SmartCast, mouseScreenPosition);
 
-		call_function<void>(RVA(oCastSpellWrapper), InputLogic, spellInfo);
-		return true;
 	}
-
+	
 	bool ReleaseSpell(int spellId, Vector3 pos)
 	{
-		typedef char(__fastcall* HudReleaseSpellFn)(QWORD* spellLogic, QWORD* idc);
-		HudReleaseSpellFn _HudReleaseSpellFn = (HudReleaseSpellFn)(globals::moduleBase + oReleaseSpell);
+		if (UPasta::SDK::Orbwalker::Functions::shouldWait || !IsSpellSlotValid(spellId))
+			return false;
 
-		if (spellId < 0 || spellId >= 14) return false;
-		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
-		SpellInput* TargetInfo = spell->GetSpellInput();
-		if (!TargetInfo) return false;
+		Object* me = globals::localPlayer;
+		Spell* spell = me->GetSpellBySlotId(spellId);
+		if (!spell || !spell->GetSpellInput() || !pos.IsValid())
+			return false;
 
-		auto castScreenPosition = *(QWORD*)(globals::moduleBase + oMouseInstance) + oMousePosition;
-		auto mouseScreenPosition = Vector2(*(int*)castScreenPosition, *(int*)(castScreenPosition + 0x4));
+		const auto mouseScreenPosition = GetMouseInstancePosition();
 
 		if (pos.x || pos.y)
 		{
-			auto posw2s = WorldToScreen(pos);
-			*(int*)castScreenPosition = posw2s.x;
-			*(int*)(castScreenPosition + 0x4) = posw2s.y;
+			const auto posw2s = WorldToScreen(pos);
+			UpdateMouseInstancePosition(posw2s);
 		}
 
-		QWORD* InputLogic = *(QWORD**)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo);
-		spoof_call(spoof_trampoline, _HudReleaseSpellFn, InputLogic, (QWORD*)0);
-		*(int*)castScreenPosition = mouseScreenPosition.x;
-		*(int*)(castScreenPosition + 0x4) = mouseScreenPosition.y;
+		const auto InputLogic = GetInputLogic();
+		call_function<void>(RVA(UPasta::Offsets::Functions::Spells::ReleaseSpell), InputLogic, (QWORD*)0);
+		UpdateMouseInstancePosition(mouseScreenPosition);
+		TriggerProcess(EventManager::EventType::OnReleaseSpell);
+
 
 		return true;
-	}
-
-	void OldCastSpell(int spellId, Vector3 pos)
-	{
-		EventManager::Trigger(EventManager::EventType::OnCastSpell, spellId, pos);
-
-		typedef bool(__fastcall* fnCastSpellWrapper)(QWORD* hudSpellInfo, QWORD* spellInfo);
-		fnCastSpellWrapper _fnCastSpellWrapper = (fnCastSpellWrapper)(globals::moduleBase + oCastSpellWrapper);
-
-		if (spellId < 0 || spellId >= 14) return;
-		Spell* spell = globals::localPlayer->GetSpellBySlotId(spellId);
-		SpellInfo* spellInfo = spell->GetSpellInfo();
-		
-		QWORD spellInput = (QWORD)spell->GetSpellInput();
-
-		auto spellInputStartPos = ReadVector3(spellInput + oSpellInputStartPos);
-		auto spellInputEndPos = ReadVector3(spellInput + oSpellInputEndPos);
-		auto spellInputEndPos2 = ReadVector3(spellInput + oSpellInputEndPos + sizeof(Vector3));
-		auto spellInputEndPos3 = ReadVector3(spellInput + oSpellInputEndPos + sizeof(Vector3) * 0x2);
-
-		if (pos.x || pos.y || pos.z)
-		{
-			WriteVector3((spellInput + oSpellInputStartPos), globals::localPlayer->GetPosition());
-			WriteVector3((spellInput + oSpellInputEndPos), pos);
-			WriteVector3((spellInput + oSpellInputEndPos + sizeof(Vector3)), pos);
-			WriteVector3((spellInput + oSpellInputEndPos + sizeof(Vector3) * 0x2), pos);
-		}
-		
-		spoof_call(spoof_trampoline, _fnCastSpellWrapper, (QWORD*)(*(QWORD*)(*(QWORD*)(globals::moduleBase + oHudInstance) + oHudInstanceSpellInfo)), (QWORD*)spellInfo);
-		
-		WriteVector3((spellInput + oSpellInputStartPos), spellInputStartPos);
-		WriteVector3((spellInput + oSpellInputEndPos), spellInputEndPos);
-		WriteVector3((spellInput + oSpellInputEndPos + sizeof(Vector3)), spellInputEndPos2);
-		WriteVector3((spellInput + oSpellInputEndPos + sizeof(Vector3) * 0x2), spellInputEndPos3);
 	}
 
 	bool CanSendInput()
@@ -567,7 +623,6 @@ namespace functions
 		if (!CanSendInput() || !objPos.IsValid()) return;
 
 		auto screenPos = WorldToScreen(objPos);
-		EventManager::TriggerProcess(EventManager::EventType::OnAfterAttack, objPos);
 
 		TryRightClick(screenPos);
 	}
@@ -577,11 +632,10 @@ namespace functions
 		if (!CanSendInput() || obj == nullptr) return;
 
 		Vector3 headPos = obj->GetPosition();
-		const float objectHeight = *(float*)(obj->GetCharacterData() + oObjCharDataDataSize) * obj->GetScale();
+		const float objectHeight = *(float*)(obj->GetCharacterData() + UPasta::Offsets::GameObject::CharData::Size) * obj->GetScale();
 		headPos.y += objectHeight - 50.0f;
 
 		auto screenPos = WorldToScreen(headPos);
-		EventManager::TriggerProcess(EventManager::EventType::OnAfterAttack, headPos);
 
 		TryRightClick(screenPos);
 	}

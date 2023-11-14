@@ -65,7 +65,7 @@ namespace UPasta
 
 		void CheckBox::Draw()
 		{
-			Checkbox(this->DisplayName, &this->Value);
+			Checkbox(SP_STRING(this->DisplayName), &this->Value);
 			
 		}
 

@@ -106,11 +106,6 @@ public:
         return false;
     }
 
-    void OnPopuplateMenu() override
-    {
-
-
-    }
     void Init() override
     {
         ADD_SETTING("Champion Settings", "Syndra", "draw Q-E range", false);

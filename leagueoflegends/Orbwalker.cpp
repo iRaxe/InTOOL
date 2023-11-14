@@ -229,7 +229,7 @@ namespace UPasta
 							if (minion->GetName() == "") continue;
 							if (!minion->IsValidTarget()) continue;
 							if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
-							if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetAttackRange())) continue;
+							if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange())) continue;
 							if (minion)
 							{
 								return
@@ -260,7 +260,7 @@ namespace UPasta
 
 				float GetAttackMissileSpeed()
 				{
-					float def = globals::localPlayer->GetAttackRange() < 300.0f ? FLT_MAX : globals::localPlayer->GetAttackWindup();
+					float def = globals::localPlayer->GetRealAttackRange() < 300.0f ? FLT_MAX : globals::localPlayer->GetAttackWindup();
 
 					if (globals::localPlayer->GetName() == "Thresh" 
 					|| globals::localPlayer->GetName() == "Azir" 
@@ -337,7 +337,7 @@ namespace UPasta
 						if (!CanDoAction())
 							return;
 
-						functions::AttackObject(obj);
+						functions::AttackObject(obj->GetPosition());
 						RefreshBuffer();
 					}
 
@@ -353,7 +353,7 @@ namespace UPasta
 					void CastSpell(int spellId, Object* target)
 					{
 						Vector3 headPos = target->GetPosition();
-						const float objectHeight = *(float*)(target->GetCharacterData() + oObjCharDataDataSize) * target->GetScale();
+						const float objectHeight = *(float*)(target->GetCharacterData() + Offsets::GameObject::CharData::Size) * target->GetScale();
 						headPos.y += objectHeight;
 						CastSpell(spellId, headPos);
 					}
@@ -373,7 +373,7 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetAttackRange());
+							auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
 							if (obj != nullptr)
 							{
 								Actions::AttackObject(obj);
@@ -388,20 +388,31 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetAttackRange());
-							const auto jungle = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetAttackRange());
-
-							if (turret != nullptr && turret->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetAttackRange())
+							const auto killableMinion = TargetSelector::Functions::GetKillableEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
+							if (killableMinion != nullptr) //&& !ShouldWaitUnderTurret(killableMinion))
 							{
+								LOG("teST");
+								if (killableMinion->GetEffectiveHealth(Physical) + 50 < Damage::CalculateAutoAttackDamage(globals::localPlayer, killableMinion))
+									Actions::AttackObject(killableMinion);
+							}
+
+							const auto jungleMonster = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange());
+							if (jungleMonster != nullptr)
+								Actions::AttackObject(jungleMonster);
+
+							const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetRealAttackRange());
+							if (turret != nullptr)
 								Actions::AttackObject(turret);
+
+							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
+							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
+							{
+								if (minion->GetHealth() > Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) * 2 
+									|| Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->GetHealth())
+									Actions::AttackObject(minion);
 							}
 
-							else if (jungle != nullptr && jungle->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetAttackRange())
-							{
-								Actions::AttackObject(jungle);
-							}
-							
-							else 
+							/*else 
 							{
 								//const int missileSpeed = GetAttackMissileSpeed();
 								for (int i = 0; i < globals::minionManager->GetListSize(); i++)
@@ -411,14 +422,14 @@ namespace UPasta
 									{
 										if (!minion->IsValidTarget()) continue;
 										if (!minion->IsMinion()) continue;
-										if (minion->GetDistanceTo(globals::localPlayer) > globals::localPlayer->GetAttackRange()) continue;
+										if (minion->GetDistanceTo(globals::localPlayer) > globals::localPlayer->GetRealAttackRange()) continue;
 
-										if (minion && minion->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetAttackRange())
+										if (minion && minion->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetRealAttackRange())
 										{
 											const float minionHealth = minion->GetHealth() - Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
 											const auto attackDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
 
-											const auto turret = TargetSelector::Functions::GetAllyTurretInRange(globals::localPlayer->GetAttackRange());
+											const auto turret = TargetSelector::Functions::GetAllyTurretInRange(globals::localPlayer->GetRealAttackRange());
 											if (turret && turret->GetDistanceTo(minion) <= 900)
 											{
 												if (minion->GetHealth() > attackDamage)
@@ -451,7 +462,7 @@ namespace UPasta
 										}
 									}
 								}
-							}
+							}*/
 						}
 
 						Actions::Idle();
@@ -461,12 +472,12 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							auto obj = UPasta::SDK::TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetAttackRange());
+							for (auto killableMinion : TargetSelector::Functions::GetKillableMinionsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange(), Physical))
+								Actions::AttackObject(killableMinion);
+
+							const auto obj = UPasta::SDK::TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
 							if (obj != nullptr)
-							{
 								Actions::AttackObject(obj);
-								return;
-							}
 						}
 
 						Actions::Idle();
@@ -476,27 +487,9 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							for (int i = 0; i < globals::minionManager->GetListSize(); i++)
-							{
-								auto minion = globals::minionManager->GetIndex(i);
-								if (minion->IsValidTarget())
-								{
-									if (minion->GetName() == "") continue;
-									if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
-									if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetAttackRange())) continue;
-
-									if (minion)
-									{
-										const float minionHealth = minion->GetHealth() - Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
-										const auto attackDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
-										if (minionHealth < attackDamage)
-										{
-											Actions::AttackObject(minion);
-											return;
-										}
-									}
-								}
-							}
+							const auto minion = TargetSelector::Functions::GetKillableEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
+							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
+								Actions::AttackObject(minion);
 						}
 
 						Actions::Idle();

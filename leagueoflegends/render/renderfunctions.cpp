@@ -243,11 +243,10 @@ namespace render
 		}
 	}
 
-	void setQuality(const uint32_t quality)
+	void setQuality()
 	{
-		if (const uint32_t last_quality = k_angles_amount_2; last_quality != quality)
+		if (const uint32_t last_quality = k_angles_amount_2; last_quality != UPasta::SDK::Awareness::Configs::Radius::qualityDraw->Value)
 		{
-			k_angles_amount_2 = quality;
 			initAngles();
 		}
 	}
@@ -269,234 +268,179 @@ namespace render
 		return angle_radians;
 	}
 
-	void test(ImVec2 lineStart, ImVec2 lineEnd)
+	void CalculateSinesAndCosines(int numPoints, std::vector<float>& sines, std::vector<float>& cosines)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-
-		const int NUM_LINES = 10;
-		const float ALPHA_VALUE = 0.030f;
-		const float BASE_LINE_WIDTH = 2.f;
-		const float EXTRA_LINE_WIDTH = 5;
-
-		for (int j = 1; j <= NUM_LINES; ++j)
+		float step = 6.28318530718f / numPoints;
+		sines.resize(numPoints);
+		cosines.resize(numPoints);
+		for (int i = 0; i < numPoints; ++i) 
 		{
-			ImVec2 lineStartOffset = { lineStart.x + j, lineStart.y + j };
-			ImVec2 lineEndOffset = { lineEnd.x + j, lineEnd.y + j };
-
-			ImColor lineColor = ImVec4(1.0f, 1.0f, 0.4f, ALPHA_VALUE);
-			float lineWidth = BASE_LINE_WIDTH + j + EXTRA_LINE_WIDTH;
-
-			window->DrawList->AddLine(lineStartOffset, lineEndOffset, lineColor, lineWidth);
-
-			lineStartOffset = { lineStart.x - j, lineStart.y - j };
-			lineEndOffset = { lineEnd.x - j, lineEnd.y - j };
-
-			window->DrawList->AddLine(lineStartOffset, lineEndOffset, lineColor, lineWidth);
+			float theta = step * i;
+			sines[i] = std::sin(theta);
+			cosines[i] = std::cos(theta);
 		}
 	}
 
-	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height, bool glow)
-	{
+	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height, bool glow) {
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window == nullptr || window->SkipItems)
+			return;
 
-		const int NUM_LINES = 3;
-		const float BASE_LINE_WIDTH = 1.f;
-		const float EXTRA_LINE_WIDTH = 3;
+		constexpr int MAX_POINTS = 100;
+		ImVec2 points[MAX_POINTS];
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
+		numPoints = min(numPoints, MAX_POINTS - 1);
 
-		numPoints = min(numPoints, 49);
-		ImVec2 points[50];
+		// Utilizza la funzione di cache per i seni e i coseni
+		static std::vector<float> sines, cosines;
+		CalculateSinesAndCosines(numPoints, sines, cosines);
 
-		float step = 6.2831f / numPoints;
-		float theta = 0.f;
+		float currentTime = ImGui::GetTime(); // Ottieni il tempo corrente di ImGui
+		float rainbowSpeed = 0.5f; // Velocità di cambiamento dei colori, regolabile
 
-		for (int i = 0; i < numPoints; i++, theta += step)
-		{
-			const Vector3 worldSpace = { worldPos.x + radius * cos(theta), worldPos.y, worldPos.z - radius * sin(theta) };
-			const ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
-			points[i].x = screenSpace.x;
+		for (int i = 0; i <= numPoints; ++i) {
+			// Usa i valori memorizzati nella cache
+			float cosTheta = cosines[i % numPoints];
+			float sinTheta = sines[i % numPoints];
 
-			if (height)
-				points[i].y = screenSpace.y - min(max(-UPasta::SDK::Awareness::Configs::Radius::heightTollerance->Value, functions::GetHeightAtPosition(worldSpace)), UPasta::SDK::Awareness::Configs::Radius::heightTollerance->Value);
-			else
-				points[i].y = screenSpace.y;
+			Vector3 worldSpace = {
+				worldPos.x + radius * cosTheta,
+				worldPos.y, // adjust for height if necessary
+				worldPos.z - radius * sinTheta
+			};
+			ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
+
+			points[i] = ImVec2(screenSpace.x, screenSpace.y);
 		}
+		/*
+		for (int i = 0; i < numPoints; ++i) {
+			float hue = fmodf(currentTime * rainbowSpeed + (float)i / numPoints, 1.0f);
+			ImVec4 rainbowColor = ImColor::HSV(hue, 1.0f, 1.0f); // Genera il colore HSV
+			ImU32 lineColor = ImGui::ColorConvertFloat4ToU32(rainbowColor);
 
-		points[numPoints] = points[0];
-		window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, 1.0f);
-		if (glow)
-		{
-			for (int j = 1; j <= NUM_LINES; ++j)
-			{
-				for (int i = 0; i < numPoints; i++)
-				{
-					ImVec2 lineStartOffset = { points[i].x + j, points[i].y + j };
-					ImVec2 lineEndOffset = { points[(i + 1) % numPoints].x + j, points[(i + 1) % numPoints].y + j };
+			// Disegna ogni segmento con un colore univoco
+			window->DrawList->AddLine(points[i], points[(i + 1) % numPoints], lineColor, thickness);
+		}*/
+		window->DrawList->AddPolyline(points, numPoints + 1, color, true, thickness);
 
-					window->DrawList->AddLine(lineStartOffset, lineEndOffset, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, 0.030f }), BASE_LINE_WIDTH + j + EXTRA_LINE_WIDTH);
+		if (glow) {
+			for (int i = 0; i < numPoints; ++i) {
+				ImVec2 p1 = points[i];
+				ImVec2 p2 = points[i + 1];
+				for (int j = 1; j <= 1; ++j) {
+					float hue = fmodf(currentTime * rainbowSpeed + (float)i / numPoints, 1.0f);
+					ImVec4 rainbowColor = ImColor::HSV(hue, 1.0f, 1.0f); // Genera il colore HSV
+					ImU32 glowColorRainbow = ImGui::ColorConvertFloat4ToU32(rainbowColor);
+					window->DrawList->AddLine(p1, p2, glowColorRainbow, thickness + j * 1);
 				}
 			}
 		}
 	}
 
-	void RenderWardRange(const Vector3& position, const ImColor& color, const float& range, bool brushes)
-	{
+	void RenderWardRange(const Vector3& position, const ImColor& color, const float& range, bool brushes) {
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window == nullptr || window->SkipItems)
+			return;
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
+		constexpr int numPoints = 120;
+		ImVec2 points[numPoints];
 
-		// todo, improve this so it doesnt count only own brush
-		if (brushes)
-		{
-			if (functions::IsBrush(position))
-				brushes = false;
-		}
+		// Utilizza la funzione di cache per i seni e i coseni
+		static std::vector<float> sines, cosines;
+		CalculateSinesAndCosines(numPoints, sines, cosines);
 
-		int numPoints = 30;
-		static ImVec2 points[30];
+		for (int i = 0; i < numPoints; ++i) {
+			float cosTheta = cosines[i];
+			float sinTheta = sines[i];
+			Vector3 p = position;
 
-		const float step = 6.2831f / numPoints;
-		float theta = 0.f;
+			for (float step2 = 20.f; step2 <= range; step2 += 20.f) {
+				p.x = position.x + (step2 * cosTheta);
+				p.z = position.z - (step2 * sinTheta);
 
-		for (int i = 0; i < numPoints; i++, theta += step)
-		{
-			Vector3 p = Vector3(0.f, 0.f, 0.f);
-
-			for (float step2 = 20.f; step2 <= range; step2 += 20.f)
-			{
-				Vector3 p2 = Vector3(position.x + (step2 * cos(theta)), position.y, position.z - (step2 * sin(theta)));
-				if (functions::IsWall(p2) || step2 == range || (brushes && functions::IsBrush(p2)))
-				{
-					p = p2;
+				if (functions::IsWall(p) || step2 == range || (brushes && functions::IsBrush(p))) {
 					break;
 				}
 			}
-			const ImVec2 screenSpace = functions::WorldToScreen(p).ToImVec();
-			points[i].x = screenSpace.x;
-			points[i].y = screenSpace.y;
+
+			points[i] = functions::WorldToScreen(p).ToImVec();
 		}
 
-		points[numPoints] = points[0];
-		window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, 1.0f);
+		for (int i = 0; i < numPoints; i += 3) {
+			const int next = (i + 3) % numPoints;
+			window->DrawList->AddBezierCubic(points[i], points[(i + 1) % numPoints], points[(i + 2) % numPoints], points[next], color, 1.0f);
+		}
+	}
+	
+	void RenderPolygon(const Geometry::Polygon& poly, uintptr_t color, float thickness)
+	{
+		ImVec2 points[100]; // Assuming 100 is the upper limit of points we want to draw
+		const int numPoints = min(static_cast<int>(poly.Points.size()), 100);
+
+		for (int i = 0; i < numPoints; ++i) {
+			points[i] = functions::WorldToScreen(poly.Points[i]).ToImVec();
+		}
+
+		ImGui::GetBackgroundDrawList()->AddPolyline(points, numPoints, color, true, thickness);
 	}
 
-	/*void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height)
-	{
+	void RenderFilledPolygon(const Geometry::Polygon& poly, uintptr_t color) {
+		ImVec2 points[100]; // Assuming 100 is the upper limit of points we want to draw
+		const int numPoints = min(static_cast<int>(poly.Points.size()), 100);
+
+		for (int i = 0; i < numPoints; ++i) {
+			points[i] = functions::WorldToScreen(poly.Points[i]).ToImVec();
+		}
+
+		ImGui::GetBackgroundDrawList()->AddConvexPolyFilled(points, numPoints, color);
+	}
+
+	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls) {
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		//window->DrawList->_FringeScale = 2.0f;
-
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-		numPoints = min(numPoints, 49);
-		ImVec2 points[50];
-
-		float step = 6.2831f / numPoints;
-		float theta = 0.f;
-		for (int i = 0; i < numPoints; i++, theta += step)
-		{
-			const Vector3 worldSpace = { worldPos.x + radius * cos(theta), worldPos.y , worldPos.z - radius * sin(theta) };
-			const ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
-			points[i].x = screenSpace.x;
-
-			if (height)
-				points[i].y = screenSpace.y - min(max(-UPasta::SDK::Awareness::Configs::Radius::heightTollerance->Value, functions::GetHeightAtPosition(worldSpace)), UPasta::SDK::Awareness::Configs::Radius::heightTollerance->Value);
-			else
-				points[i].y = screenSpace.y;
-		}
-
-		points[numPoints] = points[0];
-
-		window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, 1.0f);
-
-	}*/
-
-	void RenderPolygon(const Geometry::Polygon poly, uintptr_t color, float thickness)
-	{
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-
-		static ImVec2 points[200];
-		int i = 0;
-		for (const auto& point : poly.Points)
-		{
-			ImVec2 pos = functions::WorldToScreen(point).ToImVec();
-			points[i].x = pos.x;
-			points[i].y = pos.y;
-			i++;
-		}
-
-		ImGui::GetBackgroundDrawList()->AddPolyline(points, i, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), true, thickness);
-
-	}
-
-	void RenderFilledPolygon(const Geometry::Polygon poly, uintptr_t color)
-	{
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-
-		static ImVec2 points[200];
-		int i = 0;
-		for (const auto& point : poly.Points)
-		{
-			ImVec2 pos = functions::WorldToScreen(point).ToImVec();
-			points[i].x = pos.x;
-			points[i].y = pos.y;
-			i++;
-		}
-		ImGui::GetBackgroundDrawList()->AddConvexPolyFilled(points, i, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }));
-	}
-
-	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls)
-	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
+		if (window == nullptr || window->SkipItems)
+			return;
 
 		Vector3 dir = directionPos - worldPos;
-
 		float angle = atan2(dir.z, dir.x) * -1;
 		float startTheta = angle - arcSize / 2.0f;
 		float endTheta = angle + arcSize / 2.0f;
 
-		numPoints = min(numPoints, 49);
-		std::vector<Vector2> points = {};
+		numPoints = min(numPoints, 49);  // Limit the number of points to a fixed max value
+
+		// Pre-calculate sine and cosine values for the arc
+		static std::vector<float> sines, cosines;
+		CalculateSinesAndCosines(numPoints, sines, cosines);
 
 		float thetaStep = (endTheta - startTheta) / numPoints;
-		float theta = startTheta;
-		for (int i = 0; i <= numPoints; i++, theta += thetaStep)
-		{
-			Vector3 worldSpace = { worldPos.x + radius * cos(theta), worldPos.y, worldPos.z - radius * sin(theta) };
-			Vector2 screenSpace = (dontDrawWalls && functions::IsWall(worldSpace)) ? Vector2() : functions::WorldToScreen(worldSpace);
+		float currentTheta = startTheta;
 
-			points.push_back(screenSpace);
-		}
+		ImVec2 lastValidPoint;
+		bool lastPointValid = false;
 
-		for (int i = 0; i < points.size() - 1; i++)
-		{
-			if (!points[i].IsValid() || !points[i + 1].IsValid()) continue;
+		// Loop through each point in the arc
+		for (int i = 0; i <= numPoints; ++i) {
+			// Find the sine and cosine based on the current angle in the loop
+			float sinTheta = sin(currentTheta);
+			float cosTheta = cos(currentTheta);
+			Vector3 worldSpace = { worldPos.x + radius * cosTheta, worldPos.y, worldPos.z - radius * sinTheta };
 
-			auto from = points[i].ToImVec();
-			auto to = points[i + 1].ToImVec();
-			window->DrawList->AddLine(from, to, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), thickness);
+			// Check for walls if necessary
+			if (dontDrawWalls && (functions::IsWall(worldSpace) || functions::IsBrush(worldSpace) )) {
+				lastPointValid = false;  // Invalidate this point if it's a wall
+			}
+			else {
+				ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
+
+				// If we have a valid 'last point', and the current point is valid, draw the line segment
+				if (lastPointValid) {
+					window->DrawList->AddLine(lastValidPoint, screenSpace, color, thickness);
+				}
+
+				lastValidPoint = screenSpace;  // Update the last valid point
+				lastPointValid = true;         // Mark the current point as valid
+			}
+
+			currentTheta += thetaStep;  // Increment the angle
 		}
 	}
 }

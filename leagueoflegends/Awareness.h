@@ -83,6 +83,10 @@ namespace UPasta::SDK::Awareness
                     inline ID3D11ShaderResourceView* riftheraldTextureIcon;
 
                     void InitializeJungleImages();
+
+                    inline std::unordered_map<std::string, ID3D11ShaderResourceView*> jungleIcons;
+                    void AssignJungleIconsToMap();
+
                 }
 
                 namespace WardIcons
@@ -92,7 +96,11 @@ namespace UPasta::SDK::Awareness
                     inline ID3D11ShaderResourceView* yellowWardTextureIcon;
                     inline ID3D11ShaderResourceView* shacoBoxTextureIcon;
                     
-                    void InitializeJungleImages();
+                    void InitializeWardImages();
+
+                    inline std::unordered_map<std::string, ID3D11ShaderResourceView*> wardIcons;
+                    void AssignWardIconsToMap();
+
                 }
 
 
@@ -172,6 +180,7 @@ namespace UPasta::SDK::Awareness
             inline CheckBox* showMissilesAnimation;
             inline CheckBox* showBoundingRadius;
             inline CheckBox* showAARadius;
+            inline CheckBox* showAARadiusTurrets;
             inline CheckBox* showAARadiusSelf;
             inline CheckBox* showAARadiusAllies;
             inline CheckBox* showAARadiusEnemies;
@@ -201,6 +210,8 @@ namespace UPasta::SDK::Awareness
             inline CheckBox* status;
             inline CheckBox* showTimer;
             inline CheckBox* showIcons;
+            inline CheckBox* showNotifications;
+
         }
 
     }

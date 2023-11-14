@@ -11,34 +11,47 @@ namespace UPasta
 		{
 			namespace Functions
 			{
-
-				/*void PopulateMissilesMap()
+				void PopulateSpellsMap()
 				{
-					for (int i = 0; i < 3; ++i)
+					for (int i = 0; i < globals::heroManager->GetListSize(); i++)
 					{
-						auto obj = globals::missileManager->GetIndex(i);
-						if (obj && !missileMap.contains(obj))
+						const auto obj = globals::heroManager->GetIndex(i);
+						if (obj != nullptr && obj->GetName() != "PracticeTool_TargetDummy")
 						{
-							auto missile = obj->GetMissileByIndex();
-							if (missile)
-							{
-								auto missileData = missile->GetMissileData();
-								if (missileData && missileData->IsAutoAttack())
-									continue;
+							if (obj->IsAlly()) continue;
 
-								missileMap[obj] = std::make_tuple(
-									missile,
-									missile->GetSpellStartPos(),
-									missile->GetSpellPos(),
-									missile->GetSpellEndPos(),
-									missile->GetMissileData()->GetSpellName());
+							for (int slot = 0; slot < 6; ++slot)
+							{
+								std::vector<int> cooldownsArray;
+								constexpr int numCooldowns = 5;
+
+								for (int cooldownIndex = 1; cooldownIndex <= numCooldowns; ++cooldownIndex)
+								{
+									int cooldownValue = ceil(obj->GetSpellBySlotId(slot)->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(cooldownIndex)->GetBaseCooldown());
+									cooldownsArray.push_back(cooldownValue);
+								}
+
+								playerSpells[obj->GetName()][slot][obj->GetSpellBySlotId(slot)->GetName().c_str()] = cooldownsArray;
 							}
 						}
 					}
+				}
 
-					if (missileMap.size() > globals::missileManager->GetListSize())
-						missileMap.clear();
-				}*/
+				void InsertCooldown(Object* champion, int spellSlot, float readyAt) {
+					ChampionCooldownsMap.insert(std::make_pair(std::make_pair(champion, spellSlot), readyAt));
+				}
+
+				float GetCooldown(Object* champion, int spellSlot) {
+					auto it = ChampionCooldownsMap.find(std::make_pair(champion, spellSlot));
+					if (it != ChampionCooldownsMap.end()) {
+						if (it->second < functions::GetGameTime()) {
+							ChampionCooldownsMap.erase(it);
+							return 0.0f;
+						}
+						return it->second - functions::GetGameTime();
+					}
+					return 0.0f;
+				}
 
 				void PopulatePlayersMap()
 				{
@@ -224,6 +237,9 @@ namespace UPasta
 					__except (1) { LOG("[MAP] Error in initializing inhibitors map"); }
 					__try { PopulateInhibitorsMaps(); }
 					__except (1) { LOG("[MAPS] Error in initializing inhibitors maps"); }
+
+					__try { PopulateSpellsMap(); }
+					__except (1) { LOG("[MAP] Error in initializing spells map"); }
 					//Test();
 				}
 
@@ -231,8 +247,6 @@ namespace UPasta
 
 				void Refresh()
 				{
-					
-
 					__try { if (playersMap.size() < globals::heroManager->GetListSize())	PopulatePlayersMaps(); }
 					__except (1) { LOG("[MAPS] Error in refreshing players maps"); }
 

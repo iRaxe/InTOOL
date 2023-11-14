@@ -52,11 +52,6 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-    void OnPopuplateMenu() override
-    {
-
-
-    }
     void Init() override
     {
         const auto YorickMenu = Menu::CreateMenu("vezYorick", "vez.Yorick");

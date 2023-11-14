@@ -128,6 +128,8 @@ namespace UPasta::SDK::TargetSelector
         float GetMinionReducedPriority(Object* minion);
         Object* GetMinion(std::vector<Object*> targets, DamageType damageType);
         Object* GetEnemyMinionInRange(float radius);
+        Object* GetKillableEnemyMinionInRange(float radius);
+
 
         std::vector<Object*> GetTargetsInRange(Vector3 pos, float range);
         std::vector<Object*> GetKillableTargetsInRange(Vector3 pos, float range, float damage);
@@ -162,7 +164,9 @@ namespace UPasta::SDK::TargetSelector
         std::vector<Object*> GetObjectsInRange(Vector3 pos, std::string name, float range);
         Object* GetObjectInRange(std::string name, float range);
         Object* GetObjectInRange(float range, std::string name = "", std::vector<QWORD> includefilterTypeHashes = {}, std::vector<QWORD> excludeFilterTypeHashesDetailed = {}, bool isSpecial = false);
-    }
+        Object* GetAllyChampionInRange(float range);
+
+	}
 
     namespace Drawings
     {

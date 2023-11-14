@@ -1,16 +1,22 @@
 #include "../Awareness.h"
+#include "../ListManager.h"
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 
+CombatType Object::GetCombatType()
+{
+	return *(CombatType*)((QWORD)this + UPasta::Offsets::GameObject::CombatType);
+}
+
 ItemsDatabase InventorySlot::GetId()
 {
-	const auto item_id = *(ItemsDatabase*)(*(QWORD*)this + oInventorySlotItemId);
+	const auto item_id = *(ItemsDatabase*)(*(QWORD*)this + UPasta::Offsets::ItemManager::ItemId);
 	return item_id;
 }
 
 std::string InventorySlot::GetTexturePath()
 {
-	const auto item_texture_path = reinterpret_cast<uintptr_t>(this) + oInventorySlotItemTexturePath;
+	const auto item_texture_path = reinterpret_cast<uintptr_t>(this) + UPasta::Offsets::ItemManager::ItemTexturePath;
 	const auto pointer = *reinterpret_cast<char**>(item_texture_path);
 	if (IsValidPtr(pointer))
 		return pointer;
@@ -21,7 +27,7 @@ std::string InventorySlot::GetTexturePath()
 
 std::string InventorySlot::GetName()
 {
-	const auto item_name = *(char**)(*(QWORD*)this + oInventorySlotItemName);
+	const auto item_name = *(char**)(*(QWORD*)this + UPasta::Offsets::ItemManager::ItemName);
 	if (IsValidPtr(item_name))
 	{
 		return item_name;
@@ -33,7 +39,7 @@ std::string InventorySlot::GetName()
 
 InventorySlot* ItemListObject::GetSlot()
 {
-	const auto pointer = (InventorySlot*)(*(QWORD*)this + oInventorySlot);
+	const auto pointer = (InventorySlot*)(*(QWORD*)this + UPasta::Offsets::ItemManager::InventorySlot);
 
 	if (IsNotZeroPtr(*(QWORD*)pointer) && IsValidPtr(pointer))
 		return pointer;
@@ -44,7 +50,7 @@ InventorySlot* ItemListObject::GetSlot()
 
 InventorySlot* HeroInventory::GetInventorySlot(int slotID)
 {
-	const auto inventory_slot = (ItemListObject*)(*(QWORD*)this + (itemListObjectSize * slotID) + oInventorySlotWrapper);
+	const auto inventory_slot = (ItemListObject*)(*(QWORD*)this + (UPasta::Offsets::ItemManager::Size * slotID) + UPasta::Offsets::ItemManager::Wrapper);
 	if (IsNotZeroPtr(*(QWORD*)(inventory_slot)))
 	{
 		InventorySlot* wrapper = inventory_slot->GetSlot();
@@ -57,25 +63,44 @@ InventorySlot* HeroInventory::GetInventorySlot(int slotID)
 	return nullptr;
 }
 
-InventorySlot* HeroInventory::FindItemID(ItemsDatabase itemID)
-{
-	for (auto i = 0; i < 7; i++)
-	{
-		InventorySlot* item2 = this->GetInventorySlot(i);
-		if (item2 == nullptr) return nullptr;
-
-		if (item2 != nullptr && item2->GetId() == itemID)
-		{
-			return item2;
+InventorySlot* HeroInventory::FindItemID(ItemsDatabase itemID) {
+	const std::vector<InventorySlot*> items = ItemsList();
+	for (auto* item : items) {
+		if (item != nullptr && item->GetId() == itemID) {
+			return item;
 		}
 	}
-
 	return nullptr;
+}
+
+std::vector<InventorySlot*> HeroInventory::ItemsList()
+{
+	std::unordered_map<ItemsDatabase, size_t> itemToSlotMap;
+	std::vector<InventorySlot*> rs;
+
+	for (size_t i = 0; i < 7; i++) {
+		auto itemPtr = GetInventorySlot(i);
+		if (itemPtr != nullptr) {
+			// Controlla se l'oggetto è già stato aggiunto da un altro slot
+			auto found = itemToSlotMap.find(itemPtr->GetId());
+			if (found != itemToSlotMap.end()) {
+				// Se l'oggetto è già stato trovato in un altro slot, scegli se sovrascrivere o ignorare
+				// Esempio: sovrascrivi l'index precedente con il nuovo
+				rs[found->second] = itemPtr;
+			}
+			else {
+				// Aggiungi l'oggetto alla lista e registra il suo slot
+				itemToSlotMap[itemPtr->GetId()] = rs.size();
+				rs.push_back(itemPtr);
+			}
+		}
+	}
+	return rs;
 }
 
 HeroInventory* Object::GetHeroInventory()
 {
-	const auto heroInventory = reinterpret_cast<HeroInventory*>(reinterpret_cast<QWORD>(this) + oObjItemManager);
+	const auto heroInventory = reinterpret_cast<HeroInventory*>(reinterpret_cast<QWORD>(this) + UPasta::Offsets::ItemManager::Instance);
 	if (IsNotZeroPtr(heroInventory) && IsValidPtr(heroInventory))
 	{
 		return heroInventory;
@@ -85,61 +110,116 @@ HeroInventory* Object::GetHeroInventory()
 	return nullptr;
 }
 
+PerkID Perk::GetId()
+{
+	const auto perkId = *(PerkID*)((QWORD)this + UPasta::Offsets::GameObject::Perks::PerkID);
+	return perkId;
+}
+
+std::string Perk::GetName()
+{
+	const auto perkname = *(char**)((QWORD)this + UPasta::Offsets::GameObject::Perks::PerkName);
+	if (IsValidPtr(perkname))
+		return perkname;
+
+	LOG("GetName Doesnt work");
+	return "";
+}
+
+std::string Perk::GetRawName()
+{
+	const auto perkRawName = *(char**)((QWORD)this + UPasta::Offsets::GameObject::Perks::PerkRawName);
+	if (IsValidPtr(perkRawName))
+		return perkRawName;
+
+	LOG("GetRawName Doesnt work");
+	return "";
+}
+
+std::string Perk::GetRawDescription()
+{
+	const auto perkRawDescription = *(char**)(*(QWORD*)this + UPasta::Offsets::GameObject::Perks::PerkRawDescription);
+	if (IsValidPtr(perkRawDescription))
+		return perkRawDescription;
+
+	LOG("GetRawDescription Doesnt work");
+	return "";
+}
+
+Perk* Perks::GetPerkByIndex(int index)
+{
+	auto perkSlot = (Perk*)(*(QWORD*)(*(QWORD*)this + (UPasta::Offsets::GameObject::Perks::Size * index)));
+
+	if (IsNotZeroPtr(perkSlot))
+		return perkSlot;
+
+	return nullptr;
+}
+
+Perks* Object::GetHeroPerks()
+{
+	const auto heroPerks = (Perks*)(this + UPasta::Offsets::GameObject::Perks::Manager);
+	if (IsNotZeroPtr(heroPerks) && IsValidPtr(heroPerks))
+		return heroPerks;
+
+	LOG("GetHeroPerks Doesnt work");
+	return nullptr;
+}
 void CharacterDataStack::Update(bool change)
 {
 	typedef void(__thiscall* fnUpdate)(QWORD, bool);
-	const auto _update = reinterpret_cast<fnUpdate>(globals::moduleBase + oCharacterDataStackUpdate);
+	const auto _update = reinterpret_cast<fnUpdate>(globals::moduleBase + UPasta::Offsets::Functions::Skin::CharacterDataStackUpdate);
 	spoof_call(functions::spoof_trampoline, _update, reinterpret_cast<QWORD>(this), change);
 }
 
 Vector3 AiManager::GetTargetPosition()
 {
-	return functions::ReadVector3((QWORD)this + oObjAiManagerManagerTargetPosition);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::GameObject::AIManager::TargetPos);
 }
 
 bool AiManager::IsMoving()
 {
-	return *(bool*)((QWORD)this + oObjAiManagerManagerIsMoving);
+	return *(bool*)((QWORD)this + UPasta::Offsets::GameObject::AIManager::Path::IsMoving);
 }
 
 int AiManager::GetCurrentSegment()
 {
-	return *(int*)((QWORD)this + oObjAiManagerManagerCurrentSegment);
+	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::AIManager::Path::CurrentSegment);
 }
 
 Vector3 AiManager::GetPathStart()
 {
-	return functions::ReadVector3((QWORD)this + oObjAiManagerManagerPathStart);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::GameObject::AIManager::Path::PathStart);
 }
 
 Vector3 AiManager::GetPathEnd()
 {
-	return functions::ReadVector3((QWORD)this + oObjAiManagerManagerPathEnd);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::GameObject::AIManager::Path::PathEnd);
 }
 
 int AiManager::GetSegmentsCount()
 {
-	return *(int*)((QWORD)this + oObjAiManagerManagerSegmentsCount);
+	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::AIManager::Path::SegmentsCount);
 }
 
 float AiManager::GetDashSpeed()
 {
-	return *(float*)((QWORD)this + oObjAiManagerManagerDashSpeed);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AIManager::DashSpeed);
 }
 
 bool AiManager::IsDashing()
 {
-	return *(bool*)((QWORD)this + oObjAiManagerManagerIsDashing);
+	return *(bool*)((QWORD)this + UPasta::Offsets::GameObject::AIManager::Path::IsDashing);
 }
 
 Vector3 AiManager::GetPosition()
 {
-	return functions::ReadVector3((QWORD)this + oObjAiManagerManagerPosition);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::GameObject::AIManager::ServerPosition);
 }
 
 Vector3 AiManager::GetSegment(int index)
 {
-	return functions::ReadVector3(*(QWORD*)((QWORD)this + oObjAiManagerManagerSegments) + (min(index, this->GetSegmentsCount() - 1) * sizeof(Vector3)));
+	return functions::ReadVector3(*(QWORD*)((QWORD)this + UPasta::Offsets::GameObject::AIManager::Path::Segments) + (min(index, this->GetSegmentsCount() - 1) * sizeof(Vector3)));
 }
 
 std::vector<Vector3> AiManager::GetFutureSegments()
@@ -155,37 +235,37 @@ std::vector<Vector3> AiManager::GetFutureSegments()
 
 float CharacterData::GetSize()
 {
-	return *(float*)((QWORD)this + oObjCharDataDataSize);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharData::Size);
 }
 
 ChampionID CharacterData::GetHeroID()
 {
-	return *(ChampionID*)((QWORD)this + oObjCharDataDataHeroID);
+	return *(ChampionID*)((QWORD)this + UPasta::Offsets::GameObject::CharData::HeroID);
 }
 
 QWORD CharacterData::GetObjectTypeHash()
 {
-	return *(QWORD*)(*(QWORD*)((QWORD)this + oObjCharDataDataObjType));
+	return *(QWORD*)(*(QWORD*)((QWORD)this + UPasta::Offsets::GameObject::CharData::Type));
 }
 
 QWORD CharacterData::GetObjectTypeHashDetailed()
 {
-	return *(QWORD*)(*(QWORD*)((QWORD)this + oObjCharDataDataObjType) + oObjCharDataDataObjTypeDetailed);
+	return *(QWORD*)(*(QWORD*)((QWORD)this + UPasta::Offsets::GameObject::CharData::Type) + UPasta::Offsets::GameObject::CharData::TypeDetailed);
 }
 
 std::string SpellData::GetName()
 {
-	return *(char**)((QWORD)this + oSpellDataSpellName);
+	return *(char**)((QWORD)this + UPasta::Offsets::SpellSlot::Name);
 }
 
 float SpellData::GetManaCostByLevel(int level)
 {
-	return *(float*)((QWORD)this + oSpellDataManaCost + ((level - 1) * sizeof(float)));
+	return *(float*)((QWORD)this + UPasta::Offsets::SpellSlot::Info::DataManaCost + ((level - 1) * sizeof(float)));
 }
 
 SpellData* SpellInfo::GetSpellData()
 {
-	return *(SpellData**)((QWORD)this + oSpellInfoSpellData);
+	return *(SpellData**)((QWORD)this + UPasta::Offsets::SpellSlot::Info::Data);
 }
 
 void SpellInput::SetCaster(int index)
@@ -200,38 +280,38 @@ void SpellInput::SetTarget(int index)
 
 void SpellInput::SetStartPos(Vector3 pos)
 {
-	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputStartPos) = pos;
+	*reinterpret_cast<Vector3*>((QWORD)this + UPasta::Offsets::SpellSlot::Input::StartPos) = pos;
 }
 
 void SpellInput::SetEndPos(Vector3 pos)
 {
-	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputEndPos) = pos;
+	*reinterpret_cast<Vector3*>((QWORD)this + UPasta::Offsets::SpellSlot::Input::EndPos) = pos;
 }
 
 void SpellInput::SetClickedPos(Vector3 pos)
 {
-	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputEndPos + sizeof(Vector3)) = pos;
+	*reinterpret_cast<Vector3*>((QWORD)this + UPasta::Offsets::SpellSlot::Input::EndPos + sizeof(Vector3)) = pos;
 }
 
 void SpellInput::SetUnkPos(Vector3 pos)
 {
-	*reinterpret_cast<Vector3*>((QWORD)this + oSpellInputEndPos + sizeof(Vector3) * 2) = pos;
+	*reinterpret_cast<Vector3*>((QWORD)this + UPasta::Offsets::SpellSlot::Input::EndPos + sizeof(Vector3) * 2) = pos;
 }
 
 void SpellInput::SetReleasePos(Vector3 pos)
 {
-	auto mouseInstance = globals::moduleBase + oMouseInstance;
-	auto mouseScreenPosition = oMousePosition;
+	auto mouseInstance = globals::moduleBase + UPasta::Offsets::Instance::HUD::Mouse::Instance;
+	auto mouseScreenPosition = UPasta::Offsets::Instance::HUD::Mouse::Position;
 }
 
 int Spell::GetLevel()
 {
-	return *(int*)((QWORD)this + oSpellSlotLevel);
+	return *(int*)((QWORD)this + UPasta::Offsets::SpellSlot::Level);
 }
 
 float Spell::GetCooldownTimer()
 {
-	return *(float*)((QWORD)this + oSpellSlotCooldown);
+	return *(float*)((QWORD)this + UPasta::Offsets::SpellSlot::Cooldown);
 }
 
 float Spell::GetCooldown()
@@ -243,12 +323,37 @@ float Spell::GetCooldown()
 
 int Spell::GetStacks()
 {
-	return *(int*)((QWORD)this + oSpellSlotStacks);
+	return *(int*)((QWORD)this + UPasta::Offsets::SpellSlot::Stacks);
 }
 
 float Spell::GetTotalCooldown()
 {
-	return *(float*)((QWORD)this + oSpellSlotTotalCooldown);
+	return *(float*)((QWORD)this + UPasta::Offsets::SpellSlot::TotalCooldown);
+}
+
+float Cooldown::GetBaseCooldown()
+{
+	return *(float*)((QWORD)this);
+}
+
+Cooldown* CooldownArray::GetArrayIndex(int index)
+{
+	auto baseSlot = (Cooldown*)(this + (0x4 * index));
+
+	if (IsNotZeroPtr(baseSlot))
+		return baseSlot;
+
+	return nullptr;
+}
+
+CooldownArray* SpellData::GetCooldownArray()
+{
+	const auto cooldownArray = (CooldownArray*)(this + 0x2F0);
+	if (IsNotZeroPtr(cooldownArray) && IsValidPtr(cooldownArray))
+		return cooldownArray;
+
+	LOG("GetCooldownArray Doesnt work");
+	return nullptr;
 }
 
 float Spell::GetRelativeCooldown()
@@ -260,12 +365,12 @@ float Spell::GetRelativeCooldown()
 
 SpellInput* Spell::GetSpellInput()
 {
-	return *(SpellInput**)((QWORD)this + oSpellSlotSpellInput);
+	return *(SpellInput**)((QWORD)this + UPasta::Offsets::SpellSlot::Input::SpellInput);
 }
 
 SpellInfo* Spell::GetSpellInfo()
 {
-	return *(SpellInfo**)((QWORD)this + oSpellSlotSpellInfo);
+	return *(SpellInfo**)((QWORD)this + UPasta::Offsets::SpellSlot::Info::SpellInfo);
 }
 
 bool Spell::IsReady()
@@ -285,7 +390,7 @@ float Spell::GetManaCost()
 
 SpellInfo* SpellCast::GetSpellInfo()
 {
-	return *(SpellInfo**)((QWORD)this + oActiveSpellCastSpellInfo);
+	return *(SpellInfo**)((QWORD)this + UPasta::Offsets::GameObject::ActiveCast::Info);
 }
 
 SpellInfo* SpellCast::GetProcessSpellInfo()
@@ -296,39 +401,44 @@ SpellInfo* SpellCast::GetProcessSpellInfo()
 
 int SpellCast::GetSpellId()
 {
-	return *(int*)((QWORD)this + oActiveSpellCastSpellId);
+	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::ActiveCast::SpellID);
 }
 
 bool SpellCast::IsAutoAttack()
 {
-	return *(int*)((QWORD)this + oActiveSpellCastSpellType) == -1;
+	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::ActiveCast::Type) == -1;
 }
 
 std::string Buff::GetName()
 {
-	QWORD* namePtr = (QWORD*)(*(QWORD*)((QWORD)this + oBuffNamePtr));
+	QWORD* namePtr = (QWORD*)(*(QWORD*)((QWORD)this + UPasta::Offsets::Buff::BuffNamePtr));
 	if (!IsValidPtr(namePtr)) return "";
-	return *(char**)((QWORD)namePtr + oBuffNamePtrName);
+	return *(char**)((QWORD)namePtr + UPasta::Offsets::Buff::BuffName);
+}
+
+BuffType Buff::GetType()
+{
+	return *(BuffType*)((QWORD)this + UPasta::Offsets::Buff::BuffType);
 }
 
 float Buff::GetStartTime()
 {
-	return *(float*)((QWORD)this + oBuffStartTime);
+	return *(float*)((QWORD)this + UPasta::Offsets::Buff::BuffEntryBuffStartTime);
 }
 
 float Buff::GetEndTime()
 {
-	return *(float*)((QWORD)this + oBuffEndTime);
+	return *(float*)((QWORD)this + UPasta::Offsets::Buff::BuffEntryBuffEndTime);
 }
 
 int Buff::GetStacksAlt()
 {
-	return *(int*)((QWORD)this + oBuffStacksAlt);
+	return *(int*)((QWORD)this + UPasta::Offsets::Buff::BuffEntryBuffCountAlt);
 }
 
 int Buff::GetStacks()
 {
-	return *(int*)((QWORD)this + oBuffStacks);
+	return *(int*)((QWORD)this + UPasta::Offsets::Buff::BuffEntryBuffCount);
 }
 
 int Buff::GetMaxStacks()
@@ -338,12 +448,12 @@ int Buff::GetMaxStacks()
 
 bool Buff::isActive()
 {
-	return *(BYTE*)(this + oBuffStacksAlt) && *(int64_t*)(this + oBuffNamePtr) || *(BYTE*)(this + 0x88);
+	return *(BYTE*)(this + UPasta::Offsets::Buff::BuffEntryBuffCountAlt) && *(int64_t*)(this + UPasta::Offsets::Buff::BuffNamePtr) || *(BYTE*)(this + 0x88);
 }
 
 Buff* BuffEntry::GetBuff()
 {
-	Buff* buff = (Buff*)(*(QWORD*)((QWORD)this + oBuffEntryBuff));
+	Buff* buff = (Buff*)(*(QWORD*)((QWORD)this + UPasta::Offsets::Buff::BuffEntry));
 	if (!IsValidPtr(buff)) return nullptr;
 	return buff;
 }
@@ -357,33 +467,35 @@ BuffEntry* BuffManager::GetBuffEntryByIndex(int index)
 
 unsigned int Object::GetNetId()
 {
-	return *(int*)((QWORD)this + oObjNetId);
+	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::Index);
 }
 
 int Object::GetTeam()
 {
-	return *(int*)((QWORD)this + oObjTeam);
+	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::Team);
 }
 
 int Object::GetLevel()
 {
-	return *(int*)((QWORD)this + oObjLevel);
+	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::Level);
 }
+
+
 
 float Object::GetExperience()
 {
-	return *(float*)((QWORD)this + oObjExperience);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Experience);
 }
 
 Vector3 Object::GetPosition()
 {
-	return functions::ReadVector3((QWORD)this + oObjPosition);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::GameObject::Position);
 }
 
 bool Object::IsVisible()
 {
 	//return functions::IsCanSee(this);
-	return *(bool*)((QWORD)this + oObjVisible);
+	return *(bool*)((QWORD)this + UPasta::Offsets::GameObject::Visibility);
 }
 
 bool Object::IsAlive()
@@ -394,12 +506,12 @@ bool Object::IsAlive()
 
 float Object::GetMana()
 {
-	return *(float*)((QWORD)this + oObjMana);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Mana);
 }
 
 float Object::GetMaxMana()
 {
-	return *(float*)((QWORD)this + oObjMaxMana);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MaxMana);
 }
 
 float Object::GetPercentMana()
@@ -410,12 +522,12 @@ float Object::GetPercentMana()
 bool Object::IsTargetable()
 {
 	//return functions::IsTargetable(this);
-	return *(bool*)((QWORD)this + oObjTargetable);
+	return *(bool*)((QWORD)this + UPasta::Offsets::GameObject::Targetable);
 }
 
 bool Object::IsInvulnerable()
 {
-	return *(bool*)((QWORD)this + oObjIsInvulnerable);
+	return *(bool*)((QWORD)this + UPasta::Offsets::GameObject::Invulnerability);
 }
 
 bool Object::IsCursed()
@@ -520,12 +632,12 @@ bool Object::HasConqueror()
 
 float Object::GetHealth()
 {
-	return *(float*)((QWORD)this + oObjHealth);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Health);
 }
 
 float Object::GetMaxHealth()
 {
-	return *(float*)((QWORD)this + oObjMaxHealth);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MaxHealth);
 }
 
 float Object::GetPercentHealth()
@@ -535,52 +647,52 @@ float Object::GetPercentHealth()
 
 unsigned short Object::GetActionState()
 {
-	return *(unsigned short*)((QWORD)this + oObjActionState);
+	return *(unsigned short*)((QWORD)this + UPasta::Offsets::GameObject::State);
 }
 
 float Object::GetBaseAttackDamage()
 {
-	return *(float*)((QWORD)this + oObjBaseAttackDamage);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::BaseAtk);
 }
 
 float Object::GetAbilityPower()
 {
-	return *(float*)((QWORD)this + oObjAbilityPower);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AbilityPower);
 }
 
 float Object::GetBonusAttackDamage()
 {
-	return *(float*)((QWORD)this + oObjBonusAttackDamage);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::BonusAtk);
 }
 
 float Object::GetScale()
 {
-	return *(float*)((QWORD)this + oObjScale);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Scale);
 }
 
 float Object::GetMovementSpeed()
 {
-	return *(float*)((QWORD)this + oObjMovementSpeed);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MoveSpeed);
 }
 
 float Object::GetAttackSpeed()
 {
-	return *(float*)((QWORD)this + oObjAtkSpeedMulti);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AtkSpeedMulti);
 }
 
 float Object::GetLethality()
 {
-	return *(float*)((QWORD)this + oObjLethality);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Lethality);
 }
 
 float Object::GetArmor()
 {
-	return *(float*)((QWORD)this + oObjArmor);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Armor);
 }
 
 float Object::GetBonusArmor()
 {
-	return *(float*)((QWORD)this + oObjBonusArmor);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::BonusArmor);
 }
 
 float Object::GetTotalArmor()
@@ -590,22 +702,22 @@ float Object::GetTotalArmor()
 
 float Object::GetArmorPenetration()
 {
-	return *(float*)((QWORD)this + oObjArmorPen);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::ArmorPen);
 }
 
 float Object::GetMagicResist()
 {
-	return *(float*)((QWORD)this + oObjMagicResist);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MagicRes);
 }
 
 float Object::GetMagicPenetration()
 {
-	return *(float*)((QWORD)this + oObjMagicPen);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MagicPen);
 }
 
 float Object::GetMagicPenetrationMulti()
 {
-	return *(float*)((QWORD)this + oObjMagicPenMulti);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MagicPenMulti);
 }
 
 
@@ -616,12 +728,17 @@ float Object::GetTotalMagicPenetration()
 
 float Object::GetAttackRange()
 {
-	return *(float*)((QWORD)this + oObjAttackRange) ;
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AttackRange) ;
+}
+
+float Object::GetAbilityHaste()
+{
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AbilityHaste);
 }
 
 std::string Object::GetName()
 {
-	char* name = *reinterpret_cast<char**>(reinterpret_cast<QWORD>(this) + oObjName);
+	char* name = *reinterpret_cast<char**>(reinterpret_cast<QWORD>(this) + UPasta::Offsets::GameObject::AiName);
 	if (!IsValidPtr(name))
 	{
 		LOG("Error in getting Object Name");
@@ -632,35 +749,35 @@ std::string Object::GetName()
 
 BuffManager* Object::GetBuffManager()
 {
-	return (BuffManager*)(*(QWORD*)((QWORD)this + oObjBuffManager));
+	return (BuffManager*)(*(QWORD*)((QWORD)this + UPasta::Offsets::Buff::BuffManager));
 }
 
 QWORD* Object::GetBuffManagerEntriesEnd()
 {
-	return *(QWORD**)((QWORD)this + oObjBuffManager + oObjBuffManagerEntriesEnd);
+	return *(QWORD**)((QWORD)this + UPasta::Offsets::Buff::BuffManager + UPasta::Offsets::Buff::BuffEntriesEnd);
 }
 
 SpellCast* Object::GetActiveSpellCast()
 {
-	QWORD* activeSpellCastOffset = *(QWORD**)((QWORD)this + oObjActiveSpellCast);
+	QWORD* activeSpellCastOffset = *(QWORD**)((QWORD)this + UPasta::Offsets::GameObject::ActiveCast::ActiveCast);
 	if (!IsValidPtr(activeSpellCastOffset)) return nullptr;
 	return (SpellCast*)activeSpellCastOffset;
 }
 
 CharacterData* Object::GetCharacterData()
 {
-	return (CharacterData*)(*(QWORD*)(*(QWORD*)((QWORD)this + oObjCharData) + oObjCharDataData));
+	return (CharacterData*)(*(QWORD*)(*(QWORD*)((QWORD)this + UPasta::Offsets::GameObject::CharData::Instance) + UPasta::Offsets::GameObject::CharData::Array));
 }
 
 AiManager* Object::GetAiManager()
 {
-	LeagueObfuscation<QWORD> aiManagerObf = *(LeagueObfuscation<QWORD>*)((QWORD)this + oObjAiManager);
+	LeagueObfuscation<QWORD> aiManagerObf = *(LeagueObfuscation<QWORD>*)((QWORD)this + UPasta::Offsets::GameObject::AIManager::AiManager);
 	return (AiManager*)(*(QWORD*)(Decrypt(aiManagerObf) + 0x10));
 }
 
 Spell* Object::GetSpellBySlotId(int slotId)
 {
-	return *(Spell**)((QWORD)this + oObjSpellBook + oObjSpellBookSpellSlot + (sizeof(QWORD) * slotId));
+	return *(Spell**)((QWORD)this + UPasta::Offsets::GameObject::SpellBook + UPasta::Offsets::SpellSlot::SpellBookSpellSlot + (sizeof(QWORD) * slotId));
 }
 
 bool isASCII(const std::string& s)
@@ -672,13 +789,11 @@ bool isASCII(const std::string& s)
 
 std::string MissileData::GetMissileName()
 {
-	const auto missileDataPtr = *reinterpret_cast<MissileData**>(reinterpret_cast<QWORD>(this) + oMissileName);
-	if (IsValidPtr(missileDataPtr))
-	{
-		const char* textToReturnPtr = reinterpret_cast<char*>(missileDataPtr);
-		return textToReturnPtr;
-	}
+	const auto missileName = (char*)((QWORD)this + UPasta::Offsets::Missile::MissileName);
+	if (IsValidPtr(missileName))
+		return missileName;
 
+	LOG("GetMissileName Doesnt work");
 	return "";
 }
 
@@ -689,7 +804,7 @@ bool MissileData::IsAutoAttack()
 
 std::string MissileData::GetSpellName()
 {
-	const auto missileDataPtr = *reinterpret_cast<MissileData**>(reinterpret_cast<QWORD>(this) + oMissileSpellName);
+	const auto missileDataPtr = *reinterpret_cast<MissileData**>(reinterpret_cast<QWORD>(this) + UPasta::Offsets::Missile::SpellName);
 	if (IsValidPtr(missileDataPtr))
 	{
 		const char* textToReturnPtr = reinterpret_cast<char*>(missileDataPtr);
@@ -701,52 +816,52 @@ std::string MissileData::GetSpellName()
 
 MissileData* Missile::GetMissileData()
 {
-	return *(MissileData**)((QWORD)this + oMissileSpellInfo);
+	return *(MissileData**)((QWORD)this + UPasta::Offsets::Missile::SpellInfo::SpellInfo);
 }
 
 Missile* Object::GetMissileByIndex()
 {
-	return *(Missile**)((QWORD)this + oMissileMapVal);
+	return *(Missile**)((QWORD)this + UPasta::Offsets::Missile::Index);
 }
 
 int Missile::GetMissileSrcId()
 {
-	return *(int*)((QWORD)this + oMissileSrcIdx);
+	return *(int*)((QWORD)this + UPasta::Offsets::Missile::SrcIdx);
 }
 
 Vector3 Missile::GetSpellStartPos()
 {
-	return functions::ReadVector3((QWORD)this + oMissileStartPos);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::Missile::StartPosition);
 }
 
 Vector3 Missile::GetSpellPos()
 {
-	return functions::ReadVector3((QWORD)this + oMissilePos);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::Missile::Position);
 }
 
 Vector3 Missile::GetSpellEndPos()
 {
-	return functions::ReadVector3((QWORD)this + oMissileEndPos);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::Missile::EndPosition);
 }
 
 float Object::GetBoundingRadius()
 {
 	typedef float(__fastcall* fnGetBoundingRadius)(Object* obj);
-	fnGetBoundingRadius _fnGetBoundingRadius = (fnGetBoundingRadius)(globals::moduleBase + oGetBoundingRadius);
+	fnGetBoundingRadius _fnGetBoundingRadius = (fnGetBoundingRadius)(globals::moduleBase + UPasta::Offsets::Functions::Stats::GetBoundingRadius);
 	return _fnGetBoundingRadius(this);
 }
 
 float Object::GetAttackDelay()
 {
 	typedef float(__cdecl* fnGetAttackDelay)(Object* obj);
-	fnGetAttackDelay _fnGetAttackDelay = (fnGetAttackDelay)(globals::moduleBase + oGetAttackDelay);
+	fnGetAttackDelay _fnGetAttackDelay = (fnGetAttackDelay)(globals::moduleBase + UPasta::Offsets::Functions::Stats::GetAttackDelay);
 	return _fnGetAttackDelay(this);
 }
 
 float Object::GetAttackWindup()
 {
 	typedef float(__cdecl* fnGetAttackWindup)(Object* obj, int flags);
-	fnGetAttackWindup _fnGetAttackWindup = (fnGetAttackWindup)(globals::moduleBase + oGetAttackWindup);
+	fnGetAttackWindup _fnGetAttackWindup = (fnGetAttackWindup)(globals::moduleBase + UPasta::Offsets::Functions::Stats::GetAttackCastDelay);
 	return _fnGetAttackWindup(this, 0x40);
 }
 
@@ -757,17 +872,17 @@ bool Object::IsCastingSpell()
 }
 bool Object::CanAttack()
 {
-	return this->GetActionState() & CharacterState::CanAttack;
+	return this->GetActionState() & ActionState::CanAttack && !globals::localPlayer->GetBuffByName("KaisaE");
 }
 
 bool Object::CanCast()
 {
-	return this->GetActionState() & CharacterState::CanCast;
+	return this->GetActionState() & ActionState::CanCast;
 }
 
 bool Object::CanMove()
 {
-	return this->GetActionState() & CharacterState::CanMove;
+	return this->GetActionState() & ActionState::CanMove;
 }
 
 bool Object::IsEnemy()
@@ -797,12 +912,12 @@ bool Object::IsRespawnMarker()
 
 bool Object::IsMelee()
 {
-	return this->GetAttackRange() <= 325.0f;
+	return this->GetCombatType() == CombatType::Melee;
 }
 
 bool Object::IsRanged()
 {
-	return this->GetAttackRange() > 325.0f;
+	return this->GetCombatType() == CombatType::Ranged;
 }
 
 bool Object::IsHero()
@@ -878,7 +993,7 @@ bool Object::IsBuilding()
 
 float Object::CharGetAttackDamage()
 {
-	return *(float*)((QWORD)this + oBaseAttackDamage);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::BaseAtk);
 }
 
 float Object::GetAttackDamage()
@@ -949,6 +1064,12 @@ Vector3 Object::GetServerPosition()
 	return this->GetPosition();
 }
 
+
+bool Object::HasBuff(const char* buffname)
+{
+	return functions::Read<bool>(RVA(UPasta::Offsets::Functions::Stats::HasBuff)), this, 0, RealNameInHash(buffname);
+}
+
 int Object::GetBuffListSize()
 {
 	return (int)((QWORD)this->GetBuffManagerEntriesEnd() - (QWORD)this->GetBuffManager()) / (int)sizeof(QWORD);
@@ -966,331 +1087,343 @@ Buff* Object::GetBuffByName(std::string name)
 	return nullptr;
 }
 
+Buff* Object::GetBuffByType(BuffType type)
+{
+	for (int i = 0; i < this->GetBuffListSize(); i++)
+	{
+		auto buffEntry = this->GetBuffManager()->GetBuffEntryByIndex(i);
+		if (!buffEntry) return nullptr;
+		auto buff = buffEntry->GetBuff();
+		if (buff && buff->GetEndTime() >= functions::GetGameTime() && buff->GetType() == type) return buff;
+	}
+	return nullptr;
+}
+
 CharacterDataStack* Object::GetCharacterDataStack()
 {
-	return (CharacterDataStack*)((QWORD)this + oObjCharacterDataStack);
+	return (CharacterDataStack*)((QWORD)this + UPasta::Offsets::GameObject::CharData::Instance);
 }
 
 #pragma region CharacterStateIntermediate
 CharacterStateIntermediate* Object::GetCharacterStateIntermediate()
 {
-	return (CharacterStateIntermediate*)((QWORD)this + oCharacterStateIntermediate);
+	return (CharacterStateIntermediate*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oCharacterStateIntermediate);
 }
 
 float CharacterStateIntermediate::GetAbilityHasteMod()
 {
-	return *(float*)((QWORD)this + oAbilityHasteMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oAbilityHasteMod);
 }
 
 float CharacterStateIntermediate::GetPercentCooldownCapMod()
 {
-	return *(float*)((QWORD)this + oPercentCooldownCapMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentCooldownCapMod);
 }
 
 float CharacterStateIntermediate::GetPassiveCooldownEndTime()
 {
-	return *(float*)((QWORD)this + oPassiveCooldownEndTime);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPassiveCooldownEndTime);
 }
 
 float CharacterStateIntermediate::GetPassiveCooldownTotalTime()
 {
-	return *(float*)((QWORD)this + oPassiveCooldownTotalTime);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPassiveCooldownTotalTime);
 }
 
 float CharacterStateIntermediate::GetFlatPhysicalDamageMod()
 {
-	return *(float*)((QWORD)this + oFlatPhysicalDamageMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatPhysicalDamageMod);
 }
 
 float CharacterStateIntermediate::GetPercentPhysicalDamageMod()
 {
-	return *(float*)((QWORD)this + oPercentPhysicalDamageMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentPhysicalDamageMod);
 }
 
 float CharacterStateIntermediate::GetPercentBonusPhysicalDamageMod()
 {
-	return *(float*)((QWORD)this + oPercentBonusPhysicalDamageMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBonusPhysicalDamageMod);
 }
 
 float CharacterStateIntermediate::GetPercentBasePhysicalDamageAsFlatBonusMod()
 {
-	return *(float*)((QWORD)this + oPercentBasePhysicalDamageAsFlatBonusMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBasePhysicalDamageAsFlatBonusMod);
 }
 
 float CharacterStateIntermediate::GetFlatMagicDamageMod()
 {
-	return *(float*)((QWORD)this + oFlatMagicDamageMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatMagicDamageMod);
 }
 
 float CharacterStateIntermediate::GetPercentMagicDamageMod()
 {
-	return *(float*)((QWORD)this + oPercentMagicDamageMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentMagicDamageMod);
 }
 
 float CharacterStateIntermediate::GetFlatMagicReduction()
 {
-	return *(float*)((QWORD)this + oFlatMagicReduction);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatMagicReduction);
 }
 
 float CharacterStateIntermediate::GetPercentDamageToBarracksMinionMod()
 {
-	return *(float*)((QWORD)this + oGetPercentDamageToBarracksMinionMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oGetPercentDamageToBarracksMinionMod);
 }
 
 float CharacterStateIntermediate::GetFlatDamageReductionFromBarracksMinionMod()
 {
-	return *(float*)((QWORD)this + oGetFlatDamageReductionFromBarracksMinionMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oGetFlatDamageReductionFromBarracksMinionMod);
 }
 
 float CharacterStateIntermediate::GetPercentMagicReduction()
 {
-	return *(float*)((QWORD)this + oPercentMagicReduction);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentMagicReduction);
 }
 
 float CharacterStateIntermediate::GetFlatCastRangeMod()
 {
-	return *(float*)((QWORD)this + oFlatCastRangeMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatCastRangeMod);
 }
 
 float CharacterStateIntermediate::GetAttackSpeedMod()
 {
-	return *(float*)((QWORD)this + oAttackSpeedMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oAttackSpeedMod);
 }
 
 float CharacterStateIntermediate::GetPercentAttackSpeedMod()
 {
-	return *(float*)((QWORD)this + oPercentAttackSpeedMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentAttackSpeedMod);
 }
 
 float CharacterStateIntermediate::GetPercentMultiplicativeAttackSpeedMod()
 {
-	return *(float*)((QWORD)this + oPercentMultiplicativeAttackSpeedMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentMultiplicativeAttackSpeedMod);
 }
 
 float CharacterStateIntermediate::GetBaseAttackDamage()
 {
-	return *(float*)((QWORD)this + oBaseAttackDamage);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBaseAttackDamage);
 }
 
 float CharacterStateIntermediate::GetBaseAttackDamageSansPercentScale()
 {
-	return *(float*)((QWORD)this + oBaseAttackDamageSansPercentScale);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBaseAttackDamageSansPercentScale);
 }
 
 float CharacterStateIntermediate::GetFlatBaseAttackDamageMod()
 {
-	return *(float*)((QWORD)this + oFlatBaseAttackDamageMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBaseAttackDamageMod);
 }
 
 float CharacterStateIntermediate::GetPercentBaseAttackDamageMod()
 {
-	return *(float*)((QWORD)this + oPercentBaseAttackDamageMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBaseAttackDamageMod);
 }
 
 float CharacterStateIntermediate::GetBaseAbilityDamage()
 {
-	return *(float*)((QWORD)this + oBaseAbilityDamage);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBaseAbilityDamage);
 }
 
 float CharacterStateIntermediate::GetCritDamageMultiplier()
 {
-	return *(float*)((QWORD)this + oCritDamageMultiplier);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oCritDamageMultiplier);
 }
 
 float CharacterStateIntermediate::GetScaleSkinCoef()
 {
-	return *(float*)((QWORD)this + oScaleSkinCoef);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oScaleSkinCoef);
 }
 
 float CharacterStateIntermediate::GetDodge()
 {
-	return *(float*)((QWORD)this + oDodge);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oDodge);
 }
 
 float CharacterStateIntermediate::GetCritPercent()
 {
-	return *(float*)((QWORD)this + oCritPercent);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oCritPercent);
 }
 
 float CharacterStateIntermediate::GetFlatBaseHPPoolMod()
 {
-	return *(float*)((QWORD)this + oFlatBaseHPPoolMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBaseHPPoolMod);
 }
 
 float CharacterStateIntermediate::GetArmor()
 {
-	return *(float*)((QWORD)this + oArmor);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oArmor);
 }
 
 float CharacterStateIntermediate::GetBonusArmor()
 {
-	return *(float*)((QWORD)this + oBonusArmor);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBonusArmor);
 }
 
 float CharacterStateIntermediate::GetSpellBlock()
 {
-	return *(float*)((QWORD)this + oSpellBlock);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oSpellBlock);
 }
 
 float CharacterStateIntermediate::GetBonusSpellBlock()
 {
-	return *(float*)((QWORD)this + oBonusSpellBlock);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBonusSpellBlock);
 }
 
 float CharacterStateIntermediate::GetHPRegenRate()
 {
-	return *(float*)((QWORD)this + oHPRegenRate);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oHPRegenRate);
 }
 
 float CharacterStateIntermediate::GetBaseHPRegenRate()
 {
-	return *(float*)((QWORD)this + oBaseHPRegenRate);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBaseHPRegenRate);
 }
 
 float CharacterStateIntermediate::GetMoveSpeed()
 {
-	return *(float*)((QWORD)this + oMoveSpeed);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oMoveSpeed);
 }
 
 float CharacterStateIntermediate::GetAttackRange()
 {
-	return *(float*)((QWORD)this + oAttackRange);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oAttackRange);
 }
 
 float CharacterStateIntermediate::GetFlatBubbleRadiusMod()
 {
-	return *(float*)((QWORD)this + oFlatBubbleRadiusMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBubbleRadiusMod);
 }
 
 float CharacterStateIntermediate::GetPercentBubbleRadiusMod()
 {
-	return *(float*)((QWORD)this + oPercentBubbleRadiusMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBubbleRadiusMod);
 }
 
 float CharacterStateIntermediate::GetFlatArmorPenetration()
 {
-	return *(float*)((QWORD)this + oFlatArmorPenetration);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatArmorPenetration);
 }
 
 float CharacterStateIntermediate::GetPhysicalLethality()
 {
-	return *(float*)((QWORD)this + oPhysicalLethality);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPhysicalLethality);
 }
 
 float CharacterStateIntermediate::GetPercentArmorPenetration()
 {
-	return *(float*)((QWORD)this + oPercentArmorPenetration);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentArmorPenetration);
 }
 
 float CharacterStateIntermediate::GetPercentBonusArmorPenetration()
 {
-	return *(float*)((QWORD)this + oPercentBonusArmorPenetration);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBonusArmorPenetration);
 }
 
 float CharacterStateIntermediate::GetPercentCritBonusArmorPenetration()
 {
-	return *(float*)((QWORD)this + oPercentCritBonusArmorPenetration);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentCritBonusArmorPenetration);
 }
 
 float CharacterStateIntermediate::GetPercentCritTotalArmorPenetration()
 {
-	return *(float*)((QWORD)this + oPercentCritTotalArmorPenetration);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentCritTotalArmorPenetration);
 }
 
 float CharacterStateIntermediate::GetFlatMagicPenetration()
 {
-	return *(float*)((QWORD)this + oFlatMagicPenetration);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatMagicPenetration);
 }
 
 float CharacterStateIntermediate::GetMagicLethality()
 {
-	return *(float*)((QWORD)this + oMagicLethality);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oMagicLethality);
 }
 
 float CharacterStateIntermediate::GetPercentMagicPenetration()
 {
-	return *(float*)((QWORD)this + oPercentMagicPenetration);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentMagicPenetration);
 }
 
 float CharacterStateIntermediate::GetPercentBonusMagicPenetration()
 {
-	return *(float*)((QWORD)this + oPercentBonusMagicPenetration);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBonusMagicPenetration);
 }
 
 float CharacterStateIntermediate::GetPercentLifeStealMod()
 {
-	return *(float*)((QWORD)this + oPercentLifeStealMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentLifeStealMod);
 }
 
 float CharacterStateIntermediate::GetPercentSpellVampMod()
 {
-	return *(float*)((QWORD)this + oPercentSpellVampMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentSpellVampMod);
 }
 
 float CharacterStateIntermediate::GetPercentOmnivampMod()
 {
-	return *(float*)((QWORD)this + oPercentOmnivampMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentOmnivampMod);
 }
 
 float CharacterStateIntermediate::GetPercentPhysicalVamp()
 {
-	return *(float*)((QWORD)this + oPercentPhysicalVamp);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentPhysicalVamp);
 }
 
 float CharacterStateIntermediate::GetPathfindingRadiusMod()
 {
-	return *(float*)((QWORD)this + oPathfindingRadiusMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPathfindingRadiusMod);
 }
 
 float CharacterStateIntermediate::GetPercentCCReduction()
 {
-	return *(float*)((QWORD)this + oPercentCCReduction);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentCCReduction);
 }
 
 float CharacterStateIntermediate::GetPercentEXPBonus()
 {
-	return *(float*)((QWORD)this + oPercentEXPBonus);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentEXPBonus);
 }
 
 float CharacterStateIntermediate::GetFlatBaseArmorMod()
 {
-	return *(float*)((QWORD)this + oFlatBaseArmorMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBaseArmorMod);
 }
 
 float CharacterStateIntermediate::GetFlatBaseSpellBlockMod()
 {
-	return *(float*)((QWORD)this + oFlatBaseSpellBlockMod);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBaseSpellBlockMod);
 }
 
 float CharacterStateIntermediate::GetPrimaryARBaseRegenRateRep()
 {
-	return *(float*)((QWORD)this + oPrimaryARBaseRegenRateRep);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPrimaryARBaseRegenRateRep);
 }
 
 float CharacterStateIntermediate::GetSecondaryARRegenRateRep()
 {
-	return *(float*)((QWORD)this + oSecondaryARRegenRateRep);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oSecondaryARRegenRateRep);
 }
 
 float CharacterStateIntermediate::GetSecondaryARBaseRegenRateRep()
 {
-	return *(float*)((QWORD)this + oSecondaryARBaseRegenRateRep);
+	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oSecondaryARBaseRegenRateRep);
 }
 
 #pragma endregion
 
 int ObjectManager::GetListSize()
 {
-	return *(int*)((QWORD)this + oManagerListSize);
+	return *(int*)((QWORD)this + UPasta::Offsets::Instance::Lists::ManagerListSize);
 }
 
 Object* ObjectManager::GetIndex(int index)
 {
-	return *(Object**)(*(QWORD*)((QWORD)this + oManagerList) + (sizeof(QWORD) * index));
+	return *(Object**)(*(QWORD*)((QWORD)this + UPasta::Offsets::Instance::Lists::ManagerList) + (sizeof(QWORD) * index));
 }
 
 Vector3 SpellData::GetSpellEndPos()
 {
-	return functions::ReadVector3((QWORD)this + oMissileDestIdx);
+	return functions::ReadVector3((QWORD)this + UPasta::Offsets::Missile::EndPosition);
 }
 

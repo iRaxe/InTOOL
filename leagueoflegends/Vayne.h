@@ -6,28 +6,28 @@ using namespace scripts;
 namespace VayneConfig
 {
     namespace VayneCombo {
-        inline bool UseQ;
-        inline bool UseE;
-        inline bool UseR;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseE;
+        inline CheckBox* UseR;
 
-        inline int enemiesInRange;
+        inline Slider* enemiesInRange;
     }
 
     namespace VayneHarass {
-        inline bool UseQ;
-        inline bool UseE;
-        inline float minMana;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseE;
+        inline Slider* minMana;
     }
 
     namespace VayneClear {
-        inline bool UseQ;
-        inline float minMana;
+        inline CheckBox* UseQ;
+        inline Slider* minMana;
     }
 
     namespace VayneJungle {
-        inline bool UseQ;
-        inline bool UseE;
-        inline float minMana;
+        inline CheckBox* UseQ;
+        inline CheckBox* UseE;
+        inline Slider* minMana;
     }
 
     namespace VayneSpellsSettings {
@@ -38,6 +38,7 @@ namespace VayneConfig
         inline Slider* wStacksRequired;
         inline Slider* qRange;
         inline CheckBox* DrawQ;
+
 
         inline List* eCastMode;
         inline CheckBox* UseEOnlyStun;

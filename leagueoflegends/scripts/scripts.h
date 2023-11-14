@@ -54,7 +54,6 @@ namespace scripts
 		void RenderUpdate();
 		void DoBeforeAttack();
 		void DoCastSpell();
-		void DoPopulateMenu();
 
 	}
 

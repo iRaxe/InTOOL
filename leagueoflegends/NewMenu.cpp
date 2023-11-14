@@ -15,10 +15,11 @@
 
 #include "Awareness.h"
 #include "Colorpicker.h"
+#include "imgui_notify.h"
 #include "uxtheme.h"
 #include "Vayne.h"
 
-#define WIDTH 850
+#define WIDTH 1200
 #define HEIGHT 400
 ID3D11ShaderResourceView* platformLogo = nullptr;
 int tabs = 0;
@@ -79,7 +80,7 @@ namespace UPasta {
 				}
 			}
 
-			auto menu = Menu::CreateMenu("Menu settings", "  Menu\nSettings");
+			auto menu = Menu::CreateMenu("Menu settings", " Menu Settings");
 
 			auto menuSettings = menu->AddMenu("MainSettings", "Main Background Colors");
 			menuSettings->AddColorPicker("background_image", "Logo Color", (float*)&colors::background::background_image);
@@ -414,34 +415,16 @@ namespace UPasta {
 				return;
 
 			const auto& p = ImGui::GetWindowPos();
-			const ImVec2 startPos(p.x + 60.0f, p.y);
-			const ImVec2 endPos(240.0f + p.x, 460.0f + p.y);
-			const ImVec2 borderStart(80.0f + p.x, p.y + 20.0f);
-			const ImVec2 borderEnd(220.0f + p.x, 440.0f + p.y);
-
 			auto* drawList = ImGui::GetWindowDrawList();
-			drawList->AddRectFilled(startPos, endPos, ImGui::GetColorU32(colors::background::background_1), 7.f);
-			drawList->AddRect(borderStart, borderEnd, ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
-
-			const std::string mediaFolder = "C:\\UPorn\\Media";
-			static bool platformLogoLoaded = false;
-			const std::string platformLogoFile = mediaFolder + "\\logo.png";
-
-			if (platformLogo == nullptr && !platformLogoLoaded)
-			{
-				Awareness::Functions::EnemySidebar::LoadDX11ImageIfNeeded(platformLogoFile.c_str(), platformLogoLoaded, &platformLogo);
-				platformLogoLoaded = true;
-			}
-
-			render::RenderImage(platformLogo, ImVec2(80.0f + p.x, 30 + p.y), ImVec2(220 + p.x, 150 + p.y), COLOR_WHITE);
+			const ImVec2 startPos2( p.x + 10.0f, p.y);
+			const ImVec2 endPos2(160.0f + p.x, 350.0f + p.y);
+			drawList->AddRectFilled(startPos2, endPos2, ImGui::GetColorU32(colors::background::background_1), 7.f);
 
 			int counter = 1;
 
 			for (auto menu : RootMenus)
 			{
-				ImGui::SetCursorPos(ImVec2(100.0f, 110 + (50.0f * counter)));
-
-				if (ImGui::Tab(menu->GetIndex(), menu->Name, menu->DisplayName, menu->DisplayName, ImVec2(menu->GetWidth() - 80.0f, 40.0f)))
+				if (ImGui::Tab(menu->GetIndex(), menu->Name, menu->DisplayName, menu->DisplayName, ImVec2(140.0f, 50.0f)))
 				{
 					tabs = counter;
 					activeMenu = menu;
@@ -480,15 +463,15 @@ namespace UPasta {
 				return;
 
 			const auto& p = ImGui::GetWindowPos();
-			const ImVec2 startPos2(260 + p.x, p.y);
-			const ImVec2 endPos2(1290 + p.x, 90 + p.y);
-			const ImVec2 borderStart2(280 + p.x, p.y + 20);
-			const ImVec2 borderEnd2(1270 + p.x, 70 + p.y);
+			const ImVec2 startPos2(160.0f + p.x, p.y);
+			const ImVec2 endPos2(1200.0f + p.x, 90 + p.y);
+			const ImVec2 borderStart2(180 + p.x, p.y + 20);
+			const ImVec2 borderEnd2(1180.0f + p.x, 70 + p.y);
 			auto* drawList = ImGui::GetWindowDrawList();
 
 			drawList->AddRectFilled(startPos2, endPos2, ImGui::GetColorU32(colors::background::background_1), 7.f);
 			drawList->AddRect(borderStart2, borderEnd2, ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
-			ImGui::SetCursorPosX(320.0f);
+			ImGui::SetCursorPosX(200.0f);
 
 			for (const auto& pair : subMenuMap)
 			{
@@ -525,21 +508,23 @@ namespace UPasta {
 
 			if (!this->Children.empty())
 			{
+			
+				auto* drawList = ImGui::GetWindowDrawList();
 				const auto& p = ImGui::GetWindowPos();
 				const float tabStartY = offsetY + p.y;
 				constexpr float contentOffset = 20.0f;
 				int counter = 0;
-				const ImVec2 contentStart(260 + p.x, tabStartY);
+				const ImVec2 contentStart(160 + p.x, tabStartY);
 				const ImVec2 borderStart(contentStart.x + contentOffset, contentStart.y + contentOffset);
 
 				const float contentHeight = tabContent.size() > 6 ? 660.0f : tabContent.size() > 3 ? 460.0f : 260.0f;
-				const ImVec2 contentEnd(1290 + p.x, tabStartY + contentHeight);
+				const ImVec2 contentEnd(1200.0f + p.x, tabStartY + contentHeight);
 				const ImVec2 borderEnd(contentEnd.x - contentOffset, contentEnd.y - contentOffset);
 
 				ImGui::GetWindowDrawList()->AddRectFilled(contentStart, contentEnd, ImGui::GetColorU32(colors::background::background), 7.f);
 				ImGui::GetWindowDrawList()->AddRect(borderStart, borderEnd, ImGui::GetColorU32(colors::background::border), 4.f, 0, 2.f);
 
-				ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 40.0f + offsetY));
+				ImGui::SetCursorPos(ImVec2(200 - tab_alpha * 40, 40.0f + offsetY));
 
 				for (const auto child : this->Children)
 				{
@@ -552,9 +537,9 @@ namespace UPasta {
 					if (counter < 3 || counter > 3 && counter < 6 || counter > 6)
 						ImGui::SameLine();
 					else if (counter == 3)
-						ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 240.0f + offsetY));
+						ImGui::SetCursorPos(ImVec2(200 - tab_alpha * 40, 240.0f + offsetY));
 					else if (counter == 6)
-						ImGui::SetCursorPos(ImVec2(300 - tab_alpha * 40, 440.0f + offsetY));
+						ImGui::SetCursorPos(ImVec2(200 - tab_alpha * 40, 440.0f + offsetY));
 				}
 
 			}
@@ -567,7 +552,7 @@ namespace UPasta {
 
 			ImGui::BeginGroup();
 			{
-				ImGui::BeginChild(this->DisplayName, ImVec2(areaWidth / columnsQty, 180.0f), true);
+				ImGui::BeginChild(this->DisplayName, ImVec2(areaWidth / columnsQty, 180.0f), false);
 				{
 					if (!this->Components.empty())
 					{

@@ -1,6 +1,8 @@
 #include "Ashe.h"
 
 #include "Awareness.h"
+#include "imgui_notify.h"
+#include "ListManager.h"
 #include "Orbwalker.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
@@ -91,14 +93,9 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-    void OnPopuplateMenu() override
-    {
-
-    }
-
     void Init() override
     {
-        const auto AsheMenu = Menu::CreateMenu("vezAshe", "Champion\n  Settings");
+        const auto AsheMenu = Menu::CreateMenu("vezAshe", "Champion Settings");
 
         const auto combo = AsheMenu->AddMenu("Combo Settings", "Combo Settings");
         AsheConfig::AsheCombo::UseQ = combo->AddCheckBox("Use Q", "Use SpellSlot Q", true);
@@ -321,13 +318,74 @@ public:
         }
     }
 
+    void test()
+    {
+        int spellSlotToFind = 1;
+        std::string playerNameToFind = "Ashe";
+        std::string spellNameToFind = "Volley";
+
+        Object* ownerPointer = functions::GetPlayerPointer("Ashe");
+        if (ownerPointer != nullptr)
+            LOG("%d", ownerPointer->GetNetId());
+
+    	int cooldown = ListManager::Functions::playerSpells[playerNameToFind][spellSlotToFind][spellNameToFind][1];
+        if (cooldown != 0)
+			LOG("Trovato: Il cooldown è : %d", cooldown);
+
+        std::vector<int> cooldowns = functions::getCooldownData<std::vector<int>>(playerNameToFind, spellNameToFind);
+        if (!cooldowns.empty())
+        {
+            LOG("Trovato: PlayerName = %s, SpellName = %s, Cooldowns: \n", playerNameToFind, spellNameToFind);
+            for (int cooldown : cooldowns)
+            {
+                LOG("| %d |", cooldown);
+            }
+        }
+
+        // Utilizza la funzione generica per ottenere il proprietario dell'abilità
+        std::string owner = functions::getCooldownData<std::string>("", spellNameToFind);
+        if (!owner.empty()) 
+            LOG("Trovato: Il proprietario di %s è : %s", spellNameToFind, owner);
+
+        // Utilizza la funzione generica per ottenere lo slot dell'abilità
+        int spellSlot = functions::getCooldownData<int>(playerNameToFind, spellNameToFind);
+        if (spellSlot != -1) 
+            LOG("Trovato: Lo slot dell'abilità %s di %s è : %d", spellNameToFind, playerNameToFind, spellSlot);
+
+    }
+
+    void test2()
+    {
+
+            for (auto& obj : globals::heroManager->units_map)
+            {
+                uintptr_t network_id = obj.first;
+                Object* object = obj.second;
+
+                if (IsNotZeroPtr(object) && IsValidPtr(object) && object)
+                {
+                    LOG("%p", object);
+                }
+            }
+    }
+
     void Update() override
     {
         gameTime = functions::GetGameTime();
 
         Killsteal();
-        AntiGapCloser();
+        AntiGapCloser(); 
         AntiMelee();
+
+        //LOG("%f", functions::GetSpellRange(globals::localPlayer->GetSpellBySlotId(1)));
+        //auto rune1 = globals::localPlayer->GetHeroPerks()->GetPerkByIndex(1);
+        //auto spell = globals::localPlayer->GetSpellBySlotId(1)->GetSpellInfo();
+        //LOG("%f", ListManager::Functions::GetCooldownFromChampSpellMap(globals::localPlayer->GetNetId(), 1));
+        //LOG("%f", globals::localPlayer->GetSpellBySlotId(1)->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(1)->GetBaseCooldown());
+
+        /*auto reduction = 100 / (100 + globals::localPlayer->GetAbilityHaste());
+        LOG("REDUCTION %f", reduction);
+        LOG("TIME READY %f", 30 + 24 * reduction);*/
 
         if (AsheConfig::AsheSpellsSettings::rTapKey->Value == true && database.AsheR.IsCastable())
         {
@@ -584,6 +642,7 @@ public:
         __try {
             if (AsheConfig::AsheSpellsSettings::DrawW->Value == true && (AsheConfig::AsheSpellsSettings::DrawIfReady->Value == true && database.AsheW.IsCastable() || AsheConfig::AsheSpellsSettings::DrawIfReady->Value == false))
                 Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
+
         }
         __except (1)
         {
