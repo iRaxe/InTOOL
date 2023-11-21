@@ -65,8 +65,42 @@ namespace UPasta
 
 		void CheckBox::Draw()
 		{
-			Checkbox(SP_STRING(this->DisplayName), &this->Value);
-			
+			if (!this->Visible)
+			{
+				return;
+			}
+
+			auto position = this->GetPosition();
+			auto rect = Rect(position.x, position.y, this->GetWidth(), MenuComponent::Height);
+
+			auto box = Rect(rect.Position.x + rect.Width - (rect.Height * 1.2), rect.Position.y + 8, rect.Height - 2, rect.Height/2);
+
+			Renderer::AddRectangleFilled(rect, IM_COL32(0, 0, 0, MenuSettings::BackgroundOpacity));
+
+			Renderer::AddRoundedRectangleFilled(box, this->Value ? IM_COL32(160, 0, 0, 255) : IM_COL32(37, 37, 37, 255), 100);
+			Renderer::AddRoundedRectangle(box, IM_COL32(0, 0, 0, 255), 1, 100);
+			Renderer::AddCircleFilled(Vector2(box.Position.x + (this->Value ? 24 : 9), box.Position.y + 8.5), 6, IM_COL32(255, 255, 255, MenuSettings::BackgroundOpacity));
+			Checkbox(this->DisplayName, &this->Value, ImVec2(rect.Position.x + 9, rect.Position.y + 6));
+
+			//TODO
+			if (this->Tooltip[0] != 0)
+			{
+				auto textWidth = 10.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->DisplayName).x;
+				auto mousePos = functions::GetMousePos();
+				auto iconRect = Rect(rect.Position.x + textWidth + 5, rect.Position.y + Height * 0.5f - 10.0f, 20, 20);
+				Renderer::AddText("(?)", 16.0f, iconRect, DT_VCENTER, IM_COL32(255, 30, 30, 255));
+
+				if (iconRect.Contains(mousePos))
+				{
+					auto alpha = min(MenuSettings::BackgroundOpacity + 70, 255);
+					auto black = IM_COL32(0, 0, 0, alpha);
+					auto width = 20.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->Tooltip).x;
+					auto tooltipRect = Rect(mousePos.x + 20, mousePos.y - Height * 0.5f, width, Height);
+					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawCornerFlags_All);
+					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawCornerFlags_All);
+					Renderer::AddText(this->Tooltip, 14.0f, Rect(tooltipRect.Position.x + 10.0f, tooltipRect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
+				}
+			}
 		}
 
 		void CheckBox::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos)

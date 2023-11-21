@@ -297,7 +297,7 @@ namespace menu
 		{
 			ImGui::Begin("menu", &globals::menuOpen, window_flags);
 
-			UPasta::SDK::Menu::DrawTabs();
+			UPasta::SDK::Menu::OnDraw();
 
 			ImGui::End();
 		}

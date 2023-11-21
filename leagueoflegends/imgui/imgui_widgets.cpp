@@ -1664,6 +1664,63 @@ bool ImGui::Checkbox(const char* label, bool* v)
     return pressed;
 }
 
+bool ImGui::Checkbox(const char* label, bool* v,  ImVec2 pos)
+{
+    ImGuiWindow* window = GetCurrentWindow();
+    if (window->SkipItems)
+        return false;
+
+    ImGuiContext& g = *GImGui;
+    const ImGuiStyle& style = g.Style;
+    const ImGuiID id = window->GetID(label);
+    const ImVec2 label_size = CalcTextSize(label, NULL, true);
+
+    float size = GetWindowContentRegionMax().x - 50;
+
+    const float square_sz = GetFrameHeight();
+    const ImRect total_bb(pos, pos + ImVec2(label_size.x, 20));
+    ItemSize(total_bb, style.FramePadding.y);
+    if (!ItemAdd(total_bb, id))
+    {
+        IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags | ImGuiItemStatusFlags_Checkable | (*v ? ImGuiItemStatusFlags_Checked : 0));
+        return false;
+    }
+
+    bool hovered, held;
+    bool pressed = ButtonBehavior(total_bb, id, &hovered, &held);
+    if (IsItemClicked())
+    {
+        *v = !(*v);
+        MarkItemEdited(id);
+    }
+
+    static std::map<ImGuiID, checkbox_state> anim;
+    auto it_anim = anim.find(id);
+
+    if (it_anim == anim.end())
+    {
+        anim.insert({ id, checkbox_state() });
+        it_anim = anim.find(id);
+    }
+
+    it_anim->second.text = ImLerp(it_anim->second.text, *v ? colors::checkbox::text_active : hovered ? colors::checkbox::text_hov : colors::checkbox::text, g.IO.DeltaTime * 6.f);
+    it_anim->second.circle = ImLerp(it_anim->second.circle, *v ? colors::checkbox::circle_active : colors::checkbox::circle_inactive, g.IO.DeltaTime * 6.f);
+    it_anim->second.move_circle = ImLerp(it_anim->second.move_circle, *v ? 17.f : 0.f, g.IO.DeltaTime * 12.f);
+    it_anim->second.background_1 = ImLerp(it_anim->second.background_1, *v ? ImVec4(57, 72, 103, 200) : colors::checkbox::background, g.IO.DeltaTime * 6.f);
+    const ImRect check_bb(pos, pos + ImVec2(square_sz, square_sz));
+
+    ImVec2 label_pos = ImVec2(check_bb.Max.x - 20, check_bb.Min.y + style.FramePadding.y);
+
+    PushStyleColor(ImGuiCol_Text, GetColorU32(it_anim->second.text));
+    if (label_size.x > 0.0f) RenderText(label_pos, label);
+    PopStyleColor();
+
+    IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags | ImGuiItemStatusFlags_Checkable | (*v ? ImGuiItemStatusFlags_Checked : 0));
+
+    return pressed;
+}
+
+
 void ImGui::CheckPicker(const char* label, const char* label_picker, bool* v, float col[4])
 {
     ImGuiWindow* window = GetCurrentWindow();
@@ -3623,6 +3680,98 @@ bool ImGui::SliderScalar(const char* label, ImGuiDataType data_type, void* p_dat
     return value_changed;
 }
 
+bool ImGui::SliderScalar(const char* label, ImGuiDataType data_type, void* p_data, const void* p_min, const void* p_max, ImVec2 pos, const char* format, ImGuiSliderFlags flags)
+{
+    ImGuiWindow* window = GetCurrentWindow();
+    if (window->SkipItems)
+        return false;
+    float size = GetWindowContentRegionMax().x - 125;
+
+    ImGuiContext& g = *GImGui;
+    const ImGuiStyle& style = g.Style;
+    const ImGuiID id = window->GetID(label);
+    const float w = CalcItemWidth();
+
+    const ImVec2 label_size = CalcTextSize(label, NULL, true);
+    const ImRect frame_bb(pos, pos + ImVec2(100, label_size.y + style.FramePadding.y * 2.0f));
+    const ImRect total_bb(frame_bb.Min, frame_bb.Max + ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f, 0.0f));
+
+    const bool temp_input_allowed = (flags & ImGuiSliderFlags_NoInput) == 0;
+    ItemSize(total_bb, style.FramePadding.y);
+    if (!ItemAdd(total_bb, id, &frame_bb, temp_input_allowed ? ImGuiItemFlags_Inputable : 0))
+        return false;
+
+    if (format == NULL)
+        format = DataTypeGetInfo(data_type)->PrintFmt;
+
+    const bool hovered = ItemHoverable(frame_bb, id);
+    bool temp_input_is_active = temp_input_allowed && TempInputIsActive(id);
+    if (!temp_input_is_active)
+    {
+        // Tabbing or CTRL-clicking on Slider turns it into an input box
+        const bool input_requested_by_tabbing = temp_input_allowed && (g.LastItemData.StatusFlags & ImGuiItemStatusFlags_FocusedByTabbing) != 0;
+        const bool clicked = hovered && IsMouseClicked(0, id);
+        const bool make_active = (input_requested_by_tabbing || clicked || g.NavActivateId == id || g.NavActivateInputId == id);
+        if (make_active && clicked)
+            SetKeyOwner(ImGuiKey_MouseLeft, id);
+        if (make_active && temp_input_allowed)
+            if (input_requested_by_tabbing || (clicked && g.IO.KeyCtrl) || g.NavActivateInputId == id)
+                temp_input_is_active = true;
+
+        if (make_active && !temp_input_is_active)
+        {
+            SetActiveID(id, window);
+            SetFocusID(id, window);
+            FocusWindow(window);
+            g.ActiveIdUsingNavDirMask |= (1 << ImGuiDir_Left) | (1 << ImGuiDir_Right);
+        }
+    }
+
+    if (temp_input_is_active);
+
+    static std::map<ImGuiID, slider_state> anim;
+    auto it_anim = anim.find(id);
+
+    if (it_anim == anim.end())
+    {
+        anim.insert({ id, slider_state() });
+        it_anim = anim.find(id);
+    }
+
+    it_anim->second.circle_color = ImLerp(it_anim->second.circle_color, IsItemActive() ? colors::slider::circle_active : colors::slider::circle_inactive, g.IO.DeltaTime * 6.f);
+    it_anim->second.text_color = ImLerp(it_anim->second.text_color, IsItemActive() ? colors::slider::text_active : hovered ? colors::slider::text_hov : colors::slider::text, g.IO.DeltaTime * 6.f);
+
+    window->DrawList->AddRectFilled(frame_bb.Min + ImVec2(0, 9), frame_bb.Max - ImVec2(0, 7), GetColorU32(colors::slider::background), 100);
+
+    ImRect grab_bb;
+    const bool value_changed = SliderBehavior(frame_bb, id, data_type, p_data, p_min, p_max, format, flags, &grab_bb);
+    if (value_changed)
+        MarkItemEdited(id);
+
+    it_anim->second.slow = ImLerp(it_anim->second.slow, grab_bb.Min.x - frame_bb.Min.x, g.IO.DeltaTime * 20.f);
+
+    if (grab_bb.Max.x > grab_bb.Min.x) {
+        const int vtx_idx_1 = ImGui::GetWindowDrawList()->VtxBuffer.Size;
+        window->DrawList->AddRectFilled(frame_bb.Min + ImVec2(0, 10), frame_bb.Min + ImVec2(it_anim->second.slow, 13), GetColorU32(colors::slider::background), 100);
+        ImGui::ShadeVertsLinearColorGradientKeepAlpha(ImGui::GetWindowDrawList(), vtx_idx_1, ImGui::GetWindowDrawList()->VtxBuffer.Size, frame_bb.Min, frame_bb.Max, GetColorU32(colors::slider::gradient_start), GetColorU32(colors::slider::gradient_end));
+        window->DrawList->AddRectFilled(ImVec2(it_anim->second.slow + frame_bb.Min.x - 30, grab_bb.Min.y), ImVec2(grab_bb.Max.x, grab_bb.Max.y), GetColorU32(colors::slider::background), 100);
+
+        // window->DrawList->AddCircleFilled(ImVec2(it_anim->second.slow + frame_bb.Min.x, grab_bb.Max.y - 7), 7, GetColorU32(it_anim->second.circle_color), 100);
+    }
+
+    char value_buf[64];
+    const char* value_buf_end = value_buf + DataTypeFormatString(value_buf, IM_ARRAYSIZE(value_buf), data_type, p_data, format);
+
+    RenderTextClipped(ImVec2(grab_bb.Min.x - 30, grab_bb.Min.y), ImVec2(grab_bb.Max.x, grab_bb.Max.y), value_buf, value_buf_end, NULL, ImVec2(0.5f, 0.5f));
+
+    PushStyleColor(ImGuiCol_Text, GetColorU32(it_anim->second.text_color));
+    if (label_size.x > 0.0f) RenderText(ImVec2(frame_bb.Max.x - size - 100, frame_bb.Min.y + style.FramePadding.y), label);
+    PopStyleColor();
+
+    IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
+    return value_changed;
+}
+
 // Add multiple sliders on 1 line for compact edition of multiple components
 bool ImGui::SliderScalarN(const char* label, ImGuiDataType data_type, void* v, int components, const void* v_min, const void* v_max, const char* format, ImGuiSliderFlags flags)
 {
@@ -3687,6 +3836,11 @@ bool ImGui::SliderAngle(const char* label, float* v_rad, float v_degrees_min, fl
     bool value_changed = SliderFloat(label, &v_deg, v_degrees_min, v_degrees_max, format, flags);
     *v_rad = v_deg * (2 * IM_PI) / 360.0f;
     return value_changed;
+}
+
+bool ImGui::SliderInt(const char* label, int* v, int v_min, int v_max, ImVec2 pos, const char* format, ImGuiSliderFlags flags)
+{
+    return SliderScalar(label, ImGuiDataType_S32, v, &v_min, &v_max, pos, format, flags);
 }
 
 bool ImGui::SliderInt(const char* label, int* v, int v_min, int v_max, const char* format, ImGuiSliderFlags flags)

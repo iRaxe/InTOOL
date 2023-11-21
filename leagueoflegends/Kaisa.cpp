@@ -48,7 +48,12 @@ private:
     }
 
     static float wRange() {
-        return KaisaConfig::WConfig::wRange->Value;
+        return database.KaisaW.GetMaxRange();
+    }
+
+    static float rRange() {
+        const int Rlevel = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        return KaisaDamages::RSpell::Rrange[Rlevel];
     }
 
     const std::vector<float> qDmgSkillVector = arrayToVector(std::begin(KaisaDamages::QSpell::dmgSkillArray), std::end(KaisaDamages::QSpell::dmgSkillArray));
@@ -72,9 +77,9 @@ public:
 
     void Init() override
     {
-        const auto KaisaMenu = Menu::CreateMenu("m0sKaisa", "m0sa1c.Kaisa");
+        const auto KaisaMenu = Menu::CreateMenu("m0sKaisa", "Kai'sa");
 
-        const auto qSettings = KaisaMenu->AddMenu("Q Settings", "[Q] Icathian Rain");
+            const auto qSettings = KaisaMenu->AddMenu("Q Settings", "[Q] Icathian Rain");
         KaisaConfig::QConfig::AutoQ = qSettings->AddCheckBox("Auto Q", "Auto Q", true);
         KaisaConfig::QConfig::AutoQ->AddTooltip("Only Isolated Target");
         KaisaConfig::QConfig::ComboQ = qSettings->AddList("qMode", "Q Mode", std::vector<std::string>{"Isolated Target", "Always", "Never"}, 1);
@@ -87,6 +92,12 @@ public:
 
         const auto eSettings = KaisaMenu->AddMenu("E Settings", "[E] Supercharge");
         KaisaConfig::EConfig::ComboE = eSettings->AddList("eMode", "Use in Combo", std::vector<std::string>{"Always", "After Attack", "Never"}, 0);
+
+        const auto rSettings = KaisaMenu->AddMenu("R Settings", "[R] Killer Instinct");
+        KaisaConfig::RConfig::ComboR = rSettings->AddCheckBox("Combo R", "Use in combo", true);
+        KaisaConfig::RConfig::Rcond1 = rSettings->AddSlider("r cond1", "Target < HP %", 30, 1, 100, 5);
+        KaisaConfig::RConfig::Rcond2 = rSettings->AddSlider("r cond2", "Player > HP %% to use R", 60, 1, 100, 5);
+        KaisaConfig::RConfig::Rcond3 = rSettings->AddCheckBox("r cond3", "Dont use R under tower", true);
 
 
         const auto harassMenu = KaisaMenu->AddMenu("Harass Settings", "Harass Settings");
@@ -322,6 +333,58 @@ public:
             }
 
         }
+        if (KaisaConfig::RConfig::ComboR->Value == 1 && database.KaisaR.IsCastable())
+        {
+            if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(rRange()))
+            {
+                int meHP = globals::localPlayer->GetPercentHealth();
+                int targetHP = rTarget->GetPercentHealth();
+                float R_Radius = 525;
+                float highestDistance = 0;
+                Vector3 bestPoint;
+                if (rTarget->GetBuffByName("kaisapassivemarker") && meHP >= KaisaConfig::RConfig::Rcond2->Value && targetHP <= KaisaConfig::RConfig::Rcond1->Value)
+                {
+                    for (int point = 0; point < 360; point += 20)
+                    {
+                        float point_temp = M_PI / 180.0f * point;
+                        float pX = R_Radius * cosf(point_temp) + rTarget->GetPosition().x;
+                        float pY = rTarget->GetPosition().y;
+                        float pZ = R_Radius * cosf(point_temp) + rTarget->GetPosition().z;
+
+
+                        if (Vector3(pX, pY, pZ).distanceTo(rTarget->GetPosition()) > highestDistance)
+                        {
+                            if (KaisaConfig::RConfig::Rcond3->Value == 1)
+                            {
+                                if (!Vector3(pX, pY, pZ).IsUnderEnemyTower())
+                                {
+                                    highestDistance = Vector3(pX, pY, pZ).distanceTo(rTarget->GetPosition());
+                                    bestPoint = Vector3(pX, pY, pZ);
+                                    functions::CastSpell(R, bestPoint);
+                                    RCastedTime = gameTime;
+                                }
+
+                            }
+                            else
+                            {
+                                highestDistance = Vector3(pX, pY, pZ).distanceTo(rTarget->GetPosition());
+                                bestPoint = Vector3(pX, pY, pZ);
+
+                                functions::CastSpell(R, bestPoint);
+                                RCastedTime = gameTime;
+                            }
+
+                        }
+
+
+
+                    }
+
+                }
+
+            }
+
+        }
 
 
 
@@ -435,10 +498,10 @@ public:
     {
         __try {
             if (KaisaConfig::KaisaSpellsSettings::DrawQ->Value == true && (KaisaConfig::KaisaSpellsSettings::DrawIfReady->Value == true && database.KaisaQ.IsCastable() || KaisaConfig::KaisaSpellsSettings::DrawIfReady->Value == false))
-	            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
 
             if (KaisaConfig::KaisaSpellsSettings::DrawW->Value == true && (KaisaConfig::KaisaSpellsSettings::DrawIfReady->Value == true && database.KaisaW.IsCastable() || KaisaConfig::KaisaSpellsSettings::DrawIfReady->Value == false))
-	            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_PURPLE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_PURPLE, 1.0f);
 
         }
         __except (1)

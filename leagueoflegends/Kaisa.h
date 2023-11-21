@@ -20,6 +20,13 @@ namespace KaisaConfig
         inline List* ComboE;
     }
 
+    namespace RConfig {
+        inline CheckBox* ComboR;
+        inline Slider* Rcond1;
+        inline Slider* Rcond2;
+        inline CheckBox* Rcond3;
+    }
+
     namespace KaisaHarass {
         inline CheckBox* UseQ;
         inline CheckBox* UseW;
@@ -114,6 +121,7 @@ namespace KaisaDamages
 
     namespace RSpell
     {
+        inline float Rrange[4] = { 0,1500,2250,3000 };
         inline float dmgSkillArray[4] = { -9999, 350, 500, 650 };
         inline float dmgSkillArrayMonster[6] = { -9999, 175, 250, 325 };
         inline float additionalPercentageAD = 0.85f;

@@ -250,6 +250,7 @@ struct Vector3
         return std::to_string(this->x) + "\n" + std::to_string(this->y) + "\n" + std::to_string(this->z);
     }
 
+    bool IsUnderEnemyTower();
 };
 
 struct Vector4 {

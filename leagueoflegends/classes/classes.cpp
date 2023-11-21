@@ -1022,13 +1022,19 @@ bool Object::IsInRange(Vector3 pos, float radius)
 	return radius + this->GetBoundingRadius() >= render::Distance(pos, this->GetPosition());
 }
 
-bool Object::IsUnderEnemyTower()
+
+bool Vector3::IsUnderEnemyTower()
 {
 	const auto turret = UPasta::SDK::TargetSelector::Functions::GetEnemyTurretInRange(2000.0f);
 	if (turret && turret->IsEnemy())
-		return this->IsInRange(turret->GetPosition(), 992.0f);
+		return this->distanceTo(turret->GetPosition()) <= 992.0f;
 
 	return false;
+}
+
+bool Object::IsUnderEnemyTower()
+{
+	return this->GetPosition().IsUnderEnemyTower();
 }
 
 bool Object::IsUnderAllyTower()

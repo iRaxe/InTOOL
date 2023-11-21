@@ -25,6 +25,7 @@ namespace UPasta {
 
 			static void Initialize();
 			static void Dispose();
+			static void OnDraw();
 			static void DrawTabs();
 			void DrawSubTab();
 

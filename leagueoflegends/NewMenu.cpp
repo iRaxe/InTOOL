@@ -80,7 +80,7 @@ namespace UPasta {
 				}
 			}
 
-			auto menu = Menu::CreateMenu("Menu settings", " Menu Settings");
+			auto menu = Menu::CreateMenu("Menu settings", "Menu Settings");
 
 			auto menuSettings = menu->AddMenu("MainSettings", "Main Background Colors");
 			menuSettings->AddColorPicker("background_image", "Logo Color", (float*)&colors::background::background_image);
@@ -380,6 +380,7 @@ namespace UPasta {
 		float Menu::NeededWidth() {
 			return 10.0f + render::imFont->CalcTextSizeA(16, FLT_MAX, 0.0f, this->DisplayName).x + 5.0f + MenuComponent::Height * 0.45f;
 		}
+
 		float taboffset;
 		static int subCounter = 1;
 		std::map<std::string, Menu*> subMenuMap;
@@ -407,6 +408,19 @@ namespace UPasta {
 					menuMap[child->DisplayName] = child;
 				}
 			}
+		}
+
+		void Menu::OnDraw()
+		{
+			if (!MenuSettings::DrawMenu) {
+				return;
+			}
+
+			for (auto menu : RootMenus)
+			{
+				menu->Draw();
+			}
+
 		}
 
 		void Menu::DrawTabs()
@@ -569,13 +583,60 @@ namespace UPasta {
 
 		void Menu::Draw()
 		{
-			
+			if (!this->IsVisible())
+				return;
+
+			ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y), ImGuiCond_Always);
+			ImGui::Begin("UCPasta", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
+			auto position = this->GetPosition();
+			auto rect = Rect(position.x, position.y, this->GetWidth(), MenuComponent::Height);
+
+			Renderer::AddRectangleFilled(rect, this->Interacting ? IM_COL32(160, 0, 0, MenuSettings::BackgroundOpacity) : IM_COL32(0, 0, 0, MenuSettings::BackgroundOpacity));
+			Renderer::AddRectangle(rect, IM_COL32(0, 0, 0, MenuSettings::BackgroundOpacity));
+			Renderer::AddText(this->DisplayName, 14.0f, Rect(rect.Position.x + 10.0f, rect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
+
+			if (!this->Children.empty() || !this->Components.empty()) {
+				auto p1 = Vector2(rect.Position.x + rect.Width - (int)(rect.Height * 0.2f), rect.Position.y + (int)(rect.Height * 0.5f));
+				auto p2 = Vector2(rect.Position.x + rect.Width - (int)(rect.Height * 0.45f), rect.Position.y + (int)(rect.Height * 0.65f));
+				auto p3 = Vector2(rect.Position.x + rect.Width - (int)(rect.Height * 0.45f), rect.Position.y + (int)(rect.Height * 0.35f));
+
+				Renderer::AddTriangleFilled(p1, p2, p3, this->Interacting ? IM_COL32(255, 0, 0, 255) : IM_COL32(255, 255, 255, 255));
+
+				for (auto child : this->Children) {
+					child->Draw();
+				}
+
+				for (auto component : this->Components) {
+					component->Draw();
+				}
+			}
+
+			//TODO
+			if (this->Tooltip[0] != 0)
+			{
+				auto textWidth = 10.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->DisplayName).x;
+				auto mousePos = functions::GetMousePos();
+				auto iconRect = Rect(rect.Position.x + textWidth + 5, rect.Position.y + Height * 0.5f - 10.0f, 20, 20);
+				Renderer::AddText("(?)", 16.0f, iconRect, DT_VCENTER, IM_COL32(255, 30, 30, 255));
+
+				if (iconRect.Contains(mousePos))
+				{
+					auto alpha = min(MenuSettings::BackgroundOpacity + 70, 255);
+					auto black = IM_COL32(0, 0, 0, alpha);
+					auto width = 20.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->Tooltip).x;
+					auto tooltipRect = Rect(mousePos.x + 20, mousePos.y - Height * 0.5f, width, Height);
+					Renderer::AddRoundedRectangleFilled(tooltipRect, black, 4, ImDrawCornerFlags_All);
+					Renderer::AddRoundedRectangle(tooltipRect, black, 1.1f, 4, ImDrawCornerFlags_All);
+					Renderer::AddText(this->Tooltip, 14.0f, Rect(tooltipRect.Position.x + 10.0f, tooltipRect.Position.y, 0.0f, rect.Height), DT_VCENTER, IM_COL32(255, 255, 255, 255));
+				}
+			}
+
+			ImGui::End();
 		}
 
-		void Menu::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos)
-		{
-			for (auto child : this->Children) 
-			{
+
+		void Menu::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos) {
+			for (auto child : this->Children) {
 				child->WndProc(msg, wparam, cursorPos);
 			}
 
@@ -590,37 +651,33 @@ namespace UPasta {
 				return;
 			}
 
-			if (!IsDragging) 
-			{
+			if (!IsDragging) {
 				IsDragging = true;
 				DragPosition = BasePosition - cursorPos;
 			}
 
-			if (!this->Parent) 
-			{
-				for (auto menu : RootMenus) 
-				{
-					if (menu != this) 
-					{
-						menu->SetVisible(true);
+			if (!this->Parent) {
+				for (auto menu : RootMenus) {
+					if (menu != this) {
+						menu->SetVisible(false);
 					}
 				}
 			}
 			else {
 				for (auto menu : this->Parent->Children) {
 					if (menu != this) {
-						menu->Interacting = true;
+						menu->Interacting = false;
 						for (auto child : menu->Children) {
-							child->SetVisible(true);
+							child->SetVisible(false);
 						}
 						for (auto component : menu->Components) {
-							component->Visible = true;
-							component->Interacting = true;
+							component->Visible = false;
+							component->Interacting = false;
 						}
 					}
 				}
 				for (auto component : this->Parent->Components) {
-					component->Interacting = true;
+					component->Interacting = false;
 				}
 			}
 
@@ -634,7 +691,7 @@ namespace UPasta {
 
 			for (auto component : this->Components) {
 				component->Visible = !component->Visible;
-				component->Interacting = true;
+				component->Interacting = false;
 			}
 		}
 
