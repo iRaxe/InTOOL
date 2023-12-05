@@ -219,8 +219,7 @@ public:
 
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = VayneDamages::QSpell::additionalPercentageAD[levelSpell - 1];
-
-        const float abilityPowerDamage = globals::localPlayer->GetAttackDamage();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalAbilityPowerSkillDamage = VayneDamages::QSpell::additionalPercentageAP;
 
         const float totalDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, pEnemy) + (100 * skillDamage) + (abilityPowerDamage * additionalAbilityPowerSkillDamage);
@@ -236,7 +235,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = VayneDamages::ESpell::dmgSkillArray[levelSpell];
 
-        const float attackDamage = globals::localPlayer->GetBonusAttackDamage();
+        const float attackDamage = globals::localPlayer->ReadClientStat(Object::BonusAttackDamage);
         const float additionalAttackDamageSkillDamage = VayneDamages::ESpell::additionalPercentageAD;
 
         const float bonusSkillDamage = VayneDamages::ESpell::bonusdmgSkillArray[levelSpell];
@@ -354,7 +353,7 @@ public:
             if (VayneConfig::VayneClear::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
             {
                 const auto qTarget = TargetSelector::Functions::GetEnemyMinionInRange(aaRange());
-                if (qTarget != nullptr && qTarget->GetHealth() < Vayne_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Vayne_dmgQ(qTarget))
                     Vayne_UseQ(qTarget);
             }
         }
@@ -430,7 +429,7 @@ public:
             if (VayneConfig::VayneKillsteal::UseE->Value == true && database.VayneE.IsCastable())
             {
                 const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
-                if (eTarget != nullptr && eTarget->GetHealth() < Vayne_dmgE(eTarget))
+                if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Vayne_dmgE(eTarget))
                 {
                     Vayne_UseE(eTarget);
                 }
@@ -439,7 +438,7 @@ public:
             if (VayneConfig::VayneKillsteal::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0)
             {
                 const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(aaRange());
-                if (qTarget != nullptr && qTarget->GetHealth() < Vayne_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Vayne_dmgQ(qTarget))
                 {
                     Vayne_UseQ(qTarget);
                 }
@@ -479,7 +478,7 @@ public:
         {
             if (!Engine::MenuItemContains(VayneConfig::VayneAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-            if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetAttackRange()))
+            if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->ReadClientStat(Object::AttackRange)))
             {
                 if (VayneConfig::VayneAntiMelee::UseE->Value == true && database.VayneE.IsCastable())
                     Vayne_UseE(target);
@@ -529,7 +528,7 @@ public:
                 {
                     if (object->IsMinion())
                     {
-                        if (VayneConfig::VayneClear::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1 && object->GetHealth() < Vayne_dmgQ(object))
+                        if (VayneConfig::VayneClear::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1 && object->ReadClientStat(Object::Health) < Vayne_dmgQ(object))
                         {
                             if (!Vayne_HasEnoughMana(VayneConfig::VayneClear::minMana->Value)) return;
 

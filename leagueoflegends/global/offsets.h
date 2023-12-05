@@ -563,8 +563,8 @@ namespace UPasta
 
 			constexpr inline uintptr_t AbilityPower = 0x1630;
 
+			constexpr inline uintptr_t BaseArmor = 0x16DC;
 			constexpr inline uintptr_t BonusArmor = 0x16E0;
-			constexpr inline uintptr_t TotalArmor = 0x16DC;
 
 			constexpr inline uintptr_t Shield = 0x10E8;
 			constexpr inline uintptr_t PhysicalShield = 0x1100;

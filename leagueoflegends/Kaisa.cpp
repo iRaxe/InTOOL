@@ -440,7 +440,7 @@ public:
                 const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(KaisaConfig::KaisaKillsteal::wksRange->Value);
                 if (wTarget != nullptr
                     && wTarget->GetDistanceTo(globals::localPlayer) <= KaisaConfig::KaisaKillsteal::wksRange->Value
-                    && wTarget->GetHealth() < w_dmg(wTarget))
+                    && wTarget->ReadClientStat(Object::Health) < w_dmg(wTarget))
                 {
                     Kaisa_UseAbility(wTarget, W);
                 }
@@ -482,7 +482,7 @@ public:
             {
                 if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetAttackRange()))
+                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->ReadClientStat(Object::AttackRange)))
                 {
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 350.0f))

@@ -239,7 +239,7 @@ namespace UPasta
 							{
 								return
 									((noneKillableMinion != nullptr ? noneKillableMinion->GetNetId() != minion->GetNetId() : true)
-										&& minion->IsInAARange() && Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) > minion->GetHealth());
+										&& minion->IsInAARange() && Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) > minion->ReadClientStat(Object::Health));
 							}
 						}
 					}
@@ -358,7 +358,7 @@ namespace UPasta
 					void CastSpell(int spellId, Object* target)
 					{
 						Vector3 headPos = target->GetPosition();
-						const float objectHeight = *(float*)(target->GetCharacterData() + Offsets::GameObject::CharData::Size) * target->GetScale();
+						const float objectHeight = *(float*)(target->GetCharacterData() + Offsets::GameObject::CharData::Size) * target->ReadClientStat(Object::ScaleMulti);
 						headPos.y += objectHeight;
 						CastSpell(spellId, headPos);
 					}
@@ -410,10 +410,10 @@ namespace UPasta
 								Actions::AttackObject(turret);
 
 							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
-							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
+							if (minion != nullptr )//&& !ShouldWaitUnderTurret(minion))
 							{
-								if (minion->GetHealth() > Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) * 2 
-									|| Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->GetHealth())
+								if (minion->ReadClientStat(Object::Health) > Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) * 2 
+									|| Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->ReadClientStat(Object::Health))
 									Actions::AttackObject(minion);
 							}
 
@@ -431,18 +431,18 @@ namespace UPasta
 
 										if (minion && minion->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetRealAttackRange())
 										{
-											const float minionHealth = minion->GetHealth() - Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
+											const float minionHealth = minion->ReadClientStat(Object::Health) - Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
 											const auto attackDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
 
 											const auto turret = TargetSelector::Functions::GetAllyTurretInRange(globals::localPlayer->GetRealAttackRange());
 											if (turret && turret->GetDistanceTo(minion) <= 900)
 											{
-												if (minion->GetHealth() > attackDamage)
+												if (minion->ReadClientStat(Object::Health) > attackDamage)
 												{
 													const auto turretDamage = Damage::CalculateAutoAttackDamage(turret, minion);
-													if (minion->GetHealth() - turretDamage > 0.0f)
+													if (minion->ReadClientStat(Object::Health) - turretDamage > 0.0f)
 													{
-														for (auto minionHealth = minion->GetHealth(); minionHealth > 0.0f && turretDamage > 0.0f; minionHealth -= turretDamage)
+														for (auto minionHealth = minion->ReadClientStat(Object::Health); minionHealth > 0.0f && turretDamage > 0.0f; minionHealth -= turretDamage)
 														{
 															if (minionHealth <= attackDamage)
 																break;
@@ -500,7 +500,7 @@ namespace UPasta
 							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
 							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
 							{
-								if (Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->GetHealth())
+								if (Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->ReadClientStat(Object::Health))
 									Actions::AttackObject(minion);
 								else
 								{
@@ -527,7 +527,7 @@ namespace UPasta
 							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
 							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
 							{
-								if (Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->GetHealth())
+								if (Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->ReadClientStat(Object::Health))
 									Actions::AttackObject(minion);
 							}
 						}

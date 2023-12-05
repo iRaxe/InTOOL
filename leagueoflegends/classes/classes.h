@@ -116,66 +116,70 @@ public:
 class CharacterStateIntermediate
 {
 public:
-	float GetAbilityHasteMod();
-	float GetPercentCooldownCapMod();
-	float GetPassiveCooldownEndTime();
-	float GetPassiveCooldownTotalTime();
-	float GetFlatPhysicalDamageMod();
-	float GetPercentPhysicalDamageMod();
-	float GetPercentBonusPhysicalDamageMod();
-	float GetPercentBasePhysicalDamageAsFlatBonusMod();
-	float GetFlatMagicDamageMod();
-	float GetPercentMagicDamageMod();
-	float GetFlatMagicReduction();
-	float GetPercentDamageToBarracksMinionMod();
-	float GetFlatDamageReductionFromBarracksMinionMod();
-	float GetPercentMagicReduction();
-	float GetFlatCastRangeMod();
-	float GetAttackSpeedMod();
-	float GetPercentAttackSpeedMod();
-	float GetPercentMultiplicativeAttackSpeedMod();
-	float GetBaseAttackDamage();
-	float GetBaseAttackDamageSansPercentScale();
-	float GetFlatBaseAttackDamageMod();
-	float GetPercentBaseAttackDamageMod();
-	float GetBaseAbilityDamage();
-	float GetCritDamageMultiplier();
-	float GetScaleSkinCoef();
-	float GetDodge();
-	float GetCritPercent();
-	float GetFlatBaseHPPoolMod();
-	float GetArmor();
-	float GetBonusArmor();
-	float GetSpellBlock();
-	float GetBonusSpellBlock();
-	float GetHPRegenRate();
-	float GetBaseHPRegenRate();
-	float GetMoveSpeed();
-	float GetAttackRange();
-	float GetFlatBubbleRadiusMod();
-	float GetPercentBubbleRadiusMod();
-	float GetFlatArmorPenetration();
-	float GetPhysicalLethality();
-	float GetPercentArmorPenetration();
-	float GetPercentBonusArmorPenetration();
-	float GetPercentCritBonusArmorPenetration();
-	float GetPercentCritTotalArmorPenetration();
-	float GetFlatMagicPenetration();
-	float GetMagicLethality();
-	float GetPercentMagicPenetration();
-	float GetPercentBonusMagicPenetration();
-	float GetPercentLifeStealMod();
-	float GetPercentSpellVampMod();
-	float GetPercentOmnivampMod();
-	float GetPercentPhysicalVamp();
-	float GetPathfindingRadiusMod();
-	float GetPercentCCReduction();
-	float GetPercentEXPBonus();
-	float GetFlatBaseArmorMod();
-	float GetFlatBaseSpellBlockMod();
-	float GetPrimaryARBaseRegenRateRep();
-	float GetSecondaryARRegenRateRep();
-	float GetSecondaryARBaseRegenRateRep();
+	enum StatType {
+		AbilityHasteMod,
+		PercentCooldownCapMod,
+		PassiveCooldownEndTime,
+		PassiveCooldownTotalTime,
+		FlatPhysicalDamageMod,
+		PercentPhysicalDamageMod,
+		PercentBonusPhysicalDamageMod,
+		PercentBasePhysicalDamageAsFlatBonusMod,
+		FlatMagicDamageMod,
+		PercentMagicDamageMod,
+		FlatMagicReduction,
+		PercentDamageToBarracksMinionMod,
+		FlatDamageReductionFromBarracksMinionMod,
+		PercentMagicReduction,
+		FlatCastRangeMod,
+		AttackSpeedMod,
+		PercentAttackSpeedMod,
+		PercentMultiplicativeAttackSpeedMod,
+		BaseAttackDamage,
+		BaseAttackDamageSansPercentScale,
+		FlatBaseAttackDamageMod,
+		PercentBaseAttackDamageMod,
+		BaseAbilityDamage,
+		CritDamageMultiplier,
+		ScaleSkinCoef,
+		Dodge,
+		CritPercent,
+		FlatBaseHPPoolMod,
+		Armor,
+		BonusArmor,
+		SpellBlock,
+		BonusSpellBlock,
+		HPRegenRate,
+		BaseHPRegenRate,
+		MoveSpeed,
+		AttackRange,
+		FlatBubbleRadiusMod,
+		PercentBubbleRadiusMod,
+		FlatArmorPenetration,
+		PhysicalLethality,
+		PercentArmorPenetration,
+		PercentBonusArmorPenetration,
+		PercentCritBonusArmorPenetration,
+		PercentCritTotalArmorPenetration,
+		FlatMagicPenetration,
+		MagicLethality,
+		PercentMagicPenetration,
+		PercentBonusMagicPenetration,
+		PercentLifeStealMod,
+		PercentSpellVampMod,
+		PercentOmnivampMod,
+		PercentPhysicalVamp,
+		PathfindingRadiusMod,
+		PercentCCReduction,
+		PercentEXPBonus,
+		FlatBaseArmorMod,
+		FlatBaseSpellBlockMod,
+		PrimaryARBaseRegenRateRep,
+		SecondaryARRegenRateRep,
+		SecondaryARBaseRegenRateRep
+	};
+
+	float ReadClientStat(StatType statToReturn);
 };
 
 class AiManager
@@ -397,34 +401,11 @@ public:
 	float GetAttackDelay();
 	float GetAttackWindup();
 	float CharGetAttackDamage();
-	float GetAttackDamage();
 	float GetEffectiveHealth(int damageType);
 	float GetRealAttackRange();
 	float GetDistanceTo(Object* obj);
-	float GetHealth();
-	float GetMaxHealth();
 	float GetPercentHealth();
 	unsigned short GetActionState();
-	float GetBonusAttackDamage();
-	float GetAbilityPower();
-	float GetBaseAttackDamage();
-	float GetScale();
-	float GetShield();
-	float GetPhysicalShield();
-	float GetMagicalShield();
-	float GetMovementSpeed();
-	float GetAttackSpeed();
-	float GetLethality();
-	float GetArmor();
-	float GetBonusArmor();
-	float GetTotalArmor();
-	float GetArmorPenetration();
-	float GetMagicResist();
-	float GetMagicPenetration();
-	float GetMagicPenetrationMulti();
-	float GetTotalMagicPenetration();
-	float GetAttackRange();
-	float GetAbilityHaste();
 	float GetExperience();
 	float GetMana();
 	float GetMaxMana();
@@ -444,6 +425,47 @@ public:
 	Perks* GetHeroPerks();
 	CharacterDataStack* GetCharacterDataStack();
 	CharacterStateIntermediate* GetCharacterStateIntermediate();
+
+	enum StatType {
+		AttackRange,
+		Health,
+		BonusHealth,
+		MaxHealth,
+		LifeRegeneration,
+		Mana,
+		MaxMana,
+		BaseAttackDamage,
+		BonusAttackDamage,
+		TotalAttackDamage,
+		AbilityHaste,
+		Lethality,
+		ArmorPenetrationFlat,
+		MagicPenetrationFlat,
+		MagicPenetrationMultiplier,
+		AbilityPower,
+		BaseArmor,
+		BonusArmor,
+		TotalArmor,
+		Shield,
+		PhysicalShield,
+		MagicalShield,
+		CritFlat,
+		CritMultiplier,
+		AttackSpeed,
+		BonusMagicResist,
+		TotalMagicResist,
+		MovementSpeed,
+		Ammo,
+		MaxAmmo,
+		ScaleMulti,
+		Experience,
+		Level,
+		Visibility,
+		Targetable,
+		Invulnerability
+	};
+	float ReadClientStat(StatType s);
+
 };
 
 class ObjectManager

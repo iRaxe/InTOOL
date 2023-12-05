@@ -30,7 +30,7 @@ int __fastcall hkOnProcessSpellCast(void* spell_book, void* edx, SpellCast* spel
 					const int spellLevel = spell->GetLevel();
 					const auto cooldownValue = spell->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(spellLevel)->GetBaseCooldown();
 
-					const auto reduction = 100 / (100 + caster->GetAbilityHaste());
+					const auto reduction = 100 / (100 + caster->ReadClientStat(Object::AbilityHaste));
 					const auto readyAt = Engine::GetGameTime() + cooldownValue * reduction;
 					UPasta::SDK::ListManager::Functions::InsertCooldown(caster, spellID, readyAt);
 				}

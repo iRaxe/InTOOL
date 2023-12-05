@@ -203,10 +203,10 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = EzrealDamages::QSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = globals::localPlayer->ReadClientStat(Object::TotalAttackDamage);
         const float additionalAttackDamageSkillDamage = EzrealDamages::QSpell::additionalPercentageAD;
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalAbilityPowerSkillDamage = EzrealDamages::QSpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage) + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
@@ -221,10 +221,10 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = EzrealDamages::WSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = globals::localPlayer->ReadClientStat(Object::TotalAttackDamage);
         const float additionalAttackDamageSkillDamage = EzrealDamages::WSpell::additionalPercentageAD;
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalAbilityPowerSkillDamage = EzrealDamages::WSpell::additionalPercentageAP[levelSpell - 1];
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage) + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
@@ -239,10 +239,10 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = EzrealDamages::RSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = globals::localPlayer->ReadClientStat(Object::TotalAttackDamage);
         const float additionalAttackDamageSkillDamage = EzrealDamages::RSpell::additionalPercentageAD;
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalAbilityPowerSkillDamage = EzrealDamages::RSpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage) + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
@@ -393,7 +393,7 @@ public:
             if (EzrealConfig::EzrealClear::UseQ->Value == true && database.EzrealQ.IsCastable())
             {
                 const auto qTarget = TargetSelector::Functions::GetEnemyMinionInRange(qRange());
-                if (qTarget != nullptr && qTarget->GetHealth() < Ezreal_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Ezreal_dmgQ(qTarget))
                     Ezreal_UseQ(qTarget);
             }
         }
@@ -445,7 +445,7 @@ public:
         if (EzrealConfig::EzrealLastHit::UseQ->Value == true && database.EzrealQ.IsCastable())
         {
             const auto minion = TargetSelector::Functions::GetMinionInRange(qRange());
-            if (minion != nullptr && minion->GetHealth() < Ezreal_dmgQ(minion))
+            if (minion != nullptr && minion->ReadClientStat(Object::Health) < Ezreal_dmgQ(minion))
                 Ezreal_UseQ(minion);
         }
     }
@@ -469,7 +469,7 @@ public:
             if (EzrealConfig::EzrealKillsteal::UseQ->Value == true && database.EzrealQ.IsCastable())
             {
                 const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange());
-                if (qTarget != nullptr && qTarget->GetHealth() < Ezreal_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Ezreal_dmgQ(qTarget))
                 {
                     Ezreal_UseQ(qTarget);
                 }
@@ -481,7 +481,7 @@ public:
                 if (rTarget != nullptr
                     && rTarget->GetDistanceTo(globals::localPlayer) > EzrealConfig::EzrealSpellsSettings::minRDistance->Value
                     && rTarget->GetDistanceTo(globals::localPlayer) < EzrealConfig::EzrealSpellsSettings::maxRDistance->Value
-                    && rTarget->GetHealth() < Ezreal_dmgR(rTarget))
+                    && rTarget->ReadClientStat(Object::Health) < Ezreal_dmgR(rTarget))
                 {
                     Ezreal_UseR(rTarget);
                 }
@@ -523,7 +523,7 @@ public:
             {
                 if (!Engine::MenuItemContains(EzrealConfig::EzrealAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetAttackRange()))
+                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->ReadClientStat(Object::AttackRange)))
                 {
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f))

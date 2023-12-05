@@ -120,7 +120,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = YorickDamages::QSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = globals::localPlayer->ReadClientStat(Object::TotalAttackDamage);
         const float additionalAttackDamageSkillDamage = YorickDamages::QSpell::additionalPercentageAD;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage);
@@ -135,7 +135,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = YorickDamages::ESpell::dmgSkillArray[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalAbilityPowerSkillDamage = YorickDamages::ESpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
@@ -307,7 +307,7 @@ public:
 
             if (const auto minion = TargetSelector::Functions::GetMinionInRange(globals::localPlayer->GetRealAttackRange() + 50.0f);
                 YorickConfig::YorickLastHit::UseQ->Value == true
-                && minion && minion->GetHealth() < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
+                && minion && minion->ReadClientStat(Object::Health) < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
             {
                 Yorick_UseQ(minion);
             }
@@ -368,7 +368,7 @@ public:
             return;
 
         if (YorickConfig::YorickLastHit::UseQ->Value == true && database.YorickQ.IsCastable())
-            if (const auto minion = TargetSelector::Functions::GetMinionInRange(database.YorickQ.GetRange()); minion->GetHealth() < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
+            if (const auto minion = TargetSelector::Functions::GetMinionInRange(database.YorickQ.GetRange()); minion->ReadClientStat(Object::Health) < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
                 Yorick_UseQ(minion);
     }
 
@@ -388,7 +388,7 @@ public:
         if (YorickConfig::YorickKillsteal::UseQ->Value == true && database.YorickQ.IsCastable())
         {
             if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickQ.GetRange());
-                qTarget && qTarget->GetHealth() < Yorick_dmgQ(qTarget))
+                qTarget && qTarget->ReadClientStat(Object::Health) < Yorick_dmgQ(qTarget))
             {
                 Yorick_UseQ(qTarget);
             }
@@ -397,7 +397,7 @@ public:
         if (YorickConfig::YorickKillsteal::UseE->Value == true && database.YorickE.IsCastable())
         {
             if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickE.GetRange());
-                eTarget && eTarget->GetHealth() < Yorick_dmgE(eTarget))
+                eTarget && eTarget->ReadClientStat(Object::Health) < Yorick_dmgE(eTarget))
             {
                 Yorick_UseE(eTarget);
             }

@@ -342,7 +342,7 @@ public:
                 else
                 {
 
-                    if (Thresh_dmgQ(pEnemy) + Thresh_dmgE(pEnemy) + Thresh_dmgR(pEnemy) > pEnemy->GetHealth())
+                    if (Thresh_dmgQ(pEnemy) + Thresh_dmgE(pEnemy) + Thresh_dmgR(pEnemy) > pEnemy->ReadClientStat(Object::Health))
                     {
                         //Use for pull to thresh
                         const auto pullPos = enemyPos.Extend(globals::localPlayer->GetPosition(), 800);
@@ -410,7 +410,7 @@ public:
             /*if (ThreshConfig::ThreshClear::UseQ->Value == true && database.ThreshQ.IsCastable())
             {
                 const auto qTarget = TargetSelector::Functions::GetEnemyMinionInRange(qRange());
-                if (qTarget != nullptr && qTarget->GetHealth() < Thresh_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Thresh_dmgQ(qTarget))
                     Thresh_UseQ(qTarget);
             }*/
         }
@@ -460,7 +460,7 @@ public:
         if (ThreshConfig::ThreshLastHit::UseQ->Value == true && database.ThreshQ.IsCastable())
         {
             const auto minion = TargetSelector::Functions::GetMinionInRange(qRange());
-            if (minion != nullptr && minion->GetHealth() < Thresh_dmgQ(minion))
+            if (minion != nullptr && minion->ReadClientStat(Object::Health) < Thresh_dmgQ(minion))
                 Thresh_UseQ(minion);
         }
     }
@@ -483,7 +483,7 @@ public:
             if (ThreshConfig::ThreshKillsteal::UseQ->Value == true && database.ThreshQ.IsCastable())
             {
                 const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange());
-                if (qTarget != nullptr && qTarget->GetHealth() < Thresh_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Thresh_dmgQ(qTarget))
                 {
                     Thresh_UseQ(qTarget);
                 }
@@ -492,7 +492,7 @@ public:
             if (ThreshConfig::ThreshKillsteal::UseR->Value == true && database.ThreshR.IsCastable())
             {
                 const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(rRange());
-                if (rTarget != nullptr && rTarget->GetHealth() < Thresh_dmgR(rTarget))
+                if (rTarget != nullptr && rTarget->ReadClientStat(Object::Health) < Thresh_dmgR(rTarget))
                 {
                     Thresh_UseR(rTarget);
                 }
@@ -534,7 +534,7 @@ public:
             {
                 if (!Engine::MenuItemContains(ThreshConfig::ThreshAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetAttackRange()))
+                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->ReadClientStat(Object::AttackRange)))
                 {
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f))

@@ -279,14 +279,12 @@ std::vector<Vector3> AiManager::GetFutureSegments()
 	return segments;
 }
 
-float CharacterData::GetSize()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharData::Size);
+float CharacterData::GetSize() {
+	return ReadFLOAT(this, UPasta::Offsets::GameObject::CharData::Size);
 }
 
-ChampionID CharacterData::GetHeroID()
-{
-	return *(ChampionID*)((QWORD)this + UPasta::Offsets::GameObject::CharData::HeroID);
+ChampionID CharacterData::GetHeroID() {
+	return ReadQWORD2(ChampionID,this, UPasta::Offsets::GameObject::CharData::HeroID);
 }
 
 QWORD CharacterData::GetObjectTypeHash()
@@ -304,7 +302,6 @@ std::string SpellData::GetName()
 {
 	return *(char**)((QWORD)this + UPasta::Offsets::SpellSlot::Name);
 }
-
 
 float SpellData::GetManaCostByLevel(int level)
 {
@@ -466,9 +463,8 @@ float SpellCast::GetCastTime()
 	return *(float*)((QWORD)this + UPasta::Offsets::SpellCast::CastedAtTime);
 }
 
-std::string SpellCast::GetCasterName()
-{
-	return *(LolString*)((QWORD)this + UPasta::Offsets::SpellCast::CasterName);
+std::string SpellCast::GetCasterName() {
+	return *(LolString*)((uintptr_t)this + UPasta::Offsets::SpellCast::CasterName);
 }
 
 Vector3 SpellCast::GetStartPosition()
@@ -497,29 +493,24 @@ std::string Buff::GetName()
 	return *(char**)((QWORD)namePtr + UPasta::Offsets::Buff::BuffName);
 }
 
-BuffType Buff::GetType()
-{
-	return *(BuffType*)((QWORD)this + UPasta::Offsets::Buff::BuffType);
+BuffType Buff::GetType() {
+	return *(BuffType*)((uintptr_t)this + UPasta::Offsets::Buff::BuffType);
 }
 
-float Buff::GetStartTime()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::Buff::BuffEntryBuffStartTime);
+float Buff::GetStartTime() {
+	return ReadFLOAT(this, UPasta::Offsets::Buff::BuffEntryBuffStartTime);
 }
 
-float Buff::GetEndTime()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::Buff::BuffEntryBuffEndTime);
+float Buff::GetEndTime() {
+	return ReadFLOAT(this, UPasta::Offsets::Buff::BuffEntryBuffEndTime);
 }
 
-int Buff::GetStacksAlt()
-{
-	return *(int*)((QWORD)this + UPasta::Offsets::Buff::BuffEntryBuffCountAlt);
+int Buff::GetStacksAlt() {
+	return ReadINT(this, UPasta::Offsets::Buff::BuffEntryBuffCountAlt);
 }
 
-int Buff::GetStacks()
-{
-	return *(int*)((QWORD)this + UPasta::Offsets::Buff::BuffEntryBuffCount);
+int Buff::GetStacks() {
+	return ReadINT(this, UPasta::Offsets::Buff::BuffEntryBuffCount);
 }
 
 int Buff::GetMaxStacks()
@@ -547,62 +538,48 @@ BuffEntry* BuffManager::GetBuffEntryByIndex(int index)
 	return address;
 }
 
-unsigned int Object::GetNetId()
-{
-	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::Index);
+unsigned int Object::GetNetId() {
+	return ReadINT(this, UPasta::Offsets::GameObject::Index);
 }
 
-DWORD Object::GetHandle()
-{
-	return *(DWORD*)((QWORD)this + UPasta::Offsets::GameObject::Handle);
+DWORD Object::GetHandle() {
+	return ReadDWORD(this, UPasta::Offsets::GameObject::Handle);
 }
 
-DWORD SpellCast::GetCasterHandle()
-{
-	return *(DWORD*)((QWORD)this + UPasta::Offsets::SpellCast::CasterHandle);
+DWORD SpellCast::GetCasterHandle() {
+	return ReadDWORD(this, UPasta::Offsets::SpellCast::CasterHandle);
 }
 
-int Object::GetTeam()
-{
-	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::Team);
+int Object::GetTeam() {
+	return ReadINT(this, UPasta::Offsets::GameObject::Team);
 }
 
-int Object::GetLevel()
-{
-	return *(int*)((QWORD)this + UPasta::Offsets::GameObject::Level);
+int Object::GetLevel() {
+	return ReadINT(this, UPasta::Offsets::GameObject::Level);
 }
 
-
-float Object::GetExperience()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Experience);
+float Object::GetExperience() {
+	return ReadFLOAT(this, UPasta::Offsets::GameObject::Experience);
 }
 
-Vector3 Object::GetPosition()
-{
-	return Engine::ReadVector3((QWORD)this + UPasta::Offsets::GameObject::Position);
+Vector3 Object::GetPosition(){
+	return Engine::ReadVector3(reinterpret_cast<uintptr_t>(this) + UPasta::Offsets::GameObject::Position);
 }
 
-bool Object::IsVisible()
-{
-	//return Functions::IsCanSee(this);
-	return *(bool*)((QWORD)this + UPasta::Offsets::GameObject::Visibility);
+bool Object::IsVisible() {
+	return ReadBOOL(this, UPasta::Offsets::GameObject::Visibility);
 }
 
-bool Object::IsAlive()
-{
+bool Object::IsAlive() {
 	return !Engine::IsDead(this);
-	//return !(*(int*)((QWORD)this + oObjAlive) % 2);
 }
 
-float Object::GetMana()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Mana);
+float Object::GetMana() {
+	return ReadFLOAT(this, UPasta::Offsets::GameObject::Mana);
 }
 
-float Object::GetMaxMana()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MaxMana);
+float Object::GetMaxMana() {
+	return ReadFLOAT(this, UPasta::Offsets::GameObject::MaxMana);
 }
 
 float Object::GetPercentMana()
@@ -610,15 +587,74 @@ float Object::GetPercentMana()
 	return 100 * this->GetMana() / this->GetMaxMana() > 100 ? 100 : 100 * this->GetMana() / this->GetMaxMana();
 }
 
-bool Object::IsTargetable()
-{
-	//return Functions::IsTargetable(this);
-	return *(bool*)((QWORD)this + UPasta::Offsets::GameObject::Targetable);
+float Object::ReadClientStat(StatType statToReturn) {
+	using namespace UPasta::Offsets;
+	switch (statToReturn) {
+	case AttackRange: ReadFLOAT(this, Client::AttackRange);
+
+	case Health: ReadFLOAT(this, AttackableUnit::Health);
+	case BonusHealth: ReadFLOAT(this, AttackableUnit::BonusHealth);
+	case MaxHealth: ReadFLOAT(this, AttackableUnit::MaxHealth);
+	case LifeRegeneration: ReadFLOAT(this, Client::LifeRegeneration);
+
+	case Mana: ReadFLOAT(this, AttackableUnit::Mana);
+	case MaxMana: ReadFLOAT(this, AttackableUnit::MaxMana);
+
+	case BaseAttackDamage: ReadFLOAT(this, Client::BaseAttackDamage);
+	case BonusAttackDamage: ReadFLOAT(this, Client::BonusAttackDamage);
+	case TotalAttackDamage: ReadFLOAT(this, Client::BaseAttackDamage) + ReadFLOAT(this, Client::BonusAttackDamage);
+
+	case AbilityHaste: ReadFLOAT(this, Client::AbilityHaste);
+
+	case Lethality: ReadFLOAT(this, Client::Lethality);
+
+	case ArmorPenetrationFlat: ReadFLOAT(this, Client::ArmorPenetrationFlat);
+
+	case MagicPenetrationFlat: ReadFLOAT(this, Client::MagicPenetrationFlat);
+	case MagicPenetrationMultiplier: ReadFLOAT(this, Client::MagicPenetrationMultiplier);
+
+	case AbilityPower: ReadFLOAT(this, Client::AbilityPower);
+
+	case BonusArmor: ReadFLOAT(this, Client::BonusArmor);
+	case BaseArmor: ReadFLOAT(this, Client::BaseArmor);
+	case TotalArmor: ReadFLOAT(this, Client::BaseArmor) + ReadFLOAT(this, Client::BaseArmor);
+
+	case Shield: ReadFLOAT(this, Client::Shield);
+	case PhysicalShield: ReadFLOAT(this, Client::PhysicalShield);
+	case MagicalShield: ReadFLOAT(this, Client::MagicalShield);
+
+	case CritFlat: ReadFLOAT(this, Client::CritFlat);
+	case CritMultiplier: ReadFLOAT(this, Client::CritMultiplier);
+
+	case AttackSpeed: ReadFLOAT(this, Client::AttackSpeedMulti);
+
+	case BonusMagicResist: ReadFLOAT(this, Client::BonusMagicResist);
+	case TotalMagicResist: ReadFLOAT(this, Client::TotalMagicResist);
+
+	case MovementSpeed: ReadFLOAT(this, Client::MovementSpeed);
+
+	case Ammo: ReadFLOAT(this, Client::Ammo);
+	case MaxAmmo: ReadFLOAT(this, Client::MaxAmmo);
+
+	case ScaleMulti: ReadFLOAT(this, Client::ScaleMulti);
+
+	case Experience: ReadFLOAT(this, Client::Experience);
+	case Level: ReadINT(this, Client::Level);
+
+	case Visibility: ReadBOOL(this, AttackableUnit::Visibility);
+	case Targetable: ReadBOOL(this, AttackableUnit::Targetable);
+	case Invulnerability: ReadBOOL(this, AttackableUnit::Invulnerability);
+	default: return 0;
+	}
 }
 
-bool Object::IsInvulnerable()
-{
-	return *(bool*)((QWORD)this + UPasta::Offsets::GameObject::Invulnerability);
+
+bool Object::IsTargetable() {
+	return ReadBOOL(this, UPasta::Offsets::GameObject::Targetable);
+}
+
+bool Object::IsInvulnerable() {
+	return ReadBOOL(this, UPasta::Offsets::GameObject::Invulnerability);
 }
 
 bool Object::IsCursed()
@@ -721,125 +757,14 @@ bool Object::HasConqueror()
 	return this->GetBuffByName("ASSETS/Perks/Styles/Precision/Conqueror/ConquerorEnrage.lua");
 }
 
-float Object::GetHealth()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Health);
-}
-
-float Object::GetMaxHealth()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MaxHealth);
-}
-
 float Object::GetPercentHealth()
 {
-	return 100 * this->GetHealth() / this->GetMaxHealth() > 100 ? 100 : 100 * this->GetHealth() / this->GetMaxHealth();
+	return 100 * this->ReadClientStat(Health) / this->ReadClientStat(MaxHealth) > 100 ? 100 : 100 * this->ReadClientStat(Health) / this->ReadClientStat(MaxHealth);
 }
 
 unsigned short Object::GetActionState()
 {
 	return *(unsigned short*)((QWORD)this + UPasta::Offsets::GameObject::State);
-}
-
-float Object::GetBaseAttackDamage()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::BaseAtk);
-}
-
-float Object::GetAbilityPower()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AbilityPower);
-}
-
-float Object::GetBonusAttackDamage()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::BonusAtk);
-}
-
-float Object::GetScale()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Scale);
-}
-
-float Object::GetShield()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Shield);
-}
-
-float Object::GetPhysicalShield()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::PhysicalShield);
-}
-
-float Object::GetMagicalShield()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MagicalShield);
-}
-
-float Object::GetMovementSpeed()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MoveSpeed);
-}
-
-float Object::GetAttackSpeed()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AtkSpeedMulti);
-}
-
-float Object::GetLethality()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Lethality);
-}
-
-float Object::GetArmor()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::Armor);
-}
-
-float Object::GetBonusArmor()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::BonusArmor);
-}
-
-float Object::GetTotalArmor()
-{
-	return this->GetArmor() + this->GetBonusArmor();
-}
-
-float Object::GetArmorPenetration()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::ArmorPen);
-}
-
-float Object::GetMagicResist()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MagicRes);
-}
-
-float Object::GetMagicPenetration()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MagicPen);
-}
-
-float Object::GetMagicPenetrationMulti()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::MagicPenMulti);
-}
-
-
-float Object::GetTotalMagicPenetration()
-{
-	return this->GetMagicPenetration() + this->GetMagicPenetrationMulti();
-}
-
-float Object::GetAttackRange()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AttackRange);
-}
-
-float Object::GetAbilityHaste()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::AbilityHaste);
 }
 
 std::string Object::GetName()
@@ -946,9 +871,8 @@ Missile* Object::GetMissileByIndex()
 	return *(Missile**)((QWORD)this + UPasta::Offsets::Missile::Index);
 }
 
-int Missile::GetMissileSrcId()
-{
-	return *(int*)((QWORD)this + UPasta::Offsets::Missile::SrcIdx);
+int Missile::GetMissileSrcId() {
+	return ReadINT(this, UPasta::Offsets::Missile::SrcIdx);
 }
 
 Vector3 Missile::GetSpellStartPos()
@@ -1122,20 +1046,15 @@ float Object::CharGetAttackDamage()
 	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::BaseAtk);
 }
 
-float Object::GetAttackDamage()
-{
-	return this->GetBaseAttackDamage() + this->GetBonusAttackDamage();
-}
-
 float Object::GetEffectiveHealth(int damageType)
 {
-	if (damageType == True) return this->GetHealth();
-	return this->GetHealth() * (1 + (damageType == Physical ? this->GetArmor() : this->GetAbilityPower()) / 100);
+	if (damageType == True) return this->ReadClientStat(Health);
+	return this->ReadClientStat(Health) * (1 + (damageType == Physical ? this->ReadClientStat(TotalArmor) : this->ReadClientStat(AbilityPower)) / 100);
 }
 
 float Object::GetRealAttackRange()
 {
-	return this->GetAttackRange() + this->GetBoundingRadius();
+	return this->ReadClientStat(AttackRange) + this->GetBoundingRadius();
 }
 
 float Object::GetDistanceTo(Object* obj)
@@ -1147,7 +1066,6 @@ bool Object::IsInRange(Vector3 pos, float radius)
 {
 	return radius + this->GetBoundingRadius() >= render::Distance(pos, this->GetPosition());
 }
-
 
 bool Vector3::IsUnderEnemyTower()
 {
@@ -1238,6 +1156,7 @@ CharacterDataStack* Object::GetCharacterDataStack()
 	return (CharacterDataStack*)((QWORD)this + UPasta::Offsets::GameObject::CharData::Instance);
 }
 
+
 #pragma region CharacterStateIntermediate
 CharacterStateIntermediate* Object::GetCharacterStateIntermediate()
 {
@@ -1245,323 +1164,77 @@ CharacterStateIntermediate* Object::GetCharacterStateIntermediate()
 		UPasta::Offsets::GameObject::CharacterStateIntermediate::oCharacterStateIntermediate);
 }
 
-float CharacterStateIntermediate::GetAbilityHasteMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oAbilityHasteMod);
-}
+float CharacterStateIntermediate::ReadClientStat(StatType statToReturn) {
+	using namespace UPasta::Offsets::GameObject::CharacterStateIntermediate;
+	switch (statToReturn) {
+	case AbilityHasteMod: return ReadFLOAT(this, oAbilityHasteMod);
+	case PercentCooldownCapMod: return ReadFLOAT(this, PercentCooldownCapMod);
+	case PassiveCooldownEndTime: return ReadFLOAT(this, PassiveCooldownEndTime);
+	case PassiveCooldownTotalTime: return ReadFLOAT(this, PassiveCooldownTotalTime);
+	case FlatPhysicalDamageMod: return ReadFLOAT(this, FlatPhysicalDamageMod);
+	case PercentPhysicalDamageMod: return ReadFLOAT(this, PercentPhysicalDamageMod);
+	case PercentBonusPhysicalDamageMod: return ReadFLOAT(this, PercentBonusPhysicalDamageMod);
+	case PercentBasePhysicalDamageAsFlatBonusMod: return ReadFLOAT(this, PercentBasePhysicalDamageAsFlatBonusMod);
+	case FlatMagicDamageMod: return ReadFLOAT(this, FlatMagicDamageMod);
+	case PercentMagicDamageMod: return ReadFLOAT(this, PercentMagicDamageMod);
+	case FlatMagicReduction: return ReadFLOAT(this, FlatMagicReduction);
+	case PercentDamageToBarracksMinionMod: return ReadFLOAT(this, PercentDamageToBarracksMinionMod);
+	case FlatDamageReductionFromBarracksMinionMod: return ReadFLOAT(this, FlatDamageReductionFromBarracksMinionMod);
+	case PercentMagicReduction: return ReadFLOAT(this, PercentMagicReduction);
+	case FlatCastRangeMod: return ReadFLOAT(this, FlatCastRangeMod);
+	case AttackSpeedMod: return ReadFLOAT(this, AttackSpeedMod);
+	case PercentAttackSpeedMod: return ReadFLOAT(this, PercentAttackSpeedMod);
+	case PercentMultiplicativeAttackSpeedMod: return ReadFLOAT(this, PercentMultiplicativeAttackSpeedMod);
+	case BaseAttackDamage: return ReadFLOAT(this, BaseAttackDamage);
+	case BaseAttackDamageSansPercentScale: return ReadFLOAT(this, BaseAttackDamageSansPercentScale);
+	case FlatBaseAttackDamageMod: return ReadFLOAT(this, FlatBaseAttackDamageMod);
+	case PercentBaseAttackDamageMod: return ReadFLOAT(this, PercentBaseAttackDamageMod);
+	case BaseAbilityDamage: return ReadFLOAT(this, BaseAbilityDamage);
+	case CritDamageMultiplier: return ReadFLOAT(this, CritDamageMultiplier);
+	case ScaleSkinCoef: return ReadFLOAT(this, ScaleSkinCoef);
+	case Dodge: return ReadFLOAT(this, Dodge);
+	case CritPercent: return ReadFLOAT(this, CritPercent);
+	case FlatBaseHPPoolMod: return ReadFLOAT(this, FlatBaseHPPoolMod);
+	case Armor: return ReadFLOAT(this, Armor);
+	case BonusArmor: return ReadFLOAT(this, BonusArmor);
+	case SpellBlock: return ReadFLOAT(this, SpellBlock);
+	case BonusSpellBlock: return ReadFLOAT(this, BonusSpellBlock);
+	case HPRegenRate: return ReadFLOAT(this, HPRegenRate);
+	case BaseHPRegenRate: return ReadFLOAT(this, BaseHPRegenRate);
+	case MoveSpeed: return ReadFLOAT(this, MoveSpeed);
+	case AttackRange: return ReadFLOAT(this, AttackRange);
+	case FlatBubbleRadiusMod: return ReadFLOAT(this, FlatBubbleRadiusMod);
+	case PercentBubbleRadiusMod: return ReadFLOAT(this, PercentBubbleRadiusMod);
+	case FlatArmorPenetration: return ReadFLOAT(this, FlatArmorPenetration);
+	case PhysicalLethality: return ReadFLOAT(this, PhysicalLethality);
+	case PercentArmorPenetration: return ReadFLOAT(this, PercentArmorPenetration);
+	case PercentBonusArmorPenetration: return ReadFLOAT(this, PercentBonusArmorPenetration);
+	case PercentCritBonusArmorPenetration: return ReadFLOAT(this, PercentCritBonusArmorPenetration);
+	case PercentCritTotalArmorPenetration: return ReadFLOAT(this, PercentCritTotalArmorPenetration);
+	case FlatMagicPenetration: return ReadFLOAT(this, FlatMagicPenetration);
+	case MagicLethality: return ReadFLOAT(this, MagicLethality);
+	case PercentMagicPenetration: return ReadFLOAT(this, PercentMagicPenetration);
+	case PercentBonusMagicPenetration: return ReadFLOAT(this, PercentBonusMagicPenetration);
+	case PercentLifeStealMod: return ReadFLOAT(this, PercentLifeStealMod);
+	case PercentSpellVampMod: return ReadFLOAT(this, PercentSpellVampMod);
+	case PercentOmnivampMod: return ReadFLOAT(this, PercentOmnivampMod);
+	case PercentPhysicalVamp: return ReadFLOAT(this, PercentPhysicalVamp);
+	case PathfindingRadiusMod: return ReadFLOAT(this, PathfindingRadiusMod);
+	case PercentCCReduction: return ReadFLOAT(this, PercentCCReduction);
+	case PercentEXPBonus: return ReadFLOAT(this, PercentEXPBonus);
+	case FlatBaseArmorMod: return ReadFLOAT(this, FlatBaseArmorMod);
+	case FlatBaseSpellBlockMod: return ReadFLOAT(this, FlatBaseSpellBlockMod);
+	case PrimaryARBaseRegenRateRep: return ReadFLOAT(this, PrimaryARBaseRegenRateRep);
+	case SecondaryARRegenRateRep: return ReadFLOAT(this, SecondaryARRegenRateRep);
+	case SecondaryARBaseRegenRateRep: return ReadFLOAT(this, SecondaryARBaseRegenRateRep);
 
-float CharacterStateIntermediate::GetPercentCooldownCapMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentCooldownCapMod);
+	default: return 0;
+	}
 }
-
-float CharacterStateIntermediate::GetPassiveCooldownEndTime()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPassiveCooldownEndTime);
-}
-
-float CharacterStateIntermediate::GetPassiveCooldownTotalTime()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPassiveCooldownTotalTime);
-}
-
-float CharacterStateIntermediate::GetFlatPhysicalDamageMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatPhysicalDamageMod);
-}
-
-float CharacterStateIntermediate::GetPercentPhysicalDamageMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentPhysicalDamageMod);
-}
-
-float CharacterStateIntermediate::GetPercentBonusPhysicalDamageMod()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBonusPhysicalDamageMod);
-}
-
-float CharacterStateIntermediate::GetPercentBasePhysicalDamageAsFlatBonusMod()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBasePhysicalDamageAsFlatBonusMod);
-}
-
-float CharacterStateIntermediate::GetFlatMagicDamageMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatMagicDamageMod);
-}
-
-float CharacterStateIntermediate::GetPercentMagicDamageMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentMagicDamageMod);
-}
-
-float CharacterStateIntermediate::GetFlatMagicReduction()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatMagicReduction);
-}
-
-float CharacterStateIntermediate::GetPercentDamageToBarracksMinionMod()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oGetPercentDamageToBarracksMinionMod);
-}
-
-float CharacterStateIntermediate::GetFlatDamageReductionFromBarracksMinionMod()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oGetFlatDamageReductionFromBarracksMinionMod);
-}
-
-float CharacterStateIntermediate::GetPercentMagicReduction()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentMagicReduction);
-}
-
-float CharacterStateIntermediate::GetFlatCastRangeMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatCastRangeMod);
-}
-
-float CharacterStateIntermediate::GetAttackSpeedMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oAttackSpeedMod);
-}
-
-float CharacterStateIntermediate::GetPercentAttackSpeedMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentAttackSpeedMod);
-}
-
-float CharacterStateIntermediate::GetPercentMultiplicativeAttackSpeedMod()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentMultiplicativeAttackSpeedMod);
-}
-
-float CharacterStateIntermediate::GetBaseAttackDamage()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBaseAttackDamage);
-}
-
-float CharacterStateIntermediate::GetBaseAttackDamageSansPercentScale()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oBaseAttackDamageSansPercentScale);
-}
-
-float CharacterStateIntermediate::GetFlatBaseAttackDamageMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBaseAttackDamageMod);
-}
-
-float CharacterStateIntermediate::GetPercentBaseAttackDamageMod()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBaseAttackDamageMod);
-}
-
-float CharacterStateIntermediate::GetBaseAbilityDamage()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBaseAbilityDamage);
-}
-
-float CharacterStateIntermediate::GetCritDamageMultiplier()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oCritDamageMultiplier);
-}
-
-float CharacterStateIntermediate::GetScaleSkinCoef()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oScaleSkinCoef);
-}
-
-float CharacterStateIntermediate::GetDodge()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oDodge);
-}
-
-float CharacterStateIntermediate::GetCritPercent()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oCritPercent);
-}
-
-float CharacterStateIntermediate::GetFlatBaseHPPoolMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBaseHPPoolMod);
-}
-
-float CharacterStateIntermediate::GetArmor()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oArmor);
-}
-
-float CharacterStateIntermediate::GetBonusArmor()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBonusArmor);
-}
-
-float CharacterStateIntermediate::GetSpellBlock()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oSpellBlock);
-}
-
-float CharacterStateIntermediate::GetBonusSpellBlock()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBonusSpellBlock);
-}
-
-float CharacterStateIntermediate::GetHPRegenRate()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oHPRegenRate);
-}
-
-float CharacterStateIntermediate::GetBaseHPRegenRate()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oBaseHPRegenRate);
-}
-
-float CharacterStateIntermediate::GetMoveSpeed()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oMoveSpeed);
-}
-
-float CharacterStateIntermediate::GetAttackRange()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oAttackRange);
-}
-
-float CharacterStateIntermediate::GetFlatBubbleRadiusMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBubbleRadiusMod);
-}
-
-float CharacterStateIntermediate::GetPercentBubbleRadiusMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBubbleRadiusMod);
-}
-
-float CharacterStateIntermediate::GetFlatArmorPenetration()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatArmorPenetration);
-}
-
-float CharacterStateIntermediate::GetPhysicalLethality()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPhysicalLethality);
-}
-
-float CharacterStateIntermediate::GetPercentArmorPenetration()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentArmorPenetration);
-}
-
-float CharacterStateIntermediate::GetPercentBonusArmorPenetration()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBonusArmorPenetration);
-}
-
-float CharacterStateIntermediate::GetPercentCritBonusArmorPenetration()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentCritBonusArmorPenetration);
-}
-
-float CharacterStateIntermediate::GetPercentCritTotalArmorPenetration()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentCritTotalArmorPenetration);
-}
-
-float CharacterStateIntermediate::GetFlatMagicPenetration()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatMagicPenetration);
-}
-
-float CharacterStateIntermediate::GetMagicLethality()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oMagicLethality);
-}
-
-float CharacterStateIntermediate::GetPercentMagicPenetration()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentMagicPenetration);
-}
-
-float CharacterStateIntermediate::GetPercentBonusMagicPenetration()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentBonusMagicPenetration);
-}
-
-float CharacterStateIntermediate::GetPercentLifeStealMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentLifeStealMod);
-}
-
-float CharacterStateIntermediate::GetPercentSpellVampMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentSpellVampMod);
-}
-
-float CharacterStateIntermediate::GetPercentOmnivampMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentOmnivampMod);
-}
-
-float CharacterStateIntermediate::GetPercentPhysicalVamp()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentPhysicalVamp);
-}
-
-float CharacterStateIntermediate::GetPathfindingRadiusMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPathfindingRadiusMod);
-}
-
-float CharacterStateIntermediate::GetPercentCCReduction()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentCCReduction);
-}
-
-float CharacterStateIntermediate::GetPercentEXPBonus()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPercentEXPBonus);
-}
-
-float CharacterStateIntermediate::GetFlatBaseArmorMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBaseArmorMod);
-}
-
-float CharacterStateIntermediate::GetFlatBaseSpellBlockMod()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oFlatBaseSpellBlockMod);
-}
-
-float CharacterStateIntermediate::GetPrimaryARBaseRegenRateRep()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oPrimaryARBaseRegenRateRep);
-}
-
-float CharacterStateIntermediate::GetSecondaryARRegenRateRep()
-{
-	return *(float*)((QWORD)this + UPasta::Offsets::GameObject::CharacterStateIntermediate::oSecondaryARRegenRateRep);
-}
-
-float CharacterStateIntermediate::GetSecondaryARBaseRegenRateRep()
-{
-	return *(float*)((QWORD)this +
-		UPasta::Offsets::GameObject::CharacterStateIntermediate::oSecondaryARBaseRegenRateRep);
-}
-
 #pragma endregion
 
-int ObjectManager::GetListSize()
-{
-	return *(int*)((QWORD)this + UPasta::Offsets::Instance::Lists::ManagerListSize);
+int ObjectManager::GetListSize() {
+	return ReadINT(this, UPasta::Offsets::Instance::Lists::ManagerListSize);
 }
 
 Object* ObjectManager::GetIndex(int index)

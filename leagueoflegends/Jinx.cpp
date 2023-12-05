@@ -173,9 +173,9 @@ public:
         JinxConfig::JinxSpellsSettings::qCastMode = qSpellMenu->AddList("castMode", "Cast Mode", std::vector<std::string>{"Doesn't Matter", "While attacking"}, 0);
         JinxConfig::JinxSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange",
             "Maximum Range",
-            static_cast<float>(globals::localPlayer->GetAttackRange()) * 1.5f,
+            static_cast<float>(globals::localPlayer->ReadClientStat(Object::AttackRange)) * 1.5f,
             100,
-            static_cast<float>(globals::localPlayer->GetAttackRange()) * 2.0f, 50);
+            static_cast<float>(globals::localPlayer->ReadClientStat(Object::AttackRange)) * 2.0f, 50);
         JinxConfig::JinxSpellsSettings::DrawQ = qSpellMenu->AddCheckBox("Draw Q", "Draw Range", true);
 
         const auto wSpellMenu = spellsMenu->AddMenu("SpellSlot W Settings", "SpellSlot W");
@@ -208,7 +208,7 @@ public:
             {
                 const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
                 const int eDMG = levelSpell * 5 + 10;
-                const float sDMG = (eDMG + (globals::localPlayer->GetBonusAttackDamage() * .35) + globals::localPlayer->GetAbilityPower() * .30) * stacks;
+                const float sDMG = (eDMG + (globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * .35) + globals::localPlayer->ReadClientStat(Object::AbilityPower) * .30) * stacks;
 
                 return Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, sDMG);
             }
@@ -335,7 +335,7 @@ public:
             && isTimeToCastE())
         {
             const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange());
-            if (eTarget != nullptr && eTarget->GetHealth() < Jinx_dmgE(eTarget)) {
+            if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Jinx_dmgE(eTarget)) {
                 Jinx_UseE(eTarget);
             }
         }
@@ -355,7 +355,7 @@ public:
             if (JinxConfig::JinxKillsteal::UseE->Value && isTimeToCastE())
             {
                 const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
-                if (eTarget != nullptr && eTarget->GetHealth() < Jinx_dmgE(eTarget))
+                if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Jinx_dmgE(eTarget))
                 {
                     Jinx_UseE(eTarget);
                 }

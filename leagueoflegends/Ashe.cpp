@@ -231,7 +231,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = AsheDamages::WSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = globals::localPlayer->ReadClientStat(Object::TotalAttackDamage);
         const float additionalAttackDamageSkillDamage = AsheDamages::WSpell::additionalPercentageAD;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage);
@@ -246,7 +246,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = AsheDamages::RSpell::dmgSkillArray[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalAbilityPowerSkillDamage = AsheDamages::RSpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
@@ -290,7 +290,7 @@ public:
 
     void Ashe_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable() || AsheConfig::AsheSpellsSettings::UseWIfFullAASpeed->Value && globals::localPlayer->GetAttackSpeed() > 2.0f)
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable() || AsheConfig::AsheSpellsSettings::UseWIfFullAASpeed->Value && globals::localPlayer->ReadClientStat(Object::AttackSpeed) > 2.0f)
             return;
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < wRange() && isTimeToCastW())
@@ -517,7 +517,7 @@ public:
             //DrawStatsTest(hero);
             //render::RenderTextWorld(std::to_string(hero->ReadClientStat(Client::BonusAttackDamage)), hero->GetWorldPosition(), 16.0f, COLOR_WHITE, true);
             //LOG("A %f", hero->GetAttackDelay());
-        	//Awareness::Functions::Radius::DrawRadius(hero->GetWorldPosition(), hero->GetAttackRange() + globals::localPlayer->GetBoundingRadius(), COLOR_RED, 5.0f);
+        	//Awareness::Functions::Radius::DrawRadius(hero->GetWorldPosition(), hero->ReadClientStat(Object::AttackRange) + globals::localPlayer->GetBoundingRadius(), COLOR_RED, 5.0f);
         }
     }
 
@@ -593,7 +593,7 @@ public:
             if (AsheConfig::AsheClear::UseW->Value == true && database.AsheW.IsCastable() && TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), wRange()).size() >= AsheConfig::AsheClear::minWMinions->Value && AsheConfig::AsheSpellsSettings::wCastMode->Value == 0)
             {
                 const auto wTarget = TargetSelector::Functions::GetEnemyMinionInRange(wRange());
-                if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget) && Ashe_CanCastW(wTarget))
+                if (wTarget != nullptr && wTarget->ReadClientStat(Object::Health) < Ashe_dmgW(wTarget) && Ashe_CanCastW(wTarget))
                     Ashe_UseW(wTarget);
             }
         }
@@ -646,7 +646,7 @@ public:
         if (AsheConfig::AsheLastHit::UseW->Value == true && database.AsheW.IsCastable())
         {
             const auto wTarget = TargetSelector::Functions::GetEnemyMinionInRange(wRange());
-            if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget))
+            if (wTarget != nullptr && wTarget->ReadClientStat(Object::Health) < Ashe_dmgW(wTarget))
                 Ashe_UseW(wTarget);
         }
     }
@@ -667,7 +667,7 @@ public:
             if (AsheConfig::AsheKillsteal::UseW->Value == true && database.AsheW.IsCastable())
             {
                 const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange());
-                if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget))
+                if (wTarget != nullptr && wTarget->ReadClientStat(Object::Health) < Ashe_dmgW(wTarget))
                 {
                     Ashe_UseW(wTarget);
                 }
@@ -679,7 +679,7 @@ public:
                 if (rTarget != nullptr
                     && rTarget->GetDistanceTo(globals::localPlayer) > AsheConfig::AsheSpellsSettings::minRDistance->Value
                     && rTarget->GetDistanceTo(globals::localPlayer) < AsheConfig::AsheSpellsSettings::maxRDistance->Value
-                    && rTarget->GetHealth() < Ashe_dmgR(rTarget))
+                    && rTarget->ReadClientStat(Object::Health) < Ashe_dmgR(rTarget))
                 {
                     Ashe_UseR(rTarget);
                 }
@@ -718,7 +718,7 @@ public:
             {
                 if (!Engine::MenuItemContains(AsheConfig::AsheAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetAttackRange()))
+                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->ReadClientStat(Object::AttackRange)))
                 {
                 	Ashe_UseW(target);
                 }

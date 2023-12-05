@@ -65,7 +65,7 @@ namespace Modules::prediction
 	{
 		const auto aiManager = obj->GetAiManager();
 
-		float speed = obj->GetMovementSpeed();
+		float speed = obj->ReadClientStat(Object::MovementSpeed);
 		if (aiManager->IsDashing())
 		{
 			speed = aiManager->GetDashSpeed();

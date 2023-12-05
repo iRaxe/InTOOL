@@ -298,7 +298,7 @@ namespace UPasta
 						if (!obj->IsValidTarget()) continue;
 						if (obj->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range))continue;
-						if (obj->GetHealth()  > damage) continue;
+						if (obj->ReadClientStat(Object::Health)  > damage) continue;
 						if (obj)
 							validTargets.push_back(obj);
 					}
@@ -377,7 +377,7 @@ namespace UPasta
 					float highestPriority = 0.0f;
 					for (auto minion : minions)
 					{
-						auto priority = GetMinionReducedPriority(minion) * (damageType == Magical ? Damage::CalculateMagicalDamage(globals::localPlayer, minion, 100.0f) : Damage::CalculatePhysicalDamage(globals::localPlayer, minion, 100.0f)) / minion->GetHealth();
+						auto priority = GetMinionReducedPriority(minion) * (damageType == Magical ? Damage::CalculateMagicalDamage(globals::localPlayer, minion, 100.0f) : Damage::CalculatePhysicalDamage(globals::localPlayer, minion, 100.0f)) / minion->ReadClientStat(Object::Health);
 						if (priority > highestPriority)
 						{
 							hero = minion;
@@ -391,7 +391,7 @@ namespace UPasta
 				Object* Functions::GetEnemyMinionInRange(float radius)
 				{
 					return GetMinion(GetMinionsInRange(globals::localPlayer->GetPosition(), radius),
-						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? Physical : Magical);
+						(globals::localPlayer->ReadClientStat(Object::TotalAttackDamage) > globals::localPlayer->ReadClientStat(Object::AbilityPower)) ? Physical : Magical);
 				}
 
 					
@@ -487,7 +487,7 @@ namespace UPasta
 						if (!obj->IsValidTarget()) continue;
 
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range))continue;
-						if (obj->GetHealth() > damage) continue;
+						if (obj->ReadClientStat(Object::Health) > damage) continue;
 						if (obj)
 							validTargets.push_back(obj);
 					}
@@ -577,7 +577,7 @@ namespace UPasta
 							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
 								continue;
 
-							auto priority = GetReducedPriority(target) * (damageType == Magical ? Damage::CalculateMagicalDamage(globals::localPlayer, target, 100.0f) : Damage::CalculatePhysicalDamage(globals::localPlayer, target, 100.0f)) / target->GetHealth();
+							auto priority = GetReducedPriority(target) * (damageType == Magical ? Damage::CalculateMagicalDamage(globals::localPlayer, target, 100.0f) : Damage::CalculatePhysicalDamage(globals::localPlayer, target, 100.0f)) / target->ReadClientStat(Object::Health);
 							if (priority > highestPriority)
 							{
 								hero = target;
@@ -596,7 +596,7 @@ namespace UPasta
 							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
 								continue;
 
-							auto health = target->GetMaxHealth();
+							auto health = target->ReadClientStat(Object::MaxHealth);
 							if (health < leastHealth)
 							{
 								hero = target;
@@ -615,7 +615,7 @@ namespace UPasta
 							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
 								continue;
 
-							auto attackDamage = target->GetAttackDamage();
+							auto attackDamage = target->ReadClientStat(Object::TotalAttackDamage);
 							if (attackDamage > mostAttackDamage)
 							{
 								hero = target;
@@ -634,7 +634,7 @@ namespace UPasta
 							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
 								continue;
 
-							auto abilityPower = target->GetAbilityPower();
+							auto abilityPower = target->ReadClientStat(Object::AbilityPower);
 							if (abilityPower > mostAbilityPower)
 							{
 								hero = target;
@@ -690,7 +690,7 @@ namespace UPasta
 							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
 								continue;
 
-							auto priority = GetReducedPriority(target) * Damage::CalculatePhysicalDamage(globals::localPlayer, target, 100.0f) / target->GetMaxHealth();
+							auto priority = GetReducedPriority(target) * Damage::CalculatePhysicalDamage(globals::localPlayer, target, 100.0f) / target->ReadClientStat(Object::MaxHealth);
 							if (priority > highestPriority)
 							{
 								hero = target;
@@ -709,7 +709,7 @@ namespace UPasta
 							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
 								continue;
 
-							auto priority = GetReducedPriority(target) * Damage::CalculateMagicalDamage(globals::localPlayer, target, 100.0f) / target->GetMaxHealth();
+							auto priority = GetReducedPriority(target) * Damage::CalculateMagicalDamage(globals::localPlayer, target, 100.0f) / target->ReadClientStat(Object::MaxHealth);
 							if (priority > highestPriority) {
 								hero = target;
 								highestPriority = priority;
@@ -772,19 +772,19 @@ namespace UPasta
 				Object* Functions::GetEnemyChampionInRange(float radius)
 				{
 					return GetTarget(GetTargetsInRange(globals::localPlayer->GetPosition(), radius),
-						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? Physical : Magical);
+						(globals::localPlayer->ReadClientStat(Object::TotalAttackDamage) > globals::localPlayer->ReadClientStat(Object::AbilityPower)) ? Physical : Magical);
 				}
 
 				Object* Functions::GetEnemyChampionInRange(Vector3 pos, float radius)
 				{
 					return GetTarget(GetTargetsInRange(pos, radius),
-						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? Physical : Magical);
+						(globals::localPlayer->ReadClientStat(Object::TotalAttackDamage) > globals::localPlayer->ReadClientStat(Object::AbilityPower)) ? Physical : Magical);
 				}
 
 				Object* Functions::GetEnemyChampionInRange(float radius, Skillshot skillshot)
 				{
 					return  GetEnemyChampionInRange(radius,
-						(globals::localPlayer->GetAttackDamage() > globals::localPlayer->GetAbilityPower()) ? Physical : Magical, skillshot);
+						(globals::localPlayer->ReadClientStat(Object::TotalAttackDamage) > globals::localPlayer->ReadClientStat(Object::AbilityPower)) ? Physical : Magical, skillshot);
 				}
 
 				
@@ -798,7 +798,7 @@ namespace UPasta
 						if (!obj->IsValidTarget()) continue;
 						if (!Engine::GetCollisionFlags(obj->GetPosition()) & CollisionFlags::Building) continue;
 						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
-						if (obj->GetMaxHealth() != 5500) continue;
+						if (obj->ReadClientStat(Object::MaxHealth) != 5500) continue;
 						
 						if (obj)
 						{
@@ -1172,7 +1172,7 @@ namespace UPasta
 					{
 						Object* selectedObject = Engine::GetSelectedObject();
 						if (selectedObject && selectedObject->IsValidTarget())
-							render::RenderArcWorld(selectedObject->GetPosition(), 10, selectedObject->GetAttackRange(), COLOR_BLUE, 1.0f, PI, globals::localPlayer->GetPosition(), true);
+							render::RenderArcWorld(selectedObject->GetPosition(), 10, selectedObject->ReadClientStat(Object::AttackRange), COLOR_BLUE, 1.0f, PI, globals::localPlayer->GetPosition(), true);
 					}
 					
 				}

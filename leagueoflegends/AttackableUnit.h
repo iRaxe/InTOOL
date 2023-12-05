@@ -36,7 +36,7 @@ protected:
 		DEFINE_MEMBER_N(float _ability_power, UPasta::Offsets::Client::AbilityPower);
 
 		DEFINE_MEMBER_N(float _bonus_armor, UPasta::Offsets::Client::BonusArmor);
-		DEFINE_MEMBER_N(float _total_armor, UPasta::Offsets::Client::TotalArmor);
+		DEFINE_MEMBER_N(float _total_armor, UPasta::Offsets::Client::BaseArmor);
 
 		DEFINE_MEMBER_N(float _shield, UPasta::Offsets::Client::Shield);
 		DEFINE_MEMBER_N(float _physical_shield, UPasta::Offsets::Client::PhysicalShield);

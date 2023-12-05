@@ -156,7 +156,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = NautilusDamages::QSpell::dmgSkillQ[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalSkillDamage = NautilusDamages::QSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -171,7 +171,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = NautilusDamages::WSpell::dmgSkillW[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalSkillDamage = NautilusDamages::WSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -186,7 +186,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = NautilusDamages::ESpell::dmgSkillE[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalSkillDamage = NautilusDamages::ESpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -201,7 +201,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = NautilusDamages::RSpell::dmgSkillR[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
         const float additionalSkillDamage = NautilusDamages::RSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -415,7 +415,7 @@ public:
         if (NautilusConfig::NautilusKillsteal::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
 	        const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange());
-            if (qTarget && qTarget->GetHealth() < Nautilus_dmgQ(qTarget))
+            if (qTarget && qTarget->ReadClientStat(Object::Health) < Nautilus_dmgQ(qTarget))
             {
                 Nautilus_UseQ(qTarget);
             }
@@ -424,7 +424,7 @@ public:
         if (NautilusConfig::NautilusKillsteal::UseE->Value == true && database.NautilusE.IsCastable())
         {
 	        const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusE.GetRange());
-            if (eTarget && eTarget->GetHealth() < Nautilus_dmgE(eTarget))
+            if (eTarget && eTarget->ReadClientStat(Object::Health) < Nautilus_dmgE(eTarget))
             {
                 Nautilus_UseE(eTarget);
             }
@@ -433,7 +433,7 @@ public:
         if (NautilusConfig::NautilusKillsteal::UseR->Value == true && database.NautilusR.IsCastable())
         {
 	        const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusR.GetRange());
-            if (rTarget && rTarget->GetHealth() < Nautilus_dmgR(rTarget))
+            if (rTarget && rTarget->ReadClientStat(Object::Health) < Nautilus_dmgR(rTarget))
             {
                 Nautilus_UseR(rTarget);
             }

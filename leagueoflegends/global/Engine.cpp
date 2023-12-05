@@ -275,7 +275,7 @@ namespace Engine
 	Vector2 GetHpBarPosition(Object* obj)
 	{
 		Vector3 hpBarPos = obj->GetPosition();
-		const float hpBarHeight = Read<float>(obj->GetCharacterData() + UPasta::Offsets::GameObject::CharData::Size) * obj->GetScale();
+		const float hpBarHeight = Read<float>(obj->GetCharacterData() + UPasta::Offsets::GameObject::CharData::Size) * obj->ReadClientStat(Object::ScaleMulti);
 		hpBarPos.y += hpBarHeight;
 
 		auto screenPos = WorldToScreen(hpBarPos);
@@ -670,7 +670,7 @@ namespace Engine
 		if (!CanSendInput() || obj == nullptr) return;
 
 		Vector3 headPos = obj->GetPosition();
-		const float objectHeight = *(float*)(obj->GetCharacterData() + UPasta::Offsets::GameObject::CharData::Size) * obj->GetScale();
+		const float objectHeight = *(float*)(obj->GetCharacterData() + UPasta::Offsets::GameObject::CharData::Size) * obj->ReadClientStat(Object::ScaleMulti);
 		headPos.y += objectHeight - 50.0f;
 
 		auto screenPos = WorldToScreen(headPos);

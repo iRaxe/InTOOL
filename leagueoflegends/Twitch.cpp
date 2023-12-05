@@ -161,9 +161,9 @@ public:
         TwitchConfig::TwitchSpellsSettings::qCastMode = qSpellMenu->AddList("castMode", "Cast Mode", std::vector<std::string>{"Doesn't Matter", "While attacking"}, 0);
         TwitchConfig::TwitchSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange",
             "Maximum Range",
-            static_cast<float>(globals::localPlayer->GetAttackRange()) * 1.5f,
+            static_cast<float>(globals::localPlayer->ReadClientStat(Object::AttackRange)) * 1.5f,
             100,
-            static_cast<float>(globals::localPlayer->GetAttackRange()) * 2.0f, 50);
+            static_cast<float>(globals::localPlayer->ReadClientStat(Object::AttackRange)) * 2.0f, 50);
         TwitchConfig::TwitchSpellsSettings::DrawQ = qSpellMenu->AddCheckBox("Draw Q", "Draw Range", true);
 
         //Creating second parent menu that is itself a child of spellsMenu
@@ -196,7 +196,7 @@ public:
             {
                 const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
                 const int eDMG = levelSpell * 5 + 10;
-                const float sDMG = (eDMG + (globals::localPlayer->GetBonusAttackDamage() * .35) + globals::localPlayer->GetAbilityPower() * .30) * stacks;
+                const float sDMG = (eDMG + (globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * .35) + globals::localPlayer->ReadClientStat(Object::AbilityPower) * .30) * stacks;
 
                 return Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, sDMG);
             }
@@ -220,14 +220,14 @@ public:
 
         const Vector2 screenPos = Engine::GetHpBarPosition(pEnemy);
 
-        const float endOffset2 = TwitchDamages::xOffset + pEnemy->GetHealth() / pEnemy->GetMaxHealth() * TwitchDamages::widthMultiplier;
+        const float endOffset2 = TwitchDamages::xOffset + pEnemy->ReadClientStat(Object::Health) / pEnemy->ReadClientStat(Object::MaxHealth) * TwitchDamages::widthMultiplier;
         const float damage = Twitch_dmgE(pEnemy);
-        const float startOffset2 = max(endOffset2 - (damage / pEnemy->GetMaxHealth() * TwitchDamages::widthMultiplier), TwitchDamages::xOffset);
+        const float startOffset2 = max(endOffset2 - (damage / pEnemy->ReadClientStat(Object::MaxHealth) * TwitchDamages::widthMultiplier), TwitchDamages::xOffset);
 
         const ImVec2 topLeft = CalculateTopLeft(Vector2(screenPos.x + startOffset2, screenPos.y));
         const ImVec2 bottomRight = CalculateBottomRight(screenPos, endOffset2);
 
-        const float targetHealth = pEnemy->GetHealth();
+        const float targetHealth = pEnemy->ReadClientStat(Object::Health);
         const bool canKill = damage > targetHealth;
         const auto drawColor = canKill ? COLOR_GREEN : COLOR_RED;
         render::RenderRect(topLeft, bottomRight, drawColor, 0.0f, 0, 1.0f, true);
@@ -299,7 +299,7 @@ public:
             const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
             if (eTarget != nullptr)
             {
-                const bool canKillTarget = eTarget->GetHealth() + eTarget->GetShield() < Twitch_dmgE(eTarget);
+                const bool canKillTarget = eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget);
                 const bool shouldUseE = TwitchConfig::TwitchCombo::UseEWithStacks->Value && hasEnoughStacks(eTarget, TwitchConfig::TwitchCombo::minStacks->Value);
 
                 if (canKillTarget || shouldUseE) {
@@ -350,7 +350,7 @@ public:
                 int kill_count = 0;
                 for (const auto& minion : eMinions)
                 {
-                    if (minion != nullptr && minion->GetHealth() < Twitch_dmgE(minion)) {
+                    if (minion != nullptr && minion->ReadClientStat(Object::Health) < Twitch_dmgE(minion)) {
                         kill_count++;
                     }
 
@@ -391,7 +391,7 @@ public:
                 const auto eTarget = TargetSelector::Functions::GetJungleInRange(eRange());
                 if (eTarget != nullptr)
                 {
-                    const bool canKillTarget = eTarget->GetHealth() + eTarget->GetShield() < Twitch_dmgE(eTarget);
+                    const bool canKillTarget = eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget);
                     const bool shouldUseE = TwitchConfig::TwitchJungle::UseEWithStacks->Value && hasEnoughStacks(eTarget, TwitchConfig::TwitchJungle::minStacks->Value);
 
                     if (canKillTarget || shouldUseE) {
@@ -421,7 +421,7 @@ public:
             const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
             if (eTarget != nullptr)
             {
-                const bool canKillTarget = eTarget->GetHealth() + eTarget->GetShield() < Twitch_dmgE(eTarget);
+                const bool canKillTarget = eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget);
                 const bool shouldUseE = TwitchConfig::TwitchCombo::UseEWithStacks->Value && hasEnoughStacks(eTarget, TwitchConfig::TwitchHarass::minStacks->Value);
 
                 if (canKillTarget || shouldUseE) {
@@ -449,7 +449,7 @@ public:
             if (TwitchConfig::TwitchKillsteal::UseE->Value && isTimeToCastE())
             {
                 const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
-                if (eTarget != nullptr && eTarget->GetHealth() + eTarget->GetShield() < Twitch_dmgE(eTarget))
+                if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget))
                 {
                     Twitch_UseE(eTarget);
                 }

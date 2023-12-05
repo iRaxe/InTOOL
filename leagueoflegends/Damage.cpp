@@ -13,8 +13,8 @@ namespace UPasta
 			const int levelSpell = globals::localPlayer->GetSpellBySlotId(spellIndex)->GetLevel();
 
 			const float skillDamage = dmgSkillArray[levelSpell];
-			const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
-			const float attackDamage = globals::localPlayer->GetAttackDamage();
+			const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+			const float attackDamage = globals::localPlayer->ReadClientStat(Object::TotalAttackDamage);
 			const float totalDamage = skillDamage + (additionalPercentageAP * abilityPowerDamage) + (additionalPercentageAD * attackDamage);
 
 			switch (dmgType) {
@@ -35,14 +35,14 @@ namespace UPasta
 			auto rawTrueDamage = 0.0f;
 			auto calculatedPhysicalDamage = 0.0f;
 			auto calculatedMagicalDamage = 0.0f;
-			auto rawTotalDamage = source->GetAttackDamage();
+			auto rawTotalDamage = source->ReadClientStat(Object::TotalAttackDamage);
 
 			//auto targetFlags = target->Flags();
 			//auto sourceFlags = source->Flags();
 
 			//if (targetFlags && GameObjectFlags_AIMinionClient) {
 			if (target->IsMinion()) {
-				if (target->GetMaxHealth() <= 6.0f) {
+				if (target->ReadClientStat(Object::MaxHealth) <= 6.0f) {
 					return 1.0f;
 				}
 			}
@@ -77,9 +77,10 @@ namespace UPasta
 				return 0.0f;
 
 			const auto characterState = source->GetCharacterStateIntermediate();
-			const auto flatArmorPenetration = characterState->GetPhysicalLethality() * (0.6f + 0.4f * source->GetLevel() / 18.0f);
-			auto percentArmorPenetration = characterState->GetPercentArmorPenetration();
-			auto percentBonusArmorPenetration = characterState->GetPercentBonusArmorPenetration();
+			const auto flatArmorPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PhysicalLethality) *(0.6f + 0.4f * source->GetLevel() / 18.0f);
+
+			auto percentArmorPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PercentArmorPenetration);
+			auto percentBonusArmorPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PercentBonusArmorPenetration);
 
 			if (source->IsMinion()) {
 				percentArmorPenetration = 1.0f;
@@ -89,8 +90,8 @@ namespace UPasta
 				percentArmorPenetration = 0.7f;
 			}
 
-			const auto armor = target->GetArmor();
-			const auto bonusArmor = target->GetBonusArmor();
+			const auto armor = target->ReadClientStat(Object::BaseArmor);
+			const auto bonusArmor = target->ReadClientStat(Object::BonusArmor);
 			const auto adjustedArmor = armor * percentArmorPenetration - bonusArmor * (1.0f - percentBonusArmorPenetration) - flatArmorPenetration;
 
 			const auto bonusTrueDamage = source->IsHero() && target->IsHero() && source->HasConqueror() ? amount * 0.2f : 0.0f;
@@ -115,9 +116,9 @@ namespace UPasta
 				return 0.0f;
 
 			const auto characterState = source->GetCharacterStateIntermediate();
-			const auto flatMagicPenetration = characterState->GetFlatMagicPenetration();
-			const auto percentMagicPenetration = characterState->GetPercentMagicPenetration();
-			const auto magicResist = target->GetMagicResist();
+			const auto flatMagicPenetration = characterState->ReadClientStat(CharacterStateIntermediate::FlatMagicPenetration);
+			const auto percentMagicPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PercentMagicPenetration);
+			const auto magicResist = target->ReadClientStat(Object::TotalMagicResist);
 
 			float bonusTrueDamage = 0.0f;
 			if (target->IsCursed()) {
@@ -149,14 +150,13 @@ namespace UPasta
 			DamageModifierResult result;
 			auto sourceState = source->GetCharacterStateIntermediate();
 			auto targetState = target->GetCharacterStateIntermediate();
-
-			result.Flat = -sourceState->GetFlatMagicReduction();
-			result.Percent = 1.0f - sourceState->GetFlatMagicReduction();
+			result.Flat = -sourceState->ReadClientStat(CharacterStateIntermediate::FlatMagicReduction);
+			result.Percent = 1.0f - sourceState->ReadClientStat(CharacterStateIntermediate::FlatMagicReduction);
 
 			// Pushing advantage for minions
 			if (source->IsMinion() && target->IsMinion()) {
-				result.Flat -= targetState->GetFlatDamageReductionFromBarracksMinionMod();
-				result.Percent *= 1.0f + sourceState->GetPercentDamageToBarracksMinionMod();
+				result.Flat -= targetState->ReadClientStat(CharacterStateIntermediate::FlatDamageReductionFromBarracksMinionMod);
+				result.Percent *= 1.0f + sourceState->ReadClientStat(CharacterStateIntermediate::PercentDamageToBarracksMinionMod);
 			}
 
 			// Target buffs
@@ -166,7 +166,7 @@ namespace UPasta
 						if (target->GetBuffByName("MoltenShield")) {
 							auto spell = target->GetSpellBySlotId(2);
 							static const float annieShield[] = { 0, 60, 95, 130, 165, 200 };
-							result.Percent *= 1.0f - (annieShield[spell->GetLevel()] + 0.40f * target->GetAbilityPower()) / 100.0f;
+							result.Percent *= 1.0f - (annieShield[spell->GetLevel()] + 0.40f * target->ReadClientStat(Object::AbilityPower)) / 100.0f;
 						}
 					}},
 					{"Braum", [&]() {
@@ -180,7 +180,7 @@ namespace UPasta
 						if (target->GetBuffByName("GalioW")) {
 							auto spell = target->GetSpellBySlotId(1);
 							static const float galioShield[] = { 0, 0.25f, 0.30f, 0.35f, 0.40f, 0.45f };
-							result.Percent *= 1.0f - (galioShield[spell->GetLevel()] + (0.12f * target->GetMagicPenetrationMulti()));
+							result.Percent *= 1.0f - (galioShield[spell->GetLevel()] + (0.12f * target->ReadClientStat(Object::MagicPenetrationMultiplier)));
 						}
 					}},
 					// Add other heroes similarly...
@@ -224,20 +224,20 @@ namespace UPasta
 						result.PhysicalDamage += 20;
 				}},
 				{ItemsDatabase::Blade_of_the_Ruined_King, [&]() {
-					auto itemDamage = target->GetHealth() * 0.08f;
+					auto itemDamage = target->ReadClientStat(Object::Health) * 0.08f;
 					if (target->IsMinion()) {
 						itemDamage = min(itemDamage, 60.0f);
 					}
 					result.PhysicalDamage += max(itemDamage, 15.0f);
 				}},
 				{ItemsDatabase::Nashors_Tooth, [&]() {
-					result.MagicalDamage += 15.0f + 0.15f * source->GetAbilityPower();
+					result.MagicalDamage += 15.0f + 0.15f * source->ReadClientStat(Object::AbilityPower);
 				}},
 				{ItemsDatabase::Recurve_Bow, [&]() {
 					result.PhysicalDamage += 15.0f;
 				}},
 				{ItemsDatabase::Titanic_Hydra, [&]() {
-					result.PhysicalDamage += source->GetBuffByName("itemtitanichydracleavebuff") ? 40.0f + 0.1f * source->GetMaxHealth() : 5.0f + 0.01f * source->GetMaxHealth();
+					result.PhysicalDamage += source->GetBuffByName("itemtitanichydracleavebuff") ? 40.0f + 0.1f * source->ReadClientStat(Object::MaxHealth) : 5.0f + 0.01f * source->ReadClientStat(Object::MaxHealth);
 				}},
 				{ItemsDatabase::Dead_Mans_Plate, [&]() {
 					auto buff = source->GetBuffByName("dreadnoughtmomentumbuff");
@@ -267,13 +267,13 @@ namespace UPasta
 			std::unordered_map<std::string, std::function<void()>> sourceBuffHandlers = {
 				{"akalipweapon", [&]() {
 					static float values[18] = { 35, 38, 41, 44, 47, 50, 53, 62, 71, 80, 89, 98, 107, 122, 137, 152, 167, 182 };
-					result.MagicalDamage += values[min(source->GetLevel() - 1, 17U)] + 0.6f * source->GetBonusAttackDamage() + 0.55f * source->GetAbilityPower();
+					result.MagicalDamage += values[min(source->GetLevel() - 1, 17U)] + 0.6f * source->ReadClientStat(Object::BonusAttackDamage) + 0.55f * source->ReadClientStat(Object::AbilityPower);
 				}},
 				{"sonaqprocattacker", [&]() {
-					result.MagicalDamage += 5.0f + 5.0f * source->GetSpellBySlotId(0)->GetLevel() + 0.3f * target->GetAbilityPower();
+					result.MagicalDamage += 5.0f + 5.0f * source->GetSpellBySlotId(0)->GetLevel() + 0.3f * target->ReadClientStat(Object::AbilityPower);
 				}},
 				{"NamiE", [&]() {
-					result.MagicalDamage += 5.0f + 15.0f * source->GetSpellBySlotId(2)->GetLevel() + 0.2f * target->GetAbilityPower();
+					result.MagicalDamage += 5.0f + 15.0f * source->GetSpellBySlotId(2)->GetLevel() + 0.2f * target->ReadClientStat(Object::AbilityPower);
 				}},
 				{"itemangelhandbuff", [&]() {
 					static float values[18] = { 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f };
@@ -296,7 +296,7 @@ namespace UPasta
 				{"vaynetumblebonus", [&]() {
 					auto spell = source->GetSpellBySlotId(0);
 					float qBonus[6] = { 0, 0.75f, 0.85f, 0.95f, 1.05f, 1.15f };
-					result.PhysicalDamage += source->GetAttackDamage() * qBonus[spell->GetLevel()];
+					result.PhysicalDamage += source->ReadClientStat(Object::TotalAttackDamage) * qBonus[spell->GetLevel()];
 				}},
 			};
 			if (source->IsHero())
