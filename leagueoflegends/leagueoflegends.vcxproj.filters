@@ -47,39 +47,6 @@
     <Filter Include="Main">
       <UniqueIdentifier>{f4cc1cee-f2ee-4945-9752-cfa38a5786e9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Memory">
-      <UniqueIdentifier>{5a4fe51e-5662-431e-827c-4337615faa38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu">
-      <UniqueIdentifier>{d166a879-5863-477f-8b36-e249d999d030}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu">
-      <UniqueIdentifier>{e28418a4-eddb-4e55-9f6f-58806795a027}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Components">
-      <UniqueIdentifier>{3cf11341-2d14-44bf-a8f4-a27529df0d53}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Rendering">
-      <UniqueIdentifier>{955f8bb1-1234-4014-ad3b-5ea77b6d7b5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Components\Checkbox">
-      <UniqueIdentifier>{ede87041-a047-43e6-9475-132f0011937a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Components\Info">
-      <UniqueIdentifier>{f752cb7d-3c75-43b9-9e5f-612527758619}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Components\KeyBindings">
-      <UniqueIdentifier>{8b0fe8d7-fbb1-4cd5-b672-4c209afcaf57}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Components\List">
-      <UniqueIdentifier>{0b56ca72-0b76-4567-9ca4-19304b30f339}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Components\Slider">
-      <UniqueIdentifier>{8abffdc0-fa5f-4958-a500-113cae354420}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Components\Rect">
-      <UniqueIdentifier>{5758bfad-cbbd-4e60-a73d-a84de24c50df}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Rendering">
       <UniqueIdentifier>{2a1bb88d-0576-4781-a0e1-5e285260e70f}</UniqueIdentifier>
     </Filter>
@@ -155,15 +122,6 @@
     <Filter Include="Scripts\Champions\Vayne">
       <UniqueIdentifier>{0b500233-e9dd-4ed3-8926-0cf941a2d47c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Menu\New New Menu">
-      <UniqueIdentifier>{71739673-28ef-4db8-8b53-c56fb2a0687e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New New Menu\Notification">
-      <UniqueIdentifier>{0c59187d-68b5-4f3c-9b34-b96216cedd0a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu\New Menu\Components\ColorPicker">
-      <UniqueIdentifier>{0c768865-ead9-485f-9a21-b090f9bacb1b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scripts\Champions\Thresh">
       <UniqueIdentifier>{53c5a4df-c29e-4818-b038-c69345f481c8}</UniqueIdentifier>
     </Filter>
@@ -176,16 +134,103 @@
     <Filter Include="Scripts\Champions\Kaisa">
       <UniqueIdentifier>{2009609e-7b66-4a82-bda2-176615a42195}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\CompressedImages">
+      <UniqueIdentifier>{e71e3a26-fb2f-49f3-b825-94eda0d4624c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Bypass">
+      <UniqueIdentifier>{af7bd5e9-42c5-455a-bb02-6027df9fd54e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Utilities">
+      <UniqueIdentifier>{befbbf0e-adce-436a-82fc-35903ff7f7d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Memory">
+      <UniqueIdentifier>{5a4fe51e-5662-431e-827c-4337615faa38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu">
+      <UniqueIdentifier>{d166a879-5863-477f-8b36-e249d999d030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Components">
+      <UniqueIdentifier>{3cf11341-2d14-44bf-a8f4-a27529df0d53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Components\Checkbox">
+      <UniqueIdentifier>{ede87041-a047-43e6-9475-132f0011937a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Components\Info">
+      <UniqueIdentifier>{f752cb7d-3c75-43b9-9e5f-612527758619}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Components\KeyBindings">
+      <UniqueIdentifier>{8b0fe8d7-fbb1-4cd5-b672-4c209afcaf57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Components\List">
+      <UniqueIdentifier>{0b56ca72-0b76-4567-9ca4-19304b30f339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Components\Slider">
+      <UniqueIdentifier>{8abffdc0-fa5f-4958-a500-113cae354420}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Components\Rect">
+      <UniqueIdentifier>{5758bfad-cbbd-4e60-a73d-a84de24c50df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Components\ColorPicker">
+      <UniqueIdentifier>{0c768865-ead9-485f-9a21-b090f9bacb1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Menu\Rendering">
+      <UniqueIdentifier>{955f8bb1-1234-4014-ad3b-5ea77b6d7b5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\OldBypass">
+      <UniqueIdentifier>{3ff65862-f769-4357-b757-967248f4390f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\OldBypass\UltimateHooks">
+      <UniqueIdentifier>{5b82b873-784d-4a70-a1d2-adfc19001f19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Awarenesss">
+      <UniqueIdentifier>{6cfe9ff7-0da6-470c-bd4c-1fc3e036f8a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Awarenesss\HPBar">
+      <UniqueIdentifier>{a8ab1a11-49cf-4e07-88df-de6945e9d01b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Awarenesss\Path">
+      <UniqueIdentifier>{a2207a4b-fc6e-4af6-ba21-4c92cd9c691d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Awarenesss\LastPosition">
+      <UniqueIdentifier>{32819a2b-8258-4b11-854f-2dc33cf0adcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Awarenesss\LastHitDamage">
+      <UniqueIdentifier>{fc7fe452-2f6f-44b1-b9f1-70ff1b384103}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Utilities\Awarenesss\Sidebar">
+      <UniqueIdentifier>{f54ca85c-d8f4-40bc-8c81-c4c58032b5e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global\ObjectManager">
+      <UniqueIdentifier>{9c967306-500c-4ec9-a952-740cdb95f5b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global\ObjectManager\Objects">
+      <UniqueIdentifier>{0bc97409-f0e6-4738-be46-255dcf167a74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global\SpellBook">
+      <UniqueIdentifier>{8b4e11cd-56b6-4843-a2b0-d672ed41e089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global\SpellCast">
+      <UniqueIdentifier>{501d3cec-6b19-4710-bbd6-2dbe14d83201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global\SpellData">
+      <UniqueIdentifier>{fe683633-052c-4a45-9d7d-92f1c82e000b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global\SpellInfo">
+      <UniqueIdentifier>{90e40ccb-79f4-45ac-a2d4-829a30d4a7d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Twitch">
+      <UniqueIdentifier>{5df439ce-ba7f-4e05-a9a3-c06724121a94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Jinx">
+      <UniqueIdentifier>{16c432dc-9b94-4a8c-8b7d-ae979816fc87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
       <Filter>Global</Filter>
     </ClInclude>
-    <ClInclude Include="global\settings.h">
-      <Filter>Global</Filter>
-    </ClInclude>
     <ClInclude Include="mem\mem.h">
-      <Filter>Memory</Filter>
+      <Filter>Main\Memory</Filter>
     </ClInclude>
     <ClInclude Include="global\targetver.h">
       <Filter>Global</Filter>
@@ -247,9 +292,6 @@
     <ClInclude Include="hooks\hooks.h">
       <Filter>Hooks</Filter>
     </ClInclude>
-    <ClInclude Include="menu\menu.h">
-      <Filter>Menu</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imgui_impl_dx9.h">
       <Filter>IMGui</Filter>
     </ClInclude>
@@ -265,14 +307,14 @@
     <ClInclude Include="global\utils.h">
       <Filter>Global</Filter>
     </ClInclude>
-    <ClInclude Include="global\functions.h">
+    <ClInclude Include="global\Engine.h">
       <Filter>Global</Filter>
     </ClInclude>
     <ClInclude Include="global\colors.h">
       <Filter>Global</Filter>
     </ClInclude>
     <ClInclude Include="mem\spoof_call.h">
-      <Filter>Memory</Filter>
+      <Filter>Main\Memory</Filter>
     </ClInclude>
     <ClInclude Include="global\strings.h">
       <Filter>Global</Filter>
@@ -293,28 +335,16 @@
     <ClInclude Include="global\leagueobfuscation.h">
       <Filter>Global</Filter>
     </ClInclude>
-    <ClInclude Include="OnProcessSpellCast.h">
-      <Filter>Hooks</Filter>
-    </ClInclude>
     <ClInclude Include="VMTHook.h">
       <Filter>Hooks\VMTHook</Filter>
-    </ClInclude>
-    <ClInclude Include="customimages.h">
-      <Filter>Rendering\ImageManager</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
       <Filter>Rendering\ImageManager</Filter>
     </ClInclude>
     <ClInclude Include="clipper.hpp" />
     <ClInclude Include="json.hpp" />
-    <ClInclude Include="NewMenu.h">
-      <Filter>Menu\New Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuSettings.h">
-      <Filter>Menu\New Menu</Filter>
-    </ClInclude>
     <ClInclude Include="MenuRenderer.h">
-      <Filter>Menu\New Menu\Rendering</Filter>
+      <Filter>Rendering\Menu\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Plugins.h">
       <Filter>Scripts\utils</Filter>
@@ -347,30 +377,30 @@
       <Filter>Hooks\EventManager\Destroy</Filter>
     </ClInclude>
     <ClInclude Include="MenuComponent.h">
-      <Filter>Menu\New Menu\Components</Filter>
+      <Filter>Rendering\Menu\Components</Filter>
     </ClInclude>
     <ClInclude Include="Checkbox.h">
-      <Filter>Menu\New Menu\Components\Checkbox</Filter>
+      <Filter>Rendering\Menu\Components\Checkbox</Filter>
     </ClInclude>
     <ClInclude Include="Info.h">
-      <Filter>Menu\New Menu\Components\Info</Filter>
+      <Filter>Rendering\Menu\Components\Info</Filter>
     </ClInclude>
     <ClInclude Include="KeyBind.h">
-      <Filter>Menu\New Menu\Components\KeyBindings</Filter>
+      <Filter>Rendering\Menu\Components\KeyBindings</Filter>
     </ClInclude>
     <ClInclude Include="List.h">
-      <Filter>Menu\New Menu\Components\List</Filter>
+      <Filter>Rendering\Menu\Components\List</Filter>
     </ClInclude>
     <ClInclude Include="Slider.h">
-      <Filter>Menu\New Menu\Components\Slider</Filter>
+      <Filter>Rendering\Menu\Components\Slider</Filter>
     </ClInclude>
     <ClInclude Include="Rect.h">
-      <Filter>Menu\New Menu\Components\Rect</Filter>
+      <Filter>Rendering\Menu\Components\Rect</Filter>
     </ClInclude>
     <ClInclude Include="scripts\championmodule.h">
       <Filter>Scripts\Champions</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\scripts.h">
+    <ClInclude Include="scripts\Modules.h">
       <Filter>Scripts\SDK</Filter>
     </ClInclude>
     <ClInclude Include="Awareness.h">
@@ -409,9 +439,6 @@
     <ClInclude Include="Vayne.h">
       <Filter>Scripts\Champions\Vayne</Filter>
     </ClInclude>
-    <ClInclude Include="notification.h">
-      <Filter>Menu\New New Menu\Notification</Filter>
-    </ClInclude>
     <ClInclude Include="imgui_freetype.h">
       <Filter>IMGui</Filter>
     </ClInclude>
@@ -429,7 +456,7 @@
       <Filter>IMGui</Filter>
     </ClInclude>
     <ClInclude Include="Colorpicker.h">
-      <Filter>Menu\New Menu\Components\ColorPicker</Filter>
+      <Filter>Rendering\Menu\Components\ColorPicker</Filter>
     </ClInclude>
     <ClInclude Include="imgui_notify.h">
       <Filter>IMGui</Filter>
@@ -450,16 +477,121 @@
     <ClInclude Include="Kaisa.h">
       <Filter>Scripts\Champions\Kaisa</Filter>
     </ClInclude>
+    <ClInclude Include="decompress.h">
+      <Filter>Rendering\CompressedImages</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>Rendering\CompressedImages</Filter>
+    </ClInclude>
+    <ClInclude Include="Icons.h">
+      <Filter>Rendering\CompressedImages</Filter>
+    </ClInclude>
+    <ClInclude Include="Syscaller.h">
+      <Filter>Main\Bypass</Filter>
+    </ClInclude>
+    <ClInclude Include="Kernel.h">
+      <Filter>Main\Bypass</Filter>
+    </ClInclude>
+    <ClInclude Include="DecryptMemoryPages.h">
+      <Filter>Main\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="FindHiddenModule.h">
+      <Filter>Main\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuSettings.h">
+      <Filter>Rendering\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="NewMenu.h">
+      <Filter>Rendering\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="UltimateHooks.h">
+      <Filter>Main\OldBypass\UltimateHooks</Filter>
+    </ClInclude>
+    <ClInclude Include="makesyscall.h">
+      <Filter>Main\OldBypass\UltimateHooks</Filter>
+    </ClInclude>
+    <ClInclude Include="OnProcessSpellCast.h">
+      <Filter>Hooks\VMTHook</Filter>
+    </ClInclude>
+    <ClInclude Include="Cooldowns.h">
+      <Filter>Scripts\Utilities\Awarenesss\HPBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Experience.h">
+      <Filter>Scripts\Utilities\Awarenesss\HPBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Awarenesss.h">
+      <Filter>Scripts\Utilities\Awarenesss</Filter>
+    </ClInclude>
+    <ClInclude Include="Path.h">
+      <Filter>Scripts\Utilities\Awarenesss\Path</Filter>
+    </ClInclude>
+    <ClInclude Include="LastPosition.h">
+      <Filter>Scripts\Utilities\Awarenesss\LastPosition</Filter>
+    </ClInclude>
+    <ClInclude Include="LastHitDamage.h">
+      <Filter>Scripts\Utilities\Awarenesss\LastHitDamage</Filter>
+    </ClInclude>
+    <ClInclude Include="Sidebar.h">
+      <Filter>Scripts\Utilities\Awarenesss\Sidebar</Filter>
+    </ClInclude>
+    <ClInclude Include="Objectmanager.h">
+      <Filter>Global\ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectTypeHolder.h">
+      <Filter>Global\ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackableUnit.h">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Hero.h">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Turret.h">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellBook.h">
+      <Filter>Global\SpellBook</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellCast.h">
+      <Filter>Global\SpellCast</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellSlot.h">
+      <Filter>Global\SpellBook</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetingClient.h">
+      <Filter>Global\SpellBook</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellData.h">
+      <Filter>Global\SpellData</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellInfo.h">
+      <Filter>Global\SpellInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="Pointer.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterData.h">
+      <Filter>Global\ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Twitch.h">
+      <Filter>Scripts\Champions\Twitch</Filter>
+    </ClInclude>
+    <ClInclude Include="Jinx.h">
+      <Filter>Scripts\Champions\Jinx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
       <Filter>Global</Filter>
     </ClCompile>
-    <ClCompile Include="global\settings.cpp">
-      <Filter>Global</Filter>
-    </ClCompile>
     <ClCompile Include="mem\mem.cpp">
-      <Filter>Memory</Filter>
+      <Filter>Main\Memory</Filter>
     </ClCompile>
     <ClCompile Include="render\render.cpp">
       <Filter>Rendering</Filter>
@@ -488,9 +620,6 @@
     <ClCompile Include="hooks\hooks.cpp">
       <Filter>Hooks</Filter>
     </ClCompile>
-    <ClCompile Include="menu\menu.cpp">
-      <Filter>Menu</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
       <Filter>IMGui</Filter>
     </ClCompile>
@@ -509,7 +638,7 @@
     <ClCompile Include="imgui\imgui_tables.cpp">
       <Filter>IMGui</Filter>
     </ClCompile>
-    <ClCompile Include="global\functions.cpp">
+    <ClCompile Include="global\Engine.cpp">
       <Filter>Global</Filter>
     </ClCompile>
     <ClCompile Include="classes\classes.cpp">
@@ -528,14 +657,8 @@
     <ClCompile Include="VMTHook.cpp">
       <Filter>Hooks\VMTHook</Filter>
     </ClCompile>
-    <ClCompile Include="NewMenu.cpp">
-      <Filter>Menu\New Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuSettings.cpp">
-      <Filter>Menu\New Menu</Filter>
-    </ClCompile>
     <ClCompile Include="MenuRenderer.cpp">
-      <Filter>Menu\New Menu\Rendering</Filter>
+      <Filter>Rendering\Menu\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Plugins.cpp">
       <Filter>Scripts\utils</Filter>
@@ -561,9 +684,6 @@
     <ClCompile Include="ManagerTemplate.cpp">
       <Filter>Scripts\Utilities\Orbwalker</Filter>
     </ClCompile>
-    <ClCompile Include="EventManager.cpp">
-      <Filter>Hooks\EventManager\Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Eventmanager.h">
       <Filter>Hooks\EventManager\Manager</Filter>
     </ClCompile>
@@ -574,27 +694,27 @@
       <Filter>Hooks\EventManager\Destroy</Filter>
     </ClCompile>
     <ClCompile Include="MenuComponent.cpp">
-      <Filter>Menu\New Menu\Components</Filter>
+      <Filter>Rendering\Menu\Components</Filter>
     </ClCompile>
     <ClCompile Include="Checkbox.cpp">
-      <Filter>Menu\New Menu\Components\Checkbox</Filter>
+      <Filter>Rendering\Menu\Components\Checkbox</Filter>
     </ClCompile>
     <ClCompile Include="Info.cpp">
-      <Filter>Menu\New Menu\Components\Info</Filter>
+      <Filter>Rendering\Menu\Components\Info</Filter>
     </ClCompile>
     <ClCompile Include="KeyBind.cpp">
-      <Filter>Menu\New Menu\Components\KeyBindings</Filter>
+      <Filter>Rendering\Menu\Components\KeyBindings</Filter>
     </ClCompile>
     <ClCompile Include="List.cpp">
-      <Filter>Menu\New Menu\Components\List</Filter>
+      <Filter>Rendering\Menu\Components\List</Filter>
     </ClCompile>
     <ClCompile Include="Slider.cpp">
-      <Filter>Menu\New Menu\Components\Slider</Filter>
+      <Filter>Rendering\Menu\Components\Slider</Filter>
     </ClCompile>
     <ClCompile Include="Rect.cpp">
-      <Filter>Menu\New Menu\Components\Rect</Filter>
+      <Filter>Rendering\Menu\Components\Rect</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\scripts.cpp">
+    <ClCompile Include="scripts\Modules.cpp">
       <Filter>Scripts\SDK</Filter>
     </ClCompile>
     <ClCompile Include="scripts\prediction.cpp">
@@ -630,11 +750,8 @@
     <ClCompile Include="Vayne.cpp">
       <Filter>Scripts\Champions\Vayne</Filter>
     </ClCompile>
-    <ClCompile Include="imgui_settings.h">
-      <Filter>Menu\New New Menu\Notification</Filter>
-    </ClCompile>
     <ClCompile Include="Colorpicker.cpp">
-      <Filter>Menu\New Menu\Components\ColorPicker</Filter>
+      <Filter>Rendering\Menu\Components\ColorPicker</Filter>
     </ClCompile>
     <ClCompile Include="HealthPrediction.cpp">
       <Filter>Scripts\Utilities\Damage Calculator</Filter>
@@ -648,13 +765,91 @@
     <ClCompile Include="Kaisa.cpp">
       <Filter>Scripts\Champions\Kaisa</Filter>
     </ClCompile>
+    <ClCompile Include="Syscaller.cpp">
+      <Filter>Main\Bypass</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuSettings.cpp">
+      <Filter>Rendering\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="NewMenu.cpp">
+      <Filter>Rendering\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="UltimateHooks.cpp">
+      <Filter>Main\OldBypass\UltimateHooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Cooldowns.cpp">
+      <Filter>Scripts\Utilities\Awarenesss\HPBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Experience.cpp">
+      <Filter>Scripts\Utilities\Awarenesss\HPBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Awarenesss.cpp">
+      <Filter>Scripts\Utilities\Awarenesss</Filter>
+    </ClCompile>
+    <ClCompile Include="Path.cpp">
+      <Filter>Scripts\Utilities\Awarenesss\Path</Filter>
+    </ClCompile>
+    <ClCompile Include="LastPosition.cpp">
+      <Filter>Scripts\Utilities\Awarenesss\LastPosition</Filter>
+    </ClCompile>
+    <ClCompile Include="LastHitDamage.cpp">
+      <Filter>Scripts\Utilities\Awarenesss\LastHitDamage</Filter>
+    </ClCompile>
+    <ClCompile Include="Sidebar.cpp">
+      <Filter>Scripts\Utilities\Awarenesss\Sidebar</Filter>
+    </ClCompile>
+    <ClCompile Include="Objectmanager.cpp">
+      <Filter>Global\ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="AttackableUnit.cpp">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Hero.cpp">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Turret.cpp">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellBook.cpp">
+      <Filter>Global\SpellBook</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellCast.cpp">
+      <Filter>Global\SpellCast</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellSlot.cpp">
+      <Filter>Global\SpellBook</Filter>
+    </ClCompile>
+    <ClCompile Include="TargetingClient.cpp">
+      <Filter>Global\SpellBook</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellData.cpp">
+      <Filter>Global\SpellData</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellInfo.cpp">
+      <Filter>Global\SpellInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="Pointer.cpp">
+      <Filter>Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Global\ObjectManager\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Twitch.cpp">
+      <Filter>Scripts\Champions\Twitch</Filter>
+    </ClCompile>
+    <ClCompile Include="Jinx.cpp">
+      <Filter>Scripts\Champions\Jinx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="mem\spoofer.asm">
-      <Filter>Memory</Filter>
+      <Filter>Main\Memory</Filter>
     </MASM>
   </ItemGroup>
   <ItemGroup>

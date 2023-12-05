@@ -69,13 +69,7 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-
-    void OnPopuplateMenu()
-    {
-
-    }
-
-    void Init()
+    void Initialize() override
     {
 
         const auto EzrealMenu = Menu::CreateMenu("vezEzreal", "vez.Ezreal");
@@ -286,10 +280,10 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < qRange() && isTimeToCastQ())
         {
-            scripts::prediction::PredictionOutput qPrediction;
-            if (scripts::prediction::GetPrediction(globals::localPlayer, pEnemy, database.EzrealQ, qPrediction))
+            Modules::prediction::PredictionOutput qPrediction;
+            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealQ, qPrediction))
             {
-                functions::CastSpell(SpellIndex::Q, qPrediction.position);
+                Engine::CastSpell(SpellIndex::Q, qPrediction.position);
                 QCastedTime = gameTime;
             }
         }
@@ -302,10 +296,10 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < wRange() && isTimeToCastW())
         {
-            scripts::prediction::PredictionOutput wPrediction;
-            if (scripts::prediction::GetPrediction(globals::localPlayer, pEnemy, database.EzrealW, wPrediction))
+            Modules::prediction::PredictionOutput wPrediction;
+            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealW, wPrediction))
             {
-                functions::CastSpell(SpellIndex::W, wPrediction.position);
+                Engine::CastSpell(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -318,7 +312,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < eRange() && isTimeToCastE())
         {
-            functions::CastSpell(SpellIndex::E, functions::GetMouseWorldPos());
+            Engine::CastSpell(SpellIndex::E, Engine::GetMouseWorldPos());
             ECastedTime = gameTime;
         }
     }
@@ -330,23 +324,22 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < rRange() && isTimeToCastR())
         {
-            scripts::prediction::PredictionOutput rPrediction;
-            if (scripts::prediction::GetPrediction(globals::localPlayer, pEnemy, database.EzrealR, rPrediction))
+            Modules::prediction::PredictionOutput rPrediction;
+            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealR, rPrediction))
             {
-                functions::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastSpell(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
             }
         }
     }
 
-    void Update()
+    void Update() override
     {
-        gameTime = functions::GetGameTime();
+        gameTime = Engine::GetGameTime();
 
         Killsteal();
         AntiGapCloser();
         AntiMelee();
-
         if (EzrealConfig::EzrealSpellsSettings::rTapKey->Value == true && database.EzrealR.IsCastable())
         {
             switch (EzrealConfig::EzrealSpellsSettings::targetMode->Value)
@@ -356,7 +349,7 @@ public:
                     Ezreal_UseR(rTarget);
                 break;
             case 1: //NearMouse
-                if (const auto rTarget2 = TargetSelector::Functions::GetEnemyChampionInRange(functions::GetMouseWorldPos(), 300.0f))
+                if (const auto rTarget2 = TargetSelector::Functions::GetEnemyChampionInRange(Engine::GetMouseWorldPos(), 300.0f))
                     Ezreal_UseR(rTarget2);
                 break;
             case 2: //NearChampion
@@ -366,15 +359,9 @@ public:
             }
         }
 
-        //LOG("%d", globals::localPlayer->GetSpellBySlotId(0)->GetManaCost());
-        /*InventorySlot* item3 = globals::localPlayer->GetHeroInventory()->FindItemID(6671);
-        if (item3 != nullptr)
-        {
-            LOG(" ", item3->GetId());
-        }*/
     }
 
-    void Attack()
+    void Combo() override
     {
         if (EzrealConfig::EzrealCombo::UseR->Value == true && database.EzrealR.IsCastable() && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), EzrealConfig::EzrealSpellsSettings::minRDistance->Value).size() >= EzrealConfig::EzrealCombo::enemiesInRange->Value)
         {
@@ -395,7 +382,7 @@ public:
         }
     }
 
-    void Clear()
+    void Clear() override
     {
         //Laneclear
         if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() > 0)
@@ -432,7 +419,7 @@ public:
     }
 
 
-    void Harass()
+    void Harass() override
     {
         if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealHarass::minMana->Value))
             return;
@@ -450,7 +437,7 @@ public:
         }
     }
 
-    void Lasthit()
+    void Lasthit() override
     {
         if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealLastHit::minMana->Value))
             return;
@@ -463,14 +450,14 @@ public:
         }
     }
 
-    void Flee()
+    void Flee() override
     {
         if (EzrealConfig::EzrealFlee::UseE->Value == true && database.EzrealE.IsCastable())
         {
-            const Vector3 pathEnd = functions::GetMouseWorldPos();
+            const Vector3 pathEnd = Engine::GetMouseWorldPos();
             if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f) && isTimeToCastE())
             {
-                functions::CastSpell(SpellIndex::E, functions::GetMouseWorldPos());
+                Engine::CastSpell(SpellIndex::E, Engine::GetMouseWorldPos());
                 ECastedTime = gameTime;
             }
         }
@@ -508,11 +495,11 @@ public:
 
     void AntiGapCloser()
     {
-        if (EzrealConfig::EzrealAntiGapCloser::UseE->Value == true && functions::GetSpellState(SpellIndex::E) == 0)
+        if (EzrealConfig::EzrealAntiGapCloser::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
             for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 750.0f))
             {
-                if (!functions::MenuItemContains(EzrealConfig::EzrealAntiGapCloser::whitelist, target->GetName().c_str())) continue;
+                if (!Engine::MenuItemContains(EzrealConfig::EzrealAntiGapCloser::whitelist, target->GetName().c_str())) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
 
@@ -528,17 +515,17 @@ public:
         }
     }
 
-    void AntiMelee()
+    void AntiMelee() 
     {
-        if (EzrealConfig::EzrealAntiMelee::UseE->Value == true && functions::GetSpellState(SpellIndex::E) == 0)
+        if (EzrealConfig::EzrealAntiMelee::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
             for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 750.0f))
             {
-                if (!functions::MenuItemContains(EzrealConfig::EzrealAntiMelee::whitelist, target->GetName().c_str())) continue;
+                if (!Engine::MenuItemContains(EzrealConfig::EzrealAntiMelee::whitelist, target->GetName().c_str())) continue;
 
                 if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetAttackRange()))
                 {
-                    const Vector3 pathEnd = functions::GetMouseWorldPos();
+                    const Vector3 pathEnd = Engine::GetMouseWorldPos();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f))
                     {
                         Ezreal_UseE(target);
@@ -549,13 +536,21 @@ public:
     }
 
     //Events
-    void OnBeforeAttack()
+    void OnCreateMissile() override {
+        return;
+    }
+
+    void OnDeleteMissile() override {
+        return;
+    }
+
+    void OnBeforeAttack() override
     {
         __try {
             //Combo mode
             if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Attack)
             {
-                const auto object = functions::GetSelectedObject();
+                const auto object = Engine::GetSelectedObject();
                 if (object != nullptr && object->IsHero())
                 {
                     if (EzrealConfig::EzrealCombo::UseW->Value == true && database.EzrealW.IsCastable() && EzrealConfig::EzrealSpellsSettings::wCastMode->Value == 1)
@@ -572,7 +567,7 @@ public:
             //Laneclear mode
             if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Clear)
             {
-                const auto object = functions::GetSelectedObject();
+                const auto object = Engine::GetSelectedObject();
                 if (object != nullptr && object->IsBuilding())
                 {
                     if (EzrealConfig::EzrealClear::UseW->Value == true && database.EzrealW.IsCastable() && Ezreal_HasEnoughMana(EzrealConfig::EzrealClear::minMana->Value))
@@ -584,7 +579,7 @@ public:
             //Harass mode
             if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Harass)
             {
-                const auto object = functions::GetSelectedObject();
+                const auto object = Engine::GetSelectedObject();
                 if (object != nullptr && object->IsHero())
                 {
                     if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealHarass::minMana->Value))
@@ -609,12 +604,11 @@ public:
         }
     }
 
-    void OnCastSpell()
-    {
-
+    void OnAfterAttack() override {
+        return;
     }
 
-    void Render()
+    void Render() override
     {
         __try {
             if (EzrealConfig::EzrealSpellsSettings::DrawQ->Value == true && (EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == true && database.EzrealQ.IsCastable() || EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == false))

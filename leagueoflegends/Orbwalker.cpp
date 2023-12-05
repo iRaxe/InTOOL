@@ -86,7 +86,6 @@ namespace UPasta
 						initializedKeyBindingsMenu = true;
 					}
 				}
-
 			}
 
 			namespace Functions
@@ -113,6 +112,8 @@ namespace UPasta
 						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Attack;
 					if (Configs::KeyBindings::laneClearKey->Value && Configs::Status::statusLaneClearMode->Value)
 						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Clear;
+					if (Configs::KeyBindings::fastClearKey->Value && Configs::Status::statusFastClearMode->Value)
+						globals::scripts::orbwalker::orbwalkState = OrbwalkState::FastClear;
 					if (Configs::KeyBindings::harassKey->Value && Configs::Status::statusHarassMode->Value)
 						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Harass;
 					if (Configs::KeyBindings::lastHitKey->Value && Configs::Status::statusLastHitMode->Value)
@@ -124,7 +125,7 @@ namespace UPasta
 
 				void Update()
 				{
-					gameTime = functions::GetGameTime();
+					gameTime = Engine::GetGameTime();
 					__try { KeyChecks(); }
 					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> KEYCHECKS UPDATE"); }
 					__try { CheckActiveAttack(); }
@@ -137,7 +138,7 @@ namespace UPasta
 
 					/*if (Configs::KeyBindings::comboKey->Value)
 					{
-						Vector2 screenPos = functions::WorldToScreen(globals::localPlayer->GetPosition());
+						Vector2 screenPos = Engine::WorldToScreen(globals::localPlayer->GetPosition());
 
 						render::RenderText("test", (screenPos - Vector2(0.0f, 0.0f)).ToImVec(), 18.0f, COLOR_WHITE, true);
 					}*/
@@ -164,6 +165,10 @@ namespace UPasta
 						__try { States::Laneclear(); }
 						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> LANECLEAR UPDATE"); }
 						break;
+					case FastClear:
+						__try { States::Fastclear(); }
+						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> FASTCLEAR UPDATE"); }
+						break;
 					case Harass:
 						__try { States::Harass(); }
 						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> HARASS UPDATE"); }
@@ -186,7 +191,7 @@ namespace UPasta
 					if (spellCast != nullptr)
 					{
 						if ((spellCast->IsAutoAttack() ||
-							functions::IsAttackWindupSpell(spellCast->GetSpellId())) &&
+							Engine::IsAttackWindupSpell(spellCast->GetSpellId())) &&
 							(QWORD)spellCast != lastSpellCastAddress)
 						{
 							lastAttackTime = gameTime;
@@ -198,7 +203,7 @@ namespace UPasta
 
 				void StopOrbwalkCheck()
 				{
-					if (!functions::CanSendInput()
+					if (!Engine::CanSendInput()
 						|| gameTime < lastAttackTime + globals::localPlayer->GetAttackWindup() + (Configs::Humanizer::windupDelay->Value / 1000.0f))
 						shouldWait = true;
 					else
@@ -326,7 +331,7 @@ namespace UPasta
 							if (spellCast && spellCast->GetSpellInfo()->GetSpellData()->GetName() == "XerathLocusOfPower2")
 								return;
 
-							functions::MoveToMousePos();
+							Engine::MoveToMousePos();
 						}
 
 						RefreshBuffer();
@@ -337,7 +342,7 @@ namespace UPasta
 						if (!CanDoAction())
 							return;
 
-						functions::AttackObject(obj->GetPosition());
+						Engine::AttackObject(obj->GetPosition());
 						RefreshBuffer();
 					}
 
@@ -346,7 +351,7 @@ namespace UPasta
 						if (!CanDoAction())
 							return;
 
-						functions::AttackObject(obj->GetPosition());
+						Engine::AttackObject(obj->GetPosition());
 						RefreshBuffer();
 					}
 
@@ -362,7 +367,7 @@ namespace UPasta
 					{
 						/*if (!CanDoAction())
 							return;*/
-						functions::CastSpell(spellId, pos);
+						Engine::CastSpell(spellId, pos);
 						RefreshBuffer();
 					}
 				}
@@ -468,16 +473,48 @@ namespace UPasta
 						Actions::Idle();
 					}
 
+					void Fastclear()
+					{
+						if (globals::localPlayer->CanAttack())
+						{
+							const auto jungleMonster = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange());
+							if (jungleMonster != nullptr)
+								Actions::AttackObject(jungleMonster);
+
+							const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetRealAttackRange());
+							if (turret != nullptr)
+								Actions::AttackObject(turret);
+
+							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
+							if (minion != nullptr )
+								Actions::AttackObject(minion);
+						}
+
+						Actions::Idle();
+					}
+
 					void Harass()
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							for (auto killableMinion : TargetSelector::Functions::GetKillableMinionsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange(), Physical))
-								Actions::AttackObject(killableMinion);
-
-							const auto obj = UPasta::SDK::TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
-							if (obj != nullptr)
-								Actions::AttackObject(obj);
+							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
+							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
+							{
+								if (Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->GetHealth())
+									Actions::AttackObject(minion);
+								else
+								{
+									const auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
+									if (obj != nullptr)
+										Actions::AttackObject(obj);
+								}
+							}
+							else
+							{
+								const auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
+								if (obj != nullptr)
+									Actions::AttackObject(obj);
+							}
 						}
 
 						Actions::Idle();
@@ -487,9 +524,12 @@ namespace UPasta
 					{
 						if (globals::localPlayer->CanAttack())
 						{
-							const auto minion = TargetSelector::Functions::GetKillableEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
+							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
 							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
-								Actions::AttackObject(minion);
+							{
+								if (Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->GetHealth())
+									Actions::AttackObject(minion);
+							}
 						}
 
 						Actions::Idle();

@@ -46,7 +46,7 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-    void Init() override
+    void Initialize() override
     {
         const auto NautilusMenu = Menu::CreateMenu("vezNautilus", "vez.Nautilus");
 
@@ -215,13 +215,13 @@ public:
 
         if (pEnemy && gameTime > QCastedTime + database.NautilusQ.GetCastTime())
         {
-            if (functions::MenuItemContains(NautilusConfig::q_whitelist, pEnemy->GetName().c_str()))
+            if (Engine::MenuItemContains(NautilusConfig::q_whitelist, pEnemy->GetName().c_str()))
             {
-                prediction::PredictionOutput qPrediction;
+                Modules::prediction::PredictionOutput qPrediction;
 
                 if (GetPrediction(database.NautilusQ, qPrediction))
                 {
-                    functions::CastSpell(SpellIndex::Q, qPrediction.position);
+                    Engine::CastSpell(SpellIndex::Q, qPrediction.position);
                     QCastedTime = gameTime;
                 }
             }
@@ -235,7 +235,7 @@ public:
 
         if (pEnemy && gameTime > WCastedTime + database.NautilusW.GetCastTime())
         {
-        	functions::CastSpell(SpellIndex::W);
+        	Engine::CastSpell(SpellIndex::W);
             WCastedTime = gameTime;
         }
     }
@@ -247,7 +247,7 @@ public:
 
         if (pEnemy && gameTime > ECastedTime + database.NautilusE.GetCastTime())
         {
-            functions::CastSpell(SpellIndex::E);
+            Engine::CastSpell(SpellIndex::E);
             ECastedTime = gameTime;
         }
     }
@@ -259,9 +259,9 @@ public:
 
         if (pEnemy && gameTime > RCastedTime + database.NautilusR.GetCastTime())
         {
-            if (functions::MenuItemContains(NautilusConfig::r_whitelist, pEnemy->GetName().c_str()))
+            if (Engine::MenuItemContains(NautilusConfig::r_whitelist, pEnemy->GetName().c_str()))
             {
-                functions::CastSpell(SpellIndex::R, pEnemy);
+                Engine::CastSpell(SpellIndex::R, pEnemy);
                 RCastedTime = gameTime;
             }
         }
@@ -269,13 +269,13 @@ public:
 
     void Update() override
     {
-        gameTime = functions::GetGameTime();
+        gameTime = Engine::GetGameTime();
 
         Killsteal();
         AntiGapCloser();
     }
 
-    void Attack() override
+    void Combo() override
     {
         if (NautilusConfig::NautilusCombo::engageModeKey->Value == true)
         {
@@ -355,7 +355,7 @@ public:
 	        const auto qMonster = TargetSelector::Functions::GetJungleInRange(database.NautilusQ.GetRange());
             if (qMonster && gameTime > QCastedTime + database.NautilusQ.GetCastTime())
             {
-                functions::CastSpell(SpellIndex::Q, qMonster->GetPosition());
+                Engine::CastSpell(SpellIndex::Q, qMonster->GetPosition());
                 QCastedTime = gameTime;
             }
         }
@@ -391,20 +391,19 @@ public:
         }
     }
 
-    void Lasthit() override
-    {
-
+    void Lasthit() override {
+        return;
     }
 
     void Flee() override
     {
         if (NautilusConfig::NautilusFlee::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-	        if (const auto mousePos = functions::GetMouseWorldPos(); 
-                functions::IsWall(mousePos) 
+	        if (const auto mousePos = Engine::GetMouseWorldPos(); 
+                Engine::IsWall(mousePos) 
                 && mousePos.Distance(globals::localPlayer->GetPosition()) <= database.NautilusQ.GetRange())
 	        {
-                functions::CastSpell(SpellIndex::Q, functions::GetMouseWorldPos());
+                Engine::CastSpell(SpellIndex::Q, Engine::GetMouseWorldPos());
                 QCastedTime = gameTime;
 	        }
         }
@@ -461,21 +460,27 @@ public:
     }
 
     //Events
-    void OnBeforeAttack() override
-    {
-
+    void OnCreateMissile() override {
+        return;
     }
 
-    void OnCastSpell() override
-    {
+    void OnDeleteMissile() override {
+        return;
+    }
 
+    void OnBeforeAttack() override {
+        return;
+    }
+
+    void OnAfterAttack() override {
+        return;
     }
 
     void Render() override
     {
         if (NautilusConfig::NautilusCombo::engageModeKey->Value == true)
         {
-            Vector2 screenPos = functions::WorldToScreen(globals::localPlayer->GetPosition());
+            Vector2 screenPos = Engine::WorldToScreen(globals::localPlayer->GetPosition());
             render::RenderText("Engage Mode: ON", screenPos.ToImVec(), 18.0f, COLOR_RED, true);
         }
 

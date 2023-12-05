@@ -1,11 +1,11 @@
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 
-namespace scripts::prediction
+namespace Modules::prediction
 {
 	bool CheckCollision(Vector3 sourcePos, Vector3 targetPos, Object* sourceObject, Object* targetObject, Skillshot &skillshot)
 	{
-		if (skillshot.IsCollidableWith(CollidableObjects::Objects) && IsAnyObjectInWay(sourcePos, targetPos, sourceObject, targetObject, skillshot.GetRadius()))
+		if (skillshot.IsCollidableWith(CollidableObjects::Objects) && Modules::prediction::IsAnyObjectInWay(sourcePos, targetPos, sourceObject, targetObject, skillshot.GetRadius()))
 			return false;
 		return true;
 	}
@@ -98,7 +98,7 @@ namespace scripts::prediction
 		return waypoints.front();
 	}
 
-	bool GetPrediction(Skillshot& skillshot, PredictionOutput &out)
+	bool GetPrediction(Skillshot& skillshot, Modules::prediction::PredictionOutput &out)
 	{
 
 		auto target = UPasta::SDK::TargetSelector::Functions::GetEnemyChampionInRange(skillshot.GetMaxRange(), skillshot);
@@ -108,7 +108,7 @@ namespace scripts::prediction
 		return GetPrediction(globals::localPlayer, target, skillshot, out);
 	}
 
-	bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot &skillshot, PredictionOutput& out)
+	bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot &skillshot, Modules::prediction::PredictionOutput& out)
 	{
 		const auto sourcePos = sourceObj->GetServerPosition();
 		const auto targetAiManager = targetObj->GetAiManager();

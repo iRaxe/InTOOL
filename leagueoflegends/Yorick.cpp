@@ -52,7 +52,7 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-    void Init() override
+    void Initialize() override
     {
         const auto YorickMenu = Menu::CreateMenu("vezYorick", "vez.Yorick");
 
@@ -183,7 +183,7 @@ public:
 
         if (pEnemy && isTimeToCastQ())
         {
-            functions::CastSpell(SpellIndex::Q);
+            Engine::CastSpell(SpellIndex::Q);
             QCastedTime = gameTime;
         }
     }
@@ -197,16 +197,16 @@ public:
         {
             if (pEnemy->IsHero())
             {
-                prediction::PredictionOutput wPrediction;
+                Modules::prediction::PredictionOutput wPrediction;
                 if (GetPrediction(database.YorickW, wPrediction))
                 {
-                    functions::CastSpell(SpellIndex::W, wPrediction.position);
+                    Engine::CastSpell(SpellIndex::W, wPrediction.position);
                     WCastedTime = gameTime;
                 }
             }
             else
             {
-                functions::CastSpell(SpellIndex::W, pEnemy->GetPosition());
+                Engine::CastSpell(SpellIndex::W, pEnemy->GetPosition());
                 WCastedTime = gameTime;
             }
 
@@ -222,16 +222,16 @@ public:
         {
             if (pEnemy->IsHero())
             {
-                prediction::PredictionOutput ePrediction;
+                Modules::prediction::PredictionOutput ePrediction;
                 if (GetPrediction(database.YorickE, ePrediction))
                 {
-                    functions::CastSpell(SpellIndex::E, ePrediction.position);
+                    Engine::CastSpell(SpellIndex::E, ePrediction.position);
                     ECastedTime = gameTime;
                 }
             }
             else
             {
-                functions::CastSpell(SpellIndex::E, pEnemy->GetPosition());
+                Engine::CastSpell(SpellIndex::E, pEnemy->GetPosition());
                 ECastedTime = gameTime;
             }
         }
@@ -244,10 +244,10 @@ public:
 
         if (pEnemy && isTimeToCastR())
         {
-            prediction::PredictionOutput rPrediction;
+            Modules::prediction::PredictionOutput rPrediction;
             if (GetPrediction(database.YorickR, rPrediction))
             {
-                functions::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastSpell(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
             }
         }
@@ -255,13 +255,13 @@ public:
 
     void Update() override
     {
-        gameTime = functions::GetGameTime();
+        gameTime = Engine::GetGameTime();
 
         Killsteal();
         AntiGapCloser();
     }
 
-    void Attack() override
+    void Combo() override
     {
         if (database.YorickR.IsCastable() && YorickConfig::YorickCombo::UseR->Value == true)
         {
@@ -410,7 +410,7 @@ public:
         {
             for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), database.YorickW.GetRange()))
             {
-                if (!functions::MenuItemContains(YorickConfig::YorickAntiGapCloser::whitelist, target->GetName().c_str())) continue;
+                if (!Engine::MenuItemContains(YorickConfig::YorickAntiGapCloser::whitelist, target->GetName().c_str())) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
 
@@ -427,14 +427,20 @@ public:
     }
 
     //Events
-    void OnBeforeAttack() override
-    {
-
+    void OnCreateMissile() override {
+        return;
     }
 
-    void OnCastSpell() override
-    {
+    void OnDeleteMissile() override {
+        return;
+    }
 
+    void OnBeforeAttack() override {
+        return;
+    }
+
+    void OnAfterAttack() override {
+        return;
     }
 
     void Render() override

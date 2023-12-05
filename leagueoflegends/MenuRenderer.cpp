@@ -73,7 +73,7 @@ namespace UPasta
 			position.x = position.x + ImCos(angle) * radius;
 			position.z = position.z + ImSin(angle) * radius;
 			
-			functions::WorldToScreen(position);
+			Engine::WorldToScreen(position);
 
 			window->DrawList->_Path.push_back(*(ImVec2*)&pos);
 		}
@@ -95,7 +95,7 @@ namespace UPasta
 		float g = (float)((color >> 8) & 0xff);
 		float b = (float)((color) & 0xff);
 
-		window->DrawList->AddCircleFilled(functions::WorldToScreen(position).ToImVec(), radius, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), 100);
+		window->DrawList->AddCircleFilled(Engine::WorldToScreen(position).ToImVec(), radius, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), 100);
 	}
 
 	void Renderer::AddLine(Vector2 line1, Vector2 line2, float thickness, uintptr_t color)

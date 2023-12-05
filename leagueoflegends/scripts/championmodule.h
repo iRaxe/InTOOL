@@ -6,17 +6,19 @@ class ChampionModule
 {
 public:
 	virtual ~ChampionModule() {}
-	virtual void Init() = 0;
+	virtual void Initialize() = 0;
 	virtual void Update() = 0;
-	virtual void Attack() = 0;
+	virtual void Combo() = 0;
 	virtual void Clear() = 0;
 	virtual void Harass() = 0;
 	virtual void Lasthit() = 0;
 	virtual void Flee() = 0;
 
 	virtual void OnBeforeAttack() = 0;
-	virtual void OnCastSpell() = 0;
+	virtual void OnAfterAttack() = 0;
 
+	virtual void OnCreateMissile() = 0;
+	virtual void OnDeleteMissile() = 0;
 
 	virtual void Render() = 0;
 

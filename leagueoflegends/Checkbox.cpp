@@ -3,8 +3,6 @@
 #include "NewMenu.h"
 #include "MenuSettings.h"
 #include "MenuRenderer.h"
-#include "notification.h"
-#include "Vayne.h"
 
 namespace UPasta
 {
@@ -80,13 +78,13 @@ namespace UPasta
 			Renderer::AddRoundedRectangleFilled(box, this->Value ? IM_COL32(160, 0, 0, 255) : IM_COL32(37, 37, 37, 255), 100);
 			Renderer::AddRoundedRectangle(box, IM_COL32(0, 0, 0, 255), 1, 100);
 			Renderer::AddCircleFilled(Vector2(box.Position.x + (this->Value ? 24 : 9), box.Position.y + 8.5), 6, IM_COL32(255, 255, 255, MenuSettings::BackgroundOpacity));
-			Checkbox(this->DisplayName, &this->Value, ImVec2(rect.Position.x + 9, rect.Position.y + 6));
+			ImGui::Checkbox(this->DisplayName, &this->Value, ImVec2(rect.Position.x + 9, rect.Position.y + 6));
 
 			//TODO
 			if (this->Tooltip[0] != 0)
 			{
 				auto textWidth = 10.0f + render::imFont->CalcTextSizeA(14, FLT_MAX, 0.0f, this->DisplayName).x;
-				auto mousePos = functions::GetMousePos();
+				auto mousePos = Engine::GetMousePos();
 				auto iconRect = Rect(rect.Position.x + textWidth + 5, rect.Position.y + Height * 0.5f - 10.0f, 20, 20);
 				Renderer::AddText("(?)", 16.0f, iconRect, DT_VCENTER, IM_COL32(255, 30, 30, 255));
 

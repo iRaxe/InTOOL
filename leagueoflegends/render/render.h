@@ -23,20 +23,24 @@ namespace render
 	bool IsVector3Null(Vector3 vec);
 	bool IsOnScreen(Vector2 pos);
 
+	void* CreateTexture(void* data, int size, bool compressed);
+	void FreeTexture(void* data);
+
 	void RenderText(const std::string& text, const ImVec2& position, float size, uint32_t color, bool center);
 	void RenderLine(const ImVec2& from, const ImVec2& to, uint32_t color, float thickness);
-	void RenderCircle(const ImVec2& position, float radius, uint32_t color, float thickness, uint32_t segments);
-	void RenderCircleFilled(const ImVec2& position, float radius, uint32_t color, uint32_t segments);
-	void RenderRect(const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags, float thickness);
-	void RenderRectFilled(const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags);
-	void RenderImage(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color);
-	void RenderImageHFlip(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color);
-	void RenderImageRounded(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags);
-	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height = false, bool glow = false);
-	void RenderWardRange(const Vector3& position, const ImColor& color, const float& range = 1100.f, bool brushes = true);
-	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls);
-	void RenderPolygon(const Geometry::Polygon& poly, const uintptr_t color, float thickness);
-	void RenderFilledPolygon(const Geometry::Polygon& poly, uintptr_t color);
+	void RenderCircle(const ImVec2& position, float radius, uint32_t color, float thickness, uint32_t segments, bool filled = false);
+	void RenderRect(const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags, float thickness, bool filled = false);
+	void RenderImage(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color, bool flipped = false, bool rounded = false, float rounding = 0.0f, ImDrawFlags_ roundingCornersFlags = ImDrawFlags_RoundCornersAll);
+
+	void RenderTextWorld(const std::string& text, const Vector3& position, float size, uint32_t color, bool center);
+	void RenderLineWorld(const Vector3& from, const Vector3& to, uint32_t color, float thickness);
+	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uint32_t color, float thickness, bool height = false, bool glow = false, bool filled = false, uint32_t fillColor = 0, float transparency = 1);
+	void RenderPolygonWorld(const Geometry::Polygon& poly, uint32_t color, float thickness, bool filled = false, uint32_t fillColor = 0);
+	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uint32_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls);
+
+	void RenderWardRange(const Vector3& position, uint32_t color, const float& range = 1100.f, bool brushes = true);
+
+	void Texture2D(void* texture, const ImVec2& from, const ImVec2& to, bool rounded = false, float rounding = 4.0f);
 	float AngleBetween3point(const Vector3& vec_3d, const Vector3& pos_ext, const Vector3& current_pos);
 	void DrawArc(const Vector3& worldPos, float radius, float thickness, const uintptr_t color, int numSegments, float startAngle, float endAngle);
 	void initAngles();
@@ -45,29 +49,4 @@ namespace render
 	void Init();
 	void Update();
 
-	namespace scriptsrender
-	{
-		void Update();
-
-		namespace drawings
-		{
-			void Init();
-			void DrawCooldownBar(Object* obj);
-			void DrawEnemyListNames();
-			void DrawBuffNames(Object* obj);
-
-			void Update();
-			
-		}
-
-		namespace debug
-		{
-			void DrawData(Object* obj, int index);
-			void DrawObjectData();
-			void DrawObjectBoundingRadius();
-			void DrawCursorWorld();
-			void DrawPlayerPaths();
-			void Update();
-		}
-	}
 }

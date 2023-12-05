@@ -552,7 +552,7 @@ namespace UPasta
 					if (Configs::TSModes::Combo::Advanced::attackOnlySelectedTarget->Value
 						&& Configs::TSModes::Combo::Advanced::attackSelectedTarget->Value)
 					{
-						Object* selectedObject = functions::GetSelectedObject();
+						Object* selectedObject = Engine::GetSelectedObject();
 						if (selectedObject && selectedObject->IsValidTarget())
 							return selectedObject;
 					}
@@ -727,7 +727,7 @@ namespace UPasta
 							if (Configs::TSModes::Combo::Advanced::avoidAttackInvulnerable->Value == true && target->IsInvulnerable())
 								continue;
 
-							auto distance = functions::GetMouseWorldPos().Distance(target->GetPosition());
+							auto distance = Engine::GetMouseWorldPos().Distance(target->GetPosition());
 							if (distance < closest)
 							{
 								hero = target;
@@ -742,7 +742,7 @@ namespace UPasta
 				
 				Object* Functions::GetEnemyChampionInRange(float range, int damageType, Skillshot skillshot)
 				{
-					Object* selectedObject = functions::GetSelectedObject();
+					Object* selectedObject = Engine::GetSelectedObject();
 					Object* best = nullptr;
 					for (Object* obj : *globals::heroManager)
 					{
@@ -750,7 +750,7 @@ namespace UPasta
 
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
 
-						scripts::prediction::PredictionOutput prediction;
+						Modules::prediction::PredictionOutput prediction;
 						if (skillshot.GetType() != SkillshotNone && !GetPrediction(globals::localPlayer, obj, skillshot, prediction)) continue;
 
 						if (ChooseSelectedObject(selectedObject, obj)) return obj;
@@ -796,7 +796,7 @@ namespace UPasta
 					for (Object* obj : *globals::attackableManager)
 					{
 						if (!obj->IsValidTarget()) continue;
-						if (!functions::GetCollisionFlags(obj->GetPosition()) & CollisionFlags::Building) continue;
+						if (!Engine::GetCollisionFlags(obj->GetPosition()) & CollisionFlags::Building) continue;
 						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
 						if (obj->GetMaxHealth() != 5500) continue;
 						
@@ -817,7 +817,34 @@ namespace UPasta
 					for (Object* obj : *globals::inhibitorsManager)
 					{
 						if (!obj->IsValidTarget()) continue;
-						if (!functions::GetCollisionFlags(obj->GetPosition()) & CollisionFlags::Building) continue;
+						if (!Engine::GetCollisionFlags(obj->GetPosition()) & CollisionFlags::Building) continue;
+						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
+
+						if (obj)
+						{
+							best = obj;
+							break;
+						}
+					}
+
+					return best;
+				}
+
+				Object* Functions::GetTurretInRange(TeamType team, float range)
+				{
+					Object* best = nullptr;
+
+					for (Object* obj : *globals::turretManager)
+					{
+						if (!obj->IsVisible()) continue;
+						if (!obj->IsAlive()) continue;
+						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
+
+						if (team == TeamType::Ally && obj->IsAlly()) {}
+						if (team == TeamType::Enemy && obj->IsEnemy()){}
+
+						if (!obj->IsValidTarget()) continue;
+
 						if (obj->GetDistanceTo(globals::localPlayer) > range) continue;
 
 						if (obj)
@@ -874,7 +901,7 @@ namespace UPasta
 
 				Object* Functions::GetMinionInRange(float range)
 				{
-					Object* selectedObject = functions::GetSelectedObject();
+					Object* selectedObject = Engine::GetSelectedObject();
 					Object* best = nullptr;
 					for (Object* obj : *globals::minionManager)
 					{
@@ -907,7 +934,7 @@ namespace UPasta
 					if (Configs::TSModes::Combo::Advanced::attackOnlySelectedTarget->Value
 						&& Configs::TSModes::Combo::Advanced::attackSelectedTarget->Value)
 					{
-						Object* selectedObject = functions::GetSelectedObject();
+						Object* selectedObject = Engine::GetSelectedObject();
 						if (selectedObject && selectedObject->IsValidTarget())
 							return selectedObject;
 					}
@@ -943,7 +970,7 @@ namespace UPasta
 
 				Object* Functions::GetJungleInRange(float range)
 				{
-					Object* selectedObject = functions::GetSelectedObject();
+					Object* selectedObject = Engine::GetSelectedObject();
 					Object* best = nullptr;
 					for (Object* obj : *globals::minionManager)
 					{
@@ -975,7 +1002,7 @@ namespace UPasta
 
 				Object* Functions::GetWardInRange(float range)
 				{
-					Object* selectedObject = functions::GetSelectedObject();
+					Object* selectedObject = Engine::GetSelectedObject();
 					Object* best = nullptr;
 					for (Object* obj : *globals::minionManager)
 					{
@@ -1071,7 +1098,7 @@ namespace UPasta
 
 				Object* Functions::GetObjectInRange(float range, std::string name, std::vector<QWORD> includeFilterTypeHashes, std::vector<QWORD> excludeFilterTypeHashesDetailed, bool isSpecial)
 				{
-					Object* selectedObject = functions::GetSelectedObject();
+					Object* selectedObject = Engine::GetSelectedObject();
 					Object* best = nullptr;
 					for (Object* obj : *globals::minionManager)
 					{
@@ -1143,7 +1170,7 @@ namespace UPasta
 				{
 					if (Configs::TSDrawings::drawCurrentTarget->Value == true)
 					{
-						Object* selectedObject = functions::GetSelectedObject();
+						Object* selectedObject = Engine::GetSelectedObject();
 						if (selectedObject && selectedObject->IsValidTarget())
 							render::RenderArcWorld(selectedObject->GetPosition(), 10, selectedObject->GetAttackRange(), COLOR_BLUE, 1.0f, PI, globals::localPlayer->GetPosition(), true);
 					}
@@ -1159,7 +1186,7 @@ namespace UPasta
 						if (!obj->IsInRange(globals::localPlayer->GetPosition(), 2000)) continue;
 						if (obj)
 						{
-							Vector2 screenPos = functions::WorldToScreen(obj->GetPosition());
+							Vector2 screenPos = Engine::WorldToScreen(obj->GetPosition());
 							if (!render::IsOnScreen(screenPos)) return;
 
 							render::RenderText(std::to_string(Functions::GetMinionPriority(obj)), (screenPos - Vector2(0.0f, 22.0f)).ToImVec(), 18.0f, COLOR_WHITE, true);

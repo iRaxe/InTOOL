@@ -22,12 +22,12 @@ namespace UPasta {
 
 		void HealthPrediction::Initialize() {
 			//Aggiungere eventi agli eventi lul
-			AddEventHandler(EventManager::EventType::OnPresent, OnGameUpdate);
-			AddEventHandler(EventManager::EventType::OnProcessSpell, OnProcessSpell);
+			Event::Subscribe(Event::OnPresent, OnGameUpdate);
+			Event::Subscribe(Event::OnProcessSpell, OnProcessSpell);
 		}
 
 		void HealthPrediction::OnGameUpdate() {
-			auto time = functions::GetGameTick();
+			auto time = Engine::GetGameTick();
 			for (auto it = IncomingAttacks.begin(); it != IncomingAttacks.end();) {
 				if (it->StartTime < time - 3000) 
 					IncomingAttacks.erase(it);

@@ -130,7 +130,7 @@ namespace UPasta::SDK::TargetSelector
         Object* GetEnemyMinionInRange(float radius);
         Object* GetKillableEnemyMinionInRange(float radius);
 
-
+        Object* GetTurretInRange(TeamType team, float range);
         std::vector<Object*> GetTargetsInRange(Vector3 pos, float range);
         std::vector<Object*> GetKillableTargetsInRange(Vector3 pos, float range, float damage);
         extern Object* SelectedTarget;

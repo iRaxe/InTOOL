@@ -2,10 +2,7 @@
 #include "stdafx.h"
 #include "ColorPicker.h"
 #include "NewMenu.h"
-#include "MenuSettings.h"
 #include "MenuRenderer.h"
-#include "notification.h"
-#include "Vayne.h"
 
 namespace UPasta
 {
@@ -77,7 +74,7 @@ namespace UPasta
         bool multibox = false;
         void ColorPicker::Draw()
         {
-            CheckPicker(SP_STRING(this->DisplayName), SP_STRING(this->Name), &multibox, this->RGBA);
+	        ImGui::CheckPicker(SP_STRING(this->DisplayName), SP_STRING(this->Name), &multibox, this->RGBA);
         }
 
         void ColorPicker::WndProc(UINT msg, WPARAM wparam, Vector2 cursorPos)

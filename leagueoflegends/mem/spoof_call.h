@@ -1,5 +1,14 @@
 #include <type_traits>
 
+/*
+Uses a jmp register instruction so that the return address in the stack is inside the main game module.
+The anticheat checks if the return address of some functions is in valid game memory range so this is
+crucial to implement otherwise a game ban is assured.
+
+Source: https://www.unknowncheats.me/forum/anti-cheat-bypass/268039-x64-return-address-spoofing-source-explanation.html
+
+*/
+
 namespace detail
 {
 	extern "C" void* _spoofer_stub();

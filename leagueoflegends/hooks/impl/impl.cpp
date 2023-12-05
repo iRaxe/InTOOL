@@ -1,11 +1,11 @@
 ﻿#include "../../ListManager.h"
 #include "../../stdafx.h"
-#include "../../OnProcessSpellCast.h"
 #include "../../NewMenu.h"
 #include "../../zoom.h"
 #include "../../Orbwalker.h"
 #include "../../imgui_freetype.h"
 #include "../../imgui_notify.h"
+#include "../../InitializeEvents.h"
 
 namespace hooks
 {
@@ -26,22 +26,9 @@ namespace hooks
 			globals::objManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::ObjManager);
 			globals::missileManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::MissileList);
 
-			Skillshot::PopulateSpellsDB();
-			functions::Init();
-			//menu::InitNewMenu();
-			menu::Init();
-			render::Init();
+			UPasta::EventsManager::Initialization::OnInject();
 
-			scripts::Init();
-			settings::Load();
-			settings::Load2();
 
-			UPasta::SDK::ListManager::Functions::Initialize();
-
-			
-			//Once loaded, this is called for init all things okay that should be it hopefully the new ceraetd threads will be hidden 
-			HookOnProcessSpellCast();
-			
 			RECT windowRect;
 			if (GetWindowRect(windowDX, &windowRect))
 			{
@@ -50,7 +37,7 @@ namespace hooks
 			}
 
 
-			functions::PrintChat(CHAT_COLOR("#72ff72", "Loooool now u are going to get rekt"));
+			Engine::PrintChat(CHAT_COLOR("#72ff72", "Loooool now u are going to get rekt"));
 			globals::hookResponse = true;
 
 			LOG("%s hooked", globals::renderType);
@@ -62,17 +49,14 @@ namespace hooks
 			__try { UPasta::SDK::ListManager::Functions::Refresh(); }
 			__except (1) { LOG("ERROR IN LISTMANAGER UPDATE"); }
 
-			__try { scripts::Update(); }
+			__try { Modules::Update(); }
 			__except (1) { LOG("ERROR IN SCRIPTS UPDATE"); }
 
 			__try { render::Update(); }
 			__except (1) { LOG("ERROR IN RENDER UPDATE"); }
 
-			__try { menu::Update(); }
+			__try { UPasta::SDK::Menu::OnDraw(); }
 			__except (1) { LOG("ERROR IN MENU UPDATE"); }
-
-			/*__try { menu::Update2(); }
-			__except (1) { LOG("ERROR IN MENU UPDATE"); }*/
 
 		}
 
@@ -80,19 +64,19 @@ namespace hooks
 		{
 			if (GetAsyncKeyState(VK_DELETE) & 1)
 			{
-				settings::Save();
 				UPasta::SDK::Menu::Dispose();
-				UnHookOnProcessSpellCast();
+				UPasta::EventsManager::Dispose();
 				globals::eject = true;
 
-				functions::PrintChat(CHAT_COLOR("#ff5b5b", "Looooooooooooooooooool"));
+				Engine::PrintChat(CHAT_COLOR("#ff5b5b", "Looooooooooooooooooool"));
 
 				return true;
 			}
 
 			if (GetAsyncKeyState(VK_SHIFT)) {
 				globals::menuOpen = true;
-			} else {
+			}
+			else {
 				globals::menuOpen = false;
 			}
 
@@ -111,7 +95,7 @@ namespace hooks
 
 		LRESULT __stdcall wndProcDX(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
-			UPasta::SDK::Menu::OnWndProc(uMsg, wParam);
+			Event::Publish(Event::OnWndProc, uMsg, wParam);
 
 			if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 				return true;
@@ -155,13 +139,12 @@ namespace hooks
 
 				ImGui_ImplWin32_Init(windowDX);
 				ImGui_ImplDX9_Init(pDevice);
-
 				Inits();
 
 				_init = true;
 			}
 
-			if (functions::IsGameFocused())
+			if (Engine::IsGameFocused())
 			{
 				if (KeyChecks())
 				{
@@ -183,7 +166,7 @@ namespace hooks
 			ImGui_ImplDX9_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
-			
+
 			Updates();
 
 			//ImGui::EndFrame();
@@ -197,14 +180,14 @@ namespace hooks
 		ID3D11Device* pDeviceDX11 = nullptr;
 		ID3D11DeviceContext* pContextDX11 = nullptr;
 		ID3D11RenderTargetView* mainRenderTargetViewDX11;
-		
+
 		HRESULT __stdcall presentDX11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 		{
 			if (!_init)
 			{
 				if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&pDeviceDX11)))
 				{
-					
+
 					pDeviceDX11->GetImmediateContext(&pContextDX11);
 					DXGI_SWAP_CHAIN_DESC sd;
 					pSwapChain->GetDesc(&sd);
@@ -224,8 +207,6 @@ namespace hooks
 					io.IniFilename = "window.ini";
 					io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 					io.Fonts->AddFontFromFileTTF(SP_STRING("C:\\Windows\\Fonts\\Arial.ttf"), 14);
-
-					//noo no this
 					DXGI_SWAP_CHAIN_DESC desc;
 					pSwapChain->GetDesc(&desc);
 
@@ -239,6 +220,7 @@ namespace hooks
 
 					ImGui_ImplWin32_Init(windowDX);
 					ImGui_ImplDX11_Init(device, context);
+
 					Inits();
 
 					_init = true;
@@ -248,7 +230,7 @@ namespace hooks
 					return o_presentDX(pSwapChain, SyncInterval, Flags);
 			}
 
-			if (functions::IsGameFocused())
+			if (Engine::IsGameFocused())
 			{
 				if (KeyChecks())
 				{

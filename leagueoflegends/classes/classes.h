@@ -1,87 +1,84 @@
 #pragma once
 #include "../stdafx.h"
 
+
 class LolString
 {
-    char content[0x10]; // 0x0
-    int len = 0; // 0x10
-    int max = 0; // 0x14
+	char content[0x10]; // 0x0
+	int len = 0; // 0x10
+	int max = 0; // 0x14
 
 public:
+	LolString()
+	{
+		len = *(int*)((uintptr_t)this + 0x10);
+	}
 
-    LolString()
-    {
-        len = *(int*)((uintptr_t)this + 0x10);
-    }
+	operator const char*(void)
+	{
+		return c_str();
+	}
 
-    operator const char* (void)
-    {
-        return c_str();
-    }
-    operator std::string(void)
-    {
-        return std::string(c_str());
-    }
+	operator std::string(void)
+	{
+		return std::string(c_str());
+	}
 
-    std::string str()
-    {
-        return std::string(c_str());
-    }
+	std::string str()
+	{
+		return std::string(c_str());
+	}
 
 private:
-
-    char* c_str(void)
-    {
-        if (QWORD(this) <= 0x1000)
-            return (char*)"";
-        if (len > 15)
-        {
-            auto text = *reinterpret_cast<char**>((uintptr_t)this);
-            return text;
-        }
-        else
-        {
-            return content;
-        }
-    }
+	char* c_str(void)
+	{
+		if (QWORD(this) <= 0x1000)
+			return (char*)"";
+		if (len > 15)
+		{
+			auto text = *reinterpret_cast<char**>((uintptr_t)this);
+			return text;
+		}
+		return content;
+	}
 };
 
 class InventorySlot
 {
 public:
-    ItemsDatabase GetId();
-    std::string GetTexturePath();
-    std::string GetName();
+	ItemsDatabase GetId();
+	std::string GetTexturePath();
+	std::string GetName();
 };
 
 
 class ItemListObject
 {
 public:
-    InventorySlot* GetSlot();
+	InventorySlot* GetSlot();
 };
 
 class HeroInventory
 {
 public:
-    InventorySlot* GetInventorySlot(int slotId);
-    InventorySlot* FindItemID(ItemsDatabase itemID);
-    std::vector<InventorySlot*> ItemsList();
+	InventorySlot* GetInventorySlot(int slotId);
+	InventorySlot* FindItemID(ItemsDatabase itemID);
+	std::vector<InventorySlot*> ItemsList();
 };
 
 class Perk
 {
 public:
-    PerkID GetId();
-    std::string GetName();
-    std::string GetRawName();
-    std::string GetRawDescription();
+	PerkID GetId();
+	std::string GetName();
+	std::string GetRawName();
+	std::string GetRawDescription();
 };
 
 class Perks
 {
 public:
-    Perk* GetPerkByIndex(int index);
+	Perk* GetPerkByIndex(int index);
 };
 
 class Cooldown
@@ -99,164 +96,165 @@ public:
 class CharacterStackData
 {
 public:
-    const char* model;
-    char pad1[0x18];
-    int skin;
-    char pad2[0x60];
-    char gear;
-    char pad3[0x7];
+	const char* model;
+	char pad1[0x18];
+	int skin;
+	char pad2[0x60];
+	char gear;
+	char pad3[0x7];
 };
 
 class CharacterDataStack
 {
 public:
-    std::vector<CharacterStackData> stack;
-    CharacterStackData base_skin;
+	std::vector<CharacterStackData> stack;
+	CharacterStackData base_skin;
 
-    void Update(bool change);
+	void Update(bool change);
 };
 
 class CharacterStateIntermediate
 {
 public:
-    float GetAbilityHasteMod();
-    float GetPercentCooldownCapMod();
-    float GetPassiveCooldownEndTime();
-    float GetPassiveCooldownTotalTime();
-    float GetFlatPhysicalDamageMod();
-    float GetPercentPhysicalDamageMod();
-    float GetPercentBonusPhysicalDamageMod();
-    float GetPercentBasePhysicalDamageAsFlatBonusMod();
-    float GetFlatMagicDamageMod();
-    float GetPercentMagicDamageMod();
-    float GetFlatMagicReduction();
-    float GetPercentDamageToBarracksMinionMod();
-    float GetFlatDamageReductionFromBarracksMinionMod();
-    float GetPercentMagicReduction();
-    float GetFlatCastRangeMod();
-    float GetAttackSpeedMod();
-    float GetPercentAttackSpeedMod();
-    float GetPercentMultiplicativeAttackSpeedMod();
-    float GetBaseAttackDamage();
-    float GetBaseAttackDamageSansPercentScale();
-    float GetFlatBaseAttackDamageMod();
-    float GetPercentBaseAttackDamageMod();
-    float GetBaseAbilityDamage();
-    float GetCritDamageMultiplier();
-    float GetScaleSkinCoef();
-    float GetDodge();
-    float GetCritPercent();
-    float GetFlatBaseHPPoolMod();
-    float GetArmor();
-    float GetBonusArmor();
-    float GetSpellBlock();
-    float GetBonusSpellBlock();
-    float GetHPRegenRate();
-    float GetBaseHPRegenRate();
-    float GetMoveSpeed();
-    float GetAttackRange();
-    float GetFlatBubbleRadiusMod();
-    float GetPercentBubbleRadiusMod();
-    float GetFlatArmorPenetration();
-    float GetPhysicalLethality();
-    float GetPercentArmorPenetration();
-    float GetPercentBonusArmorPenetration();
-    float GetPercentCritBonusArmorPenetration();
-    float GetPercentCritTotalArmorPenetration();
-    float GetFlatMagicPenetration();
-    float GetMagicLethality();
-    float GetPercentMagicPenetration();
-    float GetPercentBonusMagicPenetration();
-    float GetPercentLifeStealMod();
-    float GetPercentSpellVampMod();
-    float GetPercentOmnivampMod();
-    float GetPercentPhysicalVamp();
-    float GetPathfindingRadiusMod();
-    float GetPercentCCReduction();
-    float GetPercentEXPBonus();
-    float GetFlatBaseArmorMod();
-    float GetFlatBaseSpellBlockMod();
-    float GetPrimaryARBaseRegenRateRep();
-    float GetSecondaryARRegenRateRep();
-    float GetSecondaryARBaseRegenRateRep();
+	float GetAbilityHasteMod();
+	float GetPercentCooldownCapMod();
+	float GetPassiveCooldownEndTime();
+	float GetPassiveCooldownTotalTime();
+	float GetFlatPhysicalDamageMod();
+	float GetPercentPhysicalDamageMod();
+	float GetPercentBonusPhysicalDamageMod();
+	float GetPercentBasePhysicalDamageAsFlatBonusMod();
+	float GetFlatMagicDamageMod();
+	float GetPercentMagicDamageMod();
+	float GetFlatMagicReduction();
+	float GetPercentDamageToBarracksMinionMod();
+	float GetFlatDamageReductionFromBarracksMinionMod();
+	float GetPercentMagicReduction();
+	float GetFlatCastRangeMod();
+	float GetAttackSpeedMod();
+	float GetPercentAttackSpeedMod();
+	float GetPercentMultiplicativeAttackSpeedMod();
+	float GetBaseAttackDamage();
+	float GetBaseAttackDamageSansPercentScale();
+	float GetFlatBaseAttackDamageMod();
+	float GetPercentBaseAttackDamageMod();
+	float GetBaseAbilityDamage();
+	float GetCritDamageMultiplier();
+	float GetScaleSkinCoef();
+	float GetDodge();
+	float GetCritPercent();
+	float GetFlatBaseHPPoolMod();
+	float GetArmor();
+	float GetBonusArmor();
+	float GetSpellBlock();
+	float GetBonusSpellBlock();
+	float GetHPRegenRate();
+	float GetBaseHPRegenRate();
+	float GetMoveSpeed();
+	float GetAttackRange();
+	float GetFlatBubbleRadiusMod();
+	float GetPercentBubbleRadiusMod();
+	float GetFlatArmorPenetration();
+	float GetPhysicalLethality();
+	float GetPercentArmorPenetration();
+	float GetPercentBonusArmorPenetration();
+	float GetPercentCritBonusArmorPenetration();
+	float GetPercentCritTotalArmorPenetration();
+	float GetFlatMagicPenetration();
+	float GetMagicLethality();
+	float GetPercentMagicPenetration();
+	float GetPercentBonusMagicPenetration();
+	float GetPercentLifeStealMod();
+	float GetPercentSpellVampMod();
+	float GetPercentOmnivampMod();
+	float GetPercentPhysicalVamp();
+	float GetPathfindingRadiusMod();
+	float GetPercentCCReduction();
+	float GetPercentEXPBonus();
+	float GetFlatBaseArmorMod();
+	float GetFlatBaseSpellBlockMod();
+	float GetPrimaryARBaseRegenRateRep();
+	float GetSecondaryARRegenRateRep();
+	float GetSecondaryARBaseRegenRateRep();
 };
 
 class AiManager
 {
 public:
-    Vector3 GetTargetPosition();
-    bool IsMoving();
-    int GetCurrentSegment();
-    Vector3 GetPathStart();
-    Vector3 GetPathEnd();
-    int GetSegmentsCount();
-    float GetDashSpeed();
-    bool IsDashing();
-    Vector3 GetPosition();
+	Vector3 GetTargetPosition();
+	bool IsMoving();
+	int GetCurrentSegment();
+	Vector3 GetPathStart();
+	Vector3 GetPathEnd();
+	int GetSegmentsCount();
+	float GetDashSpeed();
+	bool IsDashing();
+	Vector3 GetPosition();
+
 public:
-    Vector3 GetSegment(int index);
-    std::vector<Vector3> GetFutureSegments();
+	Vector3 GetSegment(int index);
+	std::vector<Vector3> GetFutureSegments();
 };
 
 class CharacterData
 {
 public:
-    float GetSize();
-    ChampionID GetHeroID();
-    QWORD GetObjectTypeHash();
-    QWORD GetObjectTypeHashDetailed();
+	float GetSize();
+	ChampionID GetHeroID();
+	QWORD GetObjectTypeHash();
+	QWORD GetObjectTypeHashDetailed();
 };
 
 class SpellData
 {
 public:
 	std::string GetName();
-    Vector3 GetSpellEndPos();
-    float GetManaCostByLevel(int level);
+	std::string GetTexturePath();
+	Vector3 GetSpellEndPos();
+	float GetManaCostByLevel(int level);
 	CooldownArray* GetCooldownArray();
 };
-
 
 
 class Missiles
 {
 public:
-    int GetMissileId();
-    SpellData* GetSpellData();
-    int GetMissileSrcId();
-    Vector3 GetSpellStartPos();
-    Vector3 GetSpellEndPos();
+	int GetMissileId();
+	SpellData* GetSpellData();
+	int GetMissileSrcId();
+	Vector3 GetSpellStartPos();
+	Vector3 GetSpellEndPos();
 };
 
 class MissileData
 {
 public:
-    std::string GetMissileName();
-    bool IsAutoAttack();
-    std::string GetSpellName();
+	std::string GetMissileName();
+	bool IsAutoAttack();
+	std::string GetSpellName();
 
-    int Resource;
+	int Resource;
 };
 
 class Missile
 {
 public:
-    MissileData* GetMissileData();
-    int GetMissileSrcId();
-    Vector3 GetSpellStartPos();
-    Vector3 GetSpellPos();
-    Vector3 GetSpellEndPos();
+	MissileData* GetMissileData();
+	int GetMissileSrcId();
+	Vector3 GetSpellStartPos();
+	Vector3 GetSpellPos();
+	Vector3 GetSpellEndPos();
 };
 
 class SpellInfo
 {
 public:
-    SpellData* GetSpellData();
-    Vector3 EndPosition;
-    Vector3 StartPosition;
-    uintptr_t SpellIndex;
-    MissileData* BasicAttackSpellData;
-    int SourceNetworkID;
+	SpellData* GetSpellData();
+	Vector3 EndPosition;
+	Vector3 StartPosition;
+	uintptr_t SpellIndex;
+	MissileData* BasicAttackSpellData;
+	int SourceNetworkID;
 };
 
 class SpellInput
@@ -274,227 +272,225 @@ public:
 class Spell
 {
 public:
+	std::string_view GetTextureName();
 	int GetLevel();
 	float GetCooldownTimer();
 	float GetCooldown();
-    int GetStacks();
+	int GetStacks();
 	float GetTotalCooldown();
 	float GetRelativeCooldown();
 	SpellInput* GetSpellInput();
 	SpellInfo* GetSpellInfo();
-public:
-    bool IsReady();
+	bool IsReady();
 	std::string GetName();
-    float GetManaCost();
+	float GetManaCost();
 };
 
 class SpellCast
 {
 public:
-    SpellInfo* GetSpellInfo();
-    SpellInfo* GetProcessSpellInfo();
-    int GetSpellId();
-public:
-    bool IsAutoAttack();
+	SpellInfo* GetSpellInfo();
+	SpellInfo* GetProcessSpellInfo();
+	int GetSpellId();
+	bool IsAutoAttack();
+	bool IsSpell();
+	float GetCastTime();
+	std::string GetCasterName();
+	Vector3 GetStartPosition();
+	Vector3 GetEndPosition();
+	Vector3 GetMousePosition();
+	DWORD GetCasterHandle();
 };
 
 class Buff
 {
 public:
-    std::string GetName();
-    BuffType GetType();
-    float GetStartTime();
-    float GetEndTime();
-    int GetStacksAlt();
-    int GetStacks();
-public:
-    int GetMaxStacks();
-    bool isActive();
+	std::string GetName();
+	BuffType GetType();
+	float GetStartTime();
+	float GetEndTime();
+	int GetStacksAlt();
+	int GetStacks();
+	int GetMaxStacks();
+	bool isActive();
 };
 
 class BuffEntry
 {
 public:
-    Buff* GetBuff();
+	Buff* GetBuff();
 };
 
 class BuffManager
 {
 public:
-    BuffEntry* GetBuffEntryByIndex(int index);
-};
-
-struct KappaManager
-{
-public:
-    uintptr_t* vtable;
-    std::map<uintptr_t, Missile*> missile_map;
+	BuffEntry* GetBuffEntryByIndex(int index);
 };
 
 template <class T>
 struct ManagerTemplate
 {
-    uintptr_t VTable;
-    T** list;
-    uint32_t length;
-    uint32_t capacity;
+	uintptr_t VTable;
+	T** list;
+	uint32_t length;
+	uint32_t capacity;
 };
 
 class Object
 {
 public:
-	unsigned int GetNetId();
-	int GetTeam();
-    int GetLevel();
-	float GetExperience();
-	Vector3 GetPosition();
-    bool IsVisible();
+	bool IsVisible();
 	bool IsAlive();
-    float GetMana();
-    float GetMaxMana();
-    float GetPercentMana();
-    bool IsTargetable();
+	bool IsTargetable();
 	bool IsInvulnerable();
 	bool IsCursed();
-    bool HasBarrier(int slotId);
-    bool HasFlash(int slotId);
-    bool HasCleanse(int slotId);
-    bool HasExhaust(int slotId);
-    bool HasGhost(int slotId);
-    bool HasHeal(int slotId);
-    bool HasIgnite(int slotId);
-    bool HasSmite(int slotId);
-    bool HasTeleport(int slotId);
-    bool HasConqueror();
-    float GetHealth();
-    float GetMaxHealth();
-	float GetPercentHealth();
-
-    unsigned short GetActionState();
-    float GetBonusAttackDamage();
-    float GetAbilityPower();
-    float GetBaseAttackDamage();
-	float GetScale();
-    float GetMovementSpeed();
-	float GetAttackSpeed();
-	float GetLethality();
-	float GetArmor();
-    float GetBonusArmor();
-    float GetTotalArmor();
-    float GetArmorPenetration();
-	float GetMagicResist();
-    float GetMagicPenetration();
-    float GetMagicPenetrationMulti();
-    float GetTotalMagicPenetration();
-    float GetAttackRange();
-	float GetAbilityHaste();
-	std::string GetName();
-    BuffManager* GetBuffManager();
-    QWORD* GetBuffManagerEntriesEnd();
-    SpellCast* GetActiveSpellCast();
-	Spell* GetSpellBySlotId(int slotId);
-	Missile* GetMissileByIndex();
-    CharacterData* GetCharacterData();
-    AiManager* GetAiManager();
-	CombatType GetCombatType();
-	HeroInventory* GetHeroInventory();
-	Perks* GetHeroPerks();
-
-public:
-    float GetBoundingRadius();
-    float GetAttackDelay();
-    float GetAttackWindup();
+	bool HasBarrier(int slotId);
+	bool HasFlash(int slotId);
+	bool HasCleanse(int slotId);
+	bool HasExhaust(int slotId);
+	bool HasGhost(int slotId);
+	bool HasHeal(int slotId);
+	bool HasIgnite(int slotId);
+	bool HasSmite(int slotId);
+	bool HasTeleport(int slotId);
+	bool HasConqueror();
 	bool IsCastingSpell();
-
-public:
-    bool CanAttack();
-    bool CanCast();
-    bool CanMove();
-    bool IsEnemy();
-    bool IsAlly();
-    bool IsJungle();
-    bool IsValidTarget();
+	bool CanAttack();
+	bool CanCast();
+	bool CanMove();
+	bool IsEnemy();
+	bool IsAlly();
+	bool IsJungle();
+	bool IsValidTarget();
 	bool IsRespawnMarker();
 	bool IsMelee();
 	bool IsRanged();
 	bool IsHero();
-    bool IsSpecial();
-    bool IsMinion();
-    bool IsSiegeMinion();
-    bool IsVoidMinion();
-    bool IsRangedMinion();
-    bool IsMeleeMinion();
-    bool IsSuperMinion();
-    bool IsMonster();
-    bool IsDragon();
-    bool IsWard();
-    bool IsEpicMonster();
-    bool IsTurret();
+	bool IsSpecial();
+	bool IsMinion();
+	bool IsSiegeMinion();
+	bool IsVoidMinion();
+	bool IsRangedMinion();
+	bool IsMeleeMinion();
+	bool IsSuperMinion();
+	bool IsMonster();
+	bool IsDragon();
+	bool IsWard();
+	bool IsEpicMonster();
+	bool IsTurret();
 	bool IsBuilding();
-	float CharGetAttackDamage();
-    float GetAttackDamage();
-    float GetEffectiveHealth(int damageType);
-    float GetRealAttackRange();
-    float GetDistanceTo(Object* obj);
-    bool IsInRange(Vector3 pos, float radius);
+	bool IsInRange(Vector3 pos, float radius);
 	bool IsUnderEnemyTower();
 	bool IsUnderAllyTower();
 	bool IsInAARange();
-    bool CanCastSpell(int slotId);
-    Vector3 GetServerPosition();
-    bool HasBuff(const char* buffname);
-    int GetBuffListSize();
-    Buff* GetBuffByName(std::string name);
+	bool CanCastSpell(int slotId);
+	bool HasBuff(const char* buffname);
+	Vector3 GetPosition();
+	Vector3 GetServerPosition();
+	Buff* GetBuffByName(std::string name);
 	Buff* GetBuffByType(BuffType type);
-
-public:
-    CharacterDataStack* GetCharacterDataStack();
-    CharacterStateIntermediate* GetCharacterStateIntermediate();
+	int GetBuffListSize();
+	int GetTeam();
+	int GetLevel();
+	unsigned int GetNetId();
+	float GetBoundingRadius();
+	float GetAttackDelay();
+	float GetAttackWindup();
+	float CharGetAttackDamage();
+	float GetAttackDamage();
+	float GetEffectiveHealth(int damageType);
+	float GetRealAttackRange();
+	float GetDistanceTo(Object* obj);
+	float GetHealth();
+	float GetMaxHealth();
+	float GetPercentHealth();
+	unsigned short GetActionState();
+	float GetBonusAttackDamage();
+	float GetAbilityPower();
+	float GetBaseAttackDamage();
+	float GetScale();
+	float GetShield();
+	float GetPhysicalShield();
+	float GetMagicalShield();
+	float GetMovementSpeed();
+	float GetAttackSpeed();
+	float GetLethality();
+	float GetArmor();
+	float GetBonusArmor();
+	float GetTotalArmor();
+	float GetArmorPenetration();
+	float GetMagicResist();
+	float GetMagicPenetration();
+	float GetMagicPenetrationMulti();
+	float GetTotalMagicPenetration();
+	float GetAttackRange();
+	float GetAbilityHaste();
+	float GetExperience();
+	float GetMana();
+	float GetMaxMana();
+	float GetPercentMana();
+	std::string GetName();
+	std::string GetClassicName();
+	BuffManager* GetBuffManager();
+	DWORD GetHandle();
+	QWORD* GetBuffManagerEntriesEnd();
+	SpellCast* GetActiveSpellCast();
+	Spell* GetSpellBySlotId(int slotId);
+	Missile* GetMissileByIndex();
+	CharacterData* GetCharacterData();
+	AiManager* GetAiManager();
+	CombatType GetCombatType();
+	HeroInventory* GetHeroInventory();
+	Perks* GetHeroPerks();
+	CharacterDataStack* GetCharacterDataStack();
+	CharacterStateIntermediate* GetCharacterStateIntermediate();
 };
 
 class ObjectManager
 {
 public:
-    uintptr_t* vtable;
-    std::map<uintptr_t, Missile*> missile_map;
-    std::map<uintptr_t, Object*> units_map;
-    int GetListSize();
-    Object* GetIndex(int index);
-    class iterator
-    {
-    private:
-        ObjectManager* objectManager;
-        int index;
+	uintptr_t* vtable;
+	std::map<uintptr_t, Missile*> missile_map;
+	std::map<uintptr_t, Object*> units_map;
+	int GetListSize();
+	Object* GetIndex(int index);
 
-    public:
-        iterator(ObjectManager* _objectManager, int _index)
-            : objectManager(_objectManager), index(_index) {}
+	class iterator
+	{
+	private:
+		ObjectManager* objectManager;
+		int index;
 
-        iterator& operator++()
-        {
-            index++;
-            return *this;
-        }
+	public:
+		iterator(ObjectManager* _objectManager, int _index)
+			: objectManager(_objectManager), index(_index)
+		{
+		}
 
-        bool operator!=(const iterator& other) const
-        {
-            return index != other.index;
-        }
+		iterator& operator++()
+		{
+			index++;
+			return *this;
+		}
 
-        Object* operator*()
-        {
-            return objectManager->GetIndex(index);
-        }
-    };
+		bool operator!=(const iterator& other) const
+		{
+			return index != other.index;
+		}
 
-    iterator begin()
-    {
-        return iterator(this, 0);
-    }
+		Object* operator*()
+		{
+			return objectManager->GetIndex(index);
+		}
+	};
 
-    iterator end()
-    {
-        return iterator(this, GetListSize());
-    }
+	iterator begin()
+	{
+		return iterator(this, 0);
+	}
 
+	iterator end()
+	{
+		return iterator(this, GetListSize());
+	}
 };

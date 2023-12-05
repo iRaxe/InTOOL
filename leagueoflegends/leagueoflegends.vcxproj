@@ -30,20 +30,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -165,6 +165,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\Freetype\include;C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <UseMSVC>true</UseMSVC>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -178,35 +180,45 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Ashe.h" />
+    <ClInclude Include="AttackableUnit.h" />
     <ClInclude Include="auth.hpp" />
     <ClInclude Include="Awareness.h" />
     <ClInclude Include="background.h" />
+    <ClInclude Include="CharacterData.h" />
     <ClInclude Include="Checkbox.h" />
     <ClInclude Include="classes\classes.h" />
+    <ClInclude Include="Client.h" />
     <ClInclude Include="clipper.h" />
     <ClInclude Include="clipper.hpp" />
     <ClInclude Include="Colorpicker.h" />
-    <ClInclude Include="customimages.h" />
+    <ClInclude Include="Cooldowns.h" />
     <ClInclude Include="Damage.h" />
+    <ClInclude Include="decompress.h" />
+    <ClInclude Include="DecryptMemoryPages.h" />
     <ClInclude Include="DestroyEvents.h" />
+    <ClInclude Include="Awarenesss.h" />
+    <ClInclude Include="Experience.h" />
     <ClInclude Include="Ezreal.h" />
     <ClInclude Include="fa_solid_900.h" />
+    <ClInclude Include="FindHiddenModule.h" />
     <ClInclude Include="font_awesome_5.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="global\colors.h" />
-    <ClInclude Include="global\functions.h" />
+    <ClInclude Include="global\Engine.h" />
     <ClInclude Include="global\globals.h" />
     <ClInclude Include="global\leagueobfuscation.h" />
     <ClInclude Include="global\offsets.h" />
-    <ClInclude Include="global\settings.h" />
     <ClInclude Include="global\strings.h" />
     <ClInclude Include="global\structs.h" />
     <ClInclude Include="global\targetver.h" />
     <ClInclude Include="global\utils.h" />
     <ClInclude Include="HealthPrediction.h" />
+    <ClInclude Include="Hero.h" />
     <ClInclude Include="hooks\hooks.h" />
     <ClInclude Include="hooks\impl\impl.h" />
+    <ClInclude Include="Icons.h" />
     <ClInclude Include="icon_font.h" />
+    <ClInclude Include="image.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -220,8 +232,10 @@
     <ClInclude Include="imgui_notify.h" />
     <ClInclude Include="Info.h" />
     <ClInclude Include="InitializeEvents.h" />
+    <ClInclude Include="Jinx.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Kaisa.h" />
+    <ClInclude Include="Kernel.h" />
     <ClInclude Include="KeyBind.h" />
     <ClInclude Include="kiero\kiero.h" />
     <ClInclude Include="kiero\minhook\include\MinHook.h" />
@@ -232,9 +246,12 @@
     <ClInclude Include="kiero\minhook\src\hde\table32.h" />
     <ClInclude Include="kiero\minhook\src\hde\table64.h" />
     <ClInclude Include="kiero\minhook\src\trampoline.h" />
+    <ClInclude Include="LastHitDamage.h" />
+    <ClInclude Include="LastPosition.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="ListManager.h" />
     <ClInclude Include="LoadImages.h" />
+    <ClInclude Include="makesyscall.h" />
     <ClInclude Include="ManagerTemplate.h" />
     <ClInclude Include="mem\mem.h" />
     <ClInclude Include="mem\spoof_call.h" />
@@ -243,28 +260,42 @@
     <ClInclude Include="MenuComponent.h" />
     <ClInclude Include="MenuRenderer.h" />
     <ClInclude Include="MenuSettings.h" />
-    <ClInclude Include="menu\menu.h" />
-    <ClInclude Include="notification.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="Objectmanager.h" />
+    <ClInclude Include="ObjectTypeHolder.h" />
     <ClInclude Include="OnProcessSpellCast.h" />
     <ClInclude Include="Orbwalker.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="Plugins.h" />
     <ClInclude Include="PluginTemplate.h" />
+    <ClInclude Include="Pointer.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="render\render.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="roboto_font.h" />
     <ClInclude Include="scripts\championmodule.h" />
-    <ClInclude Include="scripts\scripts.h" />
+    <ClInclude Include="scripts\Modules.h" />
     <ClInclude Include="scripts\skillshotdatabase.h" />
     <ClInclude Include="selfprotection\pipe\namedpipeclient.h" />
     <ClInclude Include="selfprotection\strings\obfuscator.h" />
     <ClInclude Include="selfprotection\utils.h" />
+    <ClInclude Include="Sidebar.h" />
     <ClInclude Include="skStr.h" />
     <ClInclude Include="Slider.h" />
+    <ClInclude Include="SpellBook.h" />
+    <ClInclude Include="SpellCast.h" />
+    <ClInclude Include="SpellData.h" />
+    <ClInclude Include="SpellInfo.h" />
+    <ClInclude Include="SpellSlot.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Syscaller.h" />
+    <ClInclude Include="TargetingClient.h" />
     <ClInclude Include="TargetSelector.h" />
     <ClInclude Include="Thresh.h" />
+    <ClInclude Include="Turret.h" />
+    <ClInclude Include="Twitch.h" />
+    <ClInclude Include="UltimateHooks.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="Vayne.h" />
     <ClInclude Include="VMTHook.h" />
@@ -274,20 +305,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ashe.cpp" />
+    <ClCompile Include="AttackableUnit.cpp" />
     <ClCompile Include="Awareness.cpp" />
     <ClCompile Include="Checkbox.cpp" />
     <ClCompile Include="classes\classes.cpp" />
+    <ClCompile Include="Client.cpp" />
     <ClCompile Include="clipper.cpp" />
     <ClCompile Include="Colorpicker.cpp" />
+    <ClCompile Include="Cooldowns.cpp" />
     <ClCompile Include="Damage.cpp" />
     <ClCompile Include="DestroyEvents.cpp" />
-    <ClCompile Include="EventManager.cpp" />
+    <ClCompile Include="Awarenesss.cpp" />
     <ClCompile Include="Eventmanager.h" />
+    <ClCompile Include="Experience.cpp" />
     <ClCompile Include="Ezreal.cpp" />
-    <ClCompile Include="global\functions.cpp" />
+    <ClCompile Include="global\Engine.cpp" />
     <ClCompile Include="global\globals.cpp" />
-    <ClCompile Include="global\settings.cpp" />
     <ClCompile Include="HealthPrediction.cpp" />
+    <ClCompile Include="Hero.cpp" />
     <ClCompile Include="hooks\hooks.cpp" />
     <ClCompile Include="hooks\impl\impl.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -297,9 +332,9 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="imgui_settings.h" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
+    <ClCompile Include="Jinx.cpp" />
     <ClCompile Include="Kaisa.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
@@ -308,6 +343,8 @@
     <ClCompile Include="kiero\minhook\src\hde\hde64.c" />
     <ClCompile Include="kiero\minhook\src\hook.c" />
     <ClCompile Include="kiero\minhook\src\trampoline.c" />
+    <ClCompile Include="LastHitDamage.cpp" />
+    <ClCompile Include="LastPosition.cpp" />
     <ClCompile Include="List.cpp" />
     <ClCompile Include="ListManager.cpp" />
     <ClCompile Include="LoadImages.cpp" />
@@ -319,21 +356,35 @@
     <ClCompile Include="MenuComponent.cpp" />
     <ClCompile Include="MenuRenderer.cpp" />
     <ClCompile Include="MenuSettings.cpp" />
-    <ClCompile Include="menu\menu.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Objectmanager.cpp" />
     <ClCompile Include="Orbwalker.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="Plugins.cpp" />
     <ClCompile Include="PluginTemplate.cpp" />
+    <ClCompile Include="Pointer.cpp" />
     <ClCompile Include="Rect.cpp" />
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="render\renderfunctions.cpp" />
     <ClCompile Include="scripts\champions\syndra.cpp" />
     <ClCompile Include="scripts\prediction.cpp" />
-    <ClCompile Include="scripts\scripts.cpp" />
+    <ClCompile Include="scripts\Modules.cpp" />
     <ClCompile Include="scripts\skillshotdatabase.cpp" />
     <ClCompile Include="scripts\TargetSelector.cpp" />
+    <ClCompile Include="Sidebar.cpp" />
     <ClCompile Include="Slider.cpp" />
+    <ClCompile Include="SpellBook.cpp" />
+    <ClCompile Include="SpellCast.cpp" />
+    <ClCompile Include="SpellData.cpp" />
+    <ClCompile Include="SpellInfo.cpp" />
+    <ClCompile Include="SpellSlot.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Syscaller.cpp" />
+    <ClCompile Include="TargetingClient.cpp" />
     <ClCompile Include="Thresh.cpp" />
+    <ClCompile Include="Turret.cpp" />
+    <ClCompile Include="Twitch.cpp" />
+    <ClCompile Include="UltimateHooks.cpp" />
     <ClCompile Include="Vayne.cpp" />
     <ClCompile Include="VMTHook.cpp" />
     <ClCompile Include="Xerath.cpp" />

@@ -1,5 +1,8 @@
 #include "../Awareness.h"
 #include "../stdafx.h"
+#include "../image.h"
+#include "../decompress.h"
+
 namespace render
 {
 	float Distance(Vector2 vec1, Vector2 vec2)
@@ -111,122 +114,302 @@ namespace render
 		return pos.x >= 0.0f && pos.y >= 0.0f && pos.x <= globals::windowWidth && pos.y <= globals::windowHeight;
 	}
 
+	void* CreateTexture(void* data, int size, bool compressed) {
+
+		ID3D11ShaderResourceView* pShaderResource = nullptr;
+
+		int image_width = 0;
+		int image_height = 0;
+
+		const unsigned int buf_decompressed_size = stb_decompress_length(static_cast<unsigned char*>(data));
+		auto buf_decompressed_data = static_cast<unsigned char*>(malloc(buf_decompressed_size));
+		stb_decompress(buf_decompressed_data, static_cast<unsigned char*>(data), size);
+
+		unsigned char* image_data = stbi_load_from_memory(compressed ? buf_decompressed_data : static_cast<unsigned char*>(data),
+			compressed ? buf_decompressed_size : size,
+			&image_width,
+			&image_height,
+			nullptr,
+			4);
+
+		// Create texture
+		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Width = image_width;
+		desc.Height = image_height;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.SampleDesc.Count = 1;
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		desc.CPUAccessFlags = 0;
+
+		ID3D11Texture2D* pTexture = NULL;
+		D3D11_SUBRESOURCE_DATA subResource;
+		subResource.pSysMem = image_data;
+		subResource.SysMemPitch = desc.Width * 4;
+		subResource.SysMemSlicePitch = 0;
+		globals::pDeviceDX11var->CreateTexture2D(&desc, &subResource, &pTexture);
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		ZeroMemory(&srvDesc, sizeof(srvDesc));
+		srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = desc.MipLevels;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		globals::pDeviceDX11var->CreateShaderResourceView(pTexture, &srvDesc, &pShaderResource);
+		pTexture->Release();
+
+		stbi_image_free(image_data);
+
+		return (void*)pShaderResource;
+		return nullptr;
+	}
+
+	void FreeTexture(void* data) {
+
+		auto p = static_cast<ID3D11ShaderResourceView*>(data);
+		p->Release();
+
+	}
+
+	ImVec4 ConvertColor(uint32_t color) {
+		const float a = static_cast<float>((color >> 24) & 0xff) / 255.0f;
+		const float r = static_cast<float>((color >> 16) & 0xff) / 255.0f;
+		const float g = static_cast<float>((color >> 8) & 0xff) / 255.0f;
+		const float b = static_cast<float>((color) & 0xff) / 255.0f;
+		return ImVec4(r, g, b, a);
+	}
+
 	void RenderText(const std::string& text, const ImVec2& position, float size, uint32_t color, bool center)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const float a = static_cast<float>((color >> 24) & 0xff) / 255.0f;
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
+		const ImVec2 textSize = imFont->CalcTextSizeA(size, FLT_MAX, 0.0f, text.c_str());
 
-		ImVec2 textSize = imFont->CalcTextSizeA(size, FLT_MAX, 0.0f, text.c_str());
-
-		float xOffset = (center) ? textSize.x / 2.0f : 0.0f;
+		const float xOffset = (center) ? textSize.x / 2.0f : 0.0f;
 
 		window->DrawList->AddText(imFont, size, { (position.x - xOffset) + 1.0f, (position.y + textSize.y) + 1.0f }, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, a / 255.0f }), text.c_str());
 		window->DrawList->AddText(imFont, size, { (position.x - xOffset) - 1.0f, (position.y + textSize.y) - 1.0f }, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, a / 255.0f }), text.c_str());
 		window->DrawList->AddText(imFont, size, { (position.x - xOffset) + 1.0f, (position.y + textSize.y) - 1.0f }, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, a / 255.0f }), text.c_str());
 		window->DrawList->AddText(imFont, size, { (position.x - xOffset) - 1.0f, (position.y + textSize.y) + 1.0f }, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, a / 255.0f }), text.c_str());
 
-		window->DrawList->AddText(imFont, size, { position.x - xOffset, position.y + textSize.y }, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), text.c_str());
+		window->DrawList->AddText(imFont, size, { position.x - xOffset, position.y + textSize.y }, ImGui::GetColorU32(ConvertColor(color)), text.c_str());
 	}
 
 	void RenderLine(const ImVec2& from, const ImVec2& to, uint32_t color, float thickness)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const ImGuiWindow* window = ImGui::GetCurrentWindow();
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-		window->DrawList->AddLine(from, to, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), thickness);
+		window->DrawList->AddLine(from, to, ImGui::GetColorU32(ConvertColor(color)), thickness);
 	}
 
-	void RenderCircle(const ImVec2& position, float radius, uint32_t color, float thickness, uint32_t segments)
+	void RenderCircle(const ImVec2& position, float radius, uint32_t color, float thickness, uint32_t segments, bool filled)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const ImGuiWindow* window = ImGui::GetCurrentWindow();
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-		window->DrawList->AddCircle(position, radius, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), segments, thickness);
+		if (filled)
+			window->DrawList->AddCircleFilled(position, radius, ImGui::GetColorU32(ConvertColor(color)), segments);
+		else
+			window->DrawList->AddCircle(position, radius, ImGui::GetColorU32(ConvertColor(color)), segments, thickness);
 	}
 
-	void RenderCircleFilled(const ImVec2& position, float radius, uint32_t color, uint32_t segments)
+	void RenderRect(const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags, float thickness, bool filled)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const ImGuiWindow* window = ImGui::GetCurrentWindow();
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-		window->DrawList->AddCircleFilled(position, radius, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), segments);
+		if (filled)
+			window->DrawList->AddRectFilled(from, to, ImGui::GetColorU32(ConvertColor(color)), rounding, roundingCornersFlags);
+		else
+			window->DrawList->AddRect(from, to, ImGui::GetColorU32(ConvertColor(color)), rounding, roundingCornersFlags, thickness);
 	}
 
-	void RenderRect(const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags, float thickness)
+	void RenderImage(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color, bool flipped, bool rounded, float rounding, ImDrawFlags_ roundingCornersFlags)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const ImGuiWindow* window = ImGui::GetCurrentWindow();
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
+		if (flipped)
+		{
+			if (rounded)
+				window->DrawList->AddImageRounded(pTexture, from, to, { 1.0f, 0.0f }, { 0.0f, 1.0f }, ImGui::GetColorU32(ConvertColor(color)), rounding, roundingCornersFlags);
+			else
+				window->DrawList->AddImage(pTexture, from, to, { 1.0f, 0.0f }, { 0.0f, 1.0f }, ImGui::GetColorU32(ConvertColor(color)));
+		}
 
-		window->DrawList->AddRect(from, to, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), rounding, roundingCornersFlags, thickness);
+		if (rounded)
+			window->DrawList->AddImageRounded(pTexture, from, to, { 0.0f, 0.0f }, { 1.0f, 1.0f }, ImGui::GetColorU32(ConvertColor(color)), rounding, roundingCornersFlags);
+		else
+			window->DrawList->AddImage(pTexture, from, to, { 0.0f, 0.0f }, { 1.0f, 1.0f }, ImGui::GetColorU32(ConvertColor(color)));
 	}
 
-	void RenderRectFilled(const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags)
+	void CalculateSinesAndCosines(int numPoints, std::vector<float>& sines, std::vector<float>& cosines)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-		window->DrawList->AddRectFilled(from, to, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), rounding, roundingCornersFlags);
+		float step = 6.28318530718f / numPoints;
+		sines.resize(numPoints);
+		cosines.resize(numPoints);
+		for (int i = 0; i < numPoints; ++i)
+		{
+			float theta = step * i;
+			sines[i] = std::sin(theta);
+			cosines[i] = std::cos(theta);
+		}
 	}
 
-	void RenderImage(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color)
+	void RenderTextWorld(const std::string& text, const Vector3& position, float size, uint32_t color, bool center)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-		window->DrawList->AddImage(pTexture, from, to, { 0.0f, 0.0f }, { 1.0f, 1.0f }, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }));
+		const auto worldToScreen = Engine::WorldToScreen(position).ToImVec();
+		RenderText(text, worldToScreen, size, color, center);
 	}
 
-	void RenderImageHFlip(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color)
+	void RenderLineWorld(const Vector3& from, const Vector3& to, uint32_t color, float thickness)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const auto fromWorldToScreen = Engine::WorldToScreen(from).ToImVec();
+		const auto toWorldToScreen = Engine::WorldToScreen(to).ToImVec();
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
-
-		window->DrawList->AddImage(pTexture, from, to, { 1.0f, 0.0f }, { 0.0f, 1.0f }, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }));
+		RenderLine(fromWorldToScreen, toWorldToScreen, color, thickness);
 	}
 
-	void RenderImageRounded(ImTextureID pTexture, const ImVec2& from, const ImVec2& to, uint32_t color, float rounding, uint32_t roundingCornersFlags)
+	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uint32_t color, float thickness, bool height, bool glow, bool filled, uint32_t fillColor, float transparency) {
+		const ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window == nullptr || window->SkipItems)
+			return;
+
+		constexpr int MAX_POINTS = 100;
+		ImVec2 points[MAX_POINTS];
+
+		numPoints = min(numPoints, MAX_POINTS - 1);
+
+		static std::vector<float> sines, cosines;
+		CalculateSinesAndCosines(numPoints, sines, cosines);
+
+		const float currentTime = Engine::GetGameTime(); // Ottieni il tempo corrente di ImGui
+
+		for (int i = 0; i <= numPoints; ++i) {
+			const float cosTheta = cosines[i % numPoints];
+			const float sinTheta = sines[i % numPoints];
+
+			const Vector3 worldSpace = {worldPos.x + radius * cosTheta, worldPos.y, worldPos.z - radius * sinTheta};
+			const ImVec2 screenSpace = Engine::WorldToScreen(worldSpace).ToImVec();
+
+			points[i] = ImVec2(screenSpace.x, screenSpace.y);
+		}
+
+		if (filled)
+			window->DrawList->AddConvexPolyFilled(points, numPoints, ImGui::GetColorU32(ConvertColor(fillColor)) * transparency);
+		else
+			window->DrawList->AddPolyline(points, numPoints + 1, ImGui::GetColorU32(ConvertColor(color)), true, thickness);
+
+		if (glow) {
+			for (int i = 0; i < numPoints; ++i) {
+				ImVec2 p1 = points[i];
+				ImVec2 p2 = points[i + 1];
+				for (int j = 1; j <= 1; ++j) {
+					constexpr float rainbowSpeed = 0.5f;
+					float hue = fmodf(currentTime * rainbowSpeed + static_cast<float>(i) / numPoints, 1.0f);
+					ImVec4 rainbowColor = ImColor::HSV(hue, 1.0f, 1.0f); // Genera il colore HSV
+					const ImU32 glowColorRainbow = ImGui::ColorConvertFloat4ToU32(rainbowColor);
+					window->DrawList->AddLine(p1, p2, glowColorRainbow, thickness + j * 1);
+				}
+			}
+		}
+	}
+
+	void RenderPolygonWorld(const Geometry::Polygon& poly, uint32_t color, float thickness, bool filled, uint32_t fillColor)
 	{
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		ImVec2 points[100];
+		const int numOfPoints = min(static_cast<int>(poly.Points.size()), 100);
 
-		float a = (float)((color >> 24) & 0xff);
-		float r = (float)((color >> 16) & 0xff);
-		float g = (float)((color >> 8) & 0xff);
-		float b = (float)((color) & 0xff);
+		for (int i = 0; i < numOfPoints; ++i) {
+			points[i] = Engine::WorldToScreen(poly.Points[i]).ToImVec();
+		}
 
-		window->DrawList->AddImageRounded(pTexture, from, to, { 0.0f, 0.0f }, { 1.0f, 1.0f }, ImGui::GetColorU32({ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }), rounding, roundingCornersFlags);
+		if (filled)
+			ImGui::GetBackgroundDrawList()->AddConvexPolyFilled(points, numOfPoints, ImGui::GetColorU32(ConvertColor(fillColor)));
+		else
+			ImGui::GetBackgroundDrawList()->AddPolyline(points, numOfPoints, ImGui::GetColorU32(ConvertColor(color)), true, thickness);
 	}
+
+	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uint32_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls) {
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window == nullptr || window->SkipItems)
+			return;
+
+		Vector3 dir = directionPos - worldPos;
+		float angle = atan2(dir.z, dir.x) * -1;
+		float startTheta = angle - arcSize / 2.0f;
+		float endTheta = angle + arcSize / 2.0f;
+
+		numPoints = min(numPoints, 49);
+
+		static std::vector<float> sines, cosines;
+		CalculateSinesAndCosines(numPoints, sines, cosines);
+
+		const float thetaStep = (endTheta - startTheta) / numPoints;
+		float currentTheta = startTheta;
+
+		ImVec2 lastValidPoint;
+		bool lastPointValid = false;
+
+		for (int i = 0; i <= numPoints; ++i) {
+			const float sinTheta = sin(currentTheta);
+			const float cosTheta = cos(currentTheta);
+			const Vector3 worldSpace = { worldPos.x + radius * cosTheta, worldPos.y, worldPos.z - radius * sinTheta };
+
+			if (dontDrawWalls && (Engine::IsWall(worldSpace) || Engine::IsBrush(worldSpace))) {
+				lastPointValid = false;
+			}
+			else {
+				ImVec2 screenSpace = Engine::WorldToScreen(worldSpace).ToImVec();
+
+				if (lastPointValid) {
+					window->DrawList->AddLine(lastValidPoint, screenSpace, ImGui::GetColorU32(ConvertColor(color)), thickness);
+				}
+
+				lastValidPoint = screenSpace;
+				lastPointValid = true;
+			}
+
+			currentTheta += thetaStep;
+		}
+	}
+
+	void RenderWardRange(const Vector3& position, uint32_t color, const float& range, bool brushes) {
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window == nullptr || window->SkipItems)
+			return;
+
+		constexpr int numPoints = 120;
+		ImVec2 points[numPoints];
+
+		static std::vector<float> sines, cosines;
+		CalculateSinesAndCosines(numPoints, sines, cosines);
+
+		for (int i = 0; i < numPoints; ++i) {
+			float cosTheta = cosines[i];
+			float sinTheta = sines[i];
+			Vector3 p = position;
+
+			for (float step2 = 20.f; step2 <= range; step2 += 20.f) {
+				p.x = position.x + (step2 * cosTheta);
+				p.z = position.z - (step2 * sinTheta);
+
+				if (Engine::IsWall(p) || step2 == range || (brushes && Engine::IsBrush(p))) {
+					break;
+				}
+			}
+
+			points[i] = Engine::WorldToScreen(p).ToImVec();
+		}
+
+		for (int i = 0; i < numPoints; i += 3) {
+			const int next = (i + 3) % numPoints;
+			window->DrawList->AddBezierCubic(points[i], points[(i + 1) % numPoints], points[(i + 2) % numPoints], points[next], ImGui::GetColorU32(ConvertColor(color)), 1.0f);
+		}
+	}
+
 
 	uint32_t k_angles_amount_2 = 150;
 	std::vector<float> sine_table_2 = {};
@@ -251,6 +434,14 @@ namespace render
 		}
 	}
 
+	void Texture2D(void* texture, const ImVec2& from, const ImVec2& to, bool rounded, float rounding) {
+
+		if (rounded)
+			ImGui::GetCurrentWindow()->DrawList->AddImageRounded(texture, from, to, { 0.0f, 0.0f }, { 1.0f, 1.0f }, COLOR_WHITE, rounding, ImDrawFlags_RoundCornersAll);
+		else
+			ImGui::GetCurrentWindow()->DrawList->AddImage(texture, from, to);
+	}
+
 	float AngleBetween3point(const Vector3& vec_3d, const Vector3& pos_ext, const Vector3& current_pos)
 	{
 		float vec1_x = vec_3d.x - pos_ext.x;
@@ -266,181 +457,5 @@ namespace render
 		float angle_radians = std::acos(cos_angle);
 
 		return angle_radians;
-	}
-
-	void CalculateSinesAndCosines(int numPoints, std::vector<float>& sines, std::vector<float>& cosines)
-	{
-		float step = 6.28318530718f / numPoints;
-		sines.resize(numPoints);
-		cosines.resize(numPoints);
-		for (int i = 0; i < numPoints; ++i) 
-		{
-			float theta = step * i;
-			sines[i] = std::sin(theta);
-			cosines[i] = std::cos(theta);
-		}
-	}
-
-	void RenderCircleWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, bool height, bool glow) {
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		if (window == nullptr || window->SkipItems)
-			return;
-
-		constexpr int MAX_POINTS = 100;
-		ImVec2 points[MAX_POINTS];
-
-		numPoints = min(numPoints, MAX_POINTS - 1);
-
-		// Utilizza la funzione di cache per i seni e i coseni
-		static std::vector<float> sines, cosines;
-		CalculateSinesAndCosines(numPoints, sines, cosines);
-
-		float currentTime = ImGui::GetTime(); // Ottieni il tempo corrente di ImGui
-		float rainbowSpeed = 0.5f; // Velocità di cambiamento dei colori, regolabile
-
-		for (int i = 0; i <= numPoints; ++i) {
-			// Usa i valori memorizzati nella cache
-			float cosTheta = cosines[i % numPoints];
-			float sinTheta = sines[i % numPoints];
-
-			Vector3 worldSpace = {
-				worldPos.x + radius * cosTheta,
-				worldPos.y, // adjust for height if necessary
-				worldPos.z - radius * sinTheta
-			};
-			ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
-
-			points[i] = ImVec2(screenSpace.x, screenSpace.y);
-		}
-		/*
-		for (int i = 0; i < numPoints; ++i) {
-			float hue = fmodf(currentTime * rainbowSpeed + (float)i / numPoints, 1.0f);
-			ImVec4 rainbowColor = ImColor::HSV(hue, 1.0f, 1.0f); // Genera il colore HSV
-			ImU32 lineColor = ImGui::ColorConvertFloat4ToU32(rainbowColor);
-
-			// Disegna ogni segmento con un colore univoco
-			window->DrawList->AddLine(points[i], points[(i + 1) % numPoints], lineColor, thickness);
-		}*/
-		window->DrawList->AddPolyline(points, numPoints + 1, color, true, thickness);
-
-		if (glow) {
-			for (int i = 0; i < numPoints; ++i) {
-				ImVec2 p1 = points[i];
-				ImVec2 p2 = points[i + 1];
-				for (int j = 1; j <= 1; ++j) {
-					float hue = fmodf(currentTime * rainbowSpeed + (float)i / numPoints, 1.0f);
-					ImVec4 rainbowColor = ImColor::HSV(hue, 1.0f, 1.0f); // Genera il colore HSV
-					ImU32 glowColorRainbow = ImGui::ColorConvertFloat4ToU32(rainbowColor);
-					window->DrawList->AddLine(p1, p2, glowColorRainbow, thickness + j * 1);
-				}
-			}
-		}
-	}
-
-	void RenderWardRange(const Vector3& position, const ImColor& color, const float& range, bool brushes) {
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		if (window == nullptr || window->SkipItems)
-			return;
-
-		constexpr int numPoints = 120;
-		ImVec2 points[numPoints];
-
-		// Utilizza la funzione di cache per i seni e i coseni
-		static std::vector<float> sines, cosines;
-		CalculateSinesAndCosines(numPoints, sines, cosines);
-
-		for (int i = 0; i < numPoints; ++i) {
-			float cosTheta = cosines[i];
-			float sinTheta = sines[i];
-			Vector3 p = position;
-
-			for (float step2 = 20.f; step2 <= range; step2 += 20.f) {
-				p.x = position.x + (step2 * cosTheta);
-				p.z = position.z - (step2 * sinTheta);
-
-				if (functions::IsWall(p) || step2 == range || (brushes && functions::IsBrush(p))) {
-					break;
-				}
-			}
-
-			points[i] = functions::WorldToScreen(p).ToImVec();
-		}
-
-		for (int i = 0; i < numPoints; i += 3) {
-			const int next = (i + 3) % numPoints;
-			window->DrawList->AddBezierCubic(points[i], points[(i + 1) % numPoints], points[(i + 2) % numPoints], points[next], color, 1.0f);
-		}
-	}
-	
-	void RenderPolygon(const Geometry::Polygon& poly, uintptr_t color, float thickness)
-	{
-		ImVec2 points[100]; // Assuming 100 is the upper limit of points we want to draw
-		const int numPoints = min(static_cast<int>(poly.Points.size()), 100);
-
-		for (int i = 0; i < numPoints; ++i) {
-			points[i] = functions::WorldToScreen(poly.Points[i]).ToImVec();
-		}
-
-		ImGui::GetBackgroundDrawList()->AddPolyline(points, numPoints, color, true, thickness);
-	}
-
-	void RenderFilledPolygon(const Geometry::Polygon& poly, uintptr_t color) {
-		ImVec2 points[100]; // Assuming 100 is the upper limit of points we want to draw
-		const int numPoints = min(static_cast<int>(poly.Points.size()), 100);
-
-		for (int i = 0; i < numPoints; ++i) {
-			points[i] = functions::WorldToScreen(poly.Points[i]).ToImVec();
-		}
-
-		ImGui::GetBackgroundDrawList()->AddConvexPolyFilled(points, numPoints, color);
-	}
-
-	void RenderArcWorld(const Vector3& worldPos, int numPoints, float radius, uintptr_t color, float thickness, float arcSize, const Vector3& directionPos, bool dontDrawWalls) {
-		ImGuiWindow* window = ImGui::GetCurrentWindow();
-		if (window == nullptr || window->SkipItems)
-			return;
-
-		Vector3 dir = directionPos - worldPos;
-		float angle = atan2(dir.z, dir.x) * -1;
-		float startTheta = angle - arcSize / 2.0f;
-		float endTheta = angle + arcSize / 2.0f;
-
-		numPoints = min(numPoints, 49);  // Limit the number of points to a fixed max value
-
-		// Pre-calculate sine and cosine values for the arc
-		static std::vector<float> sines, cosines;
-		CalculateSinesAndCosines(numPoints, sines, cosines);
-
-		float thetaStep = (endTheta - startTheta) / numPoints;
-		float currentTheta = startTheta;
-
-		ImVec2 lastValidPoint;
-		bool lastPointValid = false;
-
-		// Loop through each point in the arc
-		for (int i = 0; i <= numPoints; ++i) {
-			// Find the sine and cosine based on the current angle in the loop
-			float sinTheta = sin(currentTheta);
-			float cosTheta = cos(currentTheta);
-			Vector3 worldSpace = { worldPos.x + radius * cosTheta, worldPos.y, worldPos.z - radius * sinTheta };
-
-			// Check for walls if necessary
-			if (dontDrawWalls && (functions::IsWall(worldSpace) || functions::IsBrush(worldSpace) )) {
-				lastPointValid = false;  // Invalidate this point if it's a wall
-			}
-			else {
-				ImVec2 screenSpace = functions::WorldToScreen(worldSpace).ToImVec();
-
-				// If we have a valid 'last point', and the current point is valid, draw the line segment
-				if (lastPointValid) {
-					window->DrawList->AddLine(lastValidPoint, screenSpace, color, thickness);
-				}
-
-				lastValidPoint = screenSpace;  // Update the last valid point
-				lastPointValid = true;         // Mark the current point as valid
-			}
-
-			currentTheta += thetaStep;  // Increment the angle
-		}
 	}
 }

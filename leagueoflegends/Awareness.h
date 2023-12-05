@@ -4,129 +4,31 @@
 
 namespace UPasta::SDK::Awareness
 {
-    namespace Resources
+    namespace ChampionSpells
     {
-        namespace EnemySidebar
-        {
-            namespace DX11
-            {
-                namespace HudDesign
-                {
-                    inline ID3D11ShaderResourceView* hudHpBar;
-                    inline ID3D11ShaderResourceView* hudChampPortrait;
+        inline std::unordered_map<std::string, void*> _spell_map;
 
-                    void InitializeHudImages();
-
-                }
-
-                namespace HeroIcons
-                {
-                    const int numTextures = 10;
-                    inline ID3D11ShaderResourceView* textureArray[numTextures] = { NULL };
-
-                    void InitializeHeroImages();
-                }
-
-                namespace SummonerSpells
-                {
-                    inline ID3D11ShaderResourceView* summSpellBarrier;
-                    inline ID3D11ShaderResourceView* summSpellFlash;
-                    inline ID3D11ShaderResourceView* summSpellCleanse;
-                    inline ID3D11ShaderResourceView* summSpellExhaust;
-                    inline ID3D11ShaderResourceView* summSpellGhost;
-                    inline ID3D11ShaderResourceView* summSpellHeal;
-                    inline ID3D11ShaderResourceView* summSpellIgnite;
-                    inline ID3D11ShaderResourceView* summSpellSmite;
-                    inline ID3D11ShaderResourceView* summSpellTeleport;
-
-                    void InitializeSummSpellsImages();
-                }
-
-            }
-
-            inline bool initializedTextures;
-            void InitializeTextures();
-        }
-
-        namespace JungleTracker
-        {
-            namespace DX11
-            {
-
-                namespace HudDesign
-                {
-
-                    inline ID3D11ShaderResourceView* hudJunglePortrait;
-
-                    void InitializeHudImages();
-
-                }
-
-                namespace JungleIcons
-                {
-                    inline ID3D11ShaderResourceView* baronTextureIcon;
-                    inline ID3D11ShaderResourceView* blueTextureIcon;
-                    inline ID3D11ShaderResourceView* crabTextureIcon;
-                    inline ID3D11ShaderResourceView* dragonTextureIcon;
-                    inline ID3D11ShaderResourceView* dragonairTextureIcon;
-                    inline ID3D11ShaderResourceView* dragonchemtechTextureIcon;
-                    inline ID3D11ShaderResourceView* dragonearthTextureIcon;
-                    inline ID3D11ShaderResourceView* dragonelderTextureIcon;
-                    inline ID3D11ShaderResourceView* dragonfireTextureIcon;
-                    inline ID3D11ShaderResourceView* dragonhextechTextureIcon;
-                    inline ID3D11ShaderResourceView* dragonwaterTextureIcon;
-                    inline ID3D11ShaderResourceView* grompTextureIcon;
-                    inline ID3D11ShaderResourceView* krugTextureIcon;
-                    inline ID3D11ShaderResourceView* murkwolfTextureIcon;
-                    inline ID3D11ShaderResourceView* razorbeakTextureIcon;
-                    inline ID3D11ShaderResourceView* redTextureIcon;
-                    inline ID3D11ShaderResourceView* riftheraldTextureIcon;
-
-                    void InitializeJungleImages();
-
-                    inline std::unordered_map<std::string, ID3D11ShaderResourceView*> jungleIcons;
-                    void AssignJungleIconsToMap();
-
-                }
-
-                namespace WardIcons
-                {
-                    inline ID3D11ShaderResourceView* blueWardTextureIcon;
-                    inline ID3D11ShaderResourceView* controlWardTextureIcon;
-                    inline ID3D11ShaderResourceView* yellowWardTextureIcon;
-                    inline ID3D11ShaderResourceView* shacoBoxTextureIcon;
-                    
-                    void InitializeWardImages();
-
-                    inline std::unordered_map<std::string, ID3D11ShaderResourceView*> wardIcons;
-                    void AssignWardIconsToMap();
-
-                }
-
-
-            }
-
-            inline bool initializedTextures;
-            void InitializeTextures();
-        }
+        void InitializeSpellsImages();
     }
-
 
     namespace Configs
     {
         inline bool initializedAwarenessMenu;
         extern Menu* AwarenessMenu;
+        extern Menu* HealthbarOverlayMenu;
+
 
         namespace EnemyTracker
         {
-            inline bool initializedTrackerMenu;
-            void Initialize();
-            void InitializeTrackerMenu();
-
             inline CheckBox* status;
 
             inline CheckBox* showDamagePrediction;
             inline CheckBox* showKillableStatus;
+
+            inline CheckBox* showCooldowns;
+            inline CheckBox* showCooldownsSelf;
+            inline CheckBox* showCooldownsAllies;
+            inline CheckBox* showCooldownsEnemies;
 
             inline CheckBox* showExperience;
             inline CheckBox* showExperienceSelf;
@@ -140,9 +42,9 @@ namespace UPasta::SDK::Awareness
 
             inline CheckBox* showLastPosition;
             inline CheckBox* showPosGuesser;
+        	inline CheckBox* showLastPositionWorld;
         	inline CheckBox* showLastPositionMiniMap;
 
-        	inline CheckBox* statusWardTracker;
             inline CheckBox* showWardPosition;
             inline CheckBox* showWardTimer;
             inline CheckBox* showWardRange;
@@ -152,8 +54,6 @@ namespace UPasta::SDK::Awareness
         {
             inline bool open_ptr = true;
             inline bool initializedSidebarMenu;
-            void Initialize();
-            void InitializeSidebarMenu();
 
             inline CheckBox* status;
             inline CheckBox* locked;
@@ -170,6 +70,7 @@ namespace UPasta::SDK::Awareness
             inline float color_edit0[4] = { 255 / 255.f, 77 / 255.f, 77 / 255.f, 200 / 255.f };
 
             inline CheckBox* status;
+            inline CheckBox* rainbowMode;
             inline List* drawMode;
             inline CheckBox* showHeight;
             inline Slider* heightTollerance;
@@ -223,39 +124,16 @@ namespace UPasta::SDK::Awareness
 
         namespace EnemyTracker
         {
-            constexpr float levelExp[18] = { 0.f, 280.f, 660.f, 1140.f, 1720.f, 2400.f, 3180.f, 4060.f,
-                         5040.f, 6120.f, 7300.f, 8580.f, 9960.f, 11440.f, 13020.f,
-                         14700.f, 16480.f, 18360.f };
-
-            constexpr float expNeeded[18] = { 0.f, 280.f, 380.f, 480.f, 580.f, 680.f, 780.f, 880.f,
-                                                           980.f, 1080.f, 1180.f, 1280.f, 1380.f, 1480.f, 1580.f,
-                                                           1680.f, 1780.f, 1880.f };
-
             void DrawTracker();
             void DrawWardsTracker();
-            void DrawCooldownBar(Object* obj);
-            void DrawPlayerPaths(Object* obj);
-            void ShowLastEnemyPosition(Object* obj, int index);
-            void DrawLastHitDamage();
-
-
-            void Initialize();
-            void Update();
-        }
-
-        namespace EnemySidebar
-        {
-            ImTextureID GetSummonerSpellTexture(Object* obj, int spellIndex);
-            void LoadDX11ImageIfNeeded(const char* filename, bool loaded, ID3D11ShaderResourceView** texture);
-            static void ShowSidebar(bool* p_open);
-            void Initialize();
-            void Update();
+        	void Update();
         }
 
         namespace Radius
         {
-            void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness, bool takeHeightInConsideration = Configs::Radius::showHeight->Value, bool glow = false);
-            static void ShowMissiles();
+            void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness, bool takeHeightInConsideration = Configs::Radius::showHeight->Value, bool glow = Configs::Radius::rainbowMode->Value);
+            void DrawSpell(SpellCast* spellCastInfo);
+        	static void ShowMissiles();
             static void ShowBoundingRadius(Object* obj, int quality);
             static void ShowAARadius(Object* obj, int quality);
             void Initialize();

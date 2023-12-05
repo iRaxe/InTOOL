@@ -46,7 +46,6 @@ void startZoom()
 	while (!globals::eject) //main loop
 	{
 		Sleep(10);
-		
 
 		if (shouldInject)//probably crashes here 
 		{

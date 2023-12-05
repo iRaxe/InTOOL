@@ -26,20 +26,20 @@ public:
 		collidableWith(collidableWith) {}
 
 	void SetSlotIndex(int slotIndex);
-	float GetRange();
-	float GetRadius();
-	float GetSpeed();
-	float GetCastTime();
-	int GetType();
-	bool IsCollidableWith(int type);
+	float GetRange() const;
+	float GetRadius() const;
+	float GetSpeed() const;
+	float GetCastTime() const;
+	int GetType() const;
+	bool IsCollidableWith(int type) const;
 	static void PopulateSpellsDB();
 public:
-	float GetMaxRange();
-	std::string GetName();
-	bool IsCastable();
-	bool IsLearned();
-	bool IsProcessing();
-	int GetStacks();
+	float GetMaxRange() const;
+	std::string GetName() const;
+	bool IsCastable() const;
+	bool IsLearned() const;
+	bool IsProcessing() const;
+	int GetStacks() const;
 
 };
 
@@ -266,6 +266,10 @@ struct SkillShotDB
 	Skillshot TaliyahE;
 	Skillshot TaliyahR;
 	Skillshot TalonW;
+	Skillshot TwitchQ;
+	Skillshot TwitchW;
+	Skillshot TwitchE;
+	Skillshot TwitchR;
 	Skillshot ThreshQ;
 	Skillshot ThreshW;
 	Skillshot ThreshE;

@@ -43,7 +43,7 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-    void Init() override
+    void Initialize() override
     {
         const auto XerathMenu = Menu::CreateMenu("vezXerath", "vez.Xerath");
 
@@ -213,7 +213,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= database.XerathQ.GetRange() && isTimeToCastQ())
         {
-            functions::CastSpell(SpellIndex::Q);
+            Engine::CastSpell(SpellIndex::Q);
             QCastedTime = gameTime;
         }
     }
@@ -232,13 +232,13 @@ public:
             {
 	            if (pEnemy->IsHero())
 	            {
-                    prediction::PredictionOutput qPrediction;
+                    Modules::prediction::PredictionOutput qPrediction;
                     if (GetPrediction(database.XerathQ, qPrediction))
-                        functions::ReleaseSpell(SpellIndex::Q, qPrediction.position);
+                        Engine::ReleaseSpell(SpellIndex::Q, qPrediction.position);
                     QCastedTime = 0.0f;
 	            }
 	            else
-                    functions::ReleaseSpell(SpellIndex::Q, pEnemy->GetPosition());
+                    Engine::ReleaseSpell(SpellIndex::Q, pEnemy->GetPosition());
                 QCastedTime = 0.0f;
             }
             else
@@ -251,13 +251,13 @@ public:
                 {
                     if (pEnemy->IsHero())
                     {
-                        prediction::PredictionOutput qPrediction;
+                        Modules::prediction::PredictionOutput qPrediction;
                         if (GetPrediction(database.XerathQ, qPrediction))
-                            functions::ReleaseSpell(SpellIndex::Q, qPrediction.position);
+                            Engine::ReleaseSpell(SpellIndex::Q, qPrediction.position);
                         QCastedTime = 0.0f;
                     }
                     else
-                        functions::ReleaseSpell(SpellIndex::Q, pEnemy->GetPosition());
+                        Engine::ReleaseSpell(SpellIndex::Q, pEnemy->GetPosition());
 						QCastedTime = 0.0f;
                 }
             }
@@ -274,17 +274,17 @@ public:
         {
             if (pEnemy->IsHero())
             {
-                prediction::PredictionOutput wPrediction;
+                Modules::prediction::PredictionOutput wPrediction;
 
                 if (GetPrediction(database.XerathW, wPrediction))
                 {
-                    functions::CastSpell(SpellIndex::W, wPrediction.position);
+                    Engine::CastSpell(SpellIndex::W, wPrediction.position);
                     WCastedTime = gameTime;
                 }
             }
             else
             {
-                functions::CastSpell(SpellIndex::W, pEnemy->GetPosition());
+                Engine::CastSpell(SpellIndex::W, pEnemy->GetPosition());
                 WCastedTime = gameTime;
             }
         }
@@ -299,17 +299,17 @@ public:
         {
             if (pEnemy->IsHero())
             {
-                prediction::PredictionOutput ePrediction;
+                Modules::prediction::PredictionOutput ePrediction;
 
                 if (GetPrediction(database.XerathE, ePrediction))
                 {
-                    functions::CastSpell(SpellIndex::E, ePrediction.position);
+                    Engine::CastSpell(SpellIndex::E, ePrediction.position);
                     ECastedTime = gameTime;
                 }
             }
             else
             {
-                functions::CastSpell(SpellIndex::E, pEnemy->GetPosition());
+                Engine::CastSpell(SpellIndex::E, pEnemy->GetPosition());
                 ECastedTime = gameTime;
             }
         }
@@ -322,10 +322,10 @@ public:
        
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= database.XerathR.GetRange() && isTimeToCastR())
         {
-            prediction::PredictionOutput rPrediction;
+            Modules::prediction::PredictionOutput rPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy,database.XerathR, rPrediction))
             {
-                functions::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastSpell(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
             }
         }
@@ -333,7 +333,7 @@ public:
 
 	void Update() override
     {
-        gameTime = functions::GetGameTime();
+        gameTime = Engine::GetGameTime();
 
         Killsteal();
         AntiGapCloser();
@@ -346,7 +346,7 @@ public:
                     Xerath_UseR(rTarget);
             	break;
             case 1: //NearMouse
-                if (const auto rTarget2 = TargetSelector::Functions::GetEnemyChampionInRange(functions::GetMouseWorldPos(), 300.0f))
+                if (const auto rTarget2 = TargetSelector::Functions::GetEnemyChampionInRange(Engine::GetMouseWorldPos(), 300.0f))
                 {
 	                Xerath_UseR(rTarget2);
                 }
@@ -355,9 +355,7 @@ public:
         }
     }
 
-   
-
-    void Attack() override
+    void Combo() override
     {
 	    if (!IsCastingR())
 	    {
@@ -583,14 +581,20 @@ public:
     }
 
     //Events
-    void OnBeforeAttack() override
-    {
-	    
+    void OnCreateMissile() override {
+        return;
     }
 
-    void OnCastSpell() override
-    {
+    void OnDeleteMissile() override {
+        return;
+    }
 
+    void OnBeforeAttack() override {
+        return;
+    }
+
+    void OnAfterAttack() override {
+        return;
     }
 
     void Render() override
@@ -602,7 +606,7 @@ public:
         if (XerathConfig::XerathDrawings::DrawR->Value == true && (XerathConfig::XerathDrawings::DrawIfReady->Value == true && database.XerathR.IsCastable() || XerathConfig::XerathDrawings::DrawIfReady->Value == false))
             Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.XerathR.GetRange(), COLOR_WHITE, 1.0f);
         if (IsCastingR() && XerathConfig::XerathUltimate::targetMode->Value == 1)
-            Awareness::Functions::Radius::DrawRadius(functions::GetMouseWorldPos(), 300.0f, COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(Engine::GetMouseWorldPos(), 300.0f, COLOR_WHITE, 1.0f);
 
     }
 };

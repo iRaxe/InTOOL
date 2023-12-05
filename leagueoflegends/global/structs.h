@@ -325,6 +325,7 @@ enum OrbwalkState
     Off,
     Attack,
     Clear,
+	FastClear,
     Harass,
     Lasthit,
     Flee
@@ -353,6 +354,23 @@ enum SpellIndex
 	Item6,
 	Trinket,
 	Recall
+};
+
+enum SkillshotType
+{
+	SkillshotNone,
+	SkillshotLine,
+	SkillshotCircle,
+	SkillshotCone
+};
+
+enum SpellCastMode {
+	NormalCast = 1,
+	SmartCast,
+	SelfCast,
+	SmartCastWithIndicator,
+	SmartPlusSelfCast,
+	SmartPlusSelfCastWithIndicator,
 };
 
 enum SpellState : int
@@ -417,14 +435,6 @@ enum CollisionFlags
     Tower = 70,
     Prop = 128,
     GlobalVision = 256
-};
-
-enum SkillshotType
-{
-    SkillshotNone,
-    SkillshotLine,
-    SkillshotCircle,
-    SkillshotCone
 };
 
 enum CollidableObjects
@@ -1303,33 +1313,6 @@ enum class CombatType
 	Ranged = 2
 };
 
-
-enum kSpellSlot {
-	SpellSlot_Unknown = -1,
-	SpellSlot_Q,
-	SpellSlot_W,
-	SpellSlot_E,
-	SpellSlot_R,
-	SpellSlot_Summoner1,
-	SpellSlot_Summoner2,
-	SpellSlot_Item1,
-	SpellSlot_Item2,
-	SpellSlot_Item3,
-	SpellSlot_Item4,
-	SpellSlot_Item5,
-	SpellSlot_Item6,
-	SpellSlot_Trinket,
-};
-
-enum kCastType {
-	NormalCast = 1,
-	SmartCast,
-	SelfCast,
-	SmartCastWithIndicator,
-	SmartPlusSelfCast,
-	SmartPlusSelfCastWithIndicator,
-};
-
 enum GameState {
 	Loading,
 	Connecting,
@@ -1337,4 +1320,44 @@ enum GameState {
 	Paused,
 	Finished,
 	Exiting
+};
+
+enum class StatEnum : unsigned
+{
+	//48 89 6C 24 ? 56 48 83 EC 40 48 8B E9 E8 ? ? ? ? 
+	AbilityPower = 0,
+	Armor = 1,
+	AttackDamage = 2,
+	AttackSpeed = 3,
+	MagicResist = 5,
+	MoveSpeed = 6,
+	CritChance = 7,
+	CritDamageMultiplier = 8,
+	AbilityHaste = 10,
+	Health = 11,
+	HealthPercent = 12,
+	HealthMissingPercent = 13,
+	LifeSteal = 15,
+	MagicFlatPenetration = 19,
+	MagicBonusPercentPenetration = 20,
+	ArmorBonusPercentPenetration = 24,
+	Lethality = 26,
+	Tenacity = 27,
+	AttackRange = 28,
+	HealthRegen = 29,
+	ManaRegen = 30,
+};
+
+enum class StatType : uint8_t
+{
+	TOTAL = 0,
+	BASE = 1,
+	BONUS = 2,
+};
+
+enum class TeamType : int
+{
+	Ally,
+	Enemy,
+	Neutral,
 };

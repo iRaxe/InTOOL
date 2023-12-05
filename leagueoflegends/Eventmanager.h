@@ -1,7 +1,10 @@
 #pragma once
-#include <vector>
-namespace EventManager {
-	enum class EventType {
+#include <unordered_map>
+#include "stdafx.h"
+class Event
+{
+public:
+	enum ID {
 		OnInject,
 		OnDraw,
 		OnWndProc,
@@ -33,26 +36,33 @@ namespace EventManager {
 		Size
 	};
 
-	extern std::vector<void*> EventCallbacks[(unsigned int)EventType::Size];
-
-	void AddEventHandler(EventType eventId, void* callback);
-	void RemoveEventHandler(EventType eventId, void* callback);
-
-	template <typename... Args>
-	void Trigger(EventType eventId, Args... args) {
-		for (auto callback : EventCallbacks[(unsigned int)eventId]) {
-			static_cast<void(*)(Args...)>(callback)(args...);
-		}
+	static void Subscribe(ID event, void* callback) {
+		_subscribers[event].emplace_back(callback);
 	}
 
-	template <typename... Args>
-	bool TriggerProcess(EventType eventId, Args... args) {
-		auto process = true;
-		for (auto callback : EventCallbacks[(unsigned int)eventId]) {
-			if (!static_cast<bool(*)(Args...)>(callback)(args...)) {
-				process = false;
+	static void UnSubscribe(ID event, void* callback) {
+
+		auto& callbacks = _subscribers[event];
+		for (auto it = callbacks.begin(); it != callbacks.end(); it++)
+			if (*it == callback) {
+				callbacks.erase(it);
+				break;
 			}
-		}
-		return process;
 	}
-}
+
+	template <typename... Args>
+	constexpr static void Publish(ID event, Args ... args) {
+		auto found = _subscribers.find(event);
+
+		if (found == _subscribers.end())
+			return;
+
+
+		for (auto sub : found->second)
+			static_cast<void(*)(Args...)>(sub)(args ...);
+	}
+
+private:
+	static inline std::unordered_map<ID, std::vector<void*>> _subscribers;
+};
+

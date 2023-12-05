@@ -44,11 +44,11 @@ namespace UPasta
 				float GetCooldown(Object* champion, int spellSlot) {
 					auto it = ChampionCooldownsMap.find(std::make_pair(champion, spellSlot));
 					if (it != ChampionCooldownsMap.end()) {
-						if (it->second < functions::GetGameTime()) {
+						if (it->second < Engine::GetGameTime()) {
 							ChampionCooldownsMap.erase(it);
 							return 0.0f;
 						}
-						return it->second - functions::GetGameTime();
+						return it->second - Engine::GetGameTime();
 					}
 					return 0.0f;
 				}

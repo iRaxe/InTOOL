@@ -1,8 +1,6 @@
 #include "NewMenu.h"
 
 using namespace UPasta::SDK;
-using namespace scripts;
-
 namespace YorickConfig
 {
     namespace YorickCombo {

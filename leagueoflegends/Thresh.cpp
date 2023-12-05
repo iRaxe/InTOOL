@@ -73,9 +73,8 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-    void Init() override
+    void Initialize() override
     {
-
         const auto ThreshMenu = Menu::CreateMenu("vezThresh", "vez.Thresh");
 
         const auto combo = ThreshMenu->AddMenu("Combo Settings", "Combo Settings");
@@ -268,10 +267,10 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < qRange() && isTimeToCastQ())
         {
-            prediction::PredictionOutput qPrediction;
+            Modules::prediction::PredictionOutput qPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.ThreshQ, qPrediction))
             {
-                functions::CastSpell(SpellIndex::Q, qPrediction.position);
+                Engine::CastSpell(SpellIndex::Q, qPrediction.position);
                 QCastedTime = gameTime;
             }
         }
@@ -284,10 +283,10 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < wRange() && isTimeToCastW())
         {
-            prediction::PredictionOutput wPrediction;
+            Modules::prediction::PredictionOutput wPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.ThreshW, wPrediction))
             {
-                functions::CastSpell(SpellIndex::W, wPrediction.position);
+                Engine::CastSpell(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -300,10 +299,10 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < eRange() && isTimeToCastE())
         {
-            prediction::PredictionOutput ePrediction;
+            Modules::prediction::PredictionOutput ePrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.ThreshE, ePrediction))
             {
-                functions::CastSpell(SpellIndex::E, ePrediction.position);
+                Engine::CastSpell(SpellIndex::E, ePrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -324,10 +323,10 @@ public:
             if (ally != nullptr)
             {
                 const auto allyPos = enemyPos.Extend(ally->GetPosition(), 800);
-                if (prediction::IsSpecificObjectInWay(ally->GetPosition(), enemyPos, globals::localPlayer, database.ThreshE.GetRadius()))
-                    functions::CastSpell(SpellIndex::E, allyPos);
+                if (Modules::prediction::IsSpecificObjectInWay(ally->GetPosition(), enemyPos, globals::localPlayer, database.ThreshE.GetRadius()))
+                    Engine::CastSpell(SpellIndex::E, allyPos);
                 else if (pEnemy->GetDistanceTo(ally) < globals::localPlayer->GetDistanceTo(ally))
-                    functions::CastSpell(SpellIndex::E, enemyPos);
+                    Engine::CastSpell(SpellIndex::E, enemyPos);
             }
             else
             {
@@ -335,10 +334,10 @@ public:
                 if (allyTower != nullptr)
                 {
                     const auto allyPos = enemyPos.Extend(allyTower->GetPosition(), 800);
-                    if (prediction::IsSpecificObjectInWay(allyTower->GetPosition(), enemyPos, globals::localPlayer, database.ThreshE.GetRadius()))
-                        functions::CastSpell(SpellIndex::E, allyPos);
+                    if (Modules::prediction::IsSpecificObjectInWay(allyTower->GetPosition(), enemyPos, globals::localPlayer, database.ThreshE.GetRadius()))
+                        Engine::CastSpell(SpellIndex::E, allyPos);
                     else if (pEnemy->GetDistanceTo(allyTower) < globals::localPlayer->GetDistanceTo(allyTower))
-                        functions::CastSpell(SpellIndex::E, enemyPos);
+                        Engine::CastSpell(SpellIndex::E, enemyPos);
                 }
                 else
                 {
@@ -347,10 +346,10 @@ public:
                     {
                         //Use for pull to thresh
                         const auto pullPos = enemyPos.Extend(globals::localPlayer->GetPosition(), 800);
-                        functions::CastSpell(SpellIndex::E, pullPos);
+                        Engine::CastSpell(SpellIndex::E, pullPos);
                     }
                     else
-                        functions::CastSpell(SpellIndex::E, enemyPos);
+                        Engine::CastSpell(SpellIndex::E, enemyPos);
                 }
             }
             ECastedTime = gameTime;
@@ -364,26 +363,24 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < rRange() && isTimeToCastR())
         {
-            prediction::PredictionOutput rPrediction;
+            Modules::prediction::PredictionOutput rPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.ThreshR, rPrediction))
             {
-                functions::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastSpell(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
             }
         }
     }
 
-    void Update()
-    {
-        gameTime = functions::GetGameTime();
+    void Update() override {
+        gameTime = Engine::GetGameTime();
 
         Killsteal();
         AntiGapCloser();
         AntiMelee();
     }
 
-    void Attack()
-    {
+    void Combo()  override {
         if (ThreshConfig::ThreshCombo::UseR->Value == true && database.ThreshR.IsCastable() && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(),rRange()).size() >= ThreshConfig::ThreshCombo::enemiesInRange->Value)
         {
             if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(rRange()))
@@ -403,8 +400,7 @@ public:
         }
     }
 
-    void Clear()
-    {
+    void Clear() override {
         //Laneclear
         if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() > 0)
         {
@@ -440,8 +436,7 @@ public:
     }
 
 
-    void Harass()
-    {
+    void Harass() override {
         if (!Thresh_HasEnoughMana(ThreshConfig::ThreshHarass::minMana->Value))
             return;
 
@@ -458,8 +453,7 @@ public:
         }
     }
 
-    void Lasthit()
-    {
+    void Lasthit() override {
         if (!Thresh_HasEnoughMana(ThreshConfig::ThreshLastHit::minMana->Value))
             return;
 
@@ -471,14 +465,13 @@ public:
         }
     }
 
-    void Flee()
-    {
+    void Flee() override {
         if (ThreshConfig::ThreshFlee::UseE->Value == true && database.ThreshE.IsCastable())
         {
-            const Vector3 pathEnd = functions::GetMouseWorldPos();
+            const Vector3 pathEnd = Engine::GetMouseWorldPos();
             if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f) && isTimeToCastE())
             {
-                functions::CastSpell(SpellIndex::E, functions::GetMouseWorldPos());
+                Engine::CastSpell(SpellIndex::E, Engine::GetMouseWorldPos());
                 ECastedTime = gameTime;
             }
         }
@@ -513,11 +506,11 @@ public:
 
     void AntiGapCloser()
     {
-        if (ThreshConfig::ThreshAntiGapCloser::UseE->Value == true && functions::GetSpellState(SpellIndex::E) == 0)
+        if (ThreshConfig::ThreshAntiGapCloser::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
             for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 750.0f))
             {
-                if (!functions::MenuItemContains(ThreshConfig::ThreshAntiGapCloser::whitelist, target->GetName().c_str())) continue;
+                if (!Engine::MenuItemContains(ThreshConfig::ThreshAntiGapCloser::whitelist, target->GetName().c_str())) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
 
@@ -535,15 +528,15 @@ public:
 
     void AntiMelee()
     {
-        if (ThreshConfig::ThreshAntiMelee::UseE->Value == true && functions::GetSpellState(SpellIndex::E) == 0)
+        if (ThreshConfig::ThreshAntiMelee::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
             for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 750.0f))
             {
-                if (!functions::MenuItemContains(ThreshConfig::ThreshAntiMelee::whitelist, target->GetName().c_str())) continue;
+                if (!Engine::MenuItemContains(ThreshConfig::ThreshAntiMelee::whitelist, target->GetName().c_str())) continue;
 
                 if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetAttackRange()))
                 {
-                    const Vector3 pathEnd = functions::GetMouseWorldPos();
+                    const Vector3 pathEnd = Engine::GetMouseWorldPos();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f))
                     {
                         Thresh_UseE(target);
@@ -554,13 +547,21 @@ public:
     }
 
     //Events
-    void OnBeforeAttack()
-    {
+
+    void OnCreateMissile() override {
+        return;
+    }
+
+    void OnDeleteMissile() override {
+        return;
+    }
+
+    void OnBeforeAttack() override {
         __try {
             //Combo mode
             if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Attack)
             {
-                const auto object = functions::GetSelectedObject();
+                const auto object = Engine::GetSelectedObject();
                 if (object != nullptr && object->IsHero())
                 {
                     if (ThreshConfig::ThreshCombo::UseW->Value == true && database.ThreshW.IsCastable() && ThreshConfig::ThreshSpellsSettings::wCastMode->Value == 1)
@@ -577,7 +578,7 @@ public:
             //Laneclear mode
             if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Clear)
             {
-                const auto object = functions::GetSelectedObject();
+                const auto object = Engine::GetSelectedObject();
                 if (object != nullptr && object->IsBuilding())
                 {
                    /* if (ThreshConfig::ThreshClear::UseW->Value == true && database.ThreshW.IsCastable() && Thresh_HasEnoughMana(ThreshConfig::ThreshClear::minMana->Value))
@@ -589,7 +590,7 @@ public:
             //Harass mode
             if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Harass)
             {
-                const auto object = functions::GetSelectedObject();
+                const auto object = Engine::GetSelectedObject();
                 if (object != nullptr && object->IsHero())
                 {
                     if (!Thresh_HasEnoughMana(ThreshConfig::ThreshHarass::minMana->Value))
@@ -614,13 +615,11 @@ public:
         }
     }
 
-    void OnCastSpell()
-    {
-
+    void OnAfterAttack() override {
+        return;
     }
 
-    void Render()
-    {
+    void Render() override {
         __try {
 
             if (ThreshConfig::ThreshSpellsSettings::DrawQ->Value == true && (ThreshConfig::ThreshSpellsSettings::DrawIfReady->Value == true && database.ThreshQ.IsCastable() || ThreshConfig::ThreshSpellsSettings::DrawIfReady->Value == false))

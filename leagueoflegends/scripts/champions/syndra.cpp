@@ -2,8 +2,6 @@
 #include "../TargetSelector.h"
 #include "../Orbwalker.h"
 
-using namespace scripts;
-
 class SyndraModule : public ChampionModule
 {
 private:
@@ -106,27 +104,26 @@ public:
         return false;
     }
 
-    void Init() override
+    void Initialize() override
     {
-        ADD_SETTING("Champion Settings", "Syndra", "draw Q-E range", false);
-        ADD_SETTING("Champion Settings", "Syndra", "draw E calculation", false);
+
     }
 
     void Update() override
     {
-        gameTime = functions::GetGameTime();
+        gameTime = Engine::GetGameTime();
     }
 
-    void Attack() override
+    void Combo() override
     {
-        prediction::PredictionOutput qPrediction;
-        prediction::PredictionOutput wPrediction;
-        prediction::PredictionOutput ePrediction;
+        Modules::prediction::PredictionOutput qPrediction;
+        Modules::prediction::PredictionOutput wPrediction;
+        Modules::prediction::PredictionOutput ePrediction;
 
         auto spellCast = globals::localPlayer->GetActiveSpellCast();
         if (spellCast && spellCast->GetSpellId() == SpellIndex::E) return;
 
-        if (e.IsCastable() && prediction::GetPrediction(e, ePrediction))
+        if (e.IsCastable() && Modules::prediction::GetPrediction(e, ePrediction))
         {
             if (q.IsCastable() && (q.GetStacks() > 0 || q.GetName().size() == 7) &&
                 globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetManaCost() +
@@ -151,24 +148,24 @@ public:
             lastETargetPos = {};
         }
         
-        if (w.IsCastable() && (int)w.GetName().size() == 11 && prediction::GetPrediction(w, wPrediction))
+        if (w.IsCastable() && (int)w.GetName().size() == 11 && Modules::prediction::GetPrediction(w, wPrediction))
         {
             UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::W, wPrediction.position);
             return;
         }
 
-        if (q.IsCastable() && (q.GetStacks() > 0 || q.GetName().size() == 7) && prediction::GetPrediction(q, qPrediction))
+        if (q.IsCastable() && (q.GetStacks() > 0 || q.GetName().size() == 7) && Modules::prediction::GetPrediction(q, qPrediction))
         {
             UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::Q, qPrediction.position);
             return;
         }
 
-        if (CanCastW1() && w.IsCastable() && (int)w.GetName().size() == 7 && prediction::GetPrediction(w, wPrediction))
+        if (CanCastW1() && w.IsCastable() && (int)w.GetName().size() == 7 && Modules::prediction::GetPrediction(w, wPrediction))
         {
             auto monster = UPasta::SDK::TargetSelector::Functions::GetObjectInRange(w.GetRange(), "",
                 { ObjectType::Minion_Lane, ObjectType::Monster },
                 { ObjectType::Monster_Epic, ObjectType::Monster_Dragon }, false);
-            if (monster && monster == functions::GetSelectedObject())
+            if (monster && monster == Engine::GetSelectedObject())
             {
                 UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::W, monster->GetPosition());
                 lastW1CastTime = gameTime;
@@ -192,47 +189,50 @@ public:
         }
     }
 
-    void Clear() override
-    {
-
-    }
-    void Harass() override
-    {
-
-    }
-    void Lasthit() override
-    {
-
-    }
-    void Killsteal()
-    {
-
+    void Clear() override {
+        return;
     }
 
-    void Flee() override
-    {
+    void Harass() override {
+        return;
+    }
 
+    void Lasthit() override {
+        return;
+    }
+
+    void Killsteal() {
+        return;
+    }
+
+    void Flee() override {
+        return;
     }
 
     //Events
-    void OnBeforeAttack() override
-    {
-
+    void OnCreateMissile() override {
+        return;
     }
 
-    void OnCastSpell() override
-    {
-
+    void OnDeleteMissile() override {
+        return;
     }
 
+    void OnBeforeAttack() override {
+        return;
+    }
+
+    void OnAfterAttack() override {
+        return;
+    }
     void Render() override
     {
-        if (e.IsCastable() && SETTINGS_BOOL("Syndra", "draw Q-E range"))
+        if (e.IsCastable())
         {
             render::RenderCircleWorld(globals::localPlayer->GetPosition(), 40, e.GetRange(), COLOR_PURPLE, 1.0f);
         }
 
-        if (lastEObjPos.IsValid() && lastEProjectionPos.IsValid() && lastETargetPos.IsValid() && SETTINGS_BOOL("Syndra", "draw E calculation"))
+        if (lastEObjPos.IsValid() && lastEProjectionPos.IsValid() && lastETargetPos.IsValid() )
         {
             render::RenderCircleWorld(lastEObjPos, 20, 30.0f, COLOR_BLUE, 3.0f);
             render::RenderCircleWorld(lastETargetPos, 20, 30.0f, COLOR_RED, 3.0f);
@@ -241,10 +241,10 @@ public:
             auto projectionDirectionN = projectionDirection.Normalized();
             auto projectionSuccess = lastETargetPos + ((projectionDirection.Length() > e.GetRadius()) ? projectionDirectionN * e.GetRadius() : projectionDirection);
 
-            auto objScreen = functions::WorldToScreen(lastEObjPos).ToImVec();
-            auto projectionScreen = functions::WorldToScreen(lastEProjectionPos).ToImVec();
-            auto targetScreen = functions::WorldToScreen(lastETargetPos).ToImVec();
-            auto projectionSuccessScreen = functions::WorldToScreen(projectionSuccess).ToImVec();
+            auto objScreen = Engine::WorldToScreen(lastEObjPos).ToImVec();
+            auto projectionScreen = Engine::WorldToScreen(lastEProjectionPos).ToImVec();
+            auto targetScreen = Engine::WorldToScreen(lastETargetPos).ToImVec();
+            auto projectionSuccessScreen = Engine::WorldToScreen(projectionSuccess).ToImVec();
 
             render::RenderLine(objScreen, projectionScreen, COLOR_WHITE, 3.0f);
             render::RenderLine(projectionSuccessScreen, projectionScreen, COLOR_RED, 3.0f);

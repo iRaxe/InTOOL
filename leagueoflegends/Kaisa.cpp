@@ -75,7 +75,7 @@ public:
         ChampionModuleManager::RegisterModule(name, this);
     }
 
-    void Init() override
+    void Initialize() override
     {
         const auto KaisaMenu = Menu::CreateMenu("m0sKaisa", "Kai'sa");
 
@@ -231,9 +231,9 @@ public:
         if (!isTimeToCast()) return;
 
         auto handleSpellCast = [&](Skillshot spellData) {
-            prediction::PredictionOutput prediction;
+            Modules::prediction::PredictionOutput prediction;
             if (GetPrediction(globals::localPlayer, pEnemy, spellData, prediction))
-                functions::CastSpell(spellID, prediction.position);
+                Engine::CastSpell(spellID, prediction.position);
             };
 
         switch (spellID) {
@@ -247,7 +247,7 @@ public:
             WCastedTime = gameTime;
             break;
         case E:
-            functions::CastSpell(E, functions::GetMouseWorldPos());
+            Engine::CastSpell(E, Engine::GetMouseWorldPos());
             ECastedTime = gameTime;
             break;
         case R:
@@ -263,7 +263,7 @@ public:
 
     void Update() override
     {
-        gameTime = functions::GetGameTime();
+        gameTime = Engine::GetGameTime();
 
         Killsteal();
         AntiGapCloser();
@@ -273,19 +273,19 @@ public:
         {
             if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() == 0 && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), qRange()).size() == 1)
             {
-                functions::CastSpell(SpellIndex::Q);
+                Engine::CastSpell(SpellIndex::Q);
             }
         }
     }
 
-    void Attack() override
+    void Combo() override
     {
         if (KaisaConfig::EConfig::ComboE->Value == 1 && database.KaisaE.IsCastable())
         {
-            const auto attackedTarget = functions::GetSelectedObject();
+            const auto attackedTarget = Engine::GetSelectedObject();
             if (attackedTarget != nullptr)
             {
-                functions::CastSpell(SpellIndex::E);
+                Engine::CastSpell(SpellIndex::E);
             }
 
         }
@@ -294,7 +294,7 @@ public:
         {
             if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() == 0 && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), qRange()).size() == 1)
             {
-                functions::CastSpell(SpellIndex::Q);
+                Engine::CastSpell(SpellIndex::Q);
             }
         }
 
@@ -306,7 +306,7 @@ public:
         if (KaisaConfig::EConfig::ComboE->Value == 1 && database.KaisaE.IsCastable())
         {
             if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange()))
-                functions::CastSpell(SpellIndex::E);
+                Engine::CastSpell(SpellIndex::E);
         }
 
         if (KaisaConfig::WConfig::ComboW->Value == 0 && database.KaisaW.IsCastable())
@@ -360,7 +360,7 @@ public:
                                 {
                                     highestDistance = Vector3(pX, pY, pZ).distanceTo(rTarget->GetPosition());
                                     bestPoint = Vector3(pX, pY, pZ);
-                                    functions::CastSpell(R, bestPoint);
+                                    Engine::CastSpell(R, bestPoint);
                                     RCastedTime = gameTime;
                                 }
 
@@ -370,7 +370,7 @@ public:
                                 highestDistance = Vector3(pX, pY, pZ).distanceTo(rTarget->GetPosition());
                                 bestPoint = Vector3(pX, pY, pZ);
 
-                                functions::CastSpell(R, bestPoint);
+                                Engine::CastSpell(R, bestPoint);
                                 RCastedTime = gameTime;
                             }
 
@@ -398,7 +398,7 @@ public:
 
             if (KaisaConfig::KaisaClear::UseQ->Value == true && database.KaisaQ.IsCastable())
             {
-                functions::CastSpell(SpellIndex::Q);
+                Engine::CastSpell(SpellIndex::Q);
             }
         }
 
@@ -454,11 +454,11 @@ public:
 
     void AntiGapCloser()
     {
-        if (KaisaConfig::KaisaAntiGapCloser::UseE->Value == true && functions::GetSpellState(SpellIndex::E) == 0)
+        if (KaisaConfig::KaisaAntiGapCloser::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
             for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 450.0f))
             {
-                if (!functions::MenuItemContains(KaisaConfig::KaisaAntiGapCloser::whitelist, target->GetName().c_str())) continue;
+                if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiGapCloser::whitelist, target->GetName().c_str())) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
 
@@ -467,7 +467,7 @@ public:
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 350.0f))
                     {
-                        functions::CastSpell(SpellIndex::E);
+                        Engine::CastSpell(SpellIndex::E);
                     }
                 }
             }
@@ -476,22 +476,46 @@ public:
 
     void AntiMelee()
     {
-        if (KaisaConfig::KaisaAntiMelee::UseE->Value == true && functions::GetSpellState(SpellIndex::E) == 0)
+        if (KaisaConfig::KaisaAntiMelee::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
             for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 450.0f))
             {
-                if (!functions::MenuItemContains(KaisaConfig::KaisaAntiMelee::whitelist, target->GetName().c_str())) continue;
+                if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiMelee::whitelist, target->GetName().c_str())) continue;
 
                 if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetAttackRange()))
                 {
-                    const Vector3 pathEnd = functions::GetMouseWorldPos();
+                    const Vector3 pathEnd = Engine::GetMouseWorldPos();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 350.0f))
                     {
-                        functions::CastSpell(SpellIndex::E);
+                        Engine::CastSpell(SpellIndex::E);
                     }
                 }
             }
         }
+    }
+
+    void Lasthit() override {
+        return;
+    }
+
+    void Flee() override {
+        return;
+    }
+
+    void OnCreateMissile() override {
+        return;
+    }
+
+    void OnDeleteMissile() override {
+        return;
+    }
+
+    void OnBeforeAttack() override {
+        return;
+    }
+
+    void OnAfterAttack() override {
+        return;
     }
 
     void Render() override
@@ -508,25 +532,6 @@ public:
         {
             LOG("ERROR IN RENDER MODE");
         }
-    }
-
-    void Lasthit() override
-    {
-
-    }
-    void Flee() override
-    {
-
-    }
-
-    void OnBeforeAttack() override
-    {
-
-    }
-
-    void OnCastSpell() override
-    {
-
     }
 };
 

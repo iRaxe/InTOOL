@@ -80,7 +80,7 @@ uintptr_t GetTextSectionChecksum() {
 		}
 	}
 
-	if (!foundTextSection) 
+	if (!foundTextSection)
 	{
 		// Handle the case where the .text section was not found.
 		// You could return a special value, throw an exception, or do something else here.
@@ -145,9 +145,6 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 	AllocConsole();
 	freopen_s(&f, "CONOUT$", "w", stdout);
 #endif
-	std::string username = ReadFromJson("C:/UPorn/UAuth.json", "username");
-	LOG("Injected as Username: %s", username);
-
 	/*static const uintptr_t InitialChecksum = GetChecksum();
 	LOG("Initial checksum: %p", InitialChecksum);
 	RestoreVMHook();
@@ -156,7 +153,8 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 	0f b6 34 0b f9 <= primo check
 	0f b6 04 03 d2 f7 <= secondo check
 	0f b6 1c 1e <= terzo check
-	0f b6 04 06 <= quarto check*/
+	0f b6 04 06 <= quarto check
+	13.23 = 0x2D1410*/
 
 	std::thread(startZoom).detach();
 	Sleep(100);
@@ -179,7 +177,7 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 		if (IsValidPtr(gameTimePtr) && *gameTimePtr > 3.0f) break;
 		Sleep(300);
 	}
-	
+
 	int hooked = 2;
 	for (int i = 0; i < hooks::renderTypeNames.size(); i++)
 	{
@@ -202,7 +200,7 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 	while (!globals::eject)
 	{
 		Sleep(5);
-		if (!globals::hookResponse && GetAsyncKeyState(VK_DELETE) || functions::GetGameState() == Paused)
+		if (!globals::hookResponse && GetAsyncKeyState(VK_DELETE)) //|| Engine::GetGameState() == Paused)
 			globals::eject = true;
 	}
 
@@ -218,17 +216,13 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-	
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		if (std::filesystem::exists("C:/UPorn/UAuth.json"))
-		{
 			hLocalModule = hModule;
 			DisableThreadLibraryCalls(hModule);
 			CreateThread(nullptr, 0, OnInject, hModule, 0, nullptr);
 			break;
-		}
 	case DLL_PROCESS_DETACH:
 		break;
 	}

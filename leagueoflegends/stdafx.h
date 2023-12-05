@@ -51,24 +51,24 @@
 #include "global/utils.h"
 #include "global/leagueobfuscation.h"
 #include "classes/classes.h"
-#include "global/functions.h"
+#include "global/Engine.h"
 #include "render/render.h"
-#include "global/settings.h"
 #include "global/globals.h"
 #include "global/targetver.h"
 #include "scripts/championmodule.h"
 #include "scripts/skillshotdatabase.h"
-#include "scripts/scripts.h"
+#include "scripts/Modules.h"
+
 #include "hooks/hooks.h"
 #include "hooks/impl/impl.h"
-#include "menu/menu.h"
-
-#include "customimages.h"
 #include "Eventmanager.h"
 
 #include "json.hpp"
 using json = nlohmann::json;
+
 #define RVA(address) (uintptr_t)(globals::moduleBase + address)
+#define RVA2(address) (globals::moduleBase + address)
+
 #define DEFINE_RVA(address) ((uintptr_t)((uintptr_t)globals::moduleBase + (uintptr_t)address)
 #define CLASS_GETTER(returnType, name, offset) \
 [[nodiscard]] inline returnType name() const noexcept \

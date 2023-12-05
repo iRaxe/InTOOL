@@ -1,5 +1,4 @@
 #pragma once
-
 #define JUNGLE_MONSTER_GROMP std::string("SRU_Gromp") // OK
 #define JUNGLE_MONSTER_WOLF std::string("SRU_Murkwolf") // OK
 #define JUNGLE_MONSTER_WOLF_MINI std::string("SRU_MurkwolfMini")
@@ -13,10 +12,12 @@
 #define JUNGLE_MONSTER_RED std::string("SRU_Red") // OK
 #define JUNGLE_MONSTER_BARON std::string("SRU_Baron") // OK
 #define JUNGLE_MONSTER_HERALD std::string("SRU_RiftHerald") //OK
+
+#define JUNGLE_MONSTER_DRAGON_CLOUD std::string("SRU_Dragon_Air")
 #define JUNGLE_MONSTER_DRAGON_INFERNAL std::string("SRU_Dragon_Fire")
 #define JUNGLE_MONSTER_DRAGON_OCEAN std::string("SRU_Dragon_Water")
+#define JUNGLE_MONSTER_DRAGON_RUINED std::string("SRU_Dragon_Ruined")
 #define JUNGLE_MONSTER_DRAGON_MOUNTAIN std::string("SRU_Dragon_Earth")
-#define JUNGLE_MONSTER_DRAGON_CLOUD std::string("SRU_Dragon_Air")
 #define JUNGLE_MONSTER_DRAGON_HEXTECH std::string("SRU_Dragon_Hextech")
 #define JUNGLE_MONSTER_DRAGON_CHEMTECH std::string("SRU_Dragon_Chemtech")
 #define JUNGLE_MONSTER_DRAGON_ELDER std::string("SRU_Dragon_Elder")

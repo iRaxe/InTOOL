@@ -35,7 +35,7 @@ namespace UPasta
 	{
 		Action(int time, std::function<void()> callback)
 		{
-			Time = time + functions::GetGameTick();
+			Time = time + Engine::GetGameTick();
 			CallbackObject = callback;
 		}
 
@@ -52,7 +52,7 @@ namespace UPasta
 	{
 		ActionIUnit(int time, Object* unit, std::function<void(Object*)> callback)
 		{
-			Time = time + functions::GetGameTick();
+			Time = time + Engine::GetGameTick();
 			CallbackObject = callback;
 			Unit = unit;
 		}
@@ -72,7 +72,7 @@ namespace UPasta
 	{
 		ActionPosition(int time, Vector3 position, std::function<void(Vector3)> callback)
 		{
-			Time = time + functions::GetGameTick();
+			Time = time + Engine::GetGameTick();
 			CallbackObject = callback;
 			Position = position;
 		}
@@ -94,7 +94,7 @@ namespace UPasta
 		{
 			Actions.erase(std::remove_if(Actions.begin(), Actions.end(), [](Action& Args)
 				{
-					if (functions::GetGameTick() >= Args.Time)
+					if (Engine::GetGameTick() >= Args.Time)
 					{
 						Args.Call();
 						return true;
@@ -105,7 +105,7 @@ namespace UPasta
 
 			ActionsIunit.erase(std::remove_if(ActionsIunit.begin(), ActionsIunit.end(), [](ActionIUnit& Args)
 				{
-					if (functions::GetGameTick() >= Args.Time)
+					if (Engine::GetGameTick() >= Args.Time)
 					{
 						Args.Call();
 						return true;
@@ -115,7 +115,7 @@ namespace UPasta
 				}), ActionsIunit.end());
 			ActionsPosition.erase(std::remove_if(ActionsPosition.begin(), ActionsPosition.end(), [](ActionPosition& Args)
 				{
-					if (functions::GetGameTick() >= Args.Time)
+					if (Engine::GetGameTick() >= Args.Time)
 					{
 						Args.Call();
 						return true;

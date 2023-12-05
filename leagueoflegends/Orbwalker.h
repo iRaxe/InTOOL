@@ -100,6 +100,7 @@ namespace UPasta::SDK::Orbwalker
 
 			void Attack();
 			void Laneclear();
+            void Fastclear();
 			void Harass();
 			void Lasthit();
 		}
