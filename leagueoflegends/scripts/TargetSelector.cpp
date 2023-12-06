@@ -1172,7 +1172,7 @@ namespace UPasta
 					{
 						Object* selectedObject = Engine::GetSelectedObject();
 						if (selectedObject && selectedObject->IsValidTarget())
-							render::RenderArcWorld(selectedObject->GetPosition(), 10, selectedObject->ReadClientStat(Object::AttackRange), COLOR_BLUE, 1.0f, PI, globals::localPlayer->GetPosition(), true);
+							render::RenderArcWorld(selectedObject->GetPosition(), 10, selectedObject->GetRealAttackRange(), COLOR_BLUE, 1.0f, PI, globals::localPlayer->GetPosition(), true);
 					}
 					
 				}

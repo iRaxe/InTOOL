@@ -28,7 +28,6 @@ namespace hooks
 
 			UPasta::EventsManager::Initialization::OnInject();
 
-
 			RECT windowRect;
 			if (GetWindowRect(windowDX, &windowRect))
 			{
@@ -45,7 +44,6 @@ namespace hooks
 
 		void Updates()
 		{
-
 			__try { UPasta::SDK::ListManager::Functions::Refresh(); }
 			__except (1) { LOG("ERROR IN LISTMANAGER UPDATE"); }
 
@@ -66,10 +64,8 @@ namespace hooks
 			{
 				UPasta::SDK::Menu::Dispose();
 				UPasta::EventsManager::Dispose();
+
 				globals::eject = true;
-
-				Engine::PrintChat(CHAT_COLOR("#ff5b5b", "Looooooooooooooooooool"));
-
 				return true;
 			}
 
@@ -79,6 +75,21 @@ namespace hooks
 			else {
 				globals::menuOpen = false;
 			}
+
+			globals::scripts::orbwalker::orbwalkState = OrbwalkState::Off;
+
+			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::comboKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusComboMode->Value)
+				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Attack;
+			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::laneClearKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusLaneClearMode->Value)
+				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Clear;
+			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::fastClearKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusFastClearMode->Value)
+				globals::scripts::orbwalker::orbwalkState = OrbwalkState::FastClear;
+			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::harassKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusHarassMode->Value)
+				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Harass;
+			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::lastHitKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusLastHitMode->Value)
+				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Lasthit;
+			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::fleeKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusFleeMode->Value)
+				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Flee;
 
 			return false;
 		}
@@ -187,7 +198,6 @@ namespace hooks
 			{
 				if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&pDeviceDX11)))
 				{
-
 					pDeviceDX11->GetImmediateContext(&pContextDX11);
 					DXGI_SWAP_CHAIN_DESC sd;
 					pSwapChain->GetDesc(&sd);
@@ -198,15 +208,14 @@ namespace hooks
 					pDeviceDX11->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetViewDX11);
 					pBackBuffer->Release();
 					o_wndProcDX = (WNDPROC)SetWindowLongPtr(windowDX, GWLP_WNDPROC, (LONG_PTR)wndProcDX);
-					IMGUI_CHECKVERSION();
-					ImGui::CreateContext(); //is the only one i have
-					ImGuiIO& io = ImGui::GetIO(); (void)io;
-					ImFontConfig cfg;
-					cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_ForceAutoHint | ImGuiFreeTypeBuilderFlags_LightHinting | ImGuiFreeTypeBuilderFlags_LoadColor;
 
+					IMGUI_CHECKVERSION();
+					ImGui::CreateContext();
+					ImGuiIO& io = ImGui::GetIO(); (void)io;
 					io.IniFilename = "window.ini";
 					io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 					io.Fonts->AddFontFromFileTTF(SP_STRING("C:\\Windows\\Fonts\\Arial.ttf"), 14);
+
 					DXGI_SWAP_CHAIN_DESC desc;
 					pSwapChain->GetDesc(&desc);
 
@@ -244,10 +253,10 @@ namespace hooks
 
 					kiero::shutdown();
 					pDeviceDX11->Release();
-
 					globals::eject = true;
 
 					return result;
+
 				}
 			}
 

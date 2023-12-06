@@ -185,19 +185,23 @@ public:
 class AiManager
 {
 public:
+	std::vector<Vector3> GetFutureSegments();
+	Vector3 GetSegment(int index);
+	Vector3 GetPosition();
 	Vector3 GetTargetPosition();
-	bool IsMoving();
-	int GetCurrentSegment();
+	Vector3 GetMouseClickPosition();
 	Vector3 GetPathStart();
+	Vector3 GetDashStart();
 	Vector3 GetPathEnd();
+	Vector3 GetDirection();
+
+	bool IsMoving();
+	bool IsDashing();
+	bool IsNotDashing();
+	int GetCurrentSegment();
 	int GetSegmentsCount();
 	float GetDashSpeed();
-	bool IsDashing();
-	Vector3 GetPosition();
-
-public:
-	Vector3 GetSegment(int index);
-	std::vector<Vector3> GetFutureSegments();
+	float GetMovementSpeed();
 };
 
 class CharacterData
@@ -270,7 +274,6 @@ public:
 	void SetEndPos(Vector3 pos);
 	void SetClickedPos(Vector3 pos);
 	void SetUnkPos(Vector3 pos);
-	void SetReleasePos(Vector3 pos);
 };
 
 class Spell
@@ -348,15 +351,7 @@ public:
 	bool IsTargetable();
 	bool IsInvulnerable();
 	bool IsCursed();
-	bool HasBarrier(int slotId);
-	bool HasFlash(int slotId);
-	bool HasCleanse(int slotId);
-	bool HasExhaust(int slotId);
-	bool HasGhost(int slotId);
-	bool HasHeal(int slotId);
-	bool HasIgnite(int slotId);
-	bool HasSmite(int slotId);
-	bool HasTeleport(int slotId);
+	bool HasSummonerSpell(SummonerSpells summSpellToFind);
 	bool HasConqueror();
 	bool IsCastingSpell();
 	bool CanAttack();
@@ -390,7 +385,6 @@ public:
 	bool CanCastSpell(int slotId);
 	bool HasBuff(const char* buffname);
 	Vector3 GetPosition();
-	Vector3 GetServerPosition();
 	Buff* GetBuffByName(std::string name);
 	Buff* GetBuffByType(BuffType type);
 	int GetBuffListSize();
@@ -400,7 +394,6 @@ public:
 	float GetBoundingRadius();
 	float GetAttackDelay();
 	float GetAttackWindup();
-	float CharGetAttackDamage();
 	float GetEffectiveHealth(int damageType);
 	float GetRealAttackRange();
 	float GetDistanceTo(Object* obj);
@@ -410,6 +403,7 @@ public:
 	float GetMana();
 	float GetMaxMana();
 	float GetPercentMana();
+	float GetAttackDamage();
 	std::string GetName();
 	std::string GetClassicName();
 	BuffManager* GetBuffManager();

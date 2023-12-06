@@ -253,6 +253,7 @@
     <ClInclude Include="LoadImages.h" />
     <ClInclude Include="makesyscall.h" />
     <ClInclude Include="ManagerTemplate.h" />
+    <ClInclude Include="Memory.h" />
     <ClInclude Include="mem\mem.h" />
     <ClInclude Include="mem\spoof_call.h" />
     <ClInclude Include="Nautilus.h" />
@@ -350,6 +351,7 @@
     <ClCompile Include="LoadImages.cpp" />
     <ClCompile Include="main\dllmain.cpp" />
     <ClCompile Include="ManagerTemplate.cpp" />
+    <ClCompile Include="Memory.cpp" />
     <ClCompile Include="mem\mem.cpp" />
     <ClCompile Include="Nautilus.cpp" />
     <ClCompile Include="NewMenu.cpp" />

@@ -7,6 +7,8 @@
 #include "../MenuSettings.h"
 #include "../skStr.h"
 #include "../auth.hpp"
+#include "../Memory.h"
+#include "../Syscaller.h"
 
 //#define CONSOLE_ENABLED
 
@@ -155,6 +157,8 @@ DWORD __stdcall OnInject(LPVOID lpReserved)
 	0f b6 1c 1e <= terzo check
 	0f b6 04 06 <= quarto check
 	13.23 = 0x2D1410*/
+	if (!Syscaller::Init()) return false;
+	Memory::Init();
 
 	std::thread(startZoom).detach();
 	Sleep(100);

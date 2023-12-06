@@ -71,7 +71,7 @@ namespace Modules::prediction
 			speed = aiManager->GetDashSpeed();
 		}
 		
-		std::vector<Vector3> waypoints = { obj->GetServerPosition() };
+		std::vector<Vector3> waypoints = { obj->GetAiManager()->GetPosition() };
 		auto futureWaypoints = aiManager->GetFutureSegments();
 		for (auto waypoint : futureWaypoints)
 			waypoints.push_back(waypoint);
@@ -79,7 +79,7 @@ namespace Modules::prediction
 		const int waypointsSize = (int)waypoints.size();
 
 		if (!waypointsSize || !time || !aiManager->IsMoving())
-			return obj->GetServerPosition();
+			return obj->GetAiManager()->GetPosition();
 
 		float distance = (speed * time) - distanceBuffer;
 
@@ -110,11 +110,11 @@ namespace Modules::prediction
 
 	bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot &skillshot, Modules::prediction::PredictionOutput& out)
 	{
-		const auto sourcePos = sourceObj->GetServerPosition();
+		const auto sourcePos = sourceObj->GetAiManager()->GetPosition();
 		const auto targetAiManager = targetObj->GetAiManager();
 		const float spellRadius = skillshot.GetRadius();
 
-		float distance = sourcePos.Distance(targetObj->GetServerPosition());
+		float distance = sourcePos.Distance(targetObj->GetAiManager()->GetPosition());
 		float distanceBuffer = skillshot.GetType() == SkillshotType::SkillshotCircle ? max(spellRadius - 20.0f, 0.0f) : 0.0f;
 
 		if (distance > skillshot.GetMaxRange())
@@ -131,7 +131,7 @@ namespace Modules::prediction
 
 		if (!waypointsSize || !targetAiManager->IsMoving())
 		{
-			out.position = targetObj->GetServerPosition();
+			out.position = targetObj->GetAiManager()->GetPosition();
 			return CheckCollision(sourcePos, out.position, sourceObj, targetObj, skillshot);
 		}
 

@@ -20,10 +20,10 @@ typedef unsigned long long QWORD;
 #define ReadQWORD2(type,base, addr) *reinterpret_cast<type*>((QWORD)base + (QWORD)addr)
 
 #define ReadQWORD(base, addr) *reinterpret_cast<QWORD*>((QWORD)base + (QWORD)addr)
-#define ReadFLOAT(base, addr) *reinterpret_cast<float*>((QWORD)base + (QWORD)addr)
-#define ReadINT(base, addr) *reinterpret_cast<int*>((QWORD)base + (QWORD)addr)
-#define ReadDWORD(base, addr) *reinterpret_cast<DWORD*>((QWORD)base + (QWORD)addr)
-#define ReadBOOL(base, addr) *reinterpret_cast<bool*>((QWORD)base + (QWORD)addr)
+#define ReadFLOAT(base, addr) *reinterpret_cast<float*>((QWORD)base + addr)
+#define ReadINT(base, addr) *reinterpret_cast<int*>((QWORD)base + addr)
+#define ReadDWORD(base, addr) *reinterpret_cast<DWORD*>((QWORD)base + addr)
+#define ReadBOOL(base, addr) *reinterpret_cast<bool*>((QWORD)base + addr)
 
 #define ReadVTable(addr, idx) ((QWORD*)ReadQWORD(addr, 0))[(int)idx]
 

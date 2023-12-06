@@ -4,8 +4,8 @@
 class SpellInfo2
 {
 	union {
-		DEFINE_MEMBER_N(LolString _name, UPasta::Offsets::Missile::SpellInfo::SpellName);
-		DEFINE_MEMBER_N(SpellData2* _spell_data, UPasta::Offsets::SpellSlot::Info::Data);
+		DEFINE_MEMBER_N(LolString _name, UPasta::Offsets::MissileManager::SpellInfo::SpellName);
+		DEFINE_MEMBER_N(SpellData2* _spell_data, UPasta::Offsets::MissileManager::SpellInfo::SpellInfoInstance);
 	};
 
 public:

@@ -173,9 +173,9 @@ public:
         JinxConfig::JinxSpellsSettings::qCastMode = qSpellMenu->AddList("castMode", "Cast Mode", std::vector<std::string>{"Doesn't Matter", "While attacking"}, 0);
         JinxConfig::JinxSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange",
             "Maximum Range",
-            static_cast<float>(globals::localPlayer->ReadClientStat(Object::AttackRange)) * 1.5f,
+            static_cast<float>(globals::localPlayer->GetRealAttackRange()) * 1.5f,
             100,
-            static_cast<float>(globals::localPlayer->ReadClientStat(Object::AttackRange)) * 2.0f, 50);
+            static_cast<float>(globals::localPlayer->GetRealAttackRange()) * 2.0f, 50);
         JinxConfig::JinxSpellsSettings::DrawQ = qSpellMenu->AddCheckBox("Draw Q", "Draw Range", true);
 
         const auto wSpellMenu = spellsMenu->AddMenu("SpellSlot W Settings", "SpellSlot W");

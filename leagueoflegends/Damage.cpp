@@ -36,7 +36,6 @@ namespace UPasta
 			auto calculatedPhysicalDamage = 0.0f;
 			auto calculatedMagicalDamage = 0.0f;
 			auto rawTotalDamage = source->ReadClientStat(Object::TotalAttackDamage);
-
 			//auto targetFlags = target->Flags();
 			//auto sourceFlags = source->Flags();
 
@@ -46,7 +45,6 @@ namespace UPasta
 					return 1.0f;
 				}
 			}
-
 			//if (sourceFlags & GameObjectFlags_AIHeroClient) {
 			if (source->IsHero()) {
 				auto damageOnHit = ComputeDamageOnHit(source, target);
@@ -66,7 +64,6 @@ namespace UPasta
 
 			calculatedPhysicalDamage += CalculatePhysicalDamage(source, target, rawPhysicalDamage);
 			calculatedMagicalDamage += CalculateMagicalDamage(source, target, rawMagicalDamage);
-
 			return calculatedPhysicalDamage + calculatedMagicalDamage + rawTrueDamage;
 		}
 
@@ -92,11 +89,11 @@ namespace UPasta
 
 			const auto armor = target->ReadClientStat(Object::BaseArmor);
 			const auto bonusArmor = target->ReadClientStat(Object::BonusArmor);
+
 			const auto adjustedArmor = armor * percentArmorPenetration - bonusArmor * (1.0f - percentBonusArmorPenetration) - flatArmorPenetration;
 
 			const auto bonusTrueDamage = source->IsHero() && target->IsHero() && source->HasConqueror() ? amount * 0.2f : 0.0f;
 			amount = source->IsHero() && target->IsHero() && source->HasConqueror() ? amount * 0.8f : amount;
-
 			const auto damageModifier = ComputeDamageModifier(source, target, Physical);
 			amount = (amount + damageModifier.Flat) * damageModifier.Percent;
 
@@ -106,8 +103,9 @@ namespace UPasta
 			else if (adjustedArmor >= 0.0f) {
 				amount *= 100.0f / (100.0f + adjustedArmor);
 			}
-
+			
 			return max(amount + bonusTrueDamage, 0.0f);
+			
 		}
 
 		float Damage::CalculateMagicalDamage(Object* source, Object* target, float amount) {
@@ -142,7 +140,6 @@ namespace UPasta
 					amount *= 100.0f / (100.0f + adjustedMagicResist);
 				}
 			}
-
 			return max(amount + bonusTrueDamage, 0.0f);
 		}
 

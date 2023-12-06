@@ -482,7 +482,7 @@ public:
             {
                 if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->ReadClientStat(Object::AttackRange)))
+                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))
                 {
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 350.0f))

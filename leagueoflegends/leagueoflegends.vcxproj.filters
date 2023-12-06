@@ -585,6 +585,9 @@
     <ClInclude Include="Jinx.h">
       <Filter>Scripts\Champions\Jinx</Filter>
     </ClInclude>
+    <ClInclude Include="Memory.h">
+      <Filter>Main\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -842,6 +845,9 @@
     </ClCompile>
     <ClCompile Include="Jinx.cpp">
       <Filter>Scripts\Champions\Jinx</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory.cpp">
+      <Filter>Main\Memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

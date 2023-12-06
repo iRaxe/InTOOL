@@ -9,11 +9,11 @@ SpellBook2::STATE SpellBook2::GetSpellSlotState(SLOT s) {
 
 
 	typedef STATE(*fnNewIssueOrder)(SpellBook2*, SLOT, uintptr_t);
-	fnNewIssueOrder fun = (fnNewIssueOrder)(RVA(UPasta::Offsets::SpellBook::FnGetSpellState)); // 0x8396B0
+	fnNewIssueOrder fun = (fnNewIssueOrder)(RVA(UPasta::Offsets::Functions::Spells::GetSpellState)); // 0x8396B0
 
 	//return spoof_call((void*)RVA(Offsets::SpoofGadget), *fun, this, s, (uintptr_t)NULL);
 
-	return reinterpret_cast<STATE(*)(void*, const SLOT, const uintptr_t&)> (RVA(UPasta::Offsets::SpellBook::FnGetSpellState)) (this, s, NULL);
+	return reinterpret_cast<STATE(*)(void*, const SLOT, const uintptr_t&)> (RVA(UPasta::Offsets::Functions::Spells::GetSpellState)) (this, s, NULL);
 }
 
 SpellCast2* SpellBook2::GetActiveSpellCast() {

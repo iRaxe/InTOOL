@@ -392,57 +392,55 @@ public:
         }
     }
 
-    void DrawStatsTest(Hero* test) {
+    void DrawStatsTest(Object* test) {
         float yOffset = 0;  // Inizializza l'offset
 
-        render::RenderTextWorld("AttackRange: " + std::to_string(test->ReadClientStat(Client::AttackRange)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("AttackRange: " + std::to_string(test->ReadClientStat(Object::AttackRange)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("Health: " + std::to_string(test->ReadClientStat(Client::Health)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("BonusHealth: " + std::to_string(test->ReadClientStat(Client::BonusHealth)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MaxHealth: " + std::to_string(test->ReadClientStat(Client::MaxHealth)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("LifeRegeneration: " + std::to_string(test->ReadClientStat(Client::LifeRegeneration)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("Health: " + std::to_string(test->ReadClientStat(Object::Health)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("BonusHealth: " + std::to_string(test->ReadClientStat(Object::BonusHealth)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("MaxHealth: " + std::to_string(test->ReadClientStat(Object::MaxHealth)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("LifeRegeneration: " + std::to_string(test->ReadClientStat(Object::LifeRegeneration)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("Mana: " + std::to_string(test->ReadClientStat(Client::Mana)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MaxMana: " + std::to_string(test->ReadClientStat(Client::MaxMana)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("Mana: " + std::to_string(test->ReadClientStat(Object::Mana)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("MaxMana: " + std::to_string(test->ReadClientStat(Object::MaxMana)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("BaseAttackDamage: " + std::to_string(test->ReadClientStat(Client::BaseAttackDamage)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("BonusAttackDamage: " + std::to_string(test->ReadClientStat(Client::BonusAttackDamage)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("BaseAttackDamage: " + std::to_string(test->ReadClientStat(Object::BaseAttackDamage)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("BonusAttackDamage: " + std::to_string(test->ReadClientStat(Object::BonusAttackDamage)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("AbilityHaste: " + std::to_string(test->ReadClientStat(Client::AbilityHaste)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("AbilityHaste: " + std::to_string(test->ReadClientStat(Object::AbilityHaste)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("Lethality: " + std::to_string(test->ReadClientStat(Client::Lethality)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("Lethality: " + std::to_string(test->ReadClientStat(Object::Lethality)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("ArmorPenetrationFlat: " + std::to_string(test->ReadClientStat(Client::ArmorPenetrationFlat)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("ArmorPenetrationFlat: " + std::to_string(test->ReadClientStat(Object::ArmorPenetrationFlat)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("MagicPenetrationFlat: " + std::to_string(test->ReadClientStat(Client::MagicPenetrationFlat)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MagicPenetrationMultiplier: " + std::to_string(test->ReadClientStat(Client::MagicPenetrationMultiplier)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("MagicPenetrationFlat: " + std::to_string(test->ReadClientStat(Object::MagicPenetrationFlat)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("MagicPenetrationMultiplier: " + std::to_string(test->ReadClientStat(Object::MagicPenetrationMultiplier)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("AbilityPower: " + std::to_string(test->ReadClientStat(Client::AbilityPower)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("AbilityPower: " + std::to_string(test->ReadClientStat(Object::AbilityPower)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("BonusArmor: " + std::to_string(test->ReadClientStat(Client::BonusArmor)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("TotalArmor: " + std::to_string(test->ReadClientStat(Client::TotalArmor)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("BonusArmor: " + std::to_string(test->ReadClientStat(Object::BonusArmor)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("TotalArmor: " + std::to_string(test->ReadClientStat(Object::TotalArmor)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("Shield: " + std::to_string(test->ReadClientStat(Client::Shield)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("PhysicalShield: " + std::to_string(test->ReadClientStat(Client::PhysicalShield)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MagicalShield: " + std::to_string(test->ReadClientStat(Client::MagicalShield)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("Shield: " + std::to_string(test->ReadClientStat(Object::Shield)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("PhysicalShield: " + std::to_string(test->ReadClientStat(Object::PhysicalShield)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("MagicalShield: " + std::to_string(test->ReadClientStat(Object::MagicalShield)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("CritFlat: " + std::to_string(test->ReadClientStat(Client::CritFlat)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("CritMultiplier: " + std::to_string(test->ReadClientStat(Client::CritMultiplier)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("CritFlat: " + std::to_string(test->ReadClientStat(Object::CritFlat)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("CritMultiplier: " + std::to_string(test->ReadClientStat(Object::CritMultiplier)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+    	render::RenderTextWorld("AtackSpeedMulti: " + std::to_string(test->ReadClientStat(Object::AttackSpeed)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("AttackSpeedBonus: " + std::to_string(test->ReadClientStat(Client::AttackSpeedBonus)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("AtackSpeedMulti: " + std::to_string(test->ReadClientStat(Client::AtackSpeedMulti)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("BonusMagicResist: " + std::to_string(test->ReadClientStat(Object::BonusMagicResist)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("TotalMagicResist: " + std::to_string(test->ReadClientStat(Object::TotalMagicResist)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("BonusMagicResist: " + std::to_string(test->ReadClientStat(Client::BonusMagicResist)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("TotalMagicResist: " + std::to_string(test->ReadClientStat(Client::TotalMagicResist)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("MovementSpeed: " + std::to_string(test->ReadClientStat(Object::MovementSpeed)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("Ammo: " + std::to_string(test->ReadClientStat(Object::Ammo)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("MaxAmmo: " + std::to_string(test->ReadClientStat(Object::MaxAmmo)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-        render::RenderTextWorld("MovementSpeed: " + std::to_string(test->ReadClientStat(Client::MovementSpeed)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("Ammo: " + std::to_string(test->ReadClientStat(Client::Ammo)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MaxAmmo: " + std::to_string(test->ReadClientStat(Client::MaxAmmo)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+    	render::RenderTextWorld("ScaleMulti: " + std::to_string(test->ReadClientStat(Object::ScaleMulti)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
-    	render::RenderTextWorld("ScaleMulti: " + std::to_string(test->ReadClientStat(Client::ScaleMulti)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("Experience: " + std::to_string(test->ReadClientStat(Client::Experience)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("Level: " + std::to_string(test->ReadClientStat(Client::Level)), Vector3(test->GetWorldPosition().x, test->GetWorldPosition().y + yOffset, test->GetWorldPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("Experience: " + std::to_string(test->ReadClientStat(Object::Experience)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
+        render::RenderTextWorld("Level: " + std::to_string(test->ReadClientStat(Object::Level)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
 
     }
 
@@ -515,9 +513,9 @@ public:
            
             //if (!hero->IsRanged()) continue;
             //DrawStatsTest(hero);
-            //render::RenderTextWorld(std::to_string(hero->ReadClientStat(Client::BonusAttackDamage)), hero->GetWorldPosition(), 16.0f, COLOR_WHITE, true);
+            //render::RenderTextWorld(std::to_string(hero->ReadClientStat(Object::BonusAttackDamage)), hero->GetPosition(), 16.0f, COLOR_WHITE, true);
             //LOG("A %f", hero->GetAttackDelay());
-        	//Awareness::Functions::Radius::DrawRadius(hero->GetWorldPosition(), hero->ReadClientStat(Object::AttackRange) + globals::localPlayer->GetBoundingRadius(), COLOR_RED, 5.0f);
+        	//Awareness::Functions::Radius::DrawRadius(hero->GetPosition(), hero->GetRealAttackRange() + globals::localPlayer->GetBoundingRadius(), COLOR_RED, 5.0f);
         }
     }
 
@@ -527,7 +525,13 @@ public:
         Killsteal();
         AntiGapCloser(); 
         AntiMelee();
+
+       // DrawStatsTest(globals::localPlayer);
         //DrawTurretsRange();
+        if (globals::localPlayer->GetHeroInventory()->FindItemID(ItemsDatabase::Dorans_Ring))
+        {
+            LOG("AFAMMOCC");
+        }
         DrawHeroesRange();
         //LOG("AAAA %s", globals::localPlayer->GetSpellBySlotId(0)->GetSpellInfo()->GetSpellData()->GetTexturePath().c_str());
 
@@ -718,7 +722,7 @@ public:
             {
                 if (!Engine::MenuItemContains(AsheConfig::AsheAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->ReadClientStat(Object::AttackRange)))
+                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))
                 {
                 	Ashe_UseW(target);
                 }

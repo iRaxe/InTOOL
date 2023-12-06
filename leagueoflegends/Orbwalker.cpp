@@ -94,8 +94,6 @@ namespace UPasta
 				float gameTime = 0;
 				float lastAttackTime = 0.0f;
 				QWORD lastSpellCastAddress = 0;
-				bool shouldWait = false;
-				bool isReloading = false;
 				void Initialize()
 				{
 					if (!Configs::initializedOrbwalkerMenu)
@@ -104,50 +102,13 @@ namespace UPasta
 					}
 				}
 
-				void KeyChecks()
-				{
-					globals::scripts::orbwalker::orbwalkState = OrbwalkState::Off;
-
-					if (Configs::KeyBindings::comboKey->Value && Configs::Status::statusComboMode->Value)
-						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Attack;
-					if (Configs::KeyBindings::laneClearKey->Value && Configs::Status::statusLaneClearMode->Value)
-						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Clear;
-					if (Configs::KeyBindings::fastClearKey->Value && Configs::Status::statusFastClearMode->Value)
-						globals::scripts::orbwalker::orbwalkState = OrbwalkState::FastClear;
-					if (Configs::KeyBindings::harassKey->Value && Configs::Status::statusHarassMode->Value)
-						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Harass;
-					if (Configs::KeyBindings::lastHitKey->Value && Configs::Status::statusLastHitMode->Value)
-						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Lasthit;
-					if (Configs::KeyBindings::fleeKey->Value && Configs::Status::statusFleeMode->Value)
-						globals::scripts::orbwalker::orbwalkState = OrbwalkState::Flee;
-				}
-
-
 				void Update()
 				{
 					gameTime = Engine::GetGameTime();
-					__try { KeyChecks(); }
-					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> KEYCHECKS UPDATE"); }
 					__try { CheckActiveAttack(); }
 					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> CHECKATTIVEATTACK UPDATE"); }
-					__try { StopOrbwalkCheck(); }
-					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> STOPORBWALK UPDATE"); }
-					__try { IsReloadingCheck(); }
-					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> ISRELOADING UPDATE"); }
-					
-
-					/*if (Configs::KeyBindings::comboKey->Value)
-					{
-						Vector2 screenPos = Engine::WorldToScreen(globals::localPlayer->GetPosition());
-
-						render::RenderText("test", (screenPos - Vector2(0.0f, 0.0f)).ToImVec(), 18.0f, COLOR_WHITE, true);
-					}*/
-
-					if (shouldWait)
-						return;
-
-					if (globals::scripts::orbwalker::orbwalkState && isReloading)
-					{
+					if (ShouldStopOrbwalk()) return;
+					if (globals::scripts::orbwalker::orbwalkState && IsReloading()) {
 						Actions::Idle();
 						return;
 					}
@@ -180,7 +141,6 @@ namespace UPasta
 						__try { Actions::Idle(); }
 						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> IDLE UPDATE"); }
 						break;
-					
 					}
 
 				}
@@ -201,13 +161,11 @@ namespace UPasta
 					lastSpellCastAddress = (QWORD)spellCast;
 				}
 
-				void StopOrbwalkCheck()
+				bool ShouldStopOrbwalk()
 				{
-					if (!Engine::CanSendInput()
-						|| gameTime < lastAttackTime + globals::localPlayer->GetAttackWindup() + (Configs::Humanizer::windupDelay->Value / 1000.0f))
-						shouldWait = true;
-					else
-						shouldWait = false;
+					return 
+						!Engine::CanSendInput() ||
+						gameTime < lastAttackTime + globals::localPlayer->GetAttackWindup() + (Configs::Humanizer::windupDelay->Value / 100.0f);
 				}
 
 				float lastActionTime = 0.0f;
@@ -216,7 +174,7 @@ namespace UPasta
 					if (lastActionTime == 0.0f) 
 						lastActionTime = gameTime;
 
-					const float humanizerTimer = (Configs::Humanizer::clickDelay->Value / 1000.0f) + nextRngBuffer;
+					const float humanizerTimer = (Configs::Humanizer::clickDelay->Value / 100.0f) + nextRngBuffer;
 					if (gameTime < lastActionTime + humanizerTimer) 
 						return false;
 
@@ -245,12 +203,9 @@ namespace UPasta
 					}
 				}
 
-				void IsReloadingCheck()
+				bool IsReloading()
 				{
-					if (gameTime < lastAttackTime + globals::localPlayer->GetAttackDelay() - (Configs::Humanizer::beforeAttackDelay->Value / 1000.0f))
-						isReloading = true;
-					else
-						isReloading = false;
+					return gameTime < lastAttackTime + globals::localPlayer->GetAttackDelay() - (Configs::Humanizer::beforeAttackDelay->Value / 100.0f);
 				}
 
 				void RefreshBuffer()
@@ -358,7 +313,7 @@ namespace UPasta
 					void CastSpell(int spellId, Object* target)
 					{
 						Vector3 headPos = target->GetPosition();
-						const float objectHeight = *(float*)(target->GetCharacterData() + Offsets::GameObject::CharData::Size) * target->ReadClientStat(Object::ScaleMulti);
+						const float objectHeight = *(float*)(target->GetCharacterData() + Offsets::CharData::Size) * target->ReadClientStat(Object::ScaleMulti);
 						headPos.y += objectHeight;
 						CastSpell(spellId, headPos);
 					}
@@ -382,7 +337,6 @@ namespace UPasta
 							if (obj != nullptr)
 							{
 								Actions::AttackObject(obj);
-								return;
 							}
 						}
 
@@ -396,7 +350,6 @@ namespace UPasta
 							const auto killableMinion = TargetSelector::Functions::GetKillableEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
 							if (killableMinion != nullptr) //&& !ShouldWaitUnderTurret(killableMinion))
 							{
-								LOG("teST");
 								if (killableMinion->GetEffectiveHealth(Physical) + 50 < Damage::CalculateAutoAttackDamage(globals::localPlayer, killableMinion))
 									Actions::AttackObject(killableMinion);
 							}

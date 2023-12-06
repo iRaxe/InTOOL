@@ -387,22 +387,22 @@ enum SpellState : int
 };
 
 enum ActionState : unsigned short {
-	CanAttack = 1 << 0,
-	CanMove = 1 << 1,
-	CanCast = 1 << 2,
-	Immovable = 1 << 3,
-	Unknownz = 1 << 4,
-	IsStealth = 1 << 5,
-	Taunted = 1 << 6,
-	Feared = 1 << 7,
-	Fleeing = 1 << 8,
-	Supressed = 1 << 9,
-	Asleep = 1 << 10,
-	NearSight = 1 << 11,
-	Ghosted = 1 << 12,
-	HasGhost = 1 << 13,
-	Charmed = 1 << 14,
-	NoRender = 1 << 15
+	CanAttack = 1,
+	CanCast = 2,
+	CanMove = 4,
+	Immovable = 8,
+	Unknownz = 16,
+	IsStealth = 32,
+	Taunted = 64,
+	Feared = 128,
+	Fleeing = 256,
+	Supressed = 512,
+	Asleep = 1024,
+	NearSight = 2048,
+	Ghosted = 4096,
+	HasGhost = 8192,
+	Charmed = 16384,
+	NoRender = 32768
 };
 
 enum ObjectType : unsigned long long
@@ -1360,4 +1360,17 @@ enum class TeamType : int
 	Ally,
 	Enemy,
 	Neutral,
+};
+
+enum class SummonerSpells
+{
+	Barrier,
+	Flash,
+	Cleanse,
+	Exhaust,
+	Ghost,
+	Heal,
+	Ignite,
+	Smite,
+	Teleport,
 };

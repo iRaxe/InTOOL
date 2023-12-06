@@ -68,20 +68,12 @@ namespace UPasta::SDK::Orbwalker
 
     namespace Functions
     {
-        extern float nextRngBuffer;
-        extern float gameTime;
-        extern float lastAttackTime;
-        extern QWORD lastSpellCastAddress;
         extern float lastActionTime;
 
-        extern bool shouldWait;
-        extern bool isReloading;
-        extern bool canDoAction;
-
         void CheckActiveAttack();
-        void StopOrbwalkCheck();
+        bool ShouldStopOrbwalk();
         bool CanDoAction();
-        void IsReloadingCheck();
+        bool IsReloading();
 
         namespace Actions
         {

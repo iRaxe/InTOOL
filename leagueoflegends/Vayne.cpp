@@ -478,7 +478,7 @@ public:
         {
             if (!Engine::MenuItemContains(VayneConfig::VayneAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-            if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->ReadClientStat(Object::AttackRange)))
+            if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))
             {
                 if (VayneConfig::VayneAntiMelee::UseE->Value == true && database.VayneE.IsCastable())
                     Vayne_UseE(target);

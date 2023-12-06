@@ -161,9 +161,9 @@ public:
         TwitchConfig::TwitchSpellsSettings::qCastMode = qSpellMenu->AddList("castMode", "Cast Mode", std::vector<std::string>{"Doesn't Matter", "While attacking"}, 0);
         TwitchConfig::TwitchSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange",
             "Maximum Range",
-            static_cast<float>(globals::localPlayer->ReadClientStat(Object::AttackRange)) * 1.5f,
+            globals::localPlayer->GetRealAttackRange() * 1.5f,
             100,
-            static_cast<float>(globals::localPlayer->ReadClientStat(Object::AttackRange)) * 2.0f, 50);
+            globals::localPlayer->GetRealAttackRange() * 2.0f, 50);
         TwitchConfig::TwitchSpellsSettings::DrawQ = qSpellMenu->AddCheckBox("Draw Q", "Draw Range", true);
 
         //Creating second parent menu that is itself a child of spellsMenu
@@ -337,65 +337,61 @@ public:
             Twitch_UseR();
         }
     }
-
     void Clear() override {
-        //Laneclear
-        if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), eRange()).size() > 0)
-        {
-            if (HasEnoughMana(OrbwalkState::Clear)
-                && TwitchConfig::TwitchClear::UseE->Value
-                && isTimeToCastE())
-            {
-                const auto eMinions = TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), eRange());
+        if (!HasEnoughMana(OrbwalkState::Clear)) return;
+        const auto minionsInRange = TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), eRange());
+
+        if (!minionsInRange.empty()) {
+            if (TwitchConfig::TwitchClear::UseE->Value && isTimeToCastE()) {
                 int kill_count = 0;
-                for (const auto& minion : eMinions)
-                {
+                for (const auto& minion : minionsInRange) {
                     if (minion != nullptr && minion->ReadClientStat(Object::Health) < Twitch_dmgE(minion)) {
                         kill_count++;
+                        if (kill_count >= TwitchConfig::TwitchClear::minMinion->Value) {
+                            Twitch_UseE(minion);
+                            break;
+                        }
                     }
-
-                    if (kill_count >= TwitchConfig::TwitchClear::minMinion->Value) {
-                        LOG("SHOULD USE ON %d", kill_count);
-                        Twitch_UseE(minion);
-                        break;
-                    }
-
                 }
             }
 
-            if (HasEnoughMana(OrbwalkState::Clear)
-                && TwitchConfig::TwitchClear::UseW->Value
-                && isTimeToCastW()) {
+            if (TwitchConfig::TwitchClear::UseW->Value && isTimeToCastW()) {
                 const auto wTarget = TargetSelector::Functions::GetMinionInRange(wRange());
                 if (wTarget != nullptr) {
                     Twitch_UseW(wTarget);
                 }
             }
         }
+        else {
+            const auto jungleMonstersInRange = TargetSelector::Functions::GetJungleMonstersInRange(wRange());
+            if (!jungleMonstersInRange.empty()) {
+                Object* highestHpMonster = nullptr;
+                float highestHp = 0.0f;
+                int totalAAsNeeded = 0;
 
-        //Jungleclear
-        else if (TargetSelector::Functions::GetJungleMonstersInRange(wRange()).size() > 0)
-        {
-            if (!HasEnoughMana(OrbwalkState::Clear)) return;
+                for (const auto& monster : jungleMonstersInRange) {
+                    if (monster != nullptr) {
+                        float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, monster);
+                        totalAAsNeeded += std::ceil(monster->ReadClientStat(Object::Health) / AAdamage);
 
-            if (TwitchConfig::TwitchJungle::UseW->Value == true && isTimeToCastW()) {
-                const auto wTarget = TargetSelector::Functions::GetJungleInRange(wRange());
-                if (wTarget != nullptr) {
-                    Twitch_UseW(wTarget);
+                        if (monster->ReadClientStat(Object::Health) > highestHp) {
+                            highestHp = monster->ReadClientStat(Object::Health);
+                            highestHpMonster = monster;
+                        }
+                    }
                 }
-            }
 
-            if (TwitchConfig::TwitchJungle::UseE->Value == true
-                && isTimeToCastE())
-            {
-                const auto eTarget = TargetSelector::Functions::GetJungleInRange(eRange());
-                if (eTarget != nullptr)
-                {
-                    const bool canKillTarget = eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget);
-                    const bool shouldUseE = TwitchConfig::TwitchJungle::UseEWithStacks->Value && hasEnoughStacks(eTarget, TwitchConfig::TwitchJungle::minStacks->Value);
+                if (TwitchConfig::TwitchJungle::UseW->Value && isTimeToCastW() && totalAAsNeeded > 4 && highestHpMonster != nullptr) {
+                    Twitch_UseW(highestHpMonster);
+                }
 
-                    if (canKillTarget || shouldUseE) {
-                        Twitch_UseE(eTarget);
+                if (TwitchConfig::TwitchJungle::UseE->Value && isTimeToCastE()) {
+                    for (const auto& monster : jungleMonstersInRange) {
+                        if (monster != nullptr && (monster->ReadClientStat(Object::Health) + monster->ReadClientStat(Object::Shield) < Twitch_dmgE(monster) ||
+                            (TwitchConfig::TwitchJungle::UseEWithStacks->Value && hasEnoughStacks(monster, TwitchConfig::TwitchJungle::minStacks->Value)))) {
+                            Twitch_UseE(monster);
+                            break;
+                        }
                     }
                 }
             }

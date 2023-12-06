@@ -38,8 +38,6 @@ namespace render
 			__try { Event::Subscribe(Event::OnDeleteMissile, Modules::Champions::DoDeleteMissile); }
 			__except (1) { LOG("[Event Handler - Add] Error in DoDeleteMissile "); }
 
-			
-
 			LOG("OnDraw triggered");
 			loaded = true;
 		}
