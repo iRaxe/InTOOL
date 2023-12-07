@@ -1,105 +1,59 @@
 #pragma once
-#include "../NewMenu.h"
 #include "../stdafx.h"
+#include "NewMenu.h"
 
-namespace UPasta::SDK::Orbwalker
+namespace UPasta::SDK::OrbwalkerConfig
 {
-    namespace Configs
-    {
-        inline bool initializedOrbwalkerMenu;
-        extern Menu* OrbwalkerMenu;
-        inline CheckBox* status;
+	inline KeyBind* comboKey;
+    inline KeyBind* laneClearKey;
+    inline KeyBind* fastClearKey;
+    inline KeyBind* lastHitKey;
+    inline KeyBind* harassKey;
+    inline KeyBind* fleeKey;
 
-        void Initialize();
-
-        namespace Humanizer
-        {
-            inline bool initializedHumanizerMenu;
-            void InitializeHumanizerMenu();
-            extern Menu* HumanizerMenu;
-
-            inline CheckBox* status;
-
-            inline CheckBox* randomizeDelay;
-            inline Slider* clickDelay;
-
-            inline Slider* windupDelay;
-            inline Slider* beforeAttackDelay;
-            inline Slider* farmAttackDelay;
-
-        }
-
-        namespace Status
-        {
-            inline bool initializedStatusMenu;
-
-            void InitializeStatusMenu();
-
-            extern Menu* StatusMenu;
-
-            inline CheckBox* statusFollowMouse;
-            inline CheckBox* statusComboMode;
-            inline CheckBox* statusLaneClearMode;
-            inline CheckBox* statusFastClearMode;
-            inline CheckBox* statusLastHitMode;
-            inline CheckBox* statusHarassMode;
-            inline CheckBox* statusFleeMode;
-
-        }
-
-        namespace KeyBindings
-        {
-            inline bool initializedKeyBindingsMenu;
-
-            void InitializeKeyBindingsMenu();
-
-            extern Menu* KeyBindingsMenu;
-
-            inline KeyBind* comboKey;
-            inline KeyBind* laneClearKey;
-            inline KeyBind* fastClearKey;
-            inline KeyBind* lastHitKey;
-            inline KeyBind* harassKey;
-            inline KeyBind* fleeKey;
-
-        }
-
-    }
-
-    namespace Functions
-    {
-        extern float lastActionTime;
-
-        void CheckActiveAttack();
-        bool ShouldStopOrbwalk();
-        bool CanDoAction();
-        bool IsReloading();
-
-        namespace Actions
-        {
-            void Idle();
-            void AttackObject(Object* obj);
-            void AttackInhib(Object* obj);
-            void CastSpell(int spellId, Object* target);
-            void CastSpell(int spellId, Vector3 pos);
-        }
-
-		namespace States
-		{
-			inline Object* LastHitMinion;
-            inline Object* AlmostLastHitMinion;
-            inline Object* LaneClearMinion;
-
-			void Attack();
-			void Laneclear();
-            void Fastclear();
-			void Harass();
-			void Lasthit();
-		}
-
-        void Initialize();
-        void Update();
-        void KeyChecks();
-    }
-
+    inline CheckBox* statusFollowMouse;
+    inline CheckBox* statusComboMode;
+    inline CheckBox* statusLaneClearMode;
+    inline CheckBox* statusFastClearMode;
+    inline CheckBox* statusLastHitMode;
+    inline CheckBox* statusHarassMode;
+    inline CheckBox* statusFleeMode;
 }
+class Orbwalker
+{
+public:
+
+    enum STATE {
+        IDLE, // MOVING
+        ATTACKING, //  CANT MOVE OR CANCELS AUTO
+        CASTING, // NORMAL CAST, CAN MOVE
+        CHARGING, // XERATHQ ,CAN MOVE 
+        CHANNELING, // KATA R, CANT MOVE
+        DODGING // CANT MOVE
+    };
+
+private:
+
+    static inline STATE _state = IDLE;
+    static inline OrbwalkState _mode = Off;
+    static inline float _last_aa = 0;
+    static inline float _last_action = 0;
+
+    static bool CanAttack();
+    static bool CanMove();
+
+    static int GetLatency(int extra = 0);
+    static void InitializeMenu();
+
+public:
+    static void Init();
+    static void OnTick();
+    static void OnDraw();
+    static void OnCastSound(uintptr_t state, SpellCast* cast);
+    static void OnCombo();
+    static void OnHarass();
+    static void OnClear();
+    static void OnWndProc(UINT msg, WPARAM param);
+    static inline void Reset() { _last_aa = 0; }
+
+};

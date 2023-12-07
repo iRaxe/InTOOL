@@ -101,7 +101,7 @@ namespace Modules::prediction
 	bool GetPrediction(Skillshot& skillshot, Modules::prediction::PredictionOutput &out)
 	{
 
-		auto target = UPasta::SDK::TargetSelector::Functions::GetEnemyChampionInRange(skillshot.GetMaxRange(), skillshot);
+		auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),skillshot.GetMaxRange());
 		if (!target) 
 			return false;
 

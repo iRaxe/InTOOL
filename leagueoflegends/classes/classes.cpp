@@ -4,6 +4,8 @@
 #include "../TargetSelector.h"
 #include "../ObjectTypeHolder.h"
 
+class AttackableUnit;
+
 CombatType Object::GetCombatType() {
 	return ReadQWORD2(CombatType, this, UPasta::Offsets::Client::CombatType);
 }
@@ -555,13 +557,13 @@ float Object::ReadClientStat(StatType statToReturn) {
 	switch (statToReturn) {
 	case AttackRange: return ReadFLOAT(this, Client::AttackRange);
 
-	case Health: return ReadFLOAT(this, AttackableUnit::Health);
-	case BonusHealth: return ReadFLOAT(this, AttackableUnit::BonusHealth);
-	case MaxHealth: return ReadFLOAT(this, AttackableUnit::MaxHealth);
+	case Health: return ReadFLOAT(this, UPasta::Offsets::AttackableUnit::Health);
+	case BonusHealth: return ReadFLOAT(this, UPasta::Offsets::AttackableUnit::BonusHealth);
+	case MaxHealth: return ReadFLOAT(this, UPasta::Offsets::AttackableUnit::MaxHealth);
 	case LifeRegeneration: return ReadFLOAT(this, Client::LifeRegeneration);
 
-	case Mana: return ReadFLOAT(this, AttackableUnit::Mana);
-	case MaxMana: return ReadFLOAT(this, AttackableUnit::MaxMana);
+	case Mana: return ReadFLOAT(this, UPasta::Offsets::AttackableUnit::Mana);
+	case MaxMana: return ReadFLOAT(this, UPasta::Offsets::AttackableUnit::MaxMana);
 
 	case BaseAttackDamage: return ReadFLOAT(this, Client::BaseAttackDamage);
 	case BonusAttackDamage: return ReadFLOAT(this, Client::BonusAttackDamage);
@@ -604,9 +606,9 @@ float Object::ReadClientStat(StatType statToReturn) {
 	case Experience: return ReadFLOAT(this, Client::Experience);
 	case Level: return ReadINT(this, Client::Level);
 
-	case Visibility: return ReadBOOL(this, AttackableUnit::Visibility);
-	case Targetable: return ReadBOOL(this, AttackableUnit::Targetable);
-	case Invulnerability: return ReadBOOL(this, AttackableUnit::Invulnerability);
+	case Visibility: return ReadBOOL(this, UPasta::Offsets::AttackableUnit::Visibility);
+	case Targetable: return ReadBOOL(this, UPasta::Offsets::AttackableUnit::Targetable);
+	case Invulnerability: return ReadBOOL(this, UPasta::Offsets::AttackableUnit::Invulnerability);
 	default: return 0;
 	}
 }
@@ -892,7 +894,7 @@ bool Object::IsInRange(Vector3 pos, float radius) {
 }
 
 bool Vector3::IsUnderEnemyTower() {
-	const auto turret = UPasta::SDK::TargetSelector::Functions::GetEnemyTurretInRange(2000.0f);
+	const auto turret = TargetSelector::FindTurret(*this, 992.0f, Alliance::Enemy);
 	if (turret && turret->IsEnemy())
 		return this->distanceTo(turret->GetPosition()) <= 992.0f;
 
@@ -904,7 +906,7 @@ bool Object::IsUnderEnemyTower() {
 }
 
 bool Object::IsUnderAllyTower() {
-	const auto turret = UPasta::SDK::TargetSelector::Functions::GetAllyTurretInRange(2000.0f);
+	const auto turret = TargetSelector::FindTurret(this->GetPosition(), 992.0f, Alliance::Ally);
 	if (turret && turret->IsAlly())
 		return this->IsInRange(turret->GetPosition(), 992.0f);
 
@@ -1039,6 +1041,357 @@ Object* ObjectManager::GetIndex(int index) {
 		index));
 }
 
+
+QWORD ObjectManager::GetFirst(const QWORD& objectManager) {
+
+	static QWORD v1 = *reinterpret_cast<QWORD*>(objectManager + 0x18);
+	static QWORD v2 = *reinterpret_cast<QWORD*>(objectManager + 0x20);
+	if (v1 == v2)
+		return 0;
+	while (*reinterpret_cast<BYTE*>(v1) & 1 || !*reinterpret_cast<QWORD*>(v1))
+	{
+		v1 += 8;
+		if (v1 == v2)
+			return 0;
+	}
+	return *reinterpret_cast<QWORD*>(v1);
+}
+QWORD ObjectManager::GetNext(const QWORD& objectManager, const QWORD& obj) {
+
+	unsigned int v3; // edx
+	QWORD v5; // eax
+
+	static QWORD v2 = *(QWORD*)(objectManager + 0x18);
+	v3 = *(unsigned __int16*)(obj + 16);
+	static unsigned __int64 v4 = (unsigned __int64)((*(QWORD*)(objectManager + 0x20) - v2) >> 3);
+	while (++v3 < v4) {
+		if ((*(BYTE*)(v2 + 8i64 * v3) & 1) == 0 && *(QWORD*)(v2 + 8i64 * v3))
+			return *(QWORD*)(v2 + 8i64 * v3);
+	}
+	return 0i64;
+}
+
+void ObjectManager::HandleObject(Object* obj) {
+
+	switch (obj->GetType()) {
+
+	case Object::AIHeroClient: ObjectManager::_hero_list.emplace_back((Object*)obj); _client_map.insert({ obj->GetHandle(), (Object*)obj }); break;
+	case Object::AIMinionClient: ObjectManager::_minion_list.emplace_back((Object*)obj); _client_map.insert({ obj->GetHandle(), (Object*)obj }); break;
+	case Object::AITurretClient: ObjectManager::_turret_list.emplace_back((Object*)obj); break;
+	case Object::obj_GeneralParticleEmitter: _particle_list.emplace_back(obj); break;
+	case Object::BarracksDampener: ObjectManager::_inhibitor_list.emplace_back((Object*)obj); break;
+	case Object::HQ: ObjectManager::_nexus_list.emplace_back((Object*)obj); break;
+	default: break;
+	}
+}
+
+void ObjectManager::Flush() {
+
+	_hero_list.clear();
+	_minion_list.clear();
+	_turret_list.clear();
+	_inhibitor_list.clear();
+	_nexus_list.clear();
+	_particle_list.clear();
+	_client_map.clear();
+}
+
+void ObjectManager::Update() {
+
+	Flush();
+
+	static const QWORD obj_manager = *(QWORD*)(RVA(UPasta::Offsets::Instance::Lists::ObjManager));
+	QWORD obj = GetFirst(obj_manager);
+	while (obj)
+	{
+		const std::array<uint8_t, 8> vfunc_bytes = *reinterpret_cast<std::array<std::uint8_t, 8> *>((ReadVTable(obj, 1)));
+		if (vfunc_bytes.at(0) != 0x48 && vfunc_bytes.at(7) != 0xC3) {
+			;
+		}
+		else {
+			HandleObject((Object*)obj);
+		}
+		obj = GetNext(obj_manager, obj);
+	}
+}
+
+Object* ObjectManager::GetClientByHandle(DWORD handle) {
+	auto it = _client_map.find(handle);
+	if (it != _client_map.end())
+		return it->second;
+	return nullptr;
+}
+
 Vector3 SpellData::GetSpellEndPos() {
 	return Engine::ReadVector3((QWORD)this + UPasta::Offsets::MissileManager::EndPosition);
+}
+
+Object::TYPE Object::GetType() {
+	typedef ObjectTypeHolder* (*OriginalFn)(PVOID);
+	auto holder = Engine::CallVirtual<OriginalFn>(this, 1)(this);
+	return holder->GetType();
+
+	auto pointg = Engine::CallVirtual<ObjectTypeHolder*>(this, 1);
+	return pointg->GetType();
+}
+
+std::vector<Object*> ObjectManager::GetHeroesAs(Alliance team)
+{
+	std::vector<Object*> possible_targets;
+	for (auto hero : ObjectManager::GetHeroes()) {
+		if (!hero) continue;
+		if (team == Alliance::Ally && !hero->IsAlly() || team == Alliance::Enemy && !hero->IsEnemy()) continue;
+		if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable())
+			possible_targets.push_back(hero);
+	}
+
+	return possible_targets;
+}
+
+Object* ObjectManager::GetHeroAs(Alliance team, Vector3 position, float range)
+{
+	Object* heroToReturn = nullptr;
+	for (auto hero : ObjectManager::GetHeroesAs(team)) {
+		if (!hero) continue;
+		if (team == Alliance::Ally && !hero->IsAlly() || team == Alliance::Enemy && !hero->IsEnemy()) continue;
+		if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable() and hero->GetPosition().distanceTo(position) < range)
+		{
+			if (!heroToReturn) {
+				heroToReturn = hero;
+				break;
+			}
+		}
+	}
+
+	return heroToReturn;
+}
+
+int ObjectManager::CountHeroesInRange(Alliance team, Vector3 position, float range)
+{
+	int heroesInRange = 0;
+	for (auto hero : ObjectManager::GetHeroesAs(team)) {
+		if (!hero) continue;
+		if (team == Alliance::Ally && !hero->IsAlly() || team == Alliance::Enemy && !hero->IsEnemy()) continue;
+		if (hero->GetPosition().distanceTo(position) > range) continue;
+		heroesInRange++;
+	}
+	return heroesInRange;
+}
+
+Object* ObjectManager::GetObjectInRange(std::string name, float range)
+{
+	Object* best = nullptr;
+
+	for (auto objToFind : ObjectManager::GetMinions()) {
+		if (!objToFind) continue;
+		if (!objToFind->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+
+		if (objToFind->GetName() != name) continue;
+
+		if (!best)
+		{
+			best = objToFind;
+			continue;
+		}
+	}
+
+	return best;
+}
+
+Object* ObjectManager::GetObjectInRange(float range, std::string name, std::vector<QWORD> includeFilterTypeHashes, std::vector<QWORD> excludeFilterTypeHashesDetailed, bool isSpecial)
+{
+	Object* best = nullptr;
+	for (Object* obj : *globals::minionManager)
+	{
+		if (!(isSpecial || obj->IsValidTarget())) continue;
+
+		bool excludeHashMatched = false;
+		for (auto hash : excludeFilterTypeHashesDetailed)
+		{
+			if (obj->GetCharacterData()->GetObjectTypeHashDetailed() == hash)
+			{
+				excludeHashMatched = true;
+				break;
+			}
+		}
+		if (excludeHashMatched) continue;
+
+		bool includeHashMatched = false;
+		for (auto hash : includeFilterTypeHashes)
+		{
+			if (obj->GetCharacterData()->GetObjectTypeHash() == hash)
+			{
+				includeHashMatched = true;
+				break;
+			}
+		}
+		if (includeFilterTypeHashes.size() && !includeHashMatched) continue;
+
+		if (name != "" && obj->GetName() != name) continue;
+		if (!obj->IsInRange(globals::localPlayer->GetPosition(), range)) continue;
+
+		if (!best) {
+			best = obj;
+			continue;
+		}
+
+		if (best->GetDistanceTo(globals::localPlayer) > best->GetDistanceTo(globals::localPlayer)) {
+			best = obj;
+			continue;
+		}
+	}
+
+	return best;
+}
+
+
+std::vector<Object*> ObjectManager::GetMinionsAs(Alliance team)
+{
+	std::vector<Object*> possible_targets;
+	for (auto minion : ObjectManager::GetMinions()) {
+		if (!minion) continue;
+		if (team == Alliance::Ally && !minion->IsAlly() || team == Alliance::Enemy && !minion->IsEnemy()) continue;
+
+		if (minion->IsAlive() and minion->IsVisible() and minion->IsTargetable() and !minion->IsInvulnerable())
+			possible_targets.push_back(minion);
+	}
+
+	return possible_targets;
+}
+
+int ObjectManager::CountMinionsInRange(Alliance team, Vector3 position, float range)
+{
+	int minionsInRange = 0;
+	for (auto minion : ObjectManager::GetMinionsAs(team)) {
+		if (!minion) continue;
+		if (minion->GetPosition().distanceTo(position) > range) continue;
+		minionsInRange++;
+	}
+	return minionsInRange;
+}
+
+std::vector<Object*> ObjectManager::GetJungleMonsters()
+{
+	std::vector<Object*> possible_targets;
+	for (auto monster : ObjectManager::GetMinions()) {
+		if (!monster) continue;
+		if (!monster->IsJungle()) continue;
+		if (monster->IsAlive() and monster->IsVisible() and monster->IsTargetable() and !monster->IsInvulnerable())
+			possible_targets.push_back(monster);
+	}
+	return possible_targets;
+}
+
+int ObjectManager::CountJungleMonstersInRange(Vector3 position, float range)
+{
+	int jungleMonstersInRange = 0;
+	for (auto jungle : ObjectManager::GetJungleMonsters()) {
+		if (!jungle) continue;
+		if (jungle->GetPosition().distanceTo(position) > range) continue;
+		jungleMonstersInRange++;
+	}
+	return jungleMonstersInRange;
+}
+
+std::vector<Object*> ObjectManager::GetJunglePlants()
+{
+	std::vector<Object*> possible_targets;
+	for (auto plant : ObjectManager::GetMinions()) {
+		if (!plant) continue;
+		if (plant->GetCharacterData()->GetObjectTypeHash() != Plants) continue;
+		if (plant->IsAlive() and plant->IsVisible() and plant->IsTargetable() and !plant->IsInvulnerable())
+			possible_targets.push_back(plant);
+	}
+	return possible_targets;
+}
+
+std::vector<Object*> ObjectManager::GetJungleRespawnCamps()
+{
+	std::vector<Object*> possible_targets;
+	for (auto campRespawn : ObjectManager::GetMinions()) {
+		if (!campRespawn) continue;
+		if (campRespawn->GetCharacterData()->GetObjectTypeHash() != ObjectType::RespawnMarker) continue;
+		possible_targets.push_back(campRespawn);
+	}
+	return possible_targets;
+}
+
+
+std::vector<Object*> ObjectManager::GetWards(Alliance team)
+{
+	std::vector<Object*> possible_targets;
+	for (auto ward : ObjectManager::GetMinions()) {
+		if (!ward) continue;
+		if (team == Alliance::Ally && !ward->IsAlly() || team == Alliance::Enemy && !ward->IsEnemy()) continue;
+
+		if (!ward->IsWard()) continue;
+		if (ward->IsAlive())
+			possible_targets.push_back(ward);
+	}
+	return possible_targets;
+}
+
+std::vector<Object*> ObjectManager::GetTurretsAs(Alliance team)
+{
+	std::vector<Object*> possible_targets;
+	for (auto turret : ObjectManager::GetTurrets()) {
+		if (!turret) continue;
+		if (team == Alliance::Ally && !turret->IsAlly() || team == Alliance::Enemy && !turret->IsEnemy()) continue;
+		if (turret->IsAlive() and turret->IsVisible() and turret->IsTargetable() and !turret->IsInvulnerable())
+			possible_targets.push_back(turret);
+	}
+
+	return possible_targets;
+}
+
+int ObjectManager::CountTurretsInRange(Alliance team, Vector3 position, float range)
+{
+	int turretsInRange = 0;
+	for (auto turret : ObjectManager::GetMinionsAs(team)) {
+		if (!turret) continue;
+		if (turret->GetPosition().distanceTo(position) > range) continue;
+		turretsInRange++;
+	}
+	return turretsInRange;
+}
+
+std::vector<Object*> ObjectManager::GetInhibitorsAs(Alliance team)
+{
+	std::vector<Object*> possible_targets;
+	for (auto inhibitor : ObjectManager::GetInhibitors()) {
+		if (!inhibitor) continue;
+		if (team == Alliance::Ally && !inhibitor->IsAlly() || team == Alliance::Enemy && !inhibitor->IsEnemy()) continue;
+		if (inhibitor->IsAlive() and inhibitor->IsVisible() and inhibitor->IsTargetable() and !inhibitor->IsInvulnerable())
+			possible_targets.push_back(inhibitor);
+	}
+
+	return possible_targets;
+}
+
+int ObjectManager::CountInhibitorsInRange(Alliance team, Vector3 position, float range)
+{
+	int inhibitorsInRange = 0;
+	for (auto inhibitor : ObjectManager::GetInhibitorsAs(team)) {
+		if (!inhibitor) continue;
+		if (inhibitor->GetPosition().distanceTo(position) > range) continue;
+		inhibitorsInRange++;
+	}
+	return inhibitorsInRange;
+}
+
+Object* ObjectManager::GetNexusAs(Alliance team)
+{
+	Object* nexusToReturn = nullptr;
+	for (auto nexus : ObjectManager::GetNexuses()) {
+		if (!nexus) continue;
+		if (team == Alliance::Ally && !nexus->IsAlly() || team == Alliance::Enemy && !nexus->IsEnemy()) continue;
+		if (nexus->IsAlive() and nexus->IsVisible() and nexus->IsTargetable() and !nexus->IsInvulnerable())
+
+			if (!nexusToReturn) {
+				nexusToReturn = nexus;
+				break;
+			}
+	}
+
+	return nexusToReturn;
 }

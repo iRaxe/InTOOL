@@ -342,11 +342,11 @@ public:
             switch (XerathConfig::XerathUltimate::targetMode->Value)
             {
             case 0: //Inherit
-                if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathR.GetRange()))
+                if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathR.GetRange()))
                     Xerath_UseR(rTarget);
             	break;
             case 1: //NearMouse
-                if (const auto rTarget2 = TargetSelector::Functions::GetEnemyChampionInRange(Engine::GetMouseWorldPos(), 300.0f))
+                if (const auto rTarget2 = TargetSelector::FindBestTarget(Engine::GetMouseWorldPos(), 300.0f))
                 {
 	                Xerath_UseR(rTarget2);
                 }
@@ -361,7 +361,7 @@ public:
 	    {
             if (XerathConfig::XerathCombo::UseQ->Value == true && database.XerathQ.IsCastable())
             {
-                if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathQ.GetRange()))
+                if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathQ.GetRange()))
                 {
                     if (IsCastingQ())
                     {
@@ -378,7 +378,7 @@ public:
             {
                 if (XerathConfig::XerathCombo::UseW->Value == true && database.XerathW.IsCastable())
                 {
-                    if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathW.GetRange()))
+                    if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange()))
                     {
                         Xerath_UseW(wTarget);
                     }
@@ -386,7 +386,7 @@ public:
 
                 if (XerathConfig::XerathCombo::UseE->Value == true && database.XerathE.IsCastable())
                 {
-                    if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathE.GetRange()))
+                    if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()))
                     {
                         Xerath_UseE(eTarget);
                     }
@@ -397,7 +397,7 @@ public:
 	    {
             if (XerathConfig::XerathCombo::UseR->Value == true && database.XerathR.IsCastable())
             {
-                if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathR.GetRange()))
+                if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathR.GetRange()))
                 {
                     Xerath_UseR(rTarget);
                 }
@@ -408,11 +408,11 @@ public:
 
     void Clear() override
     {
-        const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(database.XerathQ.GetRange());
+        const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),database.XerathQ.GetRange(), Alliance::Enemy);
         if (minion && globals::localPlayer->GetPercentMana() >= XerathConfig::XerathLaneClear::minMana->Value)
         {
             if (XerathConfig::XerathLaneClear::UseQ->Value == true && database.XerathQ.IsCastable() 
-                && TargetSelector::Functions::GetMinionsInRange(minion->GetPosition(), 300.0f).size() >= XerathConfig::XerathLaneClear::minQMinions->Value)
+                && ObjectManager::CountMinionsInRange(Alliance::Enemy, minion->GetPosition(), 300.0f) >= XerathConfig::XerathLaneClear::minQMinions->Value)
             {
                 if (!IsCastingQ())
                     Xerath_UseQ(minion);
@@ -421,13 +421,13 @@ public:
             }
 
             if (XerathConfig::XerathLaneClear::UseW->Value == true && database.XerathW.IsCastable() 
-                && TargetSelector::Functions::GetMinionsInRange(minion->GetPosition(), database.XerathW.GetRadius()).size() >= XerathConfig::XerathLaneClear::minWMinions->Value)
+                && ObjectManager::CountMinionsInRange(Alliance::Enemy, minion->GetPosition(), database.XerathW.GetRadius()) >= XerathConfig::XerathLaneClear::minWMinions->Value)
             {
                 Xerath_UseW(minion);
             }
         }
 
-        const auto monster = TargetSelector::Functions::GetJungleInRange(database.XerathQ.GetRange());
+        const auto monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.XerathQ.GetRange());
         if (monster && globals::localPlayer->GetPercentMana() >= XerathConfig::XerathJungle::minMana->Value)
         {
             if (XerathConfig::XerathJungle::UseQ->Value == true && database.XerathQ.IsCastable())
@@ -457,7 +457,7 @@ public:
 
         if (XerathConfig::XerathHarass::UseQ->Value == true && database.XerathQ.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathQ.GetRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathQ.GetRange()))
             {
                 if (!IsCastingQ())
                     Xerath_UseQ(qTarget);
@@ -468,7 +468,7 @@ public:
 
         if (XerathConfig::XerathHarass::UseW->Value == true && database.XerathW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathW.GetRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange()))
             {
                 Xerath_UseW(wTarget);
             }
@@ -476,7 +476,7 @@ public:
 
         if (XerathConfig::XerathHarass::UseE->Value == true && database.XerathE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathE.GetRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()))
             {
                 Xerath_UseE(eTarget);
             }
@@ -490,13 +490,13 @@ public:
 
         if (XerathConfig::XerathLastHit::UseW->Value == true && database.XerathW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathW.GetRange()); Xerath_dmgW(wTarget) > wTarget->ReadClientStat(Object::Health))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange()); Xerath_dmgW(wTarget) > wTarget->ReadClientStat(Object::Health))
                 Xerath_UseW(wTarget);
         }
 
         if (XerathConfig::XerathLastHit::UseE->Value == true && database.XerathE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathE.GetRange()); Xerath_dmgE(eTarget) > eTarget->ReadClientStat(Object::Health))
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()); Xerath_dmgE(eTarget) > eTarget->ReadClientStat(Object::Health))
                 Xerath_UseE(eTarget);
         }
     }
@@ -505,7 +505,7 @@ public:
     {
         if (XerathConfig::XerathFlee::UseE->Value == true && database.XerathE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathE.GetRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()))
             {
                 Xerath_UseE(eTarget);
             }
@@ -518,7 +518,7 @@ public:
 	    {
             if (XerathConfig::XerathKillsteal::UseQ->Value == true && database.XerathQ.IsCastable())
             {
-                const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathQ.GetRange());
+                const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathQ.GetRange());
                 if (qTarget && qTarget->ReadClientStat(Object::Health) < Xerath_dmgQ(qTarget))
                 {
                     if (!IsCastingQ())
@@ -534,7 +534,7 @@ public:
 
             if (XerathConfig::XerathKillsteal::UseE->Value == true && database.XerathE.IsCastable())
             {
-                const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathE.GetRange());
+                const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange());
                 if (eTarget && eTarget->ReadClientStat(Object::Health) < Xerath_dmgE(eTarget))
                 {
                     Xerath_UseE(eTarget);
@@ -543,30 +543,24 @@ public:
 
             if (XerathConfig::XerathKillsteal::UseW->Value == true && database.XerathW.IsCastable())
             {
-                const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathW.GetRange());
+                const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange());
                 if (wTarget && wTarget->ReadClientStat(Object::Health) < Xerath_dmgW(wTarget))
                 {
                     Xerath_UseW(wTarget);
                 }
             }
 	    }
-
-        if (XerathConfig::XerathKillsteal::UseR->Value == true && database.XerathR.IsCastable())
-        {
-            const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.XerathR.GetRange());
-            if (rTarget && rTarget->ReadClientStat(Object::Health) < Xerath_dmgR(rTarget) && (TargetSelector::Functions::GetKillableTargetsInRange(globals::localPlayer->GetPosition(),database.XerathR.GetRange(),Xerath_dmgR(rTarget)).size() >= XerathConfig::XerathKillsteal::enemiesKillable->Value) || IsCastingR())
-            {
-                Xerath_UseR(rTarget);
-            }
-        }
     }
 
     void AntiGapCloser()
     {
         if (XerathConfig::XerathAntiGapCloser::UseE->Value == true && database.XerathE.IsCastable())
         {
-            for (const auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), database.XerathE.GetRange()))
+            for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
+                if (!target) continue;
+                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > database.XerathE.GetRange()) continue;
+         
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
 

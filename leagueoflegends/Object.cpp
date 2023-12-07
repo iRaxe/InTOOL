@@ -38,7 +38,7 @@ float Object2::GetDistanceTo(Vector3 pos) {
 }
 
 
-Object2::TYPE Object2::GetType() {
+Object::TYPE Object2::GetType() {
 	typedef ObjectTypeHolder* (*OriginalFn)(PVOID);
 	auto holder = Engine::CallVirtual<OriginalFn>(this, 1)(this);
 	return holder->GetType();

@@ -57,9 +57,9 @@ private:
 
         switch (mode) {
         case OrbwalkState::Clear:
-            if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() > 0)
+            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(TwitchConfig::TwitchClear::minMana->Value);
-            else if (TargetSelector::Functions::GetJungleMonstersInRange(qRange()).size() > 0)
+            else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(TwitchConfig::TwitchJungle::minMana->Value);
             break;
         case OrbwalkState::Harass:
@@ -296,7 +296,7 @@ public:
         if (TwitchConfig::TwitchCombo::UseE->Value == true
             && isTimeToCastE())
         {
-            const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
             if (eTarget != nullptr)
             {
                 const bool canKillTarget = eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget);
@@ -312,7 +312,7 @@ public:
             && TwitchConfig::TwitchSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
             if (wTarget != nullptr)
             {
                 Twitch_UseW(wTarget);
@@ -323,7 +323,7 @@ public:
             && TwitchConfig::TwitchSpellsSettings::qCastMode->Value == 0
             && isTimeToCastQ())
         {
-            const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
             if (qTarget != nullptr)
             {
                 Twitch_UseQ(qTarget);
@@ -331,7 +331,7 @@ public:
         }
 
         if (TwitchConfig::TwitchCombo::UseR->Value == true
-            && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), rRange()).size() >= TwitchConfig::TwitchCombo::enemiesInRange->Value
+            && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), rRange()) >= TwitchConfig::TwitchCombo::enemiesInRange->Value
             && isTimeToCastR())
         {
             Twitch_UseR();
@@ -339,13 +339,17 @@ public:
     }
     void Clear() override {
         if (!HasEnoughMana(OrbwalkState::Clear)) return;
-        const auto minionsInRange = TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), eRange());
+        
+        const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), eRange());
 
-        if (!minionsInRange.empty()) {
+        if (minionsInRange > 0) {
             if (TwitchConfig::TwitchClear::UseE->Value && isTimeToCastE()) {
                 int kill_count = 0;
-                for (const auto& minion : minionsInRange) {
-                    if (minion != nullptr && minion->ReadClientStat(Object::Health) < Twitch_dmgE(minion)) {
+                for (auto minion : ObjectManager::GetHeroesAs(Alliance::Enemy))
+                {
+                    if (!minion) continue;
+                    if (minion->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > eRange()) continue;
+                    if (minion->ReadClientStat(Object::Health) < Twitch_dmgE(minion)) {
                         kill_count++;
                         if (kill_count >= TwitchConfig::TwitchClear::minMinion->Value) {
                             Twitch_UseE(minion);
@@ -356,29 +360,32 @@ public:
             }
 
             if (TwitchConfig::TwitchClear::UseW->Value && isTimeToCastW()) {
-                const auto wTarget = TargetSelector::Functions::GetMinionInRange(wRange());
+                const auto wTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),wRange(), Alliance::Enemy);
                 if (wTarget != nullptr) {
                     Twitch_UseW(wTarget);
                 }
             }
         }
         else {
-            const auto jungleMonstersInRange = TargetSelector::Functions::GetJungleMonstersInRange(wRange());
-            if (!jungleMonstersInRange.empty()) {
+            const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange());
+            if (jungleMonstersInRange > 0) {
                 Object* highestHpMonster = nullptr;
                 float highestHp = 0.0f;
                 int totalAAsNeeded = 0;
 
-                for (const auto& monster : jungleMonstersInRange) {
-                    if (monster != nullptr) {
-                        float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, monster);
-                        totalAAsNeeded += std::ceil(monster->ReadClientStat(Object::Health) / AAdamage);
+                for (auto monster : ObjectManager::GetJungleMonsters())
+                {
+                    if (!monster) continue;
+                    if (monster->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > wRange()) continue;
 
-                        if (monster->ReadClientStat(Object::Health) > highestHp) {
-                            highestHp = monster->ReadClientStat(Object::Health);
-                            highestHpMonster = monster;
-                        }
+                    float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, monster);
+                    totalAAsNeeded += std::ceil(monster->ReadClientStat(Object::Health) / AAdamage);
+
+                    if (monster->ReadClientStat(Object::Health) > highestHp) {
+                        highestHp = monster->ReadClientStat(Object::Health);
+                        highestHpMonster = monster;
                     }
+
                 }
 
                 if (TwitchConfig::TwitchJungle::UseW->Value && isTimeToCastW() && totalAAsNeeded > 4 && highestHpMonster != nullptr) {
@@ -386,7 +393,7 @@ public:
                 }
 
                 if (TwitchConfig::TwitchJungle::UseE->Value && isTimeToCastE()) {
-                    for (const auto& monster : jungleMonstersInRange) {
+                    for (const auto& monster : ObjectManager::GetJungleMonsters()) {
                         if (monster != nullptr && (monster->ReadClientStat(Object::Health) + monster->ReadClientStat(Object::Shield) < Twitch_dmgE(monster) ||
                             (TwitchConfig::TwitchJungle::UseEWithStacks->Value && hasEnoughStacks(monster, TwitchConfig::TwitchJungle::minStacks->Value)))) {
                             Twitch_UseE(monster);
@@ -405,7 +412,7 @@ public:
             && TwitchConfig::TwitchSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
             if (wTarget != nullptr) {
                 Twitch_UseW(wTarget);
             }
@@ -414,7 +421,7 @@ public:
         if (TwitchConfig::TwitchHarass::UseE->Value == true
             && isTimeToCastE())
         {
-            const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
             if (eTarget != nullptr)
             {
                 const bool canKillTarget = eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget);
@@ -444,7 +451,7 @@ public:
         __try {
             if (TwitchConfig::TwitchKillsteal::UseE->Value && isTimeToCastE())
             {
-                const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
+                const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
                 if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget))
                 {
                     Twitch_UseE(eTarget);
@@ -489,7 +496,7 @@ public:
             if (TwitchConfig::TwitchSpellsSettings::DrawR->Value == true && (TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == true && database.TwitchR.IsCastable() || TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == false))
                 Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
 
-            const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
             if (eTarget != nullptr)
             {
                 DrawDamage(eTarget);

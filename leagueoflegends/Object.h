@@ -32,7 +32,6 @@ public:
     float GetDistanceTo(Object* target);
     float GetDistanceTo(Vector3 pos);
     enum TYPE : DWORD {
-
         NeutralMinionCamp = 0xFE7449A3,
         AIHeroClient = 0xE260302C, //HEROES
         AIMarker = 0x11F7583D,
@@ -63,6 +62,6 @@ public:
 
     };
 
-    TYPE GetType();
+    Object::TYPE GetType();
 };
 

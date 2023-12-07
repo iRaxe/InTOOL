@@ -563,7 +563,7 @@ namespace Engine
 	}
 
 	bool CastSpell(int spellId, Object* Target) {
-		if (UPasta::SDK::Orbwalker::Functions::ShouldStopOrbwalk() || !IsSpellSlotValid(spellId))
+		if (!IsSpellSlotValid(spellId))
 			return false;
 
 		Object* me = globals::localPlayer;
@@ -583,7 +583,7 @@ namespace Engine
 
 	bool CastSpell(int spellId)
 	{
-		if (UPasta::SDK::Orbwalker::Functions::ShouldStopOrbwalk() || !IsSpellSlotValid(spellId))
+		if (!IsSpellSlotValid(spellId))
 			return false;
 
 		Object* me = globals::localPlayer;
@@ -605,7 +605,7 @@ namespace Engine
 
 	bool CastSpell(int spellId, Vector3 pos)
 	{
-		if (UPasta::SDK::Orbwalker::Functions::ShouldStopOrbwalk() || !IsSpellSlotValid(spellId))
+		if (!IsSpellSlotValid(spellId))
 			return false;
 
 		Object* me = globals::localPlayer;
@@ -626,7 +626,7 @@ namespace Engine
 	
 	bool ReleaseSpell(int spellId, Vector3 pos)
 	{
-		if (UPasta::SDK::Orbwalker::Functions::ShouldStopOrbwalk() || !IsSpellSlotValid(spellId))
+		if (!IsSpellSlotValid(spellId))
 			return false;
 
 		Object* me = globals::localPlayer;

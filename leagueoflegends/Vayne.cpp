@@ -1,5 +1,6 @@
 #include "Vayne.h"
 #include "Awareness.h"
+#include "Damage.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
 
@@ -322,22 +323,22 @@ public:
 
     void Combo() override
     {
-        if (VayneConfig::VayneCombo::UseR->Value == true && database.VayneR.IsCastable() && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), VayneConfig::VayneSpellsSettings::minRDistance->Value).size() >= VayneConfig::VayneCombo::enemiesInRange->Value)
+        if (VayneConfig::VayneCombo::UseR->Value == true && database.VayneR.IsCastable() && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), VayneConfig::VayneSpellsSettings::minRDistance->Value) >= VayneConfig::VayneCombo::enemiesInRange->Value)
         {
-            if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(rRange()))
+            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange()))
                 Vayne_UseR(rTarget);
         }
 
         if (VayneConfig::VayneCombo::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
         {
-            if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange()))
                 if (VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == true && Vayne_IsCondemnable(eTarget) || VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == false && !Vayne_IsCondemnable(eTarget))
                     Vayne_UseE(eTarget);
         }
 
         if (VayneConfig::VayneCombo::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
         {
-            const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(aaRange());
+            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),aaRange());
             if (qTarget != nullptr && Vayne_CanCastQ(qTarget))
                 Vayne_UseQ(qTarget);
         }
@@ -346,32 +347,32 @@ public:
     void Clear() override
     {
         //Laneclear
-        if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), aaRange()).size() > 0)
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), aaRange()) > 0)
         {
             if (!Vayne_HasEnoughMana(VayneConfig::VayneClear::minMana->Value)) return;
 
             if (VayneConfig::VayneClear::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
             {
-                const auto qTarget = TargetSelector::Functions::GetEnemyMinionInRange(aaRange());
+                const auto qTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),aaRange(), Alliance::Enemy);
                 if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Vayne_dmgQ(qTarget))
                     Vayne_UseQ(qTarget);
             }
         }
 
         //Jungleclear
-        else if (TargetSelector::Functions::GetJungleMonstersInRange(aaRange()).size() > 0)
+        else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), aaRange()) > 0)
         {
             if (!Vayne_HasEnoughMana(VayneConfig::VayneJungle::minMana->Value)) return;
 
             if (VayneConfig::VayneJungle::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
             {
-                if (const auto wTarget = TargetSelector::Functions::GetJungleInRange(eRange()))
+                if (const auto wTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), eRange()))
                     Vayne_UseE(wTarget);
             }
 
             if (VayneConfig::VayneJungle::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
             {
-                const auto qTarget = TargetSelector::Functions::GetJungleInRange(aaRange());
+                const auto qTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), aaRange());
                 if (qTarget != nullptr && Vayne_CanCastQ(qTarget))
                     Vayne_UseQ(qTarget);
             }
@@ -386,14 +387,14 @@ public:
 
         if (VayneConfig::VayneHarass::UseE->Value == true && database.VayneE.IsCastable() && VayneConfig::VayneSpellsSettings::eCastMode->Value == 0)
         {
-            const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
             if (eTarget != nullptr && (VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == true && Vayne_IsCondemnable(eTarget) || VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == false && !Vayne_IsCondemnable(eTarget)))
                 Vayne_UseE(eTarget);
         }
 
         if (VayneConfig::VayneHarass::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
         {
-            const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(aaRange());
+            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),aaRange());
             if (qTarget != nullptr && Vayne_CanCastQ(qTarget))
                 Vayne_UseQ(qTarget);
         }
@@ -417,7 +418,7 @@ public:
 
         if (VayneConfig::VayneFlee::UseE->Value == true && database.VayneE.IsCastable())
         {
-            const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
             if (eTarget != nullptr && (VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == true && Vayne_IsCondemnable(eTarget) || VayneConfig::VayneSpellsSettings::UseEOnlyStun->Value == false && !Vayne_IsCondemnable(eTarget)))
                 Vayne_UseE(eTarget);
         }
@@ -428,7 +429,7 @@ public:
         __try {
             if (VayneConfig::VayneKillsteal::UseE->Value == true && database.VayneE.IsCastable())
             {
-                const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
+                const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
                 if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Vayne_dmgE(eTarget))
                 {
                     Vayne_UseE(eTarget);
@@ -437,7 +438,7 @@ public:
 
             if (VayneConfig::VayneKillsteal::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0)
             {
-                const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(aaRange());
+                const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),aaRange());
                 if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Vayne_dmgQ(qTarget))
                 {
                     Vayne_UseQ(qTarget);
@@ -452,8 +453,10 @@ public:
 
     void AntiGapCloser()
     {
-        for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), eRange()))
+        for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
         {
+            if (!target) continue;
+            if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > eRange()) continue;
             if (!Engine::MenuItemContains(VayneConfig::VayneAntiGapCloser::whitelist, target->GetName().c_str())) continue;
             if (!target->GetAiManager()->IsDashing()) continue;
             if (target->GetBuffByName("rocketgrab2")) continue;
@@ -474,18 +477,18 @@ public:
 
     void AntiMelee()
     {
-        for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), eRange()))
+        for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
         {
+            if (!target) continue;
+            if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > eRange()) continue;
             if (!Engine::MenuItemContains(VayneConfig::VayneAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-            if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))
-            {
-                if (VayneConfig::VayneAntiMelee::UseE->Value == true && database.VayneE.IsCastable())
-                    Vayne_UseE(target);
+            if (VayneConfig::VayneAntiMelee::UseE->Value == true && database.VayneE.IsCastable())
+                Vayne_UseE(target);
 
-                if (VayneConfig::VayneAntiMelee::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0)
-                    Vayne_UseQ(target);
-            }
+            if (VayneConfig::VayneAntiMelee::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0)
+                Vayne_UseQ(target);
+
         }
     }
 

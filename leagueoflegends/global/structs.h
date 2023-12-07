@@ -1374,3 +1374,9 @@ enum class SummonerSpells
 	Smite,
 	Teleport,
 };
+
+enum class Alliance {
+	Ally,
+	Enemy,
+	Neutral,
+};

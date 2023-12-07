@@ -460,10 +460,59 @@ public:
 	};
 	float ReadClientStat(StatType s);
 
+	enum TYPE : DWORD {
+		NeutralMinionCamp = 0xFE7449A3,
+		AIHeroClient = 0xE260302C, //HEROES
+		AIMarker = 0x11F7583D,
+		AIMinionClient = 0xCAA58CB2, //ALL MINIONS
+		ObjectAttacher = 0x9E317160,
+		LevelPropAIClient = 0x12E24BCD,
+		AITurretClient = 0xBEBA9102, //LANETURRETS
+		AITurretCommon = 0x70678BD0,
+		obj_GeneralParticleEmitter = 0xDD4DE76F, // includes troys
+		GameObject = 0x1FAC8B64,
+		MissileClient = 0x9C8ADE94, //MISSILES
+		DrawFX = 0x42D144F5,
+		UnrevealedTarget = 0xB98F49AF,
+		BarracksDampener = 0x60BB49C0, //INHIB
+		Barracks = 0xD1ED70FE,
+		AnimatedBuilding = 0x8F83FB9C,
+		BuildingClient = 0x3CCABB2E,
+		obj_Levelsizer = 0x6F2E6CAC,
+		obj_NavPoint = 0x96B0A5E6,
+		obj_SpawnPoint = 0xE3E9B36C,
+		GrassObject = 0xAA2B7AB2, // IVERN BUSH?
+		HQ = 0x503AD0D2, //NEXUS
+		obj_InfoPoint = 0xF4753AD3,
+		LevelPropGameObject = 0x5A730CB9,
+		LevelPropSpawnerPoint = 0x4D8B713A,
+		Shop = 0xA847E0A9,
+		obj_Turret = 0x3D775D09 // AZIR TURRET?
+
+	};
+
+	TYPE GetType();
+
 };
 
 class ObjectManager
 {
+private:
+	static QWORD GetFirst(const QWORD& objectManager);
+	static QWORD GetNext(const QWORD& objectManager, const QWORD& obj);
+
+	static inline std::vector<Object*> _hero_list;
+	static inline std::vector<Object*> _minion_list;
+	static inline std::vector<Object*> _turret_list;
+	static inline std::vector<Object*> _inhibitor_list;
+	static inline std::vector<Object*> _nexus_list;
+	static inline std::vector<Object*> _particle_list;
+
+	static inline std::unordered_map<DWORD, Object*> _client_map;
+
+	static void HandleObject(Object* obj);
+	static void Flush();
+
 public:
 	uintptr_t* vtable;
 	std::map<uintptr_t, Missile*> missile_map;
@@ -509,4 +558,43 @@ public:
 	{
 		return iterator(this, GetListSize());
 	}
+
+	static void Update();
+
+	static std::vector<Object*> GetHeroes() { return _hero_list; }
+	static std::vector<Object*> GetHeroesAs(Alliance team);
+	static Object* GetHeroAs(Alliance team, Vector3 position, float range);
+
+	static int CountHeroesInRange(Alliance team, Vector3 position, float range);
+
+	static Object* GetObjectInRange(std::string name, float range);
+	static Object* GetObjectInRange(float range, std::string name, std::vector<QWORD> includeFilterTypeHashes, std::vector<QWORD> excludeFilterTypeHashesDetailed, bool isSpecial);
+
+	static std::vector<Object*> GetMinions() { return _minion_list; }
+	static std::vector<Object*> GetMinionsAs(Alliance team);
+	static int CountMinionsInRange(Alliance team, Vector3 position, float range);
+
+	static std::vector<Object*> GetJungleMonsters();
+	static int CountJungleMonstersInRange(Vector3 position, float range);
+
+	static std::vector<Object*> GetJunglePlants();
+	static std::vector<Object*> GetJungleRespawnCamps();
+
+	static std::vector<Object*> GetWards(Alliance team);
+
+	static std::vector<Object*> GetTurrets() { return _turret_list; }
+	static std::vector<Object*> GetTurretsAs(Alliance team);
+	static int CountTurretsInRange(Alliance team, Vector3 position, float range);
+
+	static std::vector<Object*> GetInhibitors() { return _inhibitor_list; }
+	static std::vector<Object*> GetInhibitorsAs(Alliance team);
+	static int CountInhibitorsInRange(Alliance team, Vector3 position, float range);
+
+	static std::vector<Object*> GetNexuses() { return _nexus_list; }
+	static Object* GetNexusAs(Alliance team);
+
+	static std::vector<Object*> GetParticles() { return _particle_list; }
+	static std::map<QWORD, Object*> GetMissilesAs(Alliance type);
+
+	static Object* GetClientByHandle(DWORD handle);
 };

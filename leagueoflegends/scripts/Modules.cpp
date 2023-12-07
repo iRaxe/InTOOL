@@ -7,7 +7,6 @@ namespace Modules
 {
 	
 	static float gameTime = 0.0f;
-	static float nextRngBuffer = 0.0f;
 
 	void Init()
 	{
@@ -17,23 +16,19 @@ namespace Modules
 
 	void Update()
 	{
+		Event::Publish(Event::OnGameTick);
+
 		__try { Champions::Update(); }
 		__except (1) { LOG("ERROR IN SCRIPTS -> CHAMPIONS UPDATE"); }
-		
-		if (UPasta::SDK::Orbwalker::Configs::status->Value)
-		{
-			__try {	UPasta::SDK::Orbwalker::Functions::Update();}
-			__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER UPDATE"); }
-		}
 	}
 
 	namespace Utilities
 	{
 		void Init()
 		{
-			UPasta::SDK::TargetSelector::Configs::Initialize();
-			UPasta::SDK::Orbwalker::Functions::Initialize();
+			TargetSelector::Initialize();
 			UPasta::SDK::Awareness::Functions::Initialize();
+			Orbwalker::Init();
 		}
 	}
 

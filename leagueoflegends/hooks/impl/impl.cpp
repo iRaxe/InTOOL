@@ -78,17 +78,17 @@ namespace hooks
 
 			globals::scripts::orbwalker::orbwalkState = OrbwalkState::Off;
 
-			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::comboKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusComboMode->Value)
+			if (UPasta::SDK::OrbwalkerConfig::comboKey->Value && UPasta::SDK::OrbwalkerConfig::statusComboMode->Value)
 				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Attack;
-			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::laneClearKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusLaneClearMode->Value)
+			if (UPasta::SDK::OrbwalkerConfig::laneClearKey->Value && UPasta::SDK::OrbwalkerConfig::statusLaneClearMode->Value)
 				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Clear;
-			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::fastClearKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusFastClearMode->Value)
+			if (UPasta::SDK::OrbwalkerConfig::fastClearKey->Value && UPasta::SDK::OrbwalkerConfig::statusFastClearMode->Value)
 				globals::scripts::orbwalker::orbwalkState = OrbwalkState::FastClear;
-			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::harassKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusHarassMode->Value)
+			if (UPasta::SDK::OrbwalkerConfig::harassKey->Value && UPasta::SDK::OrbwalkerConfig::statusHarassMode->Value)
 				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Harass;
-			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::lastHitKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusLastHitMode->Value)
+			if (UPasta::SDK::OrbwalkerConfig::lastHitKey->Value && UPasta::SDK::OrbwalkerConfig::statusLastHitMode->Value)
 				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Lasthit;
-			if (UPasta::SDK::Orbwalker::Configs::KeyBindings::fleeKey->Value && UPasta::SDK::Orbwalker::Configs::Status::statusFleeMode->Value)
+			if (UPasta::SDK::OrbwalkerConfig::fleeKey->Value && UPasta::SDK::OrbwalkerConfig::statusFleeMode->Value)
 				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Flee;
 
 			return false;

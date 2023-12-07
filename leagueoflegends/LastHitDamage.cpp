@@ -1,4 +1,6 @@
 #include "LastHitDamage.h"
+
+#include "Damage.h"
 #include "TargetSelector.h"
 
 ImVec2 Awarenesss::LastHitDamage::CalculateTopLeft(const Vector2& basePos) {
@@ -13,9 +15,10 @@ void Awarenesss::LastHitDamage::Draw() {
 	if (!Configs::EnemyTracker::showDamagePrediction->Value)
 		return;
 
-	const auto minions = TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange());
-	for (const auto& minion : minions)
+	for (auto minion : ObjectManager::GetMinionsAs(Alliance::Enemy))
 	{
+		if (!minion) continue;
+		if (minion->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > globals::localPlayer->GetRealAttackRange()) continue;
 		const Vector2 screenPos = Engine::GetHpBarPosition(minion);
 		const ImVec2 topLeft = CalculateTopLeft(screenPos);
 		const ImVec2 bottomRight = CalculateBottomRight(screenPos, (60 * minion->GetPercentHealth()) / 100);

@@ -1,6 +1,7 @@
 #include "Kaisa.h"
 
 #include "Awareness.h"
+#include "Damage.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
 
@@ -268,10 +269,10 @@ public:
         Killsteal();
         AntiGapCloser();
         AntiMelee();
-
+        //ObjectManager::CountMinionsInRange(Alliance::Enemy, 
         if (KaisaConfig::QConfig::AutoQ->Value == true && database.KaisaQ.IsCastable())
         {
-            if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() == 0 && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), qRange()).size() == 1)
+            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 0 && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 1)
             {
                 Engine::CastSpell(SpellIndex::Q);
             }
@@ -292,7 +293,7 @@ public:
 
         if (KaisaConfig::QConfig::ComboQ->Value == 0 && database.KaisaQ.IsCastable())
         {
-            if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() == 0 && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), qRange()).size() == 1)
+            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange())== 0 && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 1)
             {
                 Engine::CastSpell(SpellIndex::Q);
             }
@@ -300,18 +301,18 @@ public:
 
         if (KaisaConfig::QConfig::ComboQ->Value == 1 && database.KaisaQ.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
                 Kaisa_UseAbility(qTarget, Q);
         }
         if (KaisaConfig::EConfig::ComboE->Value == 1 && database.KaisaE.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
                 Engine::CastSpell(SpellIndex::E);
         }
 
         if (KaisaConfig::WConfig::ComboW->Value == 0 && database.KaisaW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
             {
                 if (wTarget->GetBuffByType(BuffType::Stun))
                 {
@@ -322,7 +323,7 @@ public:
         }
         if (KaisaConfig::WConfig::ComboW->Value == 1 && database.KaisaW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
             {
                 auto stacks = wTarget->GetBuffByName("kaisapassivemarker");
                 if (stacks->GetStacks() >= KaisaConfig::WConfig::wstack->Value)
@@ -335,7 +336,7 @@ public:
         }
         if (KaisaConfig::RConfig::ComboR->Value == 1 && database.KaisaR.IsCastable())
         {
-            if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(rRange()))
+            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange()))
             {
                 int meHP = globals::localPlayer->GetPercentHealth();
                 int targetHP = rTarget->GetPercentHealth();
@@ -393,7 +394,7 @@ public:
     void Clear() override
     {
         //Laneclear
-        if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() >= KaisaConfig::KaisaClear::Qmin->Value)
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) >= KaisaConfig::KaisaClear::Qmin->Value)
         {
 
             if (KaisaConfig::KaisaClear::UseQ->Value == true && database.KaisaQ.IsCastable())
@@ -403,12 +404,12 @@ public:
         }
 
         //Jungleclear
-        else if (TargetSelector::Functions::GetJungleMonstersInRange(qRange()).size() > 0)
+        else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
         {
 
             if (KaisaConfig::KaisaJungle::UseQ->Value == true && database.KaisaQ.IsCastable())
             {
-                if (const auto qTarget = TargetSelector::Functions::GetJungleInRange(qRange()))
+                if (const auto qTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), qRange()))
                     Kaisa_UseAbility(qTarget, Q);
             }
         }
@@ -420,13 +421,13 @@ public:
 
         if (KaisaConfig::KaisaHarass::UseW->Value == true && database.KaisaW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
                 Kaisa_UseAbility(wTarget, W);
         }
 
         if (KaisaConfig::KaisaHarass::UseQ->Value == true && database.KaisaQ.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
                 Kaisa_UseAbility(qTarget, Q);
         }
     }
@@ -437,7 +438,7 @@ public:
 
             if (KaisaConfig::KaisaKillsteal::UseW->Value == true && database.KaisaW.IsCastable())
             {
-                const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(KaisaConfig::KaisaKillsteal::wksRange->Value);
+                const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),KaisaConfig::KaisaKillsteal::wksRange->Value);
                 if (wTarget != nullptr
                     && wTarget->GetDistanceTo(globals::localPlayer) <= KaisaConfig::KaisaKillsteal::wksRange->Value
                     && wTarget->ReadClientStat(Object::Health) < w_dmg(wTarget))
@@ -456,9 +457,12 @@ public:
     {
         if (KaisaConfig::KaisaAntiGapCloser::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
-            for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 450.0f))
+            for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
+                if (!target) continue;
                 if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiGapCloser::whitelist, target->GetName().c_str())) continue;
+                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 450.0f) continue;
+
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
 
@@ -478,8 +482,10 @@ public:
     {
         if (KaisaConfig::KaisaAntiMelee::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
-            for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 450.0f))
+            for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
+                if (!target) continue;
+                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 450.0f) continue;
                 if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiMelee::whitelist, target->GetName().c_str())) continue;
 
                 if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))

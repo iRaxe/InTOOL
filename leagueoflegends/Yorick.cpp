@@ -1,6 +1,7 @@
 #include "Yorick.h"
 
 #include "Awareness.h"
+#include "Damage.h"
 #include "Orbwalker.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
@@ -155,25 +156,34 @@ public:
 
     bool IsMaidenAround()
     {
-        auto monster = TargetSelector::Functions::GetObjectInRange("YorickBigGhoul", database.YorickR.GetMaxRange());
+        auto monster = ObjectManager::GetObjectInRange("YorickBigGhoul", database.YorickR.GetMaxRange());
         return monster;
     }
 
     bool AreGhoulsAround()
     {
-        auto monster = TargetSelector::Functions::GetObjectInRange("YorickGhoulMelee", database.YorickR.GetMaxRange());
+        auto monster = ObjectManager::GetObjectInRange("YorickGhoulMelee", database.YorickR.GetMaxRange());
         return monster;
     }
 
     bool AreGravesAround()
     {
-        auto monster = TargetSelector::Functions::GetObjectInRange("TestCubeRender10Vision", database.YorickR.GetMaxRange());
+        auto monster = ObjectManager::GetObjectInRange("TestCubeRender10Vision", database.YorickR.GetMaxRange());
         return monster;
     }
 
     int CountGravesAround()
     {
-        return TargetSelector::Functions::GetObjectsInRange(globals::localPlayer->GetPosition(), "TestCubeRender10Vision", database.YorickR.GetMaxRange()).size();
+        int gravesToReturn = 0;
+        for (auto objToFind : ObjectManager::GetMinions()) {
+            if (!objToFind) continue;
+            if (!objToFind->IsInRange(globals::localPlayer->GetPosition(), database.YorickR.GetMaxRange())) continue;
+
+            if (objToFind->GetName() != "TestCubeRender10Vision") continue;
+            gravesToReturn++;
+        }
+
+        return gravesToReturn;
     }
 
     void Yorick_UseQ(Object* pEnemy)
@@ -265,20 +275,20 @@ public:
     {
         if (database.YorickR.IsCastable() && YorickConfig::YorickCombo::UseR->Value == true)
         {
-            if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickR.GetMaxRange()))
+            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickR.GetMaxRange()))
                 Yorick_UseR(rTarget);
         }
 
         if (database.YorickW.IsCastable() && YorickConfig::YorickCombo::UseW->Value == true)
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickW.GetRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickW.GetRange()))
                 Yorick_UseW(wTarget);
 
         if (database.YorickE.IsCastable() && YorickConfig::YorickCombo::UseE->Value == true)
-            if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickE.GetRange() + 300.0f))
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetRange() + 300.0f))
                 Yorick_UseE(eTarget);
 
         if (database.YorickQ.IsCastable() && YorickConfig::YorickCombo::UseQ->Value == true)
-			if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange() + 50.0f))
+			if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),globals::localPlayer->GetRealAttackRange() + 50.0f))
 				Yorick_UseQ(qTarget);
     }
 
@@ -289,23 +299,20 @@ public:
 
         if (database.YorickQ.IsCastable())
         {
-            if (const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetRealAttackRange() + 50.0f); YorickConfig::YorickClear::UseQOnTowers->Value == true)
+            if (const auto turret = TargetSelector::FindTurret(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange() + 50.0f, Alliance::Enemy); YorickConfig::YorickClear::UseQOnTowers->Value == true)
                 Yorick_UseQ(turret);
 
-            if (const auto inhibitor = TargetSelector::Functions::GetEnemyInhibitorInRange(globals::localPlayer->GetRealAttackRange() + 50.0f); YorickConfig::YorickClear::UseQOnTowers->Value == true)
+            if (const auto inhibitor = TargetSelector::FindInhibitor(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange() + 50.0f, Alliance::Enemy); YorickConfig::YorickClear::UseQOnTowers->Value == true)
                 Yorick_UseQ(inhibitor);
 
-            if (const auto nexus = TargetSelector::Functions::GetEnemyNexusInRange(globals::localPlayer->GetRealAttackRange() + 50.0f); YorickConfig::YorickClear::UseQOnTowers->Value == true)
-                Yorick_UseQ(nexus);
-
-            if (const auto monster = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange() + 50.0f);
+            if (const auto monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange() + 50.0f);
                 YorickConfig::YorickJungle::UseQ->Value == true
                 && monster)
             {
                 Yorick_UseQ(monster);
             }
 
-            if (const auto minion = TargetSelector::Functions::GetMinionInRange(globals::localPlayer->GetRealAttackRange() + 50.0f);
+            if (const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),globals::localPlayer->GetRealAttackRange() + 50.0f, Alliance::Enemy);
                 YorickConfig::YorickLastHit::UseQ->Value == true
                 && minion && minion->ReadClientStat(Object::Health) < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
             {
@@ -315,7 +322,7 @@ public:
 
         if (database.YorickW.IsCastable())
         {
-            if (const auto monster = TargetSelector::Functions::GetJungleInRange(database.YorickW.GetRange());
+            if (const auto monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.YorickW.GetRange());
                 YorickConfig::YorickJungle::UseW->Value == true
                 && monster)
             {
@@ -325,17 +332,17 @@ public:
 
         if (database.YorickE.IsCastable())
         {
-            if (const auto monster = TargetSelector::Functions::GetJungleInRange(database.YorickE.GetRange());
+            if (const auto monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.YorickE.GetRange());
                 YorickConfig::YorickJungle::UseE->Value == true
                 && monster)
             {
                 Yorick_UseE(monster);
             }
 
-            if (const auto minion= TargetSelector::Functions::GetMinionInRange(database.YorickE.GetRange());
+            if (const auto minion= TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), database.YorickE.GetRange(), Alliance::Enemy);
                 YorickConfig::YorickClear::UseE->Value == true
                 && minion 
-                && TargetSelector::Functions::GetMinionsInRange(minion->GetPosition(), database.YorickE.GetRadius()).size() >= YorickConfig::YorickClear::minMinions->Value)
+                && ObjectManager::CountMinionsInRange(Alliance::Enemy, minion->GetPosition(), database.YorickE.GetRadius()) >= YorickConfig::YorickClear::minMinions->Value)
             {
                 Yorick_UseE(minion);
             }
@@ -348,15 +355,15 @@ public:
             return;
 
         if (database.YorickQ.IsCastable() && YorickConfig::YorickHarass::UseQ->Value == true)
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange() + 50.0f))
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),globals::localPlayer->GetRealAttackRange() + 50.0f))
                 Yorick_UseQ(qTarget);
 
         if (database.YorickW.IsCastable() && YorickConfig::YorickHarass::UseW->Value == true)
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickW.GetMaxRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickW.GetMaxRange()))
             	Yorick_UseW(wTarget);
 
         if (database.YorickE.IsCastable() && YorickConfig::YorickHarass::UseE->Value == true)
-            if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickE.GetMaxRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetMaxRange()))
                 if (AreGravesAround() && CountGravesAround() >= YorickConfig::YorickHarass::minGraves->Value)
 					Yorick_UseE(eTarget);
         
@@ -368,18 +375,18 @@ public:
             return;
 
         if (YorickConfig::YorickLastHit::UseQ->Value == true && database.YorickQ.IsCastable())
-            if (const auto minion = TargetSelector::Functions::GetMinionInRange(database.YorickQ.GetRange()); minion->ReadClientStat(Object::Health) < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
+            if (const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),database.YorickQ.GetRange(), Alliance::Enemy); minion->ReadClientStat(Object::Health) < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
                 Yorick_UseQ(minion);
     }
 
     void Flee() override
     {
         if (YorickConfig::YorickFlee::UseE->Value == true && database.YorickE.IsCastable())
-            if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickE.GetRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetRange()))
                 Yorick_UseE(eTarget);
 
         if (YorickConfig::YorickFlee::UseW->Value == true && database.YorickW.IsCastable())
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickW.GetRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickW.GetRange()))
                 Yorick_UseW(wTarget);
     }
 
@@ -387,7 +394,7 @@ public:
     {
         if (YorickConfig::YorickKillsteal::UseQ->Value == true && database.YorickQ.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickQ.GetRange());
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickQ.GetRange());
                 qTarget && qTarget->ReadClientStat(Object::Health) < Yorick_dmgQ(qTarget))
             {
                 Yorick_UseQ(qTarget);
@@ -396,7 +403,7 @@ public:
 
         if (YorickConfig::YorickKillsteal::UseE->Value == true && database.YorickE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.YorickE.GetRange());
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetRange());
                 eTarget && eTarget->ReadClientStat(Object::Health) < Yorick_dmgE(eTarget))
             {
                 Yorick_UseE(eTarget);
@@ -408,8 +415,10 @@ public:
     {
         if (YorickConfig::YorickAntiGapCloser::UseW->Value == true && database.YorickW.IsCastable())
         {
-            for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), database.YorickW.GetRange()))
+            for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
+                if (!target) continue;
+                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > database.YorickW.GetRange()) continue;
                 if (!Engine::MenuItemContains(YorickConfig::YorickAntiGapCloser::whitelist, target->GetName().c_str())) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;

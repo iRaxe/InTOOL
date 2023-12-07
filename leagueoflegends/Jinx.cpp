@@ -277,7 +277,7 @@ public:
             && JinxConfig::JinxSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
             if (wTarget != nullptr)
             {
                 Jinx_UseW(wTarget);
@@ -288,7 +288,7 @@ public:
             && JinxConfig::JinxSpellsSettings::qCastMode->Value == 0
             && isTimeToCastQ())
         {
-            const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
             if (qTarget != nullptr)
             {
                 Jinx_UseQ(qTarget);
@@ -296,7 +296,7 @@ public:
         }
 
         if (JinxConfig::JinxCombo::UseR->Value == true
-            && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), rMinRange()).size() >= JinxConfig::JinxCombo::enemiesInRange->Value
+            && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), rMinRange()) >= JinxConfig::JinxCombo::enemiesInRange->Value
             && isTimeToCastR())
         {
             Jinx_UseR();
@@ -304,12 +304,12 @@ public:
     }
 
     void Clear() override {
-		if (TargetSelector::Functions::GetJungleMonstersInRange(qRange()).size() > 0)
+		if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
         {
             if (!HasEnoughMana(OrbwalkState::Clear)) return;
 
             if (JinxConfig::JinxJungle::UseW->Value == true && isTimeToCastW()) {
-                const auto wTarget = TargetSelector::Functions::GetJungleInRange(wRange());
+                const auto wTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
                 if (wTarget != nullptr) {
                     Jinx_UseW(wTarget);
                 }
@@ -324,7 +324,7 @@ public:
             && JinxConfig::JinxSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
             if (wTarget != nullptr) {
                 Jinx_UseW(wTarget);
             }
@@ -334,7 +334,7 @@ public:
             && JinxConfig::JinxSpellsSettings::qCastMode->Value == 0
             && isTimeToCastE())
         {
-            const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange());
+            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
             if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Jinx_dmgE(eTarget)) {
                 Jinx_UseE(eTarget);
             }
@@ -354,7 +354,7 @@ public:
         __try {
             if (JinxConfig::JinxKillsteal::UseE->Value && isTimeToCastE())
             {
-                const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(eRange());
+                const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
                 if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Jinx_dmgE(eTarget))
                 {
                     Jinx_UseE(eTarget);

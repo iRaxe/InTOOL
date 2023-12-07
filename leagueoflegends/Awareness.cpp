@@ -210,10 +210,10 @@ namespace UPasta
 					}
 
 					void DrawWardsTracker() {
-						const auto& wardsList = TargetSelector::Functions::GetWardsInRange(globals::localPlayer->GetPosition(), 1100.0f);
-
-						for (const auto& ward : wardsList) {
+						for (auto ward : ObjectManager::GetWards(Alliance::Enemy))
+						{
 							if (!ward) continue;
+							if (ward->GetDistanceTo(globals::localPlayer) > 1100.0f) continue;
 
 							auto objDrawPos = Engine::GetBaseDrawPosition(ward);
 							auto objPos = Engine::WorldToScreen(objDrawPos);
@@ -454,7 +454,7 @@ namespace UPasta
 
 							const Vector3 pathEnd = globals::localPlayer->GetAiManager()->GetPathEnd();
 
-							if (!globals::localPlayer->GetAiManager()->IsMoving() && Orbwalker::Functions::lastActionTime + 5.0f < gameTime)
+							if (!globals::localPlayer->GetAiManager()->IsMoving()) //&& Orbwalker::Functions::lastActionTime + 5.0f < gameTime)
 							{
 								refresh = true;
 								if (refresh)
@@ -589,7 +589,7 @@ namespace UPasta
 					{
 						if (Engine::GetGameTime() < 100.0f) return;
 
-						for (auto obj : TargetSelector::Functions::GetJungleRespawnInRange(12000.0f))
+						for (auto obj : ObjectManager::GetJungleRespawnCamps())
 						{
 							Vector3 objDrawPos = Engine::GetBaseDrawPosition(obj);
 							Vector2 objMinimapPos = Engine::WorldToMinimap(obj);

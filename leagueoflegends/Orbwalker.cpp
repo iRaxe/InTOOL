@@ -1,494 +1,207 @@
 #include "Orbwalker.h"
 
+#include "Awareness.h"
+#include "Damage.h"
 #include "TargetSelector.h"
 
-namespace UPasta
+static bool is_kalista = false;
+
+bool Orbwalker::CanAttack() {
+	return GetTickCount64() >= (_last_aa + (globals::localPlayer->GetAttackDelay() * 1000)) && globals::localPlayer->CanAttack(); //(Engine::GetGameTime() * 1000)
+}
+
+bool Orbwalker::CanMove() {
+	if (is_kalista) return true;
+	return GetTickCount64() >= max(_last_action,(_last_aa + (globals::localPlayer->GetAttackWindup() * 1000))) && globals::localPlayer->CanMove(); //
+}
+
+int Orbwalker::GetLatency(int extra) {
+	return  extra + 100 / 2;
+}
+
+void Orbwalker::InitializeMenu()
 {
-	namespace SDK
-	{
-		namespace Orbwalker
-		{
-			namespace Configs
-			{
-				Menu* OrbwalkerMenu;
-				void Initialize()
-				{
-					OrbwalkerMenu = Menu::CreateMenu("vez.Orbwalker", "Orbwalker");
-					status = OrbwalkerMenu->AddCheckBox("status", "Enable Orbwalker", true);
-					initializedOrbwalkerMenu = true;
-
-					if (initializedOrbwalkerMenu)
-					{
-						if (!Humanizer::initializedHumanizerMenu)
-							Humanizer::InitializeHumanizerMenu();
-
-						if (Humanizer::initializedHumanizerMenu)
-							Status::InitializeStatusMenu();
-
-						if (Status::initializedStatusMenu)
-							KeyBindings::InitializeKeyBindingsMenu();
-					}
-				}
-
-				namespace Humanizer
-				{
-					Menu* HumanizerMenu;
-					void InitializeHumanizerMenu()
-					{
-						HumanizerMenu = OrbwalkerMenu->AddMenu("humanizerSection", "Humanizer settings");
-						status = HumanizerMenu->AddCheckBox("status", "Enable the humanizer", true);
-
-						randomizeDelay = HumanizerMenu->AddCheckBox("randomizeDelay", "Randomize clicks delay", false);
-						clickDelay = HumanizerMenu->AddSlider("clickDelay", "Delay between clicks", 50, 10, 100, 1);
-
-						windupDelay = HumanizerMenu->AddSlider("windupDelay", "AA Travel time delay", 30, 10, 100, 1);
-
-						beforeAttackDelay = HumanizerMenu->AddSlider("beforeAttackDelay", "AA before attack order delay", 10, 10, 100, 1);
-						farmAttackDelay = HumanizerMenu->AddSlider("farmAttackDelay", "Farm delay", 10, 10, 100, 1);
-
-
-						initializedHumanizerMenu = true;
-					}
-				}
-
-				namespace Status
-				{
-					Menu* StatusMenu;
-
-					void InitializeStatusMenu()
-					{
-						StatusMenu = OrbwalkerMenu->AddMenu("statusSection", "Status settings");
-						statusFollowMouse = StatusMenu->AddCheckBox("statusFollowMouse", "Enable Mouse follow", true);
-						statusComboMode = StatusMenu->AddCheckBox("statusComboMode", "Enable Combo mode", true);
-						statusLaneClearMode = StatusMenu->AddCheckBox("statusLaneClearMode", "Enable LaneClear mode", true);
-						statusFastClearMode = StatusMenu->AddCheckBox("statusFastClearMode", "Enable FastClear mode", true);
-						statusLastHitMode = StatusMenu->AddCheckBox("statusLastHitMode", "Enable LastHit mode", true);
-						statusHarassMode = StatusMenu->AddCheckBox("statusHarassMode", "Enable Harass mode", true);
-						statusFleeMode = StatusMenu->AddCheckBox("statusFleeMode", "Enable Flee mode", true);
-
-						initializedStatusMenu = true;
-					}
-				}
-
-				namespace KeyBindings
-				{
-					Menu* KeyBindingsMenu;
-					void InitializeKeyBindingsMenu()
-					{
-						KeyBindingsMenu = OrbwalkerMenu->AddMenu("keybindingsSection", "KeyBindings settings");
-						comboKey = KeyBindingsMenu->AddKeyBind("comboKey", "Combo Key", ' ', false, false);
-						harassKey = KeyBindingsMenu->AddKeyBind("harassKey", "Harass Key", 'C', false, false);
-						lastHitKey = KeyBindingsMenu->AddKeyBind("lastHitKey", "LastHit Key", 'X', false, false);
-						laneClearKey = KeyBindingsMenu->AddKeyBind("laneClearKey", "LaneClear Key", 'V', false, false);
-						fastClearKey = KeyBindingsMenu->AddKeyBind("fastClearKey", "FastClear Key", 'CTRL', false, false);
-						fleeKey = KeyBindingsMenu->AddKeyBind("fleeKey", "Flee Key", 'T', false, false);
-
-						initializedKeyBindingsMenu = true;
-					}
-				}
-			}
-
-			namespace Functions
-			{
-				float nextRngBuffer = 0.0f;
-				float gameTime = 0;
-				float lastAttackTime = 0.0f;
-				QWORD lastSpellCastAddress = 0;
-				void Initialize()
-				{
-					if (!Configs::initializedOrbwalkerMenu)
-					{
-						Configs::Initialize();
-					}
-				}
-
-				void Update()
-				{
-					gameTime = Engine::GetGameTime();
-					__try { CheckActiveAttack(); }
-					__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> CHECKATTIVEATTACK UPDATE"); }
-					if (ShouldStopOrbwalk()) return;
-					if (globals::scripts::orbwalker::orbwalkState && IsReloading()) {
-						Actions::Idle();
-						return;
-					}
-
-					/*if (globals::localPlayer->IsCastingSpell())
-						return;*/
-
-					switch (globals::scripts::orbwalker::orbwalkState)
-					{
-					case Attack:
-						__try { States::Attack(); }
-						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> ATTACK UPDATE"); }
-						break;
-					case Clear:
-						__try { States::Laneclear(); }
-						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> LANECLEAR UPDATE"); }
-						break;
-					case FastClear:
-						__try { States::Fastclear(); }
-						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> FASTCLEAR UPDATE"); }
-						break;
-					case Harass:
-						__try { States::Harass(); }
-						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> HARASS UPDATE"); }
-						break;
-					case Lasthit:
-						__try { States::Lasthit(); }
-						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> LASTHIT UPDATE"); }
-					case Flee:
-						__try { Actions::Idle(); }
-						__except (1) { LOG("ERROR IN SCRIPTS -> ORBWALKER -> IDLE UPDATE"); }
-						break;
-					}
-
-				}
-
-				void CheckActiveAttack()
-				{
-					auto spellCast = globals::localPlayer->GetActiveSpellCast();
-					if (spellCast != nullptr)
-					{
-						if ((spellCast->IsAutoAttack() ||
-							Engine::IsAttackWindupSpell(spellCast->GetSpellId())) &&
-							(QWORD)spellCast != lastSpellCastAddress)
-						{
-							lastAttackTime = gameTime;
-						}
-					}
-
-					lastSpellCastAddress = (QWORD)spellCast;
-				}
-
-				bool ShouldStopOrbwalk()
-				{
-					return 
-						!Engine::CanSendInput() ||
-						gameTime < lastAttackTime + globals::localPlayer->GetAttackWindup() + (Configs::Humanizer::windupDelay->Value / 100.0f);
-				}
-
-				float lastActionTime = 0.0f;
-				bool CanDoAction()
-				{
-					if (lastActionTime == 0.0f) 
-						lastActionTime = gameTime;
-
-					const float humanizerTimer = (Configs::Humanizer::clickDelay->Value / 100.0f) + nextRngBuffer;
-					if (gameTime < lastActionTime + humanizerTimer) 
-						return false;
-
-					lastActionTime = gameTime;
-					return true;
-				}
-
-				bool ShouldWaitUnderTurret(Object* noneKillableMinion)
-				{
-					for (int i = 0; i < globals::minionManager->GetListSize(); i++)
-					{
-						auto minion = globals::minionManager->GetIndex(i);
-						if (minion->IsAlive() && minion->IsVisible())
-						{
-							if (minion->GetName() == "") continue;
-							if (!minion->IsValidTarget()) continue;
-							if (minion->GetCharacterData()->GetObjectTypeHash() != ObjectType::Minion_Lane) continue;
-							if (!minion->IsInRange(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange())) continue;
-							if (minion)
-							{
-								return
-									((noneKillableMinion != nullptr ? noneKillableMinion->GetNetId() != minion->GetNetId() : true)
-										&& minion->IsInAARange() && Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) > minion->ReadClientStat(Object::Health));
-							}
-						}
-					}
-				}
-
-				bool IsReloading()
-				{
-					return gameTime < lastAttackTime + globals::localPlayer->GetAttackDelay() - (Configs::Humanizer::beforeAttackDelay->Value / 100.0f);
-				}
-
-				void RefreshBuffer()
-				{
-					if (Configs::Humanizer::randomizeDelay->Value == false)
-					{
-						nextRngBuffer = 0.0f;
-						return;
-					}
-					nextRngBuffer = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.01f);
-				}
-
-				float GetAttackMissileSpeed()
-				{
-					float def = globals::localPlayer->GetRealAttackRange() < 300.0f ? FLT_MAX : globals::localPlayer->GetAttackWindup();
-
-					if (globals::localPlayer->GetName() == "Thresh" 
-					|| globals::localPlayer->GetName() == "Azir" 
-					|| globals::localPlayer->GetName() == "Velkoz" 
-					|| globals::localPlayer->GetName() == "Rakan")
-						return FLT_MAX;
-
-					else if (globals::localPlayer->GetName() == "Thresh")
-					{
-						if (globals::localPlayer->GetBuffByName("ViktorPowerTransferReturn"))
-							return FLT_MAX;
-					}
-
-					else if (globals::localPlayer->GetName() == "Jinx")
-					{
-						if (globals::localPlayer->GetBuffByName("JinxQ"))
-							return 2000.0f;
-					}
-
-					else if (globals::localPlayer->GetName() == "Poppy")
-					{
-						if (globals::localPlayer->GetBuffByName("poppypassivebuff"))
-							return 1600.0f;
-					}
-
-					else if (globals::localPlayer->GetName() == "Ivern")
-					{
-						if (globals::localPlayer->GetBuffByName("ivernwpassive"))
-							return 1600.0f;
-					}
-
-					else if (globals::localPlayer->GetName() == "Caitlyn")
-					{
-						if (globals::localPlayer->GetBuffByName("caitlynheadshot"))
-							return 3000.0f;
-					}
-
-					else if (globals::localPlayer->GetName() == "Twitch")
-					{
-						if (globals::localPlayer->GetBuffByName("TwitchFullAutomatic"))
-							return 4000.0f;
-					}
-
-					else if (globals::localPlayer->GetName() == "Jayce")
-					{
-						if (globals::localPlayer->GetBuffByName("jaycestancegun"))
-							return 2000.0f;
-					}
-
-					return def;
-				}
-
-				namespace Actions
-				{
-					void Idle()
-					{
-						if (!(CanDoAction() && globals::localPlayer->CanMove()))
-							return;
-
-						if (Configs::Status::statusFollowMouse->Value)
-						{
-							SpellCast* spellCast = globals::localPlayer->GetActiveSpellCast();
-							if (spellCast && spellCast->GetSpellInfo()->GetSpellData()->GetName() == "XerathLocusOfPower2")
-								return;
-
-							Engine::MoveToMousePos();
-						}
-
-						RefreshBuffer();
-					}
-
-					void AttackObject(Object* obj)
-					{
-						if (!CanDoAction())
-							return;
-
-						Engine::AttackObject(obj->GetPosition());
-						RefreshBuffer();
-					}
-
-					void AttackInhib(Object* obj)
-					{
-						if (!CanDoAction())
-							return;
-
-						Engine::AttackObject(obj->GetPosition());
-						RefreshBuffer();
-					}
-
-					void CastSpell(int spellId, Object* target)
-					{
-						Vector3 headPos = target->GetPosition();
-						const float objectHeight = *(float*)(target->GetCharacterData() + Offsets::CharData::Size) * target->ReadClientStat(Object::ScaleMulti);
-						headPos.y += objectHeight;
-						CastSpell(spellId, headPos);
-					}
-
-					void CastSpell(int spellId, Vector3 pos)
-					{
-						/*if (!CanDoAction())
-							return;*/
-						Engine::CastSpell(spellId, pos);
-						RefreshBuffer();
-					}
-				}
-
-				namespace States
-				{
-					void Attack()
-					{
-						if (globals::localPlayer->CanAttack())
-						{
-							auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
-							if (obj != nullptr)
-							{
-								Actions::AttackObject(obj);
-							}
-						}
-
-						Actions::Idle();
-					}
-
-					void Laneclear()
-					{
-						if (globals::localPlayer->CanAttack())
-						{
-							const auto killableMinion = TargetSelector::Functions::GetKillableEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
-							if (killableMinion != nullptr) //&& !ShouldWaitUnderTurret(killableMinion))
-							{
-								if (killableMinion->GetEffectiveHealth(Physical) + 50 < Damage::CalculateAutoAttackDamage(globals::localPlayer, killableMinion))
-									Actions::AttackObject(killableMinion);
-							}
-
-							const auto jungleMonster = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange());
-							if (jungleMonster != nullptr)
-								Actions::AttackObject(jungleMonster);
-
-							const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetRealAttackRange());
-							if (turret != nullptr)
-								Actions::AttackObject(turret);
-
-							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
-							if (minion != nullptr )//&& !ShouldWaitUnderTurret(minion))
-							{
-								if (minion->ReadClientStat(Object::Health) > Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) * 2 
-									|| Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->ReadClientStat(Object::Health))
-									Actions::AttackObject(minion);
-							}
-
-							/*else 
-							{
-								//const int missileSpeed = GetAttackMissileSpeed();
-								for (int i = 0; i < globals::minionManager->GetListSize(); i++)
-								{
-									auto minion = globals::minionManager->GetIndex(i);
-									if (minion->IsAlive() && minion->IsVisible())
-									{
-										if (!minion->IsValidTarget()) continue;
-										if (!minion->IsMinion()) continue;
-										if (minion->GetDistanceTo(globals::localPlayer) > globals::localPlayer->GetRealAttackRange()) continue;
-
-										if (minion && minion->GetDistanceTo(globals::localPlayer) < globals::localPlayer->GetRealAttackRange())
-										{
-											const float minionHealth = minion->ReadClientStat(Object::Health) - Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
-											const auto attackDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
-
-											const auto turret = TargetSelector::Functions::GetAllyTurretInRange(globals::localPlayer->GetRealAttackRange());
-											if (turret && turret->GetDistanceTo(minion) <= 900)
-											{
-												if (minion->ReadClientStat(Object::Health) > attackDamage)
-												{
-													const auto turretDamage = Damage::CalculateAutoAttackDamage(turret, minion);
-													if (minion->ReadClientStat(Object::Health) - turretDamage > 0.0f)
-													{
-														for (auto minionHealth = minion->ReadClientStat(Object::Health); minionHealth > 0.0f && turretDamage > 0.0f; minionHealth -= turretDamage)
-														{
-															if (minionHealth <= attackDamage)
-																break;
-														}
-
-														if (!ShouldWaitUnderTurret(globals::localPlayer))
-														{
-															Actions::AttackObject(minion);
-															break;
-														}
-													}
-												}
-												break;
-											}
-
-											if (minionHealth >= 2.0f * attackDamage || minionHealth < attackDamage)
-											{
-												Actions::AttackObject(minion);
-												return;
-											}
-
-										}
-									}
-								}
-							}*/
-						}
-
-						Actions::Idle();
-					}
-
-					void Fastclear()
-					{
-						if (globals::localPlayer->CanAttack())
-						{
-							const auto jungleMonster = TargetSelector::Functions::GetJungleInRange(globals::localPlayer->GetRealAttackRange());
-							if (jungleMonster != nullptr)
-								Actions::AttackObject(jungleMonster);
-
-							const auto turret = TargetSelector::Functions::GetEnemyTurretInRange(globals::localPlayer->GetRealAttackRange());
-							if (turret != nullptr)
-								Actions::AttackObject(turret);
-
-							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
-							if (minion != nullptr )
-								Actions::AttackObject(minion);
-						}
-
-						Actions::Idle();
-					}
-
-					void Harass()
-					{
-						if (globals::localPlayer->CanAttack())
-						{
-							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
-							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
-							{
-								if (Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->ReadClientStat(Object::Health))
-									Actions::AttackObject(minion);
-								else
-								{
-									const auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
-									if (obj != nullptr)
-										Actions::AttackObject(obj);
-								}
-							}
-							else
-							{
-								const auto obj = TargetSelector::Functions::GetEnemyChampionInRange(globals::localPlayer->GetRealAttackRange());
-								if (obj != nullptr)
-									Actions::AttackObject(obj);
-							}
-						}
-
-						Actions::Idle();
-					}
-
-					void Lasthit()
-					{
-						if (globals::localPlayer->CanAttack())
-						{
-							const auto minion = TargetSelector::Functions::GetEnemyMinionInRange(globals::localPlayer->GetRealAttackRange());
-							if (minion != nullptr && !ShouldWaitUnderTurret(minion))
-							{
-								if (Damage::CalculateAutoAttackDamage(globals::localPlayer, minion) - 10.0f > minion->ReadClientStat(Object::Health))
-									Actions::AttackObject(minion);
-							}
-						}
-
-						Actions::Idle();
-					}
-				}
-			}
+	using namespace UPasta::SDK::OrbwalkerConfig;
+
+	const auto OrbwalkerMenu = UPasta::SDK::Menu::CreateMenu("vezOrbwalker", "Orbwalker Settings");
+
+	const auto StatusMenu = OrbwalkerMenu->AddMenu("statusSection", "Status settings");
+	statusFollowMouse = StatusMenu->AddCheckBox("statusFollowMouse", "Enable Mouse follow", true);
+	statusComboMode = StatusMenu->AddCheckBox("statusComboMode", "Enable Combo mode", true);
+	statusLaneClearMode = StatusMenu->AddCheckBox("statusLaneClearMode", "Enable LaneClear mode", true);
+	statusFastClearMode = StatusMenu->AddCheckBox("statusFastClearMode", "Enable FastClear mode", true);
+	statusLastHitMode = StatusMenu->AddCheckBox("statusLastHitMode", "Enable LastHit mode", true);
+	statusHarassMode = StatusMenu->AddCheckBox("statusHarassMode", "Enable Harass mode", true);
+	statusFleeMode = StatusMenu->AddCheckBox("statusFleeMode", "Enable Flee mode", true);
+
+	const auto KeyBindingsMenu = OrbwalkerMenu->AddMenu("keybindingsSection", "KeyBindings settings");
+	comboKey = KeyBindingsMenu->AddKeyBind("comboKey", "Combo Key", ' ', false, false);
+	harassKey = KeyBindingsMenu->AddKeyBind("harassKey", "Harass Key", 'C', false, false);
+	lastHitKey = KeyBindingsMenu->AddKeyBind("lastHitKey", "LastHit Key", 'X', false, false);
+	laneClearKey = KeyBindingsMenu->AddKeyBind("laneClearKey", "LaneClear Key", 'V', false, false);
+	fastClearKey = KeyBindingsMenu->AddKeyBind("fastClearKey", "FastClear Key", 'CTRL', false, false);
+	fleeKey = KeyBindingsMenu->AddKeyBind("fleeKey", "Flee Key", 'T', false, false);
+}
+
+void Orbwalker::Init() {
+	if (globals::localPlayer->GetName() == "Kalista") is_kalista = true;
+	InitializeMenu();
+	Event::Subscribe(Event::OnWndProc, &OnWndProc);
+	Event::Subscribe(Event::OnDraw, &OnDraw);
+	Event::Subscribe(Event::OnGameTick, &OnTick);
+	Event::Subscribe(Event::OnProcessSpell, &OnCastSound);
+}
+
+void Orbwalker::OnWndProc(UINT msg, WPARAM param) {
+	if (param == UPasta::SDK::OrbwalkerConfig::comboKey->Key) {
+		switch (msg) {
+			case WM_KEYDOWN: _mode = Attack; break;
+			case WM_KEYUP: _mode = Off; break;
 		}
 	}
+
+	if (param == UPasta::SDK::OrbwalkerConfig::harassKey->Key) {
+		switch (msg) {
+			case WM_KEYDOWN: _mode = Harass; break;
+			case WM_KEYUP: _mode = Off; break;
+		}
+	}
+
+	if (param == UPasta::SDK::OrbwalkerConfig::lastHitKey->Key) {
+		switch (msg) {
+			case WM_KEYDOWN: _mode = Lasthit; break;
+			case WM_KEYUP: _mode = Off; break;
+		}
+	}
+
+	if (param == UPasta::SDK::OrbwalkerConfig::laneClearKey->Key) {
+		switch (msg) {
+			case WM_KEYDOWN: _mode = Clear; break;
+			case WM_KEYUP: _mode = Off; break;
+		}
+	}
+
+	if (param == UPasta::SDK::OrbwalkerConfig::fastClearKey->Key) {
+		switch (msg) {
+			case WM_KEYDOWN: _mode = FastClear; break;
+			case WM_KEYUP: _mode = Off; break;
+		}
+	}
+
+	if (param == UPasta::SDK::OrbwalkerConfig::fleeKey->Key) {
+		switch (msg) {
+			case WM_KEYDOWN: _mode = Flee; break;
+			case WM_KEYUP: _mode = Off; break;
+		}
+	}
+}
+
+void Orbwalker::OnDraw() {
+	auto me = globals::localPlayer;
+
+	if (!me) return;
+	if (!me->IsAlive()) return;
+	UPasta::SDK::Awareness::Functions::Radius::DrawRadius(me->GetPosition(), me->GetRealAttackRange(), COLOR_RED, 3.0f);
+}
+
+void Orbwalker::OnTick() {
+	if (_mode == Off) return;
+	auto me = globals::localPlayer;
+	if (!me) return;
+	if (!me->IsAlive()) return;
+
+	if (!CanMove()) return;
+
+	if (_state == CHANNELING or _state == DODGING) return;
+
+	auto current_cast = me->GetActiveSpellCast();
+	if (current_cast and current_cast->IsSpell()) {
+		Engine::MoveToMousePos();
+		_last_action = GetTickCount64() + GetLatency();
+		return;
+	}
+
+	auto nav = me->GetAiManager();
+	if (nav and nav->IsDashing()) {
+		Engine::MoveToMousePos();
+		_last_action = GetTickCount64() + GetLatency();
+		return;
+	}
+
+	if (!CanAttack()) {
+		Engine::MoveToMousePos();
+		_last_action = GetTickCount64() + GetLatency();
+		return;
+	}
+
+	if (_mode == Attack) {
+		OnCombo();
+	}
+	if (_mode == Harass) {
+		OnHarass();
+	}
+	if (_mode == Clear) {
+		OnClear();
+	}
+}
+
+void Orbwalker::OnCastSound(uintptr_t state, SpellCast* cast) {
+	if (cast->GetCasterHandle() != globals::localPlayer->GetHandle()) return;
+	if (!cast->IsAutoAttack()) return;
+
+	_state = IDLE;
+	Event::Publish(Event::OnAfterAttack);
+	return;
+}
+
+void Orbwalker::OnCombo() {
+	auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),globals::localPlayer->GetRealAttackRange());
+	if (!target) {
+		Engine::MoveToMousePos();
+		_last_action = GetTickCount64() + GetLatency();
+		return;
+	}
+
+	Event::Publish(Event::OnBeforeAttack);
+	Engine::AttackObject(target->GetPosition());
+	_last_aa = GetTickCount64() + GetLatency();//(Engine::GetGameTime() * 1000)
+	_state = ATTACKING;
+	return;
+
+}
+
+void Orbwalker::OnHarass() {
+	auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange());
+	if (!target) {
+		Engine::MoveToMousePos();
+		_last_action = GetTickCount64() + GetLatency();
+		return;
+	}
+
+	if (!target) {
+		Engine::MoveToMousePos();
+		_last_action = GetTickCount64() + GetLatency();
+		return;
+	}
+
+	Event::Publish(Event::OnBeforeAttack);
+	Engine::AttackObject(target->GetPosition());
+	_last_aa = GetTickCount64() + GetLatency();//(Engine::GetGameTime() * 1000)
+	_state = ATTACKING;
+	return;
+
+}
+void Orbwalker::OnClear() {
+	auto target = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange(), Alliance::Enemy);
+	if (!target) {
+		Engine::MoveToMousePos();
+		_last_action = GetTickCount64() + GetLatency();
+		return;
+	}
+
+	Event::Publish(Event::OnBeforeAttack);
+	Engine::AttackObject(target->GetPosition());
+	_last_aa = GetTickCount64() + GetLatency();//(Engine::GetGameTime() * 1000)
+	_state = ATTACKING;
+	return;
 }

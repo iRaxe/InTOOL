@@ -129,14 +129,14 @@ public:
                 globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetManaCost() +
                 globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetManaCost() <= globals::localPlayer->GetMana())
             {
-                UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::Q, ePrediction.position);
+                Engine::CastSpell(SpellIndex::Q, ePrediction.position);
                 lastQForECastTime = gameTime;
                 return;
             }
 
             if (lastQForECastTime > gameTime + 0.1f ||  SphereForEExists(ePrediction.position))
             {
-                UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::E, ePrediction.position);
+                Engine::CastSpell(SpellIndex::E, ePrediction.position);
                 lastECastTime = gameTime;
                 return;
             }
@@ -150,39 +150,39 @@ public:
         
         if (w.IsCastable() && (int)w.GetName().size() == 11 && Modules::prediction::GetPrediction(w, wPrediction))
         {
-            UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::W, wPrediction.position);
+            Engine::CastSpell(SpellIndex::W, wPrediction.position);
             return;
         }
 
         if (q.IsCastable() && (q.GetStacks() > 0 || q.GetName().size() == 7) && Modules::prediction::GetPrediction(q, qPrediction))
         {
-            UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::Q, qPrediction.position);
+            Engine::CastSpell(SpellIndex::Q, qPrediction.position);
             return;
         }
 
         if (CanCastW1() && w.IsCastable() && (int)w.GetName().size() == 7 && Modules::prediction::GetPrediction(w, wPrediction))
         {
-            auto monster = UPasta::SDK::TargetSelector::Functions::GetObjectInRange(w.GetRange(), "",
+            auto monster = ObjectManager::GetObjectInRange(w.GetRange(), "",
                 { ObjectType::Minion_Lane, ObjectType::Monster },
                 { ObjectType::Monster_Epic, ObjectType::Monster_Dragon }, false);
             if (monster && monster == Engine::GetSelectedObject())
             {
-                UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::W, monster->GetPosition());
+                Engine::CastSpell(SpellIndex::W, monster->GetPosition());
                 lastW1CastTime = gameTime;
                 return;
             }
 
-            auto sphere = UPasta::SDK::TargetSelector::Functions::GetObjectInRange(w.GetRange(), SP_STRING("SyndraSphere"), { ObjectType::Special }, {}, true);
+            auto sphere = ObjectManager::GetObjectInRange(w.GetRange(), SP_STRING("SyndraSphere"), { ObjectType::Special }, {}, true);
             if (sphere && (sphere != lastESphere || gameTime > lastECastTime + 0.4f))
             {
-                UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::W, sphere->GetPosition());
+                Engine::CastSpell(SpellIndex::W, sphere->GetPosition());
                 lastW1CastTime = gameTime;
                 return;
             }
 
             if (monster)
             {
-                UPasta::SDK::Orbwalker::Functions::Actions::CastSpell(SpellIndex::W, monster->GetPosition());
+                Engine::CastSpell(SpellIndex::W, monster->GetPosition());
                 lastW1CastTime = gameTime;
                 return;
             }

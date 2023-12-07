@@ -281,13 +281,13 @@ public:
         {
             if (NautilusConfig::NautilusCombo::UseR->Value == true && database.NautilusR.IsCastable())
             {
-	            if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusR.GetRange()))
+	            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusR.GetRange()))
                 {
                     Nautilus_UseR(rTarget);
                 }
             }
 
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusQ.GetRange()))
             {
                 if (!qTarget->CanMove() && database.NautilusQ.IsCastable())
                 {
@@ -308,7 +308,7 @@ public:
         {
             if (NautilusConfig::NautilusCombo::UseQ->Value == true && database.NautilusQ.IsCastable())
             {
-	            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange()))
+	            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusQ.GetRange()))
                 {
                     Nautilus_UseQ(qTarget);
                 }
@@ -318,7 +318,7 @@ public:
             {
                 if (NautilusConfig::NautilusCombo::UseW->Value == true && database.NautilusW.IsCastable())
                 {
-	                if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusW.GetRange()))
+	                if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusW.GetRange()))
                     {
                         Nautilus_UseW(wTarget);
                     }
@@ -326,7 +326,7 @@ public:
 
                 if (NautilusConfig::NautilusCombo::UseE->Value == true && database.NautilusE.IsCastable())
                 {
-	                if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusE.GetRange()))
+	                if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusE.GetRange()))
                     {
                         Nautilus_UseE(eTarget);
                     }
@@ -334,7 +334,7 @@ public:
 
                 if (NautilusConfig::NautilusCombo::UseR->Value == true && database.NautilusR.IsCastable())
                 {
-	                if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusR.GetRange()))
+	                if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusR.GetRange()))
                     {
                         Nautilus_UseR(rTarget);
                     }
@@ -352,7 +352,7 @@ public:
 
         if (NautilusConfig::NautilusJungle::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-	        const auto qMonster = TargetSelector::Functions::GetJungleInRange(database.NautilusQ.GetRange());
+	        const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.NautilusQ.GetRange());
             if (qMonster && gameTime > QCastedTime + database.NautilusQ.GetCastTime())
             {
                 Engine::CastSpell(SpellIndex::Q, qMonster->GetPosition());
@@ -362,7 +362,7 @@ public:
         
         if (NautilusConfig::NautilusJungle::UseW->Value == true && database.NautilusW.IsCastable())
         {
-	        if (const auto wMonster = TargetSelector::Functions::GetJungleInRange(database.NautilusW.GetRange()))
+	        if (const auto wMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.NautilusW.GetRange()))
                 Nautilus_UseW(wMonster);
         }
     }
@@ -375,7 +375,7 @@ public:
 
         if (NautilusConfig::NautilusHarass::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-	        if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange()))
+	        if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusQ.GetRange()))
             {
                 if (NautilusConfig::NautilusHarass::UseQDive->Value == true && qTarget->IsUnderEnemyTower() || !qTarget->IsUnderEnemyTower())
 					Nautilus_UseQ(qTarget);
@@ -384,7 +384,7 @@ public:
 
         if (NautilusConfig::NautilusHarass::UseE->Value == true && database.NautilusE.IsCastable())
         {
-	        if (const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusE.GetRange()))
+	        if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusE.GetRange()))
             {
                 Nautilus_UseE(eTarget);
             }
@@ -414,7 +414,7 @@ public:
 
         if (NautilusConfig::NautilusKillsteal::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-	        const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusQ.GetRange());
+	        const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusQ.GetRange());
             if (qTarget && qTarget->ReadClientStat(Object::Health) < Nautilus_dmgQ(qTarget))
             {
                 Nautilus_UseQ(qTarget);
@@ -423,7 +423,7 @@ public:
 
         if (NautilusConfig::NautilusKillsteal::UseE->Value == true && database.NautilusE.IsCastable())
         {
-	        const auto eTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusE.GetRange());
+	        const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusE.GetRange());
             if (eTarget && eTarget->ReadClientStat(Object::Health) < Nautilus_dmgE(eTarget))
             {
                 Nautilus_UseE(eTarget);
@@ -432,7 +432,7 @@ public:
 
         if (NautilusConfig::NautilusKillsteal::UseR->Value == true && database.NautilusR.IsCastable())
         {
-	        const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(database.NautilusR.GetRange());
+	        const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusR.GetRange());
             if (rTarget && rTarget->ReadClientStat(Object::Health) < Nautilus_dmgR(rTarget))
             {
                 Nautilus_UseR(rTarget);
@@ -444,8 +444,10 @@ public:
     {
         if (NautilusConfig::NautilusAntiGapCloser::UseE->Value == true && database.NautilusE.IsCastable())
         {
-            for (const auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), database.NautilusE.GetRange()))
+            for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
+                if (!target) continue;
+                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > database.NautilusE.GetRange()) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
 

@@ -1,5 +1,6 @@
 #include "Thresh.h"
 #include "Awareness.h"
+#include "Damage.h"
 #include "stdafx.h"
 #include "TargetSelector.h"
 class ThreshModule : public ChampionModule
@@ -319,7 +320,7 @@ public:
             auto enemyPos = pEnemy->GetPosition();
 
 
-            const auto ally = TargetSelector::Functions::GetAllyChampionInRange(1100);
+            const auto ally = ObjectManager::GetHeroAs(Alliance::Ally, globals::localPlayer->GetPosition(), 1100.0f);;
             if (ally != nullptr)
             {
                 const auto allyPos = enemyPos.Extend(ally->GetPosition(), 800);
@@ -330,7 +331,7 @@ public:
             }
             else
             {
-                const auto allyTower = TargetSelector::Functions::GetAllyTurretInRange(1100);
+                const auto allyTower = TargetSelector::FindTurret(globals::localPlayer->GetPosition(),1100.0f, Alliance::Ally);
                 if (allyTower != nullptr)
                 {
                     const auto allyPos = enemyPos.Extend(allyTower->GetPosition(), 800);
@@ -381,28 +382,28 @@ public:
     }
 
     void Combo()  override {
-        if (ThreshConfig::ThreshCombo::UseR->Value == true && database.ThreshR.IsCastable() && TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(),rRange()).size() >= ThreshConfig::ThreshCombo::enemiesInRange->Value)
+        if (ThreshConfig::ThreshCombo::UseR->Value == true && database.ThreshR.IsCastable() && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(),rRange()) >= ThreshConfig::ThreshCombo::enemiesInRange->Value)
         {
-            if (const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(rRange()))
+            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange()))
                 Thresh_UseR(rTarget);
         }
 
         if (ThreshConfig::ThreshCombo::UseW->Value == true && database.ThreshW.IsCastable() && ThreshConfig::ThreshSpellsSettings::wCastMode->Value == 0)
         {
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
                 Thresh_UseW(wTarget);
         }
 
         if (ThreshConfig::ThreshCombo::UseQ->Value == true && database.ThreshQ.IsCastable() && ThreshConfig::ThreshSpellsSettings::qCastMode->Value == 0)
         {
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
                 Thresh_UseQ(qTarget);
         }
     }
 
     void Clear() override {
         //Laneclear
-        if (TargetSelector::Functions::GetMinionsInRange(globals::localPlayer->GetPosition(), qRange()).size() > 0)
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) > 0)
         {
 
             if (!Thresh_HasEnoughMana(ThreshConfig::ThreshClear::minMana->Value)) return;
@@ -416,20 +417,20 @@ public:
         }
 
         //Jungleclear
-        else if (TargetSelector::Functions::GetJungleMonstersInRange(qRange()).size() > 0)
+        else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
         {
             if (!Thresh_HasEnoughMana(ThreshConfig::ThreshJungle::minMana->Value)) return;
 
             if (ThreshConfig::ThreshJungle::UseW->Value == true && database.ThreshW.IsCastable())
             {
-                const auto wTarget = TargetSelector::Functions::GetJungleInRange(wRange());
+                const auto wTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
                 if (wTarget != nullptr && (wTarget->GetName().contains("Dragon") || wTarget->GetName().contains("Baron") || wTarget->GetName().contains("Herald")))
                     Thresh_UseW(wTarget);
             }
 
             if (ThreshConfig::ThreshJungle::UseQ->Value == true && database.ThreshQ.IsCastable())
             {
-                if (const auto qTarget = TargetSelector::Functions::GetJungleInRange(qRange()))
+                if (const auto qTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), qRange()))
                     Thresh_UseQ(qTarget);
             }
         }
@@ -442,13 +443,13 @@ public:
 
         /*if (ThreshConfig::ThreshHarass::UseW->Value == true && database.ThreshW.IsCastable() && ThreshConfig::ThreshSpellsSettings::wCastMode->Value == 0)
         {
-            if (const auto wTarget = TargetSelector::Functions::GetEnemyChampionInRange(wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
                 Thresh_UseW(wTarget);
         }*/
 
         if (ThreshConfig::ThreshHarass::UseQ->Value == true && database.ThreshQ.IsCastable() && ThreshConfig::ThreshSpellsSettings::qCastMode->Value == 0)
         {
-            if (const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
                 Thresh_UseQ(qTarget);
         }
     }
@@ -459,7 +460,7 @@ public:
 
         if (ThreshConfig::ThreshLastHit::UseQ->Value == true && database.ThreshQ.IsCastable())
         {
-            const auto minion = TargetSelector::Functions::GetMinionInRange(qRange());
+            const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),qRange(), Alliance::Enemy);
             if (minion != nullptr && minion->ReadClientStat(Object::Health) < Thresh_dmgQ(minion))
                 Thresh_UseQ(minion);
         }
@@ -482,7 +483,7 @@ public:
         __try {
             if (ThreshConfig::ThreshKillsteal::UseQ->Value == true && database.ThreshQ.IsCastable())
             {
-                const auto qTarget = TargetSelector::Functions::GetEnemyChampionInRange(qRange());
+                const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
                 if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Thresh_dmgQ(qTarget))
                 {
                     Thresh_UseQ(qTarget);
@@ -491,7 +492,7 @@ public:
 
             if (ThreshConfig::ThreshKillsteal::UseR->Value == true && database.ThreshR.IsCastable())
             {
-                const auto rTarget = TargetSelector::Functions::GetEnemyChampionInRange(rRange());
+                const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange());
                 if (rTarget != nullptr && rTarget->ReadClientStat(Object::Health) < Thresh_dmgR(rTarget))
                 {
                     Thresh_UseR(rTarget);
@@ -508,8 +509,10 @@ public:
     {
         if (ThreshConfig::ThreshAntiGapCloser::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
-            for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 750.0f))
+            for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
+                if (!target) continue;
+                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 750.0f) continue;
                 if (!Engine::MenuItemContains(ThreshConfig::ThreshAntiGapCloser::whitelist, target->GetName().c_str())) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
@@ -530,8 +533,10 @@ public:
     {
         if (ThreshConfig::ThreshAntiMelee::UseE->Value == true && Engine::GetSpellState(SpellIndex::E) == 0)
         {
-            for (auto target : TargetSelector::Functions::GetTargetsInRange(globals::localPlayer->GetPosition(), 750.0f))
+            for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
+                if (!target) continue;
+                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 750.0f) continue;
                 if (!Engine::MenuItemContains(ThreshConfig::ThreshAntiMelee::whitelist, target->GetName().c_str())) continue;
 
                 if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))
