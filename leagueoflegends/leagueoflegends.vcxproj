@@ -280,6 +280,7 @@
     <ClInclude Include="selfprotection\pipe\namedpipeclient.h" />
     <ClInclude Include="selfprotection\strings\obfuscator.h" />
     <ClInclude Include="selfprotection\utils.h" />
+    <ClInclude Include="Senna.h" />
     <ClInclude Include="Sidebar.h" />
     <ClInclude Include="skStr.h" />
     <ClInclude Include="Slider.h" />
@@ -373,6 +374,7 @@
     <ClCompile Include="scripts\Modules.cpp" />
     <ClCompile Include="scripts\skillshotdatabase.cpp" />
     <ClCompile Include="scripts\TargetSelector.cpp" />
+    <ClCompile Include="Senna.cpp" />
     <ClCompile Include="Sidebar.cpp" />
     <ClCompile Include="Slider.cpp" />
     <ClCompile Include="SpellBook.cpp" />

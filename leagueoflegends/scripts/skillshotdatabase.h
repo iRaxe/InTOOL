@@ -237,6 +237,7 @@ struct SkillShotDB
 	Skillshot SejuaniR;
 	Skillshot SennaQ;
 	Skillshot SennaW;
+	Skillshot SennaE;
 	Skillshot SennaR;
 	Skillshot SeraphineQ;
 	Skillshot SeraphineE;

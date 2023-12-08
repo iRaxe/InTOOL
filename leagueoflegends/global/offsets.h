@@ -450,7 +450,7 @@ namespace UPasta
 		}
 
 		namespace Turret {
-			static uintptr_t constexpr TargetNetworkID = 0x4138;
+			static uintptr_t constexpr TargetNetworkID = 0x4158;
 		}
 
 		namespace Client {

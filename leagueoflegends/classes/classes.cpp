@@ -508,6 +508,11 @@ DWORD Object::GetHandle() {
 	return ReadDWORD(this, UPasta::Offsets::Client::Handle);
 }
 
+DWORD Object::GetTurretTargetNetworkID() {
+	return ReadDWORD(this, UPasta::Offsets::Turret::TargetNetworkID);
+}
+
+
 DWORD SpellCast::GetCasterHandle() {
 	return ReadDWORD(this, UPasta::Offsets::SpellCast::CasterHandle);
 }
@@ -796,6 +801,10 @@ bool Object::IsEnemy() {
 	return this->GetTeam() != globals::localPlayer->GetTeam();
 }
 
+bool Object::IsLocalPlayer() {
+	return this->GetNetId() == globals::localPlayer->GetNetId();
+}
+
 bool Object::IsAlly() {
 	return this->GetTeam() == globals::localPlayer->GetTeam();
 }
@@ -869,7 +878,7 @@ bool Object::IsEpicMonster() {
 }
 
 bool Object::IsTurret() {
-	return this->GetCharacterData()->GetObjectTypeHash() == Structure_Turret;
+	return this->GetType() == TYPE::AITurretClient;
 }
 
 bool Object::IsBuilding() {
@@ -1074,7 +1083,6 @@ QWORD ObjectManager::GetNext(const QWORD& objectManager, const QWORD& obj) {
 void ObjectManager::HandleObject(Object* obj) {
 
 	switch (obj->GetType()) {
-
 	case Object::AIHeroClient: ObjectManager::_hero_list.emplace_back((Object*)obj); _client_map.insert({ obj->GetHandle(), (Object*)obj }); break;
 	case Object::AIMinionClient: ObjectManager::_minion_list.emplace_back((Object*)obj); _client_map.insert({ obj->GetHandle(), (Object*)obj }); break;
 	case Object::AITurretClient: ObjectManager::_turret_list.emplace_back((Object*)obj); break;
@@ -1140,7 +1148,7 @@ std::vector<Object*> ObjectManager::GetHeroesAs(Alliance team)
 	std::vector<Object*> possible_targets;
 	for (auto hero : ObjectManager::GetHeroes()) {
 		if (!hero) continue;
-		if (team == Alliance::Ally && !hero->IsAlly() || team == Alliance::Enemy && !hero->IsEnemy()) continue;
+		if (team == Alliance::Ally && !hero->IsAlly()  || team == Alliance::Enemy && !hero->IsEnemy()) continue;
 		if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable())
 			possible_targets.push_back(hero);
 	}
@@ -1244,7 +1252,6 @@ Object* ObjectManager::GetObjectInRange(float range, std::string name, std::vect
 	return best;
 }
 
-
 std::vector<Object*> ObjectManager::GetMinionsAs(Alliance team)
 {
 	std::vector<Object*> possible_targets;
@@ -1315,7 +1322,6 @@ std::vector<Object*> ObjectManager::GetJungleRespawnCamps()
 	}
 	return possible_targets;
 }
-
 
 std::vector<Object*> ObjectManager::GetWards(Alliance team)
 {

@@ -224,6 +224,9 @@
     <Filter Include="Scripts\Champions\Jinx">
       <UniqueIdentifier>{16c432dc-9b94-4a8c-8b7d-ae979816fc87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Champions\Senna">
+      <UniqueIdentifier>{8f401b92-2f3c-4c07-ae7d-55247ad3ee03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -588,6 +591,9 @@
     <ClInclude Include="Memory.h">
       <Filter>Main\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Senna.h">
+      <Filter>Scripts\Champions\Senna</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -848,6 +854,9 @@
     </ClCompile>
     <ClCompile Include="Memory.cpp">
       <Filter>Main\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Senna.cpp">
+      <Filter>Scripts\Champions\Senna</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

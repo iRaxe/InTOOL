@@ -211,8 +211,6 @@ public:
         AsheConfig::AsheSpellsSettings::maxRDistance = rSpellMenu->AddSlider("maxRDistance", "Maximum Distance", 3000, 100, database.AsheR.GetRange(), 100);
 
         AsheConfig::AsheSpellsSettings::DrawIfReady = spellsMenu->AddCheckBox("DrawIfReady", "Draw SpellSlots Only If Ready", true);
-        ObjectManager2::Update();
-
     }
 
     static bool Ashe_CanCastW(Object* pEnemy)

@@ -358,6 +358,7 @@ public:
 	bool CanCast();
 	bool CanMove();
 	bool IsEnemy();
+	bool IsLocalPlayer();
 	bool IsAlly();
 	bool IsJungle();
 	bool IsValidTarget();
@@ -408,6 +409,7 @@ public:
 	std::string GetClassicName();
 	BuffManager* GetBuffManager();
 	DWORD GetHandle();
+	DWORD GetTurretTargetNetworkID();
 	QWORD* GetBuffManagerEntriesEnd();
 	SpellCast* GetActiveSpellCast();
 	Spell* GetSpellBySlotId(int slotId);

@@ -4,13 +4,6 @@
 
 namespace UPasta::SDK::OrbwalkerConfig
 {
-	inline KeyBind* comboKey;
-    inline KeyBind* laneClearKey;
-    inline KeyBind* fastClearKey;
-    inline KeyBind* lastHitKey;
-    inline KeyBind* harassKey;
-    inline KeyBind* fleeKey;
-
     inline CheckBox* statusFollowMouse;
     inline CheckBox* statusComboMode;
     inline CheckBox* statusLaneClearMode;
@@ -18,6 +11,23 @@ namespace UPasta::SDK::OrbwalkerConfig
     inline CheckBox* statusLastHitMode;
     inline CheckBox* statusHarassMode;
     inline CheckBox* statusFleeMode;
+
+	inline KeyBind* comboKey;
+    inline KeyBind* laneClearKey;
+    inline KeyBind* fastClearKey;
+    inline KeyBind* lastHitKey;
+    inline KeyBind* harassKey;
+    inline KeyBind* fleeKey;
+
+    inline CheckBox* status;
+    inline CheckBox* showHeroes;
+	inline CheckBox* showSelf; 
+    inline CheckBox* showAllies;
+    inline CheckBox* showEnemies;
+
+    inline CheckBox* showTurrets;
+    inline CheckBox* showAlliesTurrets;
+    inline CheckBox* showEnemiesTurrets;
 }
 class Orbwalker
 {
@@ -38,6 +48,8 @@ private:
     static inline OrbwalkState _mode = Off;
     static inline float _last_aa = 0;
     static inline float _last_action = 0;
+    static inline float _draw_range = 1500.0f;
+
 
     static bool CanAttack();
     static bool CanMove();
@@ -49,6 +61,7 @@ public:
     static void Init();
     static void OnTick();
     static void OnDraw();
+    static void DrawRange(Object* obj);
     static void OnCastSound(uintptr_t state, SpellCast* cast);
     static void OnCombo();
     static void OnHarass();

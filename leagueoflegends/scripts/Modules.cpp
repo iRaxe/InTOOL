@@ -16,6 +16,8 @@ namespace Modules
 
 	void Update()
 	{
+		ObjectManager::Update();
+
 		Event::Publish(Event::OnGameTick);
 
 		__try { Champions::Update(); }

@@ -423,6 +423,7 @@ enum ObjectType : unsigned long long
     UNKNOWN = 5980780305148018688,
     RespawnMarker = 30506402751803475,
     Plants = 5773751200854991191,
+	SennaSoul = 8028075772544512841,
     Less = 126939457912832
 };
 

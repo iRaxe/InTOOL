@@ -56,10 +56,9 @@ namespace render
 		ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 		ImGui::SetWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
 
-		Event::Publish(Event::OnDraw);
-		{
-			DoOnDraw();
-		}
+		Event::Publish(Event::OnDraw); 
+		DoOnDraw();
+		
 
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
 		window->DrawList->PushClipRectFullScreen();

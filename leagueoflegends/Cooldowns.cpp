@@ -96,8 +96,6 @@ void Awarenesss::HPBar::Draw(Object* obj) {
     if (shouldDrawCooldowns) {
         DrawCooldowns(obj, basePos);
     }
-    ObjectManager2::Update();
-
 }
 
 void Awarenesss::HPBar::InitializeMenu()

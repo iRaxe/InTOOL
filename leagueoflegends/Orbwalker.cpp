@@ -7,12 +7,12 @@
 static bool is_kalista = false;
 
 bool Orbwalker::CanAttack() {
-	return GetTickCount64() >= (_last_aa + (globals::localPlayer->GetAttackDelay() * 1000)) && globals::localPlayer->CanAttack(); //(Engine::GetGameTime() * 1000)
+	return GetTickCount64() >= (_last_aa + (globals::localPlayer->GetAttackDelay() * 1000)); //(Engine::GetGameTime() * 1000)
 }
 
 bool Orbwalker::CanMove() {
 	if (is_kalista) return true;
-	return GetTickCount64() >= max(_last_action,(_last_aa + (globals::localPlayer->GetAttackWindup() * 1000))) && globals::localPlayer->CanMove(); //
+	return GetTickCount64() >= max(_last_action,(_last_aa + (globals::localPlayer->GetAttackWindup() * 1000))); //
 }
 
 int Orbwalker::GetLatency(int extra) {
@@ -41,6 +41,21 @@ void Orbwalker::InitializeMenu()
 	laneClearKey = KeyBindingsMenu->AddKeyBind("laneClearKey", "LaneClear Key", 'V', false, false);
 	fastClearKey = KeyBindingsMenu->AddKeyBind("fastClearKey", "FastClear Key", 'CTRL', false, false);
 	fleeKey = KeyBindingsMenu->AddKeyBind("fleeKey", "Flee Key", 'T', false, false);
+
+	const auto DrawingsMenu = OrbwalkerMenu->AddMenu("drawingsSection", "Drawings settings");
+	status = DrawingsMenu->AddCheckBox("status", "Show Range Drawings", true);
+
+	const auto HeroDrawingsMenu = DrawingsMenu->AddMenu("heroDrawingsSection", "Heroes settings");
+	showHeroes = HeroDrawingsMenu->AddCheckBox("showHeroes", "Show Heroes Range", true);
+	showSelf = HeroDrawingsMenu->AddCheckBox("showSelf", "Show Self Range", true);
+	showAllies = HeroDrawingsMenu->AddCheckBox("showAllies", "Show Allies Range", true);
+	showEnemies = HeroDrawingsMenu->AddCheckBox("showEnemies", "Show Enemies Range", true);
+
+	const auto TurretDrawingsMenu = DrawingsMenu->AddMenu("turretDrawingsSection", "Turrets settings");
+	showTurrets = TurretDrawingsMenu->AddCheckBox("showTurrets", "Show Turrets Range", true);
+	showAlliesTurrets = TurretDrawingsMenu->AddCheckBox("showAlliesTurrets", "Show Allies Turrets Range", true);
+	showEnemiesTurrets = TurretDrawingsMenu->AddCheckBox("showEnemiesTurrets", "Show Enemies Turrets Range", true);
+
 }
 
 void Orbwalker::Init() {
@@ -98,10 +113,95 @@ void Orbwalker::OnWndProc(UINT msg, WPARAM param) {
 
 void Orbwalker::OnDraw() {
 	auto me = globals::localPlayer;
-
 	if (!me) return;
-	if (!me->IsAlive()) return;
-	UPasta::SDK::Awareness::Functions::Radius::DrawRadius(me->GetPosition(), me->GetRealAttackRange(), COLOR_RED, 3.0f);
+
+	if (!UPasta::SDK::OrbwalkerConfig::status->Value) return;
+
+	if (UPasta::SDK::OrbwalkerConfig::showHeroes->Value) {
+		if (UPasta::SDK::OrbwalkerConfig::showSelf->Value) {
+			DrawRange(me);
+		}
+
+		if (UPasta::SDK::OrbwalkerConfig::showAllies->Value) {
+			for (auto hero : ObjectManager::GetHeroesAs(Alliance::Ally)) {
+				if (!hero) continue;
+				if (hero->GetPosition().Distance(me->GetPosition()) <= _draw_range + hero->GetBoundingRadius() / 2) {
+					DrawRange(hero);
+					continue;
+				}
+			}
+		}
+
+		if (UPasta::SDK::OrbwalkerConfig::showEnemies->Value) {
+			for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
+				if (!hero) continue;
+				if (hero->GetPosition().Distance(me->GetPosition()) <= _draw_range + hero->GetBoundingRadius() / 2) {
+					DrawRange(hero);
+					continue;
+				}
+			}
+		}
+	}
+
+	if (UPasta::SDK::OrbwalkerConfig::showTurrets->Value) {
+		if (UPasta::SDK::OrbwalkerConfig::showAlliesTurrets->Value) {
+			for (auto turret : ObjectManager::GetTurretsAs(Alliance::Ally)) {
+				if (!turret) continue;
+				if (turret->GetPosition().Distance(me->GetPosition()) <= _draw_range + turret->GetBoundingRadius() / 2) {
+					DrawRange(turret);
+					continue;
+				}
+			}
+		}
+
+		if (UPasta::SDK::OrbwalkerConfig::showEnemiesTurrets->Value) {
+			for (auto turret : ObjectManager::GetTurretsAs(Alliance::Enemy)) {
+				if (!turret) continue;
+				if (turret->GetPosition().Distance(me->GetPosition()) <= _draw_range + turret->GetBoundingRadius() / 2) {
+					DrawRange(turret);
+					continue;
+				}
+			}
+		}
+	}
+}
+
+void Orbwalker::DrawRange(Object* obj) {
+	if (!obj) return;
+	if (!obj->IsAlive()) return;
+
+	if (UPasta::SDK::OrbwalkerConfig::showHeroes->Value and obj->IsHero())
+	{
+		if (!UPasta::SDK::OrbwalkerConfig::showAllies->Value and obj->IsAlly() and !obj->IsLocalPlayer()) return;
+		if (!UPasta::SDK::OrbwalkerConfig::showSelf->Value and obj->IsLocalPlayer()) return;
+		if (!UPasta::SDK::OrbwalkerConfig::showEnemies->Value and obj->IsEnemy()) return;
+
+		UPasta::SDK::Awareness::Functions::Radius::DrawRadius(obj->GetPosition(),  obj->GetRealAttackRange(), COLOR_RED, 1.0f);
+		return;
+	}
+
+	if (UPasta::SDK::OrbwalkerConfig::showTurrets->Value and obj->IsTurret())
+	{
+		if (!UPasta::SDK::OrbwalkerConfig::showAlliesTurrets->Value and obj->IsAlly()) {
+			UPasta::SDK::Awareness::Functions::Radius::DrawRadius(obj->GetPosition(), 992.0f + globals::localPlayer->GetBoundingRadius(), COLOR_GREEN, 1.0f);
+			return;
+		}
+
+		if (UPasta::SDK::OrbwalkerConfig::showEnemiesTurrets->Value and obj->IsEnemy()) {
+			auto col = COLOR_GREEN;
+			auto localPlayerNetID = ReadINT(globals::localPlayer , UPasta::Offsets::BaseObject::NetworkID);
+			if (obj->GetTurretTargetNetworkID()) {
+				if (obj->GetTurretTargetNetworkID() == localPlayerNetID)
+					col = COLOR_RED;
+				else
+					col = COLOR_GREEN;
+			}
+
+			UPasta::SDK::Awareness::Functions::Radius::DrawRadius(obj->GetPosition(), 992.0f + globals::localPlayer->GetBoundingRadius(), col, 1.0f);
+			return;
+		}
+		return;
+	}
 }
 
 void Orbwalker::OnTick() {
@@ -164,7 +264,7 @@ void Orbwalker::OnCombo() {
 
 	Event::Publish(Event::OnBeforeAttack);
 	Engine::AttackObject(target->GetPosition());
-	_last_aa = GetTickCount64() + GetLatency();//(Engine::GetGameTime() * 1000)
+	_last_aa = GetTickCount64() + GetLatency();
 	_state = ATTACKING;
 	return;
 
@@ -191,6 +291,7 @@ void Orbwalker::OnHarass() {
 	return;
 
 }
+
 void Orbwalker::OnClear() {
 	auto target = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange(), Alliance::Enemy);
 	if (!target) {
