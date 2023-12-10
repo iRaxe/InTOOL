@@ -40,6 +40,32 @@ namespace Modules::prediction
 		return false;
 	}
 
+	int CountObjectsInWay(Vector3 sourcePos, Vector3 targetPos, Object* sourceObject, Alliance team, float pathRadius)
+	{
+		int nCount = 0;
+
+		if (sourceObject->IsHero()) {
+			for (auto hero : ObjectManager::GetHeroesAs(team)) {
+				if (!hero) continue;
+				if (IsSpecificObjectInWay(sourcePos, targetPos, sourceObject, pathRadius)) {
+					nCount += 1;
+				}
+			}
+		}
+		else if (sourceObject->IsHero()) {
+			for (auto minion : ObjectManager::GetMinionsAs(team)) {
+				if (!minion) continue;
+				if (IsSpecificObjectInWay(sourcePos, targetPos, sourceObject, pathRadius)) {
+					nCount += 1;
+				}
+			}
+		}
+
+		return nCount;
+
+	}
+
+
 	bool IsAnyObjectInWay(Vector3 sourcePos, Vector3 targetPos, Object* sourceObject, Object* targetObject, float projectileRadius)
 	{
 		auto objectInWay = [&](auto& objectManager) {

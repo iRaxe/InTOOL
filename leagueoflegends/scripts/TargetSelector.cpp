@@ -230,3 +230,22 @@ Object* TargetSelector::FindInhibitor(Vector3 from, float range, Alliance team) 
 	return _last_turret;
 }
 
+Object* TargetSelector::FindBestLaneClear(Vector3 from, float range) {
+	Object* minionTarget = FindBestMinion(from, range, Alliance::Enemy);
+	if (minionTarget)
+		return minionTarget;
+
+	Object* jungleTarget = FindBestJungle(from, range);
+	if (jungleTarget)
+		return jungleTarget;
+
+	Object* turretTarget = FindTurret(from, range, Alliance::Enemy);
+	if (turretTarget)
+		return turretTarget;
+
+	Object* inhibitorTarget = FindInhibitor(from, range, Alliance::Enemy);
+	if (inhibitorTarget)
+		return inhibitorTarget;
+
+	return nullptr;
+}

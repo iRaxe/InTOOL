@@ -227,6 +227,9 @@
     <Filter Include="Scripts\Champions\Senna">
       <UniqueIdentifier>{8f401b92-2f3c-4c07-ae7d-55247ad3ee03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Champions\KogMaw">
+      <UniqueIdentifier>{33bba00c-6aa5-42d8-8c12-9ff7b870794c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -594,6 +597,9 @@
     <ClInclude Include="Senna.h">
       <Filter>Scripts\Champions\Senna</Filter>
     </ClInclude>
+    <ClInclude Include="KogMaw.h">
+      <Filter>Scripts\Champions\KogMaw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -857,6 +863,9 @@
     </ClCompile>
     <ClCompile Include="Senna.cpp">
       <Filter>Scripts\Champions\Senna</Filter>
+    </ClCompile>
+    <ClCompile Include="KogMaw.cpp">
+      <Filter>Scripts\Champions\KogMaw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

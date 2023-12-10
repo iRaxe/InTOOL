@@ -71,6 +71,10 @@ namespace TwitchConfig
         inline CheckBox* UseQ;
     }
 
+    namespace TwitchHPBAR {
+        inline CheckBox* DrawEDamage;
+    }
+
 }
 
 namespace TwitchDamages

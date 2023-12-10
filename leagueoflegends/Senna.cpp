@@ -52,6 +52,8 @@ private:
         return static_cast<float>(SennaConfig::SennaSpellsSettings::maxRDistance->Value);
     }
 
+
+
     static bool HasEnoughMana(OrbwalkState mode) {
         float minManaThreshold = 0.0f;
 
@@ -169,14 +171,18 @@ private:
         Object* heroToReturn = nullptr;
         for (auto hero : GetHeroesThatNeedsHeal()) {
             if (!hero) continue;
+            const float heroHPPercent = hero->ReadClientStat(Object::Health) / hero->ReadClientStat(Object::MaxHealth) * 100;
 
-            if (!heroToReturn and hero->ReadClientStat(Object::Health) / hero->ReadClientStat(Object::Health) <= (SennaConfig::SennaAuto::MinHealth->Value / 100.0f)) {
+            if (!heroToReturn && heroHPPercent <= SennaConfig::SennaAuto::MinHealth->Value and hero->IsAlive() and hero->IsTargetable()) {
                 heroToReturn = hero;
                 break;
             }
         }
 
-        return heroToReturn;
+        if (heroToReturn)
+            return heroToReturn;
+
+        return nullptr;
     }
 
     static ImVec2 CalculateTopLeft(const Vector2& basePos) {
@@ -200,9 +206,7 @@ public:
 
         const auto comboMenu = SennaMenu->AddMenu("Combo Settings", "Combo Settings");
         SennaConfig::SennaCombo::UseQ = comboMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
-        SennaConfig::SennaCombo::UseW = comboMenu->AddCheckBox("Use W", "Use SpellSlot W", true);
-        SennaConfig::SennaCombo::UseE = comboMenu->AddCheckBox("Use E", "Use SpellSlot E", true);
-        SennaConfig::SennaCombo::UseR = comboMenu->AddCheckBox("Use R", "Use SpellSlot R", true);
+        SennaConfig::SennaCombo::UseW = comboMenu->AddCheckBox("Use W", "Use SpellSlot W", true);        SennaConfig::SennaCombo::UseR = comboMenu->AddCheckBox("Use R", "Use SpellSlot R", true);
         SennaConfig::SennaCombo::UseQAlly = comboMenu->AddCheckBox("Use Q Ally", "Use SpellSlot Q for heal Ally", true);
         SennaConfig::SennaCombo::enemiesInRange = comboMenu->AddSlider("minEnemiesInRange", "Minimum enemies to use R", 2, 1, 5, 1);
 
@@ -214,7 +218,7 @@ public:
         const auto clearMenu = SennaMenu->AddMenu("Clear Settings", "Clear Settings");
         const auto laneClearMenu = clearMenu->AddMenu("Laneclear Settings", "Laneclear Settings");
         SennaConfig::SennaClear::UseQ = laneClearMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
-        SennaConfig::SennaClear::UseW = laneClearMenu->AddCheckBox("Use Q", "Use SpellSlot Q", false);
+        SennaConfig::SennaClear::UseW = laneClearMenu->AddCheckBox("Use W", "Use SpellSlot W", false);
         SennaConfig::SennaClear::minMana = laneClearMenu->AddSlider("minClearMana", "Minimum Mana", 60, 1, 100, 5);
 
         const auto lastHitMenu = clearMenu->AddMenu("Lasthit Settings", "Lasthit Settings");
@@ -229,10 +233,10 @@ public:
         const auto additionalMenu = SennaMenu->AddMenu("Additional Settings", "Additional Settings");
 
         const auto autoMenu = additionalMenu->AddMenu("Auto Settings", "Auto Settings");
-        SennaConfig::SennaAuto::AutoHeal = autoMenu->AddCheckBox("Use R", "Use SpellSlot R", true);
+        SennaConfig::SennaAuto::AutoHeal = autoMenu->AddCheckBox("Auto Heal", "Auto Heal", true);
         SennaConfig::SennaAuto::MinHealth = autoMenu->AddSlider("minClearMana", "Minimum Mana", 60, 1, 100, 5);
         SennaConfig::SennaAuto::MinManaHeal = autoMenu->AddSlider("minHealth", "Health Percentage Minimum", 40, 1, 100, 5);
-        SennaConfig::SennaAuto::UseW = autoMenu->AddCheckBox("Use W on CC Target", "Use SpellSlot W", true);
+        SennaConfig::SennaAuto::UseW = autoMenu->AddCheckBox("Use W on CC Target", "Use W on CC Target", true);
 
         const auto ksMenu = additionalMenu->AddMenu("Killsteal Settings", "Killsteal Settings");
         SennaConfig::SennaKillsteal::UseQ = ksMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
@@ -247,7 +251,7 @@ public:
 
         const auto qSpellMenu = spellsMenu->AddMenu("SpellSlot Q Settings", "SpellSlot Q");
         SennaConfig::SennaSpellsSettings::qCastMode = qSpellMenu->AddList("castMode", "Cast Mode", std::vector<std::string>{"Doesn't Matter", "While attacking"}, 0);
-        SennaConfig::SennaSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange", "Maximum Range", database.SennaQ.GetRange(), 100, database.SennaQ.GetRange(), 50);
+        SennaConfig::SennaSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange", "Maximum Range", globals::localPlayer->GetRealAttackRange(), 100, globals::localPlayer->GetRealAttackRange(), 50);
         SennaConfig::SennaSpellsSettings::DrawQ = qSpellMenu->AddCheckBox("Draw Q", "Draw Range", true);
 
         const auto wSpellMenu = spellsMenu->AddMenu("SpellSlot W Settings", "SpellSlot W");
@@ -261,10 +265,13 @@ public:
 
         const auto rSpellMenu = spellsMenu->AddMenu("SpellSlot R Settings", "SpellSlot R");
         SennaConfig::SennaSpellsSettings::DrawR = rSpellMenu->AddCheckBox("Draw R", "Draw Range", true);
-        SennaConfig::SennaSpellsSettings::minRDistance = rSpellMenu->AddSlider("minRDistance", "SpellSlot R Minimum Fire Distance", 1000, 100, database.EzrealR.GetRange(), 100);
-        SennaConfig::SennaSpellsSettings::maxRDistance = rSpellMenu->AddSlider("maxRDistance", "SpellSlot R Maximum Fire Distance", 3000, 100, database.EzrealR.GetRange(), 100);
+        SennaConfig::SennaSpellsSettings::minRDistance = rSpellMenu->AddSlider("minRDistance", "SpellSlot R Minimum Fire Distance", 1000, 100, database.EzrealR.GetRange() * 2, 100);
+        SennaConfig::SennaSpellsSettings::maxRDistance = rSpellMenu->AddSlider("maxRDistance", "SpellSlot R Maximum Fire Distance", 3000, 100, database.EzrealR.GetRange() * 2, 100);
 
         SennaConfig::SennaSpellsSettings::DrawIfReady = spellsMenu->AddCheckBox("DrawIfReady", "Draw SpellSlots Only If Ready", true);
+
+        const auto miscMenu = additionalMenu->AddMenu("Hp bar", "Damage Drawings");
+        SennaConfig::SennaHPBAR::DrawRDamage = miscMenu->AddCheckBox("DrawRDamage", "Draw R Damage", true);
     }
 
     void DrawDamage(Object* pEnemy) const
@@ -333,32 +340,47 @@ public:
 
     void TryQHealAlly() {
         if (!SennaConfig::SennaAuto::AutoHeal->Value || !SennaConfig::SennaCombo::UseQAlly->Value && OrbwalkState::Attack) return;
-        if (SennaConfig::SennaAuto::MinManaHeal->Value < globals::localPlayer->ReadClientStat(Object::Mana)) return;
+        const float manaPercent = globals::localPlayer->ReadClientStat(Object::Mana) / globals::localPlayer->ReadClientStat(Object::MaxMana) * 100;
+        if (SennaConfig::SennaAuto::MinManaHeal->Value > manaPercent) return;
         if (!isTimeToCastQ()) return;
 
         auto qAlly = GetHeroThatNeedsHeal();
         if (qAlly != nullptr) {
-            if (SennaConfig::SennaAuto::MinHealth->Value > qAlly->ReadClientStat(Object::Health)) {
-                Senna_UseQ(qAlly);
-            }
+            Senna_UseQ(qAlly);
         }
     }
 
-    void Senna_UseR(Object* pEnemy)
+    bool isEnemyCountSufficient(Object* hero, const Modules::prediction::PredictionOutput& rPrediction) {
+        float distanceToPrediction = globals::localPlayer->GetPosition().Distance(rPrediction.position);
+        auto newPosition = rPrediction.position.Extend(rPrediction.position, distanceToPrediction + rRange());
+        int enemyCount = Modules::prediction::CountObjectsInWay(globals::localPlayer->GetPosition(), newPosition, hero, Alliance::Enemy, database.SennaR.GetRadius());
+
+        return (enemyCount >= SennaConfig::SennaCombo::enemiesInRange->Value);
+    }
+
+    void Senna_UseR(bool check_count = false)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastR())
+        if (!isTimeToCastR())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= rRange())
-        {
+        for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
+            if (!hero) continue;
+            float distanceToHero = hero->GetPosition().Distance(globals::localPlayer->GetPosition());
+            if (distanceToHero > rRange() + hero->GetBoundingRadius() / 2 || distanceToHero < SennaConfig::SennaSpellsSettings::minRDistance->Value + hero->GetBoundingRadius() / 2)
+                continue;
+
             Modules::prediction::PredictionOutput rPrediction;
-            if (GetPrediction(database.SennaR, rPrediction))
-            {
+            if (!GetPrediction(database.SennaR, rPrediction))
+                continue;
+
+            if (CanKill(hero, Senna_dmgR(hero)) || (check_count && isEnemyCountSufficient(hero, rPrediction))) {
                 Engine::CastSpell(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
+                return;
             }
         }
     }
+
 
     void Update() override {
         gameTime = Engine::GetGameTime();
@@ -369,13 +391,9 @@ public:
 
     void Combo() override {
         if (SennaConfig::SennaCombo::UseR->Value == true
-            && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), SennaConfig::SennaSpellsSettings::minRDistance->Value) >= SennaConfig::SennaCombo::enemiesInRange->Value
             && isTimeToCastR())
         {
-            const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
-            if (rTarget != nullptr) {
-                Senna_UseR(rTarget);
-            }
+            Senna_UseR(true);
         }
 
         if (SennaConfig::SennaCombo::UseW->Value == true
@@ -398,7 +416,9 @@ public:
             }
         }
 
-       
+        TryQHealAlly();
+
+
     }
     void Clear() override {
         if (!HasEnoughMana(OrbwalkState::Clear)) return;
@@ -427,7 +447,7 @@ public:
                 const auto wJungle = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
                 if (wJungle != nullptr) {
                     const float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, wJungle);
-                    if (AAdamage * 4 > wJungle->ReadClientStat(Object::Health)) {
+                    if (AAdamage * 2 < wJungle->ReadClientStat(Object::Health)) {
                         Senna_UseW(wJungle);
                     }
                 }
@@ -497,41 +517,30 @@ public:
 
     void Killsteal()
     {
-        __try
-        {
-            if (SennaConfig::SennaKillsteal::UseQ->Value && isTimeToCastQ()) {
-                const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
-                if (qTarget != nullptr) {
-                    if (CanKill(qTarget, Senna_dmgQ(qTarget))) {
-                        Senna_UseQ(qTarget);
-                    }
+
+
+        if (SennaConfig::SennaKillsteal::UseQ->Value && isTimeToCastQ()) {
+            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            if (qTarget != nullptr) {
+                if (CanKill(qTarget, Senna_dmgQ(qTarget))) {
+                    Senna_UseQ(qTarget);
                 }
-
-            }
-
-            if (SennaConfig::SennaKillsteal::UseW->Value && isTimeToCastW()) {
-                const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
-                if (wTarget != nullptr) {
-                    if (CanKill(wTarget, Senna_dmgW(wTarget))) {
-                        Senna_UseW(wTarget);
-                    }
-                }
-
-            }
-            if (SennaConfig::SennaKillsteal::UseR->Value && isTimeToCastR()) {
-                const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
-                if (rTarget != nullptr) {
-                    if (CanKill(rTarget, Senna_dmgR(rTarget))) {
-                        Senna_UseR(rTarget);
-                    }
-                }
-
             }
         }
-        __except (1)
-        {
-            LOG("ERROR IN KILLSTEAL MODE");
+
+        if (SennaConfig::SennaKillsteal::UseW->Value && isTimeToCastW()) {
+            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            if (wTarget != nullptr) {
+                if (CanKill(wTarget, Senna_dmgW(wTarget))) {
+                    Senna_UseW(wTarget);
+                }
+            }
+
         }
+        if (SennaConfig::SennaKillsteal::UseR->Value && isTimeToCastR()) {
+            Senna_UseR();
+        }
+
     }
 
 
@@ -563,13 +572,14 @@ public:
             Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
 
         if (SennaConfig::SennaSpellsSettings::DrawR->Value == true && (SennaConfig::SennaSpellsSettings::DrawIfReady->Value == true && database.SennaR.IsCastable() || SennaConfig::SennaSpellsSettings::DrawIfReady->Value == false))
-			Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
-        
+            Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
 
-        for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
-            if (!hero) continue;
-            if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable() and hero->GetPosition().Distance(globals::localPlayer->GetPosition()) <= rRange() + hero->GetBoundingRadius() / 2)
-                DrawDamage(hero);
+        if (SennaConfig::SennaHPBAR::DrawRDamage->Value == true) {
+            for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
+                if (!hero) continue;
+                if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable() and hero->GetPosition().Distance(globals::localPlayer->GetPosition()) <= rRange() + hero->GetBoundingRadius() / 2)
+                    DrawDamage(hero);
+            }
         }
     }
 };

@@ -175,7 +175,8 @@ void Skillshot::PopulateSpellsDB()
 	database.KhazixW2 = SkillshotManager::RegisterSpell(SP_STRING("Khazix"), W, Skillshot(1000, 70, 1700, 0.25, SkillshotCone, {}));
 	database.KledQ = SkillshotManager::RegisterSpell(SP_STRING("Kled"), Q, Skillshot(800, 45, 1600, 0.25, SkillshotLine, {}));
 	database.KledQ2 = SkillshotManager::RegisterSpell(SP_STRING("Kled"), Q, Skillshot(700, 0, 3000, 0.25, SkillshotCone, {}));
-	database.KogMawQ = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), Q, Skillshot(1175, 70, 1650, 0.25, SkillshotLine, {}));
+	database.KogMawQ = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), Q, Skillshot(1175, 70, 1650, 0.25, SkillshotLine, {CollidableObjects::Objects}));
+	database.KogMawW = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), W, Skillshot(globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetRealAttackRange(), 1650, 0.25, SkillshotNone, { }));
 	database.KogMawE = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), E, Skillshot(1360, 120, 1400, 0.25, SkillshotLine, {}));
 	database.KogMawR = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), R, Skillshot(1300, 200, FLT_MAX, 1.1, SkillshotCircle, {}));
 	database.KSanteQ = SkillshotManager::RegisterSpell(SP_STRING("KSante"), Q, Skillshot(465, 75, 1800, 0.25, SkillshotLine, {}));
@@ -250,7 +251,7 @@ void Skillshot::PopulateSpellsDB()
 	database.SemiraQ = SkillshotManager::RegisterSpell(SP_STRING("Semira"), Q, Skillshot(1000, 60, 2600, 0.25, SkillshotLine, {}));
 	database.SejuaniR = SkillshotManager::RegisterSpell(SP_STRING("Sejuani"), R, Skillshot(1300, 120, 1600, 0.25, SkillshotLine, {}));
 	database.SennaQ = SkillshotManager::RegisterSpell(SP_STRING("Senna"), Q, Skillshot(1100, 80, FLT_MAX, 0.4, SkillshotLine, {}));
-	database.SennaW = SkillshotManager::RegisterSpell(SP_STRING("Senna"), W, Skillshot(1300, 60, 1150, 0.25, SkillshotLine, {CollidableObjects::Objects}));
+	database.SennaW = SkillshotManager::RegisterSpell(SP_STRING("Senna"), W, Skillshot(1300, 100, 1150, 0.25, SkillshotLine, {CollidableObjects::Objects}));
 	database.SennaE = SkillshotManager::RegisterSpell(SP_STRING("Senna"), E, Skillshot(globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetRealAttackRange(), 1750, 0.25, SkillshotNone, {}));
 	database.SennaR = SkillshotManager::RegisterSpell(SP_STRING("Senna"), R, Skillshot(12500, 180, 20000, 1, SkillshotLine, {}));
 	database.SeraphineQ = SkillshotManager::RegisterSpell(SP_STRING("Seraphine"), Q, Skillshot(900, 350, 1200, 0.25, SkillshotCircle, {}));

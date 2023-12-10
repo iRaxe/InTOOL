@@ -20,12 +20,15 @@ namespace Modules
 
 		bool CheckCollision(Vector3 sourcePos, Vector3 targetPos, Object* sourceObject, Object* targetObject, Skillshot& skillshot);
 		bool IsSpecificObjectInWay(Vector3 sourcePos, Vector3 targetPos, Object* collisionObject, float projectileRadius);
+		int CountObjectsInWay(Vector3 sourcePos, Vector3 targetPos, Object* sourceObject, Alliance team, float pathRadius);
+
 		bool IsAnyObjectInWay(Vector3 sourcePos, Vector3 targetPos, Object* sourceObject, Object* targetObject, float projectileRadius);
 
 		Vector3 GetObjectPositionAfterTime(Object* obj, float time, float distanceBuffer = 0.0f);
 
 		bool GetPrediction(Skillshot &spell, PredictionOutput& out);
 		bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot &spell, PredictionOutput &out);
+
 	}
 
 	namespace Utilities

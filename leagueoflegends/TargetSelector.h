@@ -18,6 +18,7 @@ public:
 	static Object* FindBestJungle(Vector3 from, float range);
 	static Object* FindTurret(Vector3 from, float range, Alliance team);
 	static Object* FindInhibitor(Vector3 from, float range, Alliance team);
+	static Object* FindBestLaneClear(Vector3 from, float range);
 	static Object* GetOverrideTarget() { return _override_target; }
 };
 

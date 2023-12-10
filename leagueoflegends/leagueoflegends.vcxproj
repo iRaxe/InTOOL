@@ -246,6 +246,7 @@
     <ClInclude Include="kiero\minhook\src\hde\table32.h" />
     <ClInclude Include="kiero\minhook\src\hde\table64.h" />
     <ClInclude Include="kiero\minhook\src\trampoline.h" />
+    <ClInclude Include="KogMaw.h" />
     <ClInclude Include="LastHitDamage.h" />
     <ClInclude Include="LastPosition.h" />
     <ClInclude Include="List.h" />
@@ -345,6 +346,7 @@
     <ClCompile Include="kiero\minhook\src\hde\hde64.c" />
     <ClCompile Include="kiero\minhook\src\hook.c" />
     <ClCompile Include="kiero\minhook\src\trampoline.c" />
+    <ClCompile Include="KogMaw.cpp" />
     <ClCompile Include="LastHitDamage.cpp" />
     <ClCompile Include="LastPosition.cpp" />
     <ClCompile Include="List.cpp" />

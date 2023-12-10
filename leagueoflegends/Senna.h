@@ -59,6 +59,9 @@ namespace SennaConfig
         inline CheckBox* UseE;
     }
 
+    namespace SennaHPBAR {
+        inline CheckBox* DrawRDamage;
+    }
 
     namespace SennaSpellsSettings {
 
@@ -83,6 +86,7 @@ namespace SennaConfig
 
         inline CheckBox* DrawIfReady;
     }
+
 
 }
 

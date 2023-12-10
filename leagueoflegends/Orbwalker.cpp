@@ -16,7 +16,7 @@ bool Orbwalker::CanMove() {
 }
 
 int Orbwalker::GetLatency(int extra) {
-	return  extra + 100 / 2;
+	return  extra + 80 / 2;
 }
 
 void Orbwalker::InitializeMenu()
@@ -293,13 +293,15 @@ void Orbwalker::OnHarass() {
 }
 
 void Orbwalker::OnClear() {
-	auto target = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange(), Alliance::Enemy);
+	auto target = TargetSelector::FindBestLaneClear(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange());
 	if (!target) {
 		Engine::MoveToMousePos();
 		_last_action = GetTickCount64() + GetLatency();
 		return;
 	}
 
+	if (target->IsHero()) return;
+		
 	Event::Publish(Event::OnBeforeAttack);
 	Engine::AttackObject(target->GetPosition());
 	_last_aa = GetTickCount64() + GetLatency();//(Engine::GetGameTime() * 1000)

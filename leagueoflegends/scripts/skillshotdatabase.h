@@ -162,6 +162,7 @@ struct SkillShotDB
 	Skillshot KledQ;
 	Skillshot KledQ2;
 	Skillshot KogMawQ;
+	Skillshot KogMawW;
 	Skillshot KogMawE;
 	Skillshot KogMawR;
 	Skillshot KSanteQ;
