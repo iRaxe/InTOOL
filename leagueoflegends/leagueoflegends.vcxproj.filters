@@ -763,11 +763,6 @@
     </MASM>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\..\..\..\Desktop\New folder\black menu\Freetype\win64\freetype.lib">
-      <Filter>IMGui</Filter>
-    </Library>
-  </ItemGroup>
-  <ItemGroup>
     <Natvis Include="imgui\imgui.natvis">
       <Filter>IMGui</Filter>
     </Natvis>

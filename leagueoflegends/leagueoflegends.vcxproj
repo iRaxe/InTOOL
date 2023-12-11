@@ -374,9 +374,6 @@
     <MASM Include="mem\spoofer.asm" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\..\..\..\Desktop\New folder\black menu\Freetype\win64\freetype.lib" />
-  </ItemGroup>
-  <ItemGroup>
     <Natvis Include="imgui\imgui.natvis" />
   </ItemGroup>
   <ItemGroup>
