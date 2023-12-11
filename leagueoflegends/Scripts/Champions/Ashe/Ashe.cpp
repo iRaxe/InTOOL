@@ -1,9 +1,7 @@
 #include "Ashe.h"
-
 #include "../Awareness.h"
 #include "../imgui_notify.h"
 #include "../ListManager.h"
-#include "../ObjectManager.h"
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 
@@ -369,26 +367,6 @@ public:
             }
     }
 
-    void DrawTurretsRange() {
-        for (auto turret : ObjectManager2::GetTurrets())
-        {
-            if (!turret) continue;
-            if (!turret->IsEnemyTo(globals::localPlayer)) continue;
-            if (!turret->IsVisible()) continue;
-            if (!turret->IsAlive()) continue;
-
-            auto col = ImVec4(255, 255, 255, 50);
-            auto test = *(int*)((QWORD)globals::localPlayer + 0xC8);
-            if (turret->GetTargetNetworkID()) {
-                if (turret->GetTargetNetworkID() == test)
-                    col = ImVec4(255, 255, 255, 50);
-                else 
-                    col = ImVec4(125, 0, 255, 50);
-            }
-            Awareness::Functions::Radius::DrawRadius(turret->GetWorldPosition(), 500 + globals::localPlayer->GetBoundingRadius(), ImGui::GetColorU32(col), 1.0f);
-            render::RenderTextWorld(turret->GetName(), turret->GetWorldPosition(), 16.0f, COLOR_WHITE, true);
-        }
-    }
 
     void DrawStatsTest(Object* test) {
         float yOffset = 0;  // Inizializza l'offset
@@ -442,81 +420,6 @@ public:
 
     }
 
-    struct Cooldowns {
-        float spell[6];
-    };
-
-    static inline std::unordered_map<DWORD, Cooldowns*> _cooldown_map;
-    static inline std::unordered_map<std::string, void*> _spell_map;
-    static inline std::unordered_map<std::string, void*> _hero_map;
-    void CreateCooldownMap() {
-        for (auto hero : ObjectManager2::GetHeroes()) {
-            if (!hero) continue;
-            auto cooldown_entry = new Cooldowns();
-            _cooldown_map.insert({ hero->GetHandle(), cooldown_entry });
-        }
-    }
-    void OnDrawUnderHUD() {
-
-        auto me = globals::localPlayer;
-        if (!me) return;
-
-        for (auto hero : ObjectManager2::GetHeroes()) {
-            if (!hero) continue;
-            //if (!hero->IsEnemyTo(me)) continue;
-            if (!hero->IsAlive()) continue;
-            if (!hero->IsVisible()) continue;
-            
-            auto it = _cooldown_map.find(hero->GetHandle());
-            if (it == _cooldown_map.end()) continue;
-            auto cooldowns = it->second;
-            Vector3 hp_pos;
-        	hp_pos.x = (int)hero->GetWorldPosition().x - 46;
-            hp_pos.y = (int)hero->GetWorldPosition().x - 2;
-
-            auto spellbook = hero->GetSpellBook();
-
-            // DRAW ABILITIES
-            for (int i = 0; i < 4; i++) {
-                float offset = 27 * i;
-                
-
-                auto spell = spellbook->GetSpellSlot((SpellBook2::SLOT)i);
-                if (!spell) continue;
-
-                if (!spell->GetLevel()) {
-                    render::RenderRect(Engine::WorldToScreen(Vector3(hp_pos.x + offset, hp_pos.y, 0)).ToImVec(), Engine::WorldToScreen(Vector3(hp_pos.x + offset + 27, hp_pos.y + 4, 0)).ToImVec(), COLOR_WHITE, 0, true, 1.0f, true);
-                    continue;
-                }
-                
-                float cooldown_expire = cooldowns->spell[i];
-                if (cooldown_expire < Engine::GetGameTime()) {
-                    render::RenderRect(Engine::WorldToScreen(Vector3(hp_pos.x + offset, hp_pos.y, 0)).ToImVec(), Engine::WorldToScreen(Vector3(hp_pos.x + offset + 27, hp_pos.y + 4, 0)).ToImVec(), COLOR_RED, 0, true, 1.0f, true);
-                    continue;
-                }
-
-                float remaining_cd = cooldown_expire - Engine::GetGameTime();
-                float cooldown = spell->GetSpellInfo()->GetSpellData()->GetCooldowns()[spell->GetLevel()];
-                float percentage = 100.f / cooldown * (cooldown - remaining_cd);
-                float perc_bar = 27.f / 100.f * percentage;
-                render::RenderRect(Engine::WorldToScreen(Vector3(hp_pos.x + offset, hp_pos.y, 0)).ToImVec(), Engine::WorldToScreen(Vector3(hp_pos.x + offset + perc_bar, hp_pos.y + 4, 0)).ToImVec(), COLOR_WHITE, 0, true, 1.0f, true);
-                render::RenderRect(Engine::WorldToScreen(Vector3(hp_pos.x + offset, hp_pos.y, 0)).ToImVec(), Engine::WorldToScreen(Vector3(hp_pos.x + offset + 27, hp_pos.y + 4, 0)).ToImVec(), COLOR_BLACK, 0, true, 1.0f, true);
-            }
-
-        }
-    }
-    void DrawHeroesRange() {
-        for (auto hero : ObjectManager2::GetHeroes()) {
-            if (!hero) continue;
-           
-            //if (!hero->IsRanged()) continue;
-            //DrawStatsTest(hero);
-            //render::RenderTextWorld(std::to_string(hero->ReadClientStat(Object::BonusAttackDamage)), hero->GetPosition(), 16.0f, COLOR_WHITE, true);
-            //LOG("A %f", hero->GetAttackDelay());
-        	//Awareness::Functions::Radius::DrawRadius(hero->GetPosition(), hero->GetRealAttackRange() + globals::localPlayer->GetBoundingRadius(), COLOR_RED, 5.0f);
-        }
-    }
-
     void Update() override
     {
         gameTime = Engine::GetGameTime();
@@ -524,13 +427,6 @@ public:
         AntiGapCloser(); 
         AntiMelee();
 
-       // DrawStatsTest(globals::localPlayer);
-        //DrawTurretsRange();
-        if (globals::localPlayer->GetHeroInventory()->FindItemID(ItemsDatabase::Dorans_Ring))
-        {
-            LOG("AFAMMOCC");
-        }
-        DrawHeroesRange();
         //LOG("AAAA %s", globals::localPlayer->GetSpellBySlotId(0)->GetSpellInfo()->GetSpellData()->GetTexturePath().c_str());
 
         //LOG("%f", Functions::GetSpellRange(globals::localPlayer->GetSpellBySlotId(1)));

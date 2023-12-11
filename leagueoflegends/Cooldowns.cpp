@@ -3,7 +3,6 @@
 #include "Awarenesss.h"
 #include "Experience.h"
 #include "ListManager.h"
-#include "Objectmanager.h"
 
 ImVec2 Awarenesss::HPBar::CalculateTopLeft(const Vector2& basePos, int index, float width) {
 	return {basePos.x + index * (width + 1.0f) + 1.0f, basePos.y + 1.0f};

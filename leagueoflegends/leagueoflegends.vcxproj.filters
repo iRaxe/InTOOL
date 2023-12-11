@@ -191,20 +191,8 @@
     <Filter Include="Global\ObjectManager">
       <UniqueIdentifier>{9c967306-500c-4ec9-a952-740cdb95f5b7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Global\ObjectManager\Objects">
-      <UniqueIdentifier>{0bc97409-f0e6-4738-be46-255dcf167a74}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Global\SpellBook">
       <UniqueIdentifier>{8b4e11cd-56b6-4843-a2b0-d672ed41e089}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Global\SpellCast">
-      <UniqueIdentifier>{501d3cec-6b19-4710-bbd6-2dbe14d83201}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Global\SpellData">
-      <UniqueIdentifier>{fe683633-052c-4a45-9d7d-92f1c82e000b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Global\SpellInfo">
-      <UniqueIdentifier>{90e40ccb-79f4-45ac-a2d4-829a30d4a7d4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scripts\Champions\Twitch">
       <UniqueIdentifier>{5df439ce-ba7f-4e05-a9a3-c06724121a94}</UniqueIdentifier>
@@ -492,50 +480,11 @@
     <ClInclude Include="Sidebar.h">
       <Filter>Scripts\Utilities\Awarenesss\Sidebar</Filter>
     </ClInclude>
-    <ClInclude Include="Objectmanager.h">
-      <Filter>Global\ObjectManager</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectTypeHolder.h">
       <Filter>Global\ObjectManager</Filter>
     </ClInclude>
-    <ClInclude Include="AttackableUnit.h">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Hero.h">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Turret.h">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="SpellBook.h">
-      <Filter>Global\SpellBook</Filter>
-    </ClInclude>
-    <ClInclude Include="SpellCast.h">
-      <Filter>Global\SpellCast</Filter>
-    </ClInclude>
-    <ClInclude Include="SpellSlot.h">
-      <Filter>Global\SpellBook</Filter>
-    </ClInclude>
     <ClInclude Include="TargetingClient.h">
       <Filter>Global\SpellBook</Filter>
-    </ClInclude>
-    <ClInclude Include="SpellData.h">
-      <Filter>Global\SpellData</Filter>
-    </ClInclude>
-    <ClInclude Include="SpellInfo.h">
-      <Filter>Global\SpellInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="Pointer.h">
-      <Filter>Global</Filter>
-    </ClInclude>
-    <ClInclude Include="Client.h">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="CharacterData.h">
-      <Filter>Global\ObjectManager</Filter>
     </ClInclude>
     <ClInclude Include="Memory.h">
       <Filter>Main\Memory</Filter>
@@ -759,44 +708,8 @@
     <ClCompile Include="Sidebar.cpp">
       <Filter>Scripts\Utilities\Awarenesss\Sidebar</Filter>
     </ClCompile>
-    <ClCompile Include="Objectmanager.cpp">
-      <Filter>Global\ObjectManager</Filter>
-    </ClCompile>
-    <ClCompile Include="AttackableUnit.cpp">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Hero.cpp">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Turret.cpp">
-      <Filter>Global\ObjectManager\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="SpellBook.cpp">
-      <Filter>Global\SpellBook</Filter>
-    </ClCompile>
-    <ClCompile Include="SpellCast.cpp">
-      <Filter>Global\SpellCast</Filter>
-    </ClCompile>
-    <ClCompile Include="SpellSlot.cpp">
-      <Filter>Global\SpellBook</Filter>
-    </ClCompile>
     <ClCompile Include="TargetingClient.cpp">
       <Filter>Global\SpellBook</Filter>
-    </ClCompile>
-    <ClCompile Include="SpellData.cpp">
-      <Filter>Global\SpellData</Filter>
-    </ClCompile>
-    <ClCompile Include="SpellInfo.cpp">
-      <Filter>Global\SpellInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="Pointer.cpp">
-      <Filter>Global</Filter>
-    </ClCompile>
-    <ClCompile Include="Client.cpp">
-      <Filter>Global\ObjectManager\Objects</Filter>
     </ClCompile>
     <ClCompile Include="Memory.cpp">
       <Filter>Main\Memory</Filter>

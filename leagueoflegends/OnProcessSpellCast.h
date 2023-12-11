@@ -1,7 +1,6 @@
 #pragma once
 #include "Awareness.h"
 #include "ListManager.h"
-#include "ObjectManager.h"
 #include "../stdafx.h"
 
 #include "VMTHook.h"
@@ -17,7 +16,7 @@ int __fastcall hkOnProcessSpellCast(void* spell_book, void* edx, SpellCast* spel
 	static auto fn = reinterpret_cast<int(__fastcall*)(void*, void*, SpellCast*, uintptr_t*)>(pOnProcessSpellCast);
 	if (spellCastInfo != nullptr)
 	{
-		const auto caster = ObjectManager2::GetClientByHandle(spellCastInfo->GetCasterHandle());
+		const auto caster = ObjectManager::GetClientByHandle(spellCastInfo->GetCasterHandle());
 		if (caster != nullptr)
 		{
 			if (!caster->IsAlly() || !spellCastInfo->IsAutoAttack()) {
