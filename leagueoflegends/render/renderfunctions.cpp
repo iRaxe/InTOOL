@@ -1,7 +1,7 @@
 #include "../Awareness.h"
-#include "../stdafx.h"
 #include "../image.h"
 #include "../decompress.h"
+#include "../stdafx.h"
 
 namespace render
 {

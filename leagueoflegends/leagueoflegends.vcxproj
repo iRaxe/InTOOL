@@ -92,9 +92,9 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
     <TargetName>Spaghetti</TargetName>
-    <IncludePath>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\Freetype\include;$(IncludePath);C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\SDK LIB\Include</IncludePath>
-    <ExternalIncludePath>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\SDK LIB\Include;$(ExternalIncludePath)</ExternalIncludePath>
-    <LibraryPath>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\Freetype\win64;$(LibraryPath);C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\SDK LIB\Lib\x64</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -163,7 +163,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;FIRSTINTERNALHACK_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui\Freetype\include;C:\Users\Administrator\source\repos\iRaxe\spaghettiPlatform\leagueoflegends\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <UseMSVC>true</UseMSVC>
@@ -179,9 +179,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Ashe.h" />
     <ClInclude Include="AttackableUnit.h" />
-    <ClInclude Include="auth.hpp" />
     <ClInclude Include="Awareness.h" />
     <ClInclude Include="background.h" />
     <ClInclude Include="CharacterData.h" />
@@ -198,7 +196,6 @@
     <ClInclude Include="DestroyEvents.h" />
     <ClInclude Include="Awarenesss.h" />
     <ClInclude Include="Experience.h" />
-    <ClInclude Include="Ezreal.h" />
     <ClInclude Include="fa_solid_900.h" />
     <ClInclude Include="FindHiddenModule.h" />
     <ClInclude Include="font_awesome_5.h" />
@@ -232,9 +229,7 @@
     <ClInclude Include="imgui_notify.h" />
     <ClInclude Include="Info.h" />
     <ClInclude Include="InitializeEvents.h" />
-    <ClInclude Include="Jinx.h" />
     <ClInclude Include="json.hpp" />
-    <ClInclude Include="Kaisa.h" />
     <ClInclude Include="Kernel.h" />
     <ClInclude Include="KeyBind.h" />
     <ClInclude Include="kiero\kiero.h" />
@@ -246,18 +241,15 @@
     <ClInclude Include="kiero\minhook\src\hde\table32.h" />
     <ClInclude Include="kiero\minhook\src\hde\table64.h" />
     <ClInclude Include="kiero\minhook\src\trampoline.h" />
-    <ClInclude Include="KogMaw.h" />
     <ClInclude Include="LastHitDamage.h" />
     <ClInclude Include="LastPosition.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="ListManager.h" />
-    <ClInclude Include="LoadImages.h" />
     <ClInclude Include="makesyscall.h" />
     <ClInclude Include="ManagerTemplate.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="mem\mem.h" />
     <ClInclude Include="mem\spoof_call.h" />
-    <ClInclude Include="Nautilus.h" />
     <ClInclude Include="NewMenu.h" />
     <ClInclude Include="MenuComponent.h" />
     <ClInclude Include="MenuRenderer.h" />
@@ -276,38 +268,41 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="roboto_font.h" />
     <ClInclude Include="scripts\championmodule.h" />
+    <ClInclude Include="Scripts\Champions\Ashe\Ashe.h" />
+    <ClInclude Include="Scripts\Champions\Ezreal\Ezreal.h" />
+    <ClInclude Include="Scripts\Champions\Jinx\Jinx.h" />
+    <ClInclude Include="Scripts\Champions\Kaisa\Kaisa.h" />
+    <ClInclude Include="Scripts\Champions\KogMaw\KogMaw.h" />
+    <ClInclude Include="Scripts\Champions\Nautilius\Nautilus.h" />
+    <ClInclude Include="Scripts\Champions\Senna\Senna.h" />
+    <ClInclude Include="Scripts\Champions\Thresh\Thresh.h" />
+    <ClInclude Include="Scripts\Champions\Twitch\Twitch.h" />
+    <ClInclude Include="Scripts\Champions\Vayne\Vayne.h" />
+    <ClInclude Include="Scripts\Champions\Xerath\Xerath.h" />
+    <ClInclude Include="Scripts\Champions\Yorick\Yorick.h" />
     <ClInclude Include="scripts\Modules.h" />
     <ClInclude Include="scripts\skillshotdatabase.h" />
     <ClInclude Include="selfprotection\pipe\namedpipeclient.h" />
     <ClInclude Include="selfprotection\strings\obfuscator.h" />
     <ClInclude Include="selfprotection\utils.h" />
-    <ClInclude Include="Senna.h" />
     <ClInclude Include="Sidebar.h" />
-    <ClInclude Include="skStr.h" />
     <ClInclude Include="Slider.h" />
     <ClInclude Include="SpellBook.h" />
     <ClInclude Include="SpellCast.h" />
     <ClInclude Include="SpellData.h" />
     <ClInclude Include="SpellInfo.h" />
     <ClInclude Include="SpellSlot.h" />
-    <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Syscaller.h" />
     <ClInclude Include="TargetingClient.h" />
     <ClInclude Include="TargetSelector.h" />
-    <ClInclude Include="Thresh.h" />
     <ClInclude Include="Turret.h" />
-    <ClInclude Include="Twitch.h" />
     <ClInclude Include="UltimateHooks.h" />
     <ClInclude Include="variable.h" />
-    <ClInclude Include="Vayne.h" />
     <ClInclude Include="VMTHook.h" />
-    <ClInclude Include="Xerath.h" />
-    <ClInclude Include="Yorick.h" />
     <ClInclude Include="zoom.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Ashe.cpp" />
     <ClCompile Include="AttackableUnit.cpp" />
     <ClCompile Include="Awareness.cpp" />
     <ClCompile Include="Checkbox.cpp" />
@@ -321,7 +316,6 @@
     <ClCompile Include="Awarenesss.cpp" />
     <ClCompile Include="Eventmanager.h" />
     <ClCompile Include="Experience.cpp" />
-    <ClCompile Include="Ezreal.cpp" />
     <ClCompile Include="global\Engine.cpp" />
     <ClCompile Include="global\globals.cpp" />
     <ClCompile Include="HealthPrediction.cpp" />
@@ -337,8 +331,6 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
-    <ClCompile Include="Jinx.cpp" />
-    <ClCompile Include="Kaisa.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
     <ClCompile Include="kiero\minhook\src\buffer.c" />
@@ -346,17 +338,14 @@
     <ClCompile Include="kiero\minhook\src\hde\hde64.c" />
     <ClCompile Include="kiero\minhook\src\hook.c" />
     <ClCompile Include="kiero\minhook\src\trampoline.c" />
-    <ClCompile Include="KogMaw.cpp" />
     <ClCompile Include="LastHitDamage.cpp" />
     <ClCompile Include="LastPosition.cpp" />
     <ClCompile Include="List.cpp" />
     <ClCompile Include="ListManager.cpp" />
-    <ClCompile Include="LoadImages.cpp" />
     <ClCompile Include="main\dllmain.cpp" />
     <ClCompile Include="ManagerTemplate.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="mem\mem.cpp" />
-    <ClCompile Include="Nautilus.cpp" />
     <ClCompile Include="NewMenu.cpp" />
     <ClCompile Include="MenuComponent.cpp" />
     <ClCompile Include="MenuRenderer.cpp" />
@@ -371,12 +360,23 @@
     <ClCompile Include="Rect.cpp" />
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="render\renderfunctions.cpp" />
-    <ClCompile Include="scripts\champions\syndra.cpp" />
+    <ClCompile Include="Scripts\Champions\Ashe\Ashe.cpp" />
+    <ClCompile Include="Scripts\Champions\Ezreal\Ezreal.cpp" />
+    <ClCompile Include="Scripts\Champions\Jinx\Jinx.cpp" />
+    <ClCompile Include="Scripts\Champions\Kaisa\Kaisa.cpp" />
+    <ClCompile Include="Scripts\Champions\KogMaw\KogMaw.cpp" />
+    <ClCompile Include="Scripts\Champions\Nautilius\Nautilus.cpp" />
+    <ClCompile Include="Scripts\Champions\Senna\Senna.cpp" />
+    <ClCompile Include="Scripts\Champions\Syndra\syndra.cpp" />
+    <ClCompile Include="Scripts\Champions\Thresh\Thresh.cpp" />
+    <ClCompile Include="Scripts\Champions\Twitch\Twitch.cpp" />
+    <ClCompile Include="Scripts\Champions\Vayne\Vayne.cpp" />
+    <ClCompile Include="Scripts\Champions\Xerath\Xerath.cpp" />
+    <ClCompile Include="Scripts\Champions\Yorick\Yorick.cpp" />
     <ClCompile Include="scripts\prediction.cpp" />
     <ClCompile Include="scripts\Modules.cpp" />
     <ClCompile Include="scripts\skillshotdatabase.cpp" />
     <ClCompile Include="scripts\TargetSelector.cpp" />
-    <ClCompile Include="Senna.cpp" />
     <ClCompile Include="Sidebar.cpp" />
     <ClCompile Include="Slider.cpp" />
     <ClCompile Include="SpellBook.cpp" />
@@ -387,14 +387,9 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Syscaller.cpp" />
     <ClCompile Include="TargetingClient.cpp" />
-    <ClCompile Include="Thresh.cpp" />
     <ClCompile Include="Turret.cpp" />
-    <ClCompile Include="Twitch.cpp" />
     <ClCompile Include="UltimateHooks.cpp" />
-    <ClCompile Include="Vayne.cpp" />
     <ClCompile Include="VMTHook.cpp" />
-    <ClCompile Include="Xerath.cpp" />
-    <ClCompile Include="Yorick.cpp" />
     <ClCompile Include="zoom.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -405,7 +400,6 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\..\..\Desktop\New folder\black menu\Freetype\win64\freetype.lib" />
-    <Library Include="library_x64.lib" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="imgui\imgui.natvis" />
@@ -417,9 +411,6 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" />
     <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
-    <Import Project="..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets" Condition="Exists('..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" />
-    <Import Project="..\packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets" Condition="Exists('..\packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets')" />
-    <Import Project="..\packages\freetype.2.8.0.1\build\native\freetype.targets" Condition="Exists('..\packages\freetype.2.8.0.1\build\native\freetype.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -427,8 +418,5 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CppWinRT.2.0.210806.1\build\native\Microsoft.Windows.CppWinRT.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets'))" />
-    <Error Condition="!Exists('..\packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype.redist.2.8.0.1\build\native\freetype.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\freetype.2.8.0.1\build\native\freetype.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype.2.8.0.1\build\native\freetype.targets'))" />
   </Target>
 </Project>

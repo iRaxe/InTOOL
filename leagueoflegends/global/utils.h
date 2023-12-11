@@ -26,5 +26,7 @@ typedef unsigned long long QWORD;
 #define ReadBOOL(base, addr) *reinterpret_cast<bool*>((QWORD)base + addr)
 
 #define ReadVTable(addr, idx) ((QWORD*)ReadQWORD(addr, 0))[(int)idx]
+#define STB_IMAGE_IMPLEMENTATION
+
 
 

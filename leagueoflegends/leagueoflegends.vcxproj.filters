@@ -50,9 +50,6 @@
     <Filter Include="Rendering">
       <UniqueIdentifier>{2a1bb88d-0576-4781-a0e1-5e285260e70f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering\ImageManager">
-      <UniqueIdentifier>{25c7c04b-8060-4914-95a2-b1ba0ea28ebe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scripts">
       <UniqueIdentifier>{85eba398-4002-457b-a719-ff583cd85b6e}</UniqueIdentifier>
     </Filter>
@@ -83,9 +80,6 @@
     <Filter Include="Scripts\Utilities\Awareness">
       <UniqueIdentifier>{5e7ba45f-fb8b-4909-b78b-317e98f27b76}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering\ImageManager\LoadTextures">
-      <UniqueIdentifier>{edb49661-ae5a-4192-b185-c389f05553ed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scripts\Utilities\Awareness\Zoom">
       <UniqueIdentifier>{4e63f8d3-5ad4-44d0-95dc-36588b9e231c}</UniqueIdentifier>
     </Filter>
@@ -103,12 +97,6 @@
     </Filter>
     <Filter Include="Scripts\Champions\Xerath">
       <UniqueIdentifier>{ba1b74f7-5be7-4aa6-aefb-44f5291c8506}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="KeyAuth">
-      <UniqueIdentifier>{5465d425-12ab-4256-97e3-7719d1eae121}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="KeyAuth\Header Files">
-      <UniqueIdentifier>{c0df4590-8f79-465e-9699-ac433dad1b4b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scripts\Champions\Yorick">
       <UniqueIdentifier>{781ce784-200b-476b-a8a3-6dff6b5d572b}</UniqueIdentifier>
@@ -344,9 +332,6 @@
     <ClInclude Include="VMTHook.h">
       <Filter>Hooks\VMTHook</Filter>
     </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Rendering\ImageManager</Filter>
-    </ClInclude>
     <ClInclude Include="clipper.hpp" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="MenuRenderer.h">
@@ -357,9 +342,6 @@
     </ClInclude>
     <ClInclude Include="PluginTemplate.h">
       <Filter>Scripts\Champions\SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="Ashe.h">
-      <Filter>Scripts\Champions\Ashe</Filter>
     </ClInclude>
     <ClInclude Include="TargetSelector.h">
       <Filter>Scripts\Utilities\Target Selector</Filter>
@@ -412,38 +394,14 @@
     <ClInclude Include="Awareness.h">
       <Filter>Scripts\Utilities\Awareness</Filter>
     </ClInclude>
-    <ClInclude Include="LoadImages.h">
-      <Filter>Rendering\ImageManager\LoadTextures</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="ListManager.h">
       <Filter>Scripts\Utilities\Lists Management</Filter>
     </ClInclude>
-    <ClInclude Include="Nautilus.h">
-      <Filter>Scripts\Champions\Nautilus</Filter>
-    </ClInclude>
-    <ClInclude Include="Ezreal.h">
-      <Filter>Scripts\Champions\Ezreal</Filter>
-    </ClInclude>
     <ClInclude Include="scripts\skillshotdatabase.h">
       <Filter>Scripts\SDK\Skills</Filter>
-    </ClInclude>
-    <ClInclude Include="Xerath.h">
-      <Filter>Scripts\Champions\Xerath</Filter>
-    </ClInclude>
-    <ClInclude Include="auth.hpp">
-      <Filter>KeyAuth\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="skStr.h">
-      <Filter>KeyAuth\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Yorick.h">
-      <Filter>Scripts\Champions\Yorick</Filter>
-    </ClInclude>
-    <ClInclude Include="Vayne.h">
-      <Filter>Scripts\Champions\Vayne</Filter>
     </ClInclude>
     <ClInclude Include="imgui_freetype.h">
       <Filter>IMGui</Filter>
@@ -476,13 +434,7 @@
     <ClInclude Include="HealthPrediction.h">
       <Filter>Scripts\Utilities\Damage Calculator</Filter>
     </ClInclude>
-    <ClInclude Include="Thresh.h">
-      <Filter>Scripts\Champions\Thresh</Filter>
-    </ClInclude>
     <ClInclude Include="clipper.h" />
-    <ClInclude Include="Kaisa.h">
-      <Filter>Scripts\Champions\Kaisa</Filter>
-    </ClInclude>
     <ClInclude Include="decompress.h">
       <Filter>Rendering\CompressedImages</Filter>
     </ClInclude>
@@ -585,20 +537,44 @@
     <ClInclude Include="CharacterData.h">
       <Filter>Global\ObjectManager</Filter>
     </ClInclude>
-    <ClInclude Include="Twitch.h">
-      <Filter>Scripts\Champions\Twitch</Filter>
-    </ClInclude>
-    <ClInclude Include="Jinx.h">
-      <Filter>Scripts\Champions\Jinx</Filter>
-    </ClInclude>
     <ClInclude Include="Memory.h">
       <Filter>Main\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Senna.h">
+    <ClInclude Include="Scripts\Champions\Ashe\Ashe.h">
+      <Filter>Scripts\Champions\Ashe</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Ezreal\Ezreal.h">
+      <Filter>Scripts\Champions\Ezreal</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Jinx\Jinx.h">
+      <Filter>Scripts\Champions\Jinx</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Kaisa\Kaisa.h">
+      <Filter>Scripts\Champions\Kaisa</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\KogMaw\KogMaw.h">
+      <Filter>Scripts\Champions\KogMaw</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Nautilius\Nautilus.h">
+      <Filter>Scripts\Champions\Nautilus</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Senna\Senna.h">
       <Filter>Scripts\Champions\Senna</Filter>
     </ClInclude>
-    <ClInclude Include="KogMaw.h">
-      <Filter>Scripts\Champions\KogMaw</Filter>
+    <ClInclude Include="Scripts\Champions\Thresh\Thresh.h">
+      <Filter>Scripts\Champions\Thresh</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Twitch\Twitch.h">
+      <Filter>Scripts\Champions\Twitch</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Vayne\Vayne.h">
+      <Filter>Scripts\Champions\Vayne</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Xerath\Xerath.h">
+      <Filter>Scripts\Champions\Xerath</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Yorick\Yorick.h">
+      <Filter>Scripts\Champions\Yorick</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -681,9 +657,6 @@
     <ClCompile Include="PluginTemplate.cpp">
       <Filter>Scripts\Champions\SDK</Filter>
     </ClCompile>
-    <ClCompile Include="Ashe.cpp">
-      <Filter>Scripts\Champions\Ashe</Filter>
-    </ClCompile>
     <ClCompile Include="scripts\TargetSelector.cpp">
       <Filter>Scripts\Utilities\Target Selector</Filter>
     </ClCompile>
@@ -738,32 +711,11 @@
     <ClCompile Include="Awareness.cpp">
       <Filter>Scripts\Utilities\Awareness</Filter>
     </ClCompile>
-    <ClCompile Include="LoadImages.cpp">
-      <Filter>Rendering\ImageManager\LoadTextures</Filter>
-    </ClCompile>
     <ClCompile Include="ListManager.cpp">
       <Filter>Scripts\Utilities\Lists Management</Filter>
     </ClCompile>
-    <ClCompile Include="Nautilus.cpp">
-      <Filter>Scripts\Champions\Nautilus</Filter>
-    </ClCompile>
-    <ClCompile Include="Ezreal.cpp">
-      <Filter>Scripts\Champions\Ezreal</Filter>
-    </ClCompile>
     <ClCompile Include="scripts\skillshotdatabase.cpp">
       <Filter>Scripts\SDK\Skills</Filter>
-    </ClCompile>
-    <ClCompile Include="Xerath.cpp">
-      <Filter>Scripts\Champions\Xerath</Filter>
-    </ClCompile>
-    <ClCompile Include="Yorick.cpp">
-      <Filter>Scripts\Champions\Yorick</Filter>
-    </ClCompile>
-    <ClCompile Include="scripts\champions\syndra.cpp">
-      <Filter>Scripts\Champions\Syndra</Filter>
-    </ClCompile>
-    <ClCompile Include="Vayne.cpp">
-      <Filter>Scripts\Champions\Vayne</Filter>
     </ClCompile>
     <ClCompile Include="Colorpicker.cpp">
       <Filter>Rendering\Menu\Components\ColorPicker</Filter>
@@ -771,14 +723,8 @@
     <ClCompile Include="HealthPrediction.cpp">
       <Filter>Scripts\Utilities\Damage Calculator</Filter>
     </ClCompile>
-    <ClCompile Include="Thresh.cpp">
-      <Filter>Scripts\Champions\Thresh</Filter>
-    </ClCompile>
     <ClCompile Include="clipper.cpp">
       <Filter>Global</Filter>
-    </ClCompile>
-    <ClCompile Include="Kaisa.cpp">
-      <Filter>Scripts\Champions\Kaisa</Filter>
     </ClCompile>
     <ClCompile Include="Syscaller.cpp">
       <Filter>Main\Bypass</Filter>
@@ -852,20 +798,47 @@
     <ClCompile Include="Client.cpp">
       <Filter>Global\ObjectManager\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Twitch.cpp">
-      <Filter>Scripts\Champions\Twitch</Filter>
-    </ClCompile>
-    <ClCompile Include="Jinx.cpp">
-      <Filter>Scripts\Champions\Jinx</Filter>
-    </ClCompile>
     <ClCompile Include="Memory.cpp">
       <Filter>Main\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="Senna.cpp">
+    <ClCompile Include="Scripts\Champions\Ashe\Ashe.cpp">
+      <Filter>Scripts\Champions\Ashe</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Ezreal\Ezreal.cpp">
+      <Filter>Scripts\Champions\Ezreal</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Jinx\Jinx.cpp">
+      <Filter>Scripts\Champions\Jinx</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Kaisa\Kaisa.cpp">
+      <Filter>Scripts\Champions\Kaisa</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\KogMaw\KogMaw.cpp">
+      <Filter>Scripts\Champions\KogMaw</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Nautilius\Nautilus.cpp">
+      <Filter>Scripts\Champions\Nautilus</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Senna\Senna.cpp">
       <Filter>Scripts\Champions\Senna</Filter>
     </ClCompile>
-    <ClCompile Include="KogMaw.cpp">
-      <Filter>Scripts\Champions\KogMaw</Filter>
+    <ClCompile Include="Scripts\Champions\Syndra\syndra.cpp">
+      <Filter>Scripts\Champions\Syndra</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Thresh\Thresh.cpp">
+      <Filter>Scripts\Champions\Thresh</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Twitch\Twitch.cpp">
+      <Filter>Scripts\Champions\Twitch</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Vayne\Vayne.cpp">
+      <Filter>Scripts\Champions\Vayne</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Xerath\Xerath.cpp">
+      <Filter>Scripts\Champions\Xerath</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Yorick\Yorick.cpp">
+      <Filter>Scripts\Champions\Yorick</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -877,9 +850,6 @@
     </MASM>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="library_x64.lib">
-      <Filter>KeyAuth\Header Files</Filter>
-    </Library>
     <Library Include="..\..\..\..\..\Desktop\New folder\black menu\Freetype\win64\freetype.lib">
       <Filter>IMGui</Filter>
     </Library>

@@ -5,12 +5,12 @@
 #include "Keybind.h"
 #include "List.h"
 #include "Slider.h"
-#include "imgui.h"
+#include "../imgui/imgui.h"
 #include <d3d11.h>
 #include <tchar.h>
-#pragma comment(lib, "D3DX11.lib")
+//#pragma comment(lib, "D3DX11.lib")
 #include <iostream>
-#include <imgui_internal.h>
+#include <../imgui/imgui_internal.h>
 #include <string>
 #include "Colorpicker.h"
 #include "imgui_notify.h"

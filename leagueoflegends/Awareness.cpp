@@ -7,7 +7,6 @@
 #include "Experience.h"
 #include "Orbwalker.h"
 
-#include "LoadImages.h"
 #include "TargetSelector.h"
 #include "zoom.h"
 #include "../stdafx.h"
