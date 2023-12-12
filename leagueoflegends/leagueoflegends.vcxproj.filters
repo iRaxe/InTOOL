@@ -206,6 +206,15 @@
     <Filter Include="Scripts\Champions\KogMaw">
       <UniqueIdentifier>{33bba00c-6aa5-42d8-8c12-9ff7b870794c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Champions\Blitzcrank">
+      <UniqueIdentifier>{eb8ce28d-78d9-4700-a425-133ece7faa46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Teemo">
+      <UniqueIdentifier>{e9bf0a52-b790-48bf-9e9d-d9fc54942d39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\Amumu">
+      <UniqueIdentifier>{0ec2c327-731b-4727-8b2c-a2fe1dc9295f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -525,6 +534,21 @@
     <ClInclude Include="Scripts\Champions\Yorick\Yorick.h">
       <Filter>Scripts\Champions\Yorick</Filter>
     </ClInclude>
+    <ClInclude Include="Evade.h">
+      <Filter>Scripts\Utilities\Evade</Filter>
+    </ClInclude>
+    <ClInclude Include="JustEvade.h">
+      <Filter>Scripts\Utilities\Evade</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Blitzcrank\Blitzcrank.h">
+      <Filter>Scripts\Champions\Blitzcrank</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Amumu\Amumu.h">
+      <Filter>Scripts\Champions\Amumu</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Teemo\Teemo.h">
+      <Filter>Scripts\Champions\Teemo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -752,6 +776,21 @@
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Yorick\Yorick.cpp">
       <Filter>Scripts\Champions\Yorick</Filter>
+    </ClCompile>
+    <ClCompile Include="Evade.cpp">
+      <Filter>Scripts\Utilities\Evade</Filter>
+    </ClCompile>
+    <ClCompile Include="JustEvade.cpp">
+      <Filter>Scripts\Utilities\Evade</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Blitzcrank\Blitzcrank.cpp">
+      <Filter>Scripts\Champions\Blitzcrank</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Amumu\Amumu.cpp">
+      <Filter>Scripts\Champions\Amumu</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Teemo\Teemo.cpp">
+      <Filter>Scripts\Champions\Teemo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

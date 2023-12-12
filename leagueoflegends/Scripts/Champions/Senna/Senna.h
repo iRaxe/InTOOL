@@ -41,6 +41,8 @@ namespace SennaConfig
 
     namespace SennaAuto {
         inline CheckBox* AutoHeal;
+        inline CheckBox* AutoSoul;
+        inline CheckBox* NoSoulInCombo;
         inline Slider* MinHealth;
         inline Slider* MinManaHeal;
         inline CheckBox* UseW;

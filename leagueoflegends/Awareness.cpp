@@ -75,11 +75,6 @@ namespace UPasta
 						rainbowMode = RadiusMenu->AddCheckBox("rainbowMode", "Enable rainbow drawings", false);
 
 						const auto DrawingsToShowMenu = RadiusMenu->AddMenu("DrawingsToShowMenu", "Drawings To Show");
-
-						const auto MissilesMenu = RadiusMenu->AddMenu("MissilesMenu", "Missiles Drawings");
-						showMissiles = MissilesMenu->AddCheckBox("showMissiles", "Enable missiles drawings", true);
-						showMissilesAnimation = MissilesMenu->AddCheckBox("showMissilesAnimation", "Enable missiles drawings animation", false);
-
 						showBoundingRadius = DrawingsToShowMenu->AddCheckBox("showBoundingRadius", "Enable bounding radius", true);
 						showAARadius = DrawingsToShowMenu->AddCheckBox("showAARadius", "Enable autoattack radius", true);
 
@@ -270,35 +265,6 @@ namespace UPasta
 
 				namespace Radius
 				{
-					void ShowMissiles()
-					{
-						for (auto& missileClient : globals::missileManager->missile_map)
-						{
-							uintptr_t network_id = missileClient.first;
-							Missile* missile = missileClient.second;
-
-							if (IsNotZeroPtr(missile) && IsValidPtr(missile) && missile && !missile->GetMissileData()->IsAutoAttack())
-							{
-								auto missilePos = missile->GetSpellPos().ToGround();
-								if (missilePos.Distance(globals::localPlayer->GetPosition()) > 1500.0f)
-									return;
-
-								auto startPos = missile->GetSpellStartPos().ToGround();
-								auto endPos = missile->GetSpellEndPos().ToGround();
-
-								Geometry::Polygon poly = Geometry::Rectangle(startPos, endPos, 70.f).ToPolygon();
-								render::RenderPolygonWorld(poly, COLOR_WHITE, 1.0f);
-
-								if (Configs::Radius::showMissilesAnimation->Value == true)
-								{
-									Geometry::Polygon poly2 = Geometry::Rectangle(startPos, missilePos, 70.f).ToPolygon();
-									render::RenderPolygonWorld(poly2, 0x40FFFFFF, 1.0f, true, 0x40FFFFFF);
-								}
-
-							}
-						}
-					}
-
 					void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness, bool takeHeightInConsideration, bool glow)
 					{
 						switch (Configs::Radius::drawMode->Value)
@@ -374,11 +340,6 @@ namespace UPasta
 						{
 							if (Configs::Radius::status->Value == true)
 							{
-								if (Configs::Radius::showMissiles->Value == true)
-								{
-									ShowMissiles();
-								}
-
 								for (int i = 0; i < globals::heroManager->GetListSize(); i++)
 								{
 									auto obj = globals::heroManager->GetIndex(i);

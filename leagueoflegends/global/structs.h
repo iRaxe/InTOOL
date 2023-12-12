@@ -6,7 +6,8 @@
 #define M_PI 3.14159265358979323846f
 #define M_PI_F (float)M_PI
 #endif
-
+struct ProjectionInfo;
+struct IntersectionResult;
 struct Vector2
 {
     float x, y;
@@ -99,7 +100,6 @@ struct Vector3
     }
 
 
-
     Vector3 Extend(const Vector3& to, float distance) const
     {
         const auto from = *this;
@@ -124,6 +124,7 @@ struct Vector3
         return (*this + other) / 2;
     }
 
+	
 
     Vector3 ToGround() const
     {
@@ -236,6 +237,11 @@ struct Vector3
         return sqrtf(this->x * this->x + this->y * this->y + this->z * this->z);
     }
 
+	float LengthSquared() const
+	{
+		return this->x * this->x + this->y * this->y + this->z * this->z;
+	}
+
     float DotProduct(const Vector3& other) const
     {
         return this->x * other.x + this->y * other.y + this->z * other.z;
@@ -251,7 +257,36 @@ struct Vector3
     }
 
     bool IsUnderEnemyTower();
+
+    float DistanceSquared(Vector3 const& to) const;
+
+	Vector3 Append(Vector3 pos1, Vector3 pos2, float dist) {
+		return pos2 + (pos2 - pos1).Normalized() * dist;
+	}
+
+	Vector3 Prepend(Vector3 pos1, Vector3 pos2, float dist) {
+		return pos1 + (pos2 - pos1).Normalized() * dist;
+	}
+	ProjectionInfo ProjectOn(Vector3 const& segment_start, Vector3 const& segment_end) const;
+	IntersectionResult Intersection(Vector3 const& line_segment_end, Vector3 const& line_segment2_start, Vector3 const& line_segment2_end) const;
 };
+
+
+inline bool isLeft(const Vector3& a, const Vector3& b, const Vector3& c) {
+	return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) > 0;
+}
+
+inline float Vector3::DistanceSquared(Vector3 const& to) const
+{
+	Vector3 delta;
+
+	delta.x = x - to.x;
+	delta.y = y - to.y;
+	delta.y = z - to.z;
+
+	return delta.LengthSquared();
+}
+
 
 struct Vector4 {
     float x, y, z, w;
@@ -294,22 +329,6 @@ struct Vector4 {
     }
 };
 
-struct ProjectionInfo
-{
-    bool IsOnSegment;
-    Vector3 LinePoint;
-    Vector3 SegmentPoint;
-
-    ProjectionInfo(bool is_on_segment, Vector3 const& segment_point, Vector3 const& line_point);
-};
-
-struct IntersectionResult
-{
-    bool Intersects;
-    Vector3 Point;
-
-    IntersectionResult(bool intersects = false, Vector3 const& point = Vector3());
-};
 
 template<typename T>
 struct SEntityList

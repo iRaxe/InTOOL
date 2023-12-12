@@ -328,6 +328,7 @@ namespace UPasta
 			static uintptr_t constexpr AiManagerInstance = 0x3740; // https://www.unknowncheats.me/forum/3735791-post9262.html
 			static uintptr_t constexpr Manager = 0x10;
 			static uintptr_t constexpr ServerPosition = 0x414;
+			static uintptr_t constexpr Velocity = 0x02B8;
 			static uintptr_t constexpr TargetPos = 0x14;
 			static uintptr_t constexpr DashSpeed = 0x300;
 

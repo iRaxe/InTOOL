@@ -1,4 +1,6 @@
 #include "../Awareness.h"
+#include "../Evade.h"
+#include "../JustEvade.h"
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 #include "../Orbwalker.h"
@@ -31,6 +33,7 @@ namespace Modules
 			TargetSelector::Initialize();
 			UPasta::SDK::Awareness::Functions::Initialize();
 			Orbwalker::Init();
+			Evade::Core::Initalize();
 		}
 	}
 

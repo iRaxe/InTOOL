@@ -28,5 +28,94 @@ typedef unsigned long long QWORD;
 #define ReadVTable(addr, idx) ((QWORD*)ReadQWORD(addr, 0))[(int)idx]
 #define STB_IMAGE_IMPLEMENTATION
 
+#define Compare(x, y, z) StringCompare(x, y, z)
+bool StringContains(std::string strA, std::string strB, bool ignore_case = false);
+bool StringContains(std::wstring strA, std::wstring strB, bool ignore_case = false);
+bool StringCompare(std::string strA, std::string strB, bool ignore_case = false);
+bool StringCompare(std::wstring strA, std::wstring strB, bool ignore_case = false);
+inline std::string ToLower(std::string str)
+{
+	std::string strLower;
+	strLower.resize(str.size());
 
+	std::transform(str.begin(),
+		str.end(),
+		strLower.begin(),
+		::tolower);
+
+	return strLower;
+	return str;
+}
+
+inline std::wstring ToLower(std::wstring str)
+{
+	std::wstring strLower;
+	strLower.resize(str.size());
+
+	std::transform(str.begin(),
+		str.end(),
+		strLower.begin(),
+		::tolower);
+
+	return strLower;
+	return str;
+}
+
+inline bool StringContains(std::string strA, std::string strB, bool ignore_case)
+{
+	if (strA.empty() || strB.empty())
+		return true;
+
+	if (ignore_case)
+	{
+		strA = ToLower(strA);
+		strB = ToLower(strB);
+	}
+
+	if (strA.find(strB) != std::string::npos)
+		return true;
+
+	return false;
+}
+
+inline bool StringContains(std::wstring strA, std::wstring strB, bool ignore_case)
+{
+	if (strA.empty() || strB.empty())
+		return true;
+
+	if (ignore_case)
+	{
+		strA = ToLower(strA);
+		strB = ToLower(strB);
+	}
+
+	if (strA.find(strB) != std::wstring::npos)
+		return true;
+
+	return false;
+}
+
+inline bool StringCompare(std::string strA, std::string strB, bool ignore_case) {
+	if (strA.empty() && strB.empty())
+		return false;
+	if (ignore_case)
+	{
+		strA = ToLower(strA);
+		strB = ToLower(strB);
+	}
+
+	return strA.compare(strB) == 0;
+}
+
+inline bool StringCompare(std::wstring strA, std::wstring strB, bool ignore_case) {
+	if (strA.empty() && strB.empty())
+		return false;
+	if (ignore_case)
+	{
+		strA = ToLower(strA);
+		strB = ToLower(strB);
+	}
+
+	return strA.compare(strB) == 0;
+}
 

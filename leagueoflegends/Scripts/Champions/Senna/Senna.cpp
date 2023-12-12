@@ -2,6 +2,7 @@
 #include "../Damage.h"
 #include "../stdafx.h"
 #include "../TargetSelector.h"
+#include "../Orbwalker.h"
 #include "Senna.h"
 
 
@@ -36,7 +37,7 @@ private:
     }
 
     static float qRange() {
-        return static_cast<float>(SennaConfig::SennaSpellsSettings::qRange->Value);
+        return globals::localPlayer->GetRealAttackRange();
     }
 
     static float wRange() {
@@ -232,9 +233,11 @@ public:
         const auto additionalMenu = SennaMenu->AddMenu("Additional Settings", "Additional Settings");
 
         const auto autoMenu = additionalMenu->AddMenu("Auto Settings", "Auto Settings");
-        SennaConfig::SennaAuto::AutoHeal = autoMenu->AddCheckBox("Auto Heal", "Auto Heal", true);
-        SennaConfig::SennaAuto::MinHealth = autoMenu->AddSlider("minClearMana", "Minimum Mana", 60, 1, 100, 5);
-        SennaConfig::SennaAuto::MinManaHeal = autoMenu->AddSlider("minHealth", "Health Percentage Minimum", 40, 1, 100, 5);
+        SennaConfig::SennaAuto::AutoSoul = autoMenu->AddCheckBox("Auto Grab Souls", "Auto Grab Souls", true);
+        SennaConfig::SennaAuto::NoSoulInCombo = autoMenu->AddCheckBox("Dont Grab Souls In Combo", "Dont Grab Souls In Combo", true);
+        SennaConfig::SennaAuto::AutoHeal = autoMenu->AddCheckBox("Auto Heal", "Auto Heal", true); //NoSoulInCombo
+        SennaConfig::SennaAuto::MinManaHeal = autoMenu->AddSlider("minClearMana", "Minimum Mana", 60, 1, 100, 5);
+        SennaConfig::SennaAuto::MinHealth = autoMenu->AddSlider("minHealth", "Health Percentage Minimum", 40, 1, 100, 5);
         SennaConfig::SennaAuto::UseW = autoMenu->AddCheckBox("Use W on CC Target", "Use W on CC Target", true);
 
         const auto ksMenu = additionalMenu->AddMenu("Killsteal Settings", "Killsteal Settings");
@@ -250,7 +253,7 @@ public:
 
         const auto qSpellMenu = spellsMenu->AddMenu("SpellSlot Q Settings", "SpellSlot Q");
         SennaConfig::SennaSpellsSettings::qCastMode = qSpellMenu->AddList("castMode", "Cast Mode", std::vector<std::string>{"Doesn't Matter", "While attacking"}, 0);
-        SennaConfig::SennaSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange", "Maximum Range", globals::localPlayer->GetRealAttackRange(), 100, globals::localPlayer->GetRealAttackRange(), 50);
+        SennaConfig::SennaSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange", "Maximum Range", qRange(), 100, qRange(), 50);
         SennaConfig::SennaSpellsSettings::DrawQ = qSpellMenu->AddCheckBox("Draw Q", "Draw Range", true);
 
         const auto wSpellMenu = spellsMenu->AddMenu("SpellSlot W Settings", "SpellSlot W");
@@ -326,6 +329,22 @@ public:
         }
     }
 
+    void AttackOrb() {
+        if (!SennaConfig::SennaAuto::AutoSoul->Value) {
+            return;
+        }
+
+        if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Attack and SennaConfig::SennaAuto::NoSoulInCombo->Value) {
+            return;
+        }
+
+        auto orbtarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange(), Alliance::Enemy);
+        if (orbtarget != nullptr and orbtarget->GetName() == MINION_SENNA_SOUL) {
+            Orbwalker::AttackTarget(orbtarget);
+            return;
+        }
+    }
+
     void TryWOnControlledTarget() {
         if (SennaConfig::SennaAuto::UseW->Value && !isTimeToCastW()) return;
 
@@ -383,6 +402,7 @@ public:
 
     void Update() override {
         gameTime = Engine::GetGameTime();
+        AttackOrb();
         Killsteal();
         TryWOnControlledTarget();
         TryQHealAlly();
@@ -571,7 +591,7 @@ public:
             Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
 
         if (SennaConfig::SennaSpellsSettings::DrawR->Value == true && (SennaConfig::SennaSpellsSettings::DrawIfReady->Value == true && database.SennaR.IsCastable() || SennaConfig::SennaSpellsSettings::DrawIfReady->Value == false))
-	        Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
 
         if (SennaConfig::SennaHPBAR::DrawRDamage->Value == true) {
             for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
