@@ -140,6 +140,7 @@ namespace Modules::prediction
 		// Calculate the predicted position
 		Vector3 predictedPosition = currentPosition + (velocityVector * predictionTime);
 
+
 		return predictedPosition;
 	}
 
@@ -189,7 +190,7 @@ namespace Modules::prediction
 		while (std::abs(travelTime - missileTime) > 0.01f)
 		{
 			travelTime = missileTime;
-			predictedPos = GetObjectPositionAfterTime(targetObj, travelTime, distanceBuffer);
+			predictedPos = PredictTargetPosition(targetObj, travelTime);
 
 			distance = predictedPos.Distance(sourcePos);
 			if (distance > skillshot.GetMaxRange())
@@ -201,6 +202,12 @@ namespace Modules::prediction
 		}
 
 		out.position = predictedPos;
+		
+		if (Engine::IsWall(out.position))
+		{
+			return false;
+		}
+
 		return CheckCollision(sourcePos, out.position, sourceObj, targetObj, skillshot);
 	}
 }
