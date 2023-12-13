@@ -6,6 +6,9 @@
 
 static bool is_kalista = false;
 
+int Orbwalker::GetLatency(int extra) {
+	return  extra + 80 / 2;
+}
 
 bool Orbwalker::CanAttack() {
 	return GetTickCount64() >= (_last_aa + (globals::localPlayer->GetAttackDelay() * 1000)); //(Engine::GetGameTime() * 1000)
@@ -16,11 +19,16 @@ bool Orbwalker::CanMove() {
 	return GetTickCount64() >= max(_last_action, (_last_aa + (globals::localPlayer->GetAttackWindup() * 1000))); //
 }
 
-int Orbwalker::GetLatency(int extra) {
-	return  extra + 80 / 2;
+bool Orbwalker::CanCastAfterAttack() {
+	const std::string _championName = globals::localPlayer->GetName();
+
+	auto localExtraWindup = 0;
+	if (_championName == "Rengar" && (globals::localPlayer->GetBuffByName("rengarqbase") || globals::localPlayer->GetBuffByName("rengarqemp")))	{
+		localExtraWindup = 200;
+	}
+
+	return (GetTickCount64() + GetLatency() / 2 >= _last_aa + globals::localPlayer->GetAttackDelay() * 1000 + localExtraWindup);
 }
-
-
 
 void Orbwalker::InitializeMenu()
 {

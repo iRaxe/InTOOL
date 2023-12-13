@@ -361,15 +361,24 @@ public:
     }
 
     void Render() override {
-        __try {
-            if (BlitzcrankConfig::BlitzcrankSpellsSettings::qDraw->Value && (BlitzcrankConfig::BlitzcrankSpellsSettings::DrawIfReady->Value == true && database.BlitzcrankQ.IsCastable() || BlitzcrankConfig::BlitzcrankSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
-            if (BlitzcrankConfig::BlitzcrankSpellsSettings::rDraw->Value && (BlitzcrankConfig::BlitzcrankSpellsSettings::DrawIfReady->Value == true && database.BlitzcrankR.IsCastable() || BlitzcrankConfig::BlitzcrankSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
-        }
-        __except (1)
-        {
-            LOG("Render error");
+        if (BlitzcrankConfig::BlitzcrankSpellsSettings::qDraw->Value && (BlitzcrankConfig::BlitzcrankSpellsSettings::DrawIfReady->Value == true && database.BlitzcrankQ.IsCastable() || BlitzcrankConfig::BlitzcrankSpellsSettings::DrawIfReady->Value == false))
+            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+        if (BlitzcrankConfig::BlitzcrankSpellsSettings::rDraw->Value && (BlitzcrankConfig::BlitzcrankSpellsSettings::DrawIfReady->Value == true && database.BlitzcrankR.IsCastable() || BlitzcrankConfig::BlitzcrankSpellsSettings::DrawIfReady->Value == false))
+            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
+
+    	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
+            if (!hero) continue;
+            if (hero->GetDistanceTo(globals::localPlayer) > qRange()) continue;
+            auto dmgPos = Engine::GetBaseDrawPosition(hero);
+
+            if (isTimeToCastQ()) {
+	            render::RenderTextWorld("Damage Q: " + std::to_string(ceil(BlitzcrankQDamage(hero))), dmgPos, 16, COLOR_WHITE, false);
+            }
+
+            if (isTimeToCastR()) {
+	            render::RenderTextWorld("Damage R: " + std::to_string(ceil(BlitzcrankRDamage(hero))), Vector3(dmgPos.x, dmgPos.y - 32.0f, dmgPos.z), 16, COLOR_WHITE, false);
+            }
+
         }
     }
 };

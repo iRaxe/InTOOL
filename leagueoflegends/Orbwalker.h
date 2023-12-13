@@ -68,6 +68,8 @@ public:
     static void OnClear();
     static void OnWndProc(UINT msg, WPARAM param);
     static void AttackTarget(Object* obj);
+    static bool CanCastAfterAttack();
+
     static inline void Reset() { _last_aa = 0; }
 
 };

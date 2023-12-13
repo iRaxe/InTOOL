@@ -181,6 +181,7 @@
   <ItemGroup>
     <ClInclude Include="Awareness.h" />
     <ClInclude Include="background.h" />
+    <ClInclude Include="Brand.h" />
     <ClInclude Include="Checkbox.h" />
     <ClInclude Include="classes\classes.h" />
     <ClInclude Include="clipper.h" />
@@ -321,6 +322,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
+    <ClCompile Include="Brand.cpp" />
     <ClCompile Include="JustEvade.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />

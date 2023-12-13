@@ -208,21 +208,21 @@ public:
     {
         static const std::vector<float> dmgSkillVector = arrayToVector(std::begin(ThreshDamages::QSpell::dmgSkillArray), std::end(ThreshDamages::QSpell::dmgSkillArray));
 
-        return Damage::CalculateSkillDamage(SpellIndex::Q, pEnemy, dmgSkillVector, Magical, ThreshDamages::QSpell::additionalPercentageAP);
+        return Damage::CalculateSkillDamage(SpellIndex::Q, pEnemy, ThreshDamages::QSpell::dmgSkillArray, Magical, ThreshDamages::QSpell::additionalPercentageAP);
     }
 
     static float Thresh_dmgE(Object* pEnemy)
     {
         static const std::vector<float> dmgSkillVector = arrayToVector(std::begin(ThreshDamages::ESpell::dmgSkillArray), std::end(ThreshDamages::ESpell::dmgSkillArray));
 
-        return Damage::CalculateSkillDamage(SpellIndex::E, pEnemy, dmgSkillVector, Magical, ThreshDamages::ESpell::additionalPercentageAP);
+        return Damage::CalculateSkillDamage(SpellIndex::E, pEnemy, ThreshDamages::ESpell::dmgSkillArray, Magical, ThreshDamages::ESpell::additionalPercentageAP);
     }
 
     static float Thresh_dmgR(Object* pEnemy)
     {
         static const std::vector<float> dmgSkillVector = arrayToVector(std::begin(ThreshDamages::RSpell::dmgSkillArray), std::end(ThreshDamages::RSpell::dmgSkillArray));
 
-        return Damage::CalculateSkillDamage(SpellIndex::R, pEnemy, dmgSkillVector, Magical, ThreshDamages::RSpell::additionalPercentageAP);
+        return Damage::CalculateSkillDamage(SpellIndex::R, pEnemy, ThreshDamages::RSpell::dmgSkillArray, Magical, ThreshDamages::RSpell::additionalPercentageAP);
     }
 
     static float Thresh_shieldW()

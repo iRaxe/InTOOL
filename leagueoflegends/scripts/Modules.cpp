@@ -1,4 +1,5 @@
 #include "../Awareness.h"
+#include "../Brand.h"
 #include "../Evade.h"
 #include "../JustEvade.h"
 #include "../stdafx.h"
@@ -43,10 +44,15 @@ namespace Modules
 
 		void Init()
 		{
-			activeChampModule = ChampionModuleManager::GetModule(globals::localPlayer->GetName());
-			if (!activeChampModule) return;
+			if (globals::localPlayer->GetName() == "Brand") {
+				UPasta::Plugins::Brand::Events::Initialize();
+			}
+			else {
+				activeChampModule = ChampionModuleManager::GetModule(globals::localPlayer->GetName());
+				if (!activeChampModule) return;
 
-			activeChampModule->Initialize();
+				activeChampModule->Initialize();
+			}
 		}
 
 		void Update()

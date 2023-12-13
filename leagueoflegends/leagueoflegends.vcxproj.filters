@@ -549,6 +549,9 @@
     <ClInclude Include="Scripts\Champions\Teemo\Teemo.h">
       <Filter>Scripts\Champions\Teemo</Filter>
     </ClInclude>
+    <ClInclude Include="Brand.h">
+      <Filter>Scripts\Champions\SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -791,6 +794,9 @@
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Teemo\Teemo.cpp">
       <Filter>Scripts\Champions\Teemo</Filter>
+    </ClCompile>
+    <ClCompile Include="Brand.cpp">
+      <Filter>Scripts\Champions\SDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

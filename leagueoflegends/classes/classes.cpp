@@ -1308,6 +1308,7 @@ int ObjectManager::CountMinionsInRange(Alliance team, Vector3 position, float ra
 	int minionsInRange = 0;
 	for (auto minion : ObjectManager::GetMinionsAs(team)) {
 		if (!minion) continue;
+		if (minion->IsJungle()) continue;
 		if (minion->GetPosition().distanceTo(position) > range) continue;
 		minionsInRange++;
 	}

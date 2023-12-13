@@ -27,7 +27,7 @@ typedef unsigned long long QWORD;
 
 #define ReadVTable(addr, idx) ((QWORD*)ReadQWORD(addr, 0))[(int)idx]
 #define STB_IMAGE_IMPLEMENTATION
-
+#define TryCatch(function, catchError) __try {function;} __except (1){	LOG(catchError); }
 #define Compare(x, y, z) StringCompare(x, y, z)
 bool StringContains(std::string strA, std::string strB, bool ignore_case = false);
 bool StringContains(std::wstring strA, std::wstring strB, bool ignore_case = false);
