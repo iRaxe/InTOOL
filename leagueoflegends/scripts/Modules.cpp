@@ -1,11 +1,11 @@
 #include "../Awareness.h"
-#include "../Brand.h"
 #include "../Evade.h"
 #include "../JustEvade.h"
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 #include "../Orbwalker.h"
-#include "../Tristana.h"
+#include "Champions/Brand/Brand.h"
+#include "Champions/Tristana/Tristana.h"
 
 namespace Modules
 {

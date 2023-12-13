@@ -1,7 +1,6 @@
 #pragma once
-#include "Damage.h"
-#include "TargetSelector.h"
-#include "PluginTemplate.h"
+#include "../Damage.h"
+#include "../PluginTemplate.h"
 
 #define PI 3.14159265f
 namespace UPasta {

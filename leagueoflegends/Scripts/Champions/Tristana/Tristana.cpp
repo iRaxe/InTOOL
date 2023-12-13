@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "../Awareness.h"
+#include "../Damage.h"
+#include "../stdafx.h"
+#include "../TargetSelector.h"
+#include "../../../Orbwalker.h"
 #include "Tristana.h"
-
-#include "Awareness.h"
-#include "Damage.h"
-#include "Orbwalker.h"
 
 using namespace UPasta::SDK;
 using namespace UPasta::Plugins::Tristana;

@@ -34,6 +34,17 @@ private:
         return gameTime > RCastedTime + database.AmumuR.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
     }
 
+    static bool HasAuraOfDespairBuff() {
+        if (globals::localPlayer == nullptr) {
+            // Handle the case where localPlayer is null (optional)
+            return false;
+        }
+
+        // Assume that localPlayer has a GetBuffByName method
+        Buff* auraOfDespairBuff = globals::localPlayer->GetBuffByName("AuraofDespair");
+        return auraOfDespairBuff != nullptr;
+    }
+
     static bool HasEnoughMana(OrbwalkState mode) {
         float minManaThreshold = 0.0f;
 
@@ -117,6 +128,7 @@ public:
 
         const auto harassMenu = AmumuMenu->AddMenu("Harass Settings", "Harass Settings");
         AmumuConfig::AmumuHarass::UseQ = harassMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
+        AmumuConfig::AmumuHarass::UseW = harassMenu->AddCheckBox("Use W", "Use SpellSlot W", true);
         AmumuConfig::AmumuHarass::UseE = harassMenu->AddCheckBox("Use E", "Use SpellSlot E", true);
         AmumuConfig::AmumuHarass::minMana = harassMenu->AddSlider("minMana", "Minimum Mana", 60, 1, 100, 10);
 
@@ -138,8 +150,8 @@ public:
         const auto additionalMenu = AmumuMenu->AddMenu("Additional Settings", "Additional Settings");
 
         const auto ksMenu = additionalMenu->AddMenu("Killsteal Settings", "Killsteal Settings");
-        AmumuConfig::AmumuKillsteal::UseQ = ksMenu->AddCheckBox("Use Q", "Use SpellSlot Q", true);
-        AmumuConfig::AmumuKillsteal::UseR = ksMenu->AddCheckBox("Use R", "Use SpellSlot R", true);
+        AmumuConfig::AmumuKillsteal::UseQ = ksMenu->AddCheckBox("Use Q", "Use SpellSlot Q", false);
+        AmumuConfig::AmumuKillsteal::UseR = ksMenu->AddCheckBox("Use R", "Use SpellSlot R", false);
 
         // const auto fleeMenu = additionalMenu->AddMenu("Flee Settings", "Flee Settings");
         // AmumuConfig::AmumuFlee::UseW = fleeMenu->AddCheckBox("Use W", "Use SpellSlot W");
@@ -153,14 +165,14 @@ public:
         AmumuConfig::AmumuSpellsSettings::qDraw = qSpellMenu->AddCheckBox("Q Draw", "Draw Q", true);
 
         const auto wSpellMenu = spellsMenu->AddMenu("SpellSlot W Settings", "SpellSlot W Settings");
-        AmumuConfig::AmumuSpellsSettings::wRange = wSpellMenu->AddSlider("WRange", "Maximum Range", database.AmumuQ.GetRange(), 0, 350, 50);
+        AmumuConfig::AmumuSpellsSettings::wRange = wSpellMenu->AddSlider("WRange", "Maximum Range", 300, 0, 350, 50);
 
         const auto eSpellMenu = spellsMenu->AddMenu("SpellSlot E Settings", "SpellSlot E Settings");
-        AmumuConfig::AmumuSpellsSettings::eRange = eSpellMenu->AddSlider("ERange", "Maximum Range", globals::localPlayer->GetRealAttackRange(), 0, 350, 50);
+        AmumuConfig::AmumuSpellsSettings::eRange = eSpellMenu->AddSlider("ERange", "Maximum Range", 300, 0, 350, 50);
         AmumuConfig::AmumuSpellsSettings::eMode = comboMenu->AddList("eMode", "E Cast Mode", std::vector<std::string>{ "Before Attack", "After Attack" }, 0);
 
         const auto rSpellMenu = spellsMenu->AddMenu("SpellSlot R Settings", "SpellSlot R Settings");
-        AmumuConfig::AmumuSpellsSettings::rRange = rSpellMenu->AddSlider("RRange", "Maximum Range", database.AmumuR.GetRange(), 100, 550, 50);
+        AmumuConfig::AmumuSpellsSettings::rRange = rSpellMenu->AddSlider("RRange", "Maximum Range", database.AmumuR.GetRange(), 500, 550, 50);
         AmumuConfig::AmumuSpellsSettings::rDraw = rSpellMenu->AddCheckBox("RDraw", "Draw R", true);
     }
 
@@ -196,8 +208,18 @@ public:
         if (globals::localPlayer == nullptr || !isTimeToCastW())
             return;
 
-        Engine::CastSpell(SpellIndex::W);
-        WCastedTime = gameTime;
+        int enemiesInRange = ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange());
+
+        bool isAuraOfDespairActive = HasAuraOfDespairBuff();
+
+        if (enemiesInRange > 0 && !isAuraOfDespairActive) {
+            Engine::CastSpell(SpellIndex::W);
+            WCastedTime = gameTime;
+        }
+        else if (enemiesInRange == 0 && isAuraOfDespairActive) {
+            Engine::CastSpell(SpellIndex::W);
+            WCastedTime = gameTime;
+        }
     }
 
     void CastESpell(Object* target) {
@@ -268,14 +290,21 @@ public:
             }
         }
 
+        if (AmumuConfig::AmumuHarass::UseW->Value && isTimeToCastW()) {
+            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            if (wTarget != nullptr) {
+                CastWSpell();
+            }
+        }
+
         if (AmumuConfig::AmumuHarass::UseE->Value && isTimeToCastE()) {
             const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
             if (eTarget != nullptr) {
                 CastESpell(eTarget);
             }
         }
-    }
 
+    }
 
     void Clear() override {
         if (!HasEnoughMana(OrbwalkState::Clear)) return;
@@ -290,11 +319,22 @@ public:
                 }
             }
 
-            if (AmumuConfig::AmumuJungle::UseW->Value) {
-                const auto wMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
-                if (wMonster != nullptr) {
-                    CastQSpell(wMonster);
-                }
+            int enemiesInRange = ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange());
+        	int jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange());
+
+            // Check if the "AuraofDespair" Buff aktiv ist
+            bool isAuraOfDespairActive = HasAuraOfDespairBuff();
+
+            // Toggle W basierend auf Bedingungen
+            if ((enemiesInRange > 0 || jungleMonstersInRange > 0) && !isAuraOfDespairActive) {
+                // Toggle W aktivieren
+                Engine::CastSpell(SpellIndex::W);
+                WCastedTime = gameTime;
+            }
+            else if ((enemiesInRange == 0 && jungleMonstersInRange == 0) && isAuraOfDespairActive) {
+                // Toggle W deaktivieren, wenn keine Gegner in Reichweite sind und Aura aktiv ist
+                Engine::CastSpell(SpellIndex::W);
+                WCastedTime = gameTime;
             }
 
             if (AmumuConfig::AmumuJungle::UseE->Value && isTimeToCastE()) {
@@ -312,12 +352,7 @@ public:
     }
 
     void Flee() override {
-        if (AmumuConfig::AmumuFlee::UseW->Value && isTimeToCastW()) {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
-            if (wTarget != nullptr) {
-                CastWSpell();
-            }
-        }
+        return;
     }
 
     void Killsteal() {

@@ -181,7 +181,6 @@
   <ItemGroup>
     <ClInclude Include="Awareness.h" />
     <ClInclude Include="background.h" />
-    <ClInclude Include="Brand.h" />
     <ClInclude Include="Checkbox.h" />
     <ClInclude Include="classes\classes.h" />
     <ClInclude Include="clipper.h" />
@@ -267,6 +266,7 @@
     <ClInclude Include="Scripts\Champions\Amumu\Amumu.h" />
     <ClInclude Include="Scripts\Champions\Ashe\Ashe.h" />
     <ClInclude Include="Scripts\Champions\Blitzcrank\Blitzcrank.h" />
+    <ClInclude Include="Scripts\Champions\Brand\Brand.h" />
     <ClInclude Include="Scripts\Champions\Ezreal\Ezreal.h" />
     <ClInclude Include="Scripts\Champions\Jinx\Jinx.h" />
     <ClInclude Include="Scripts\Champions\Kaisa\Kaisa.h" />
@@ -275,6 +275,7 @@
     <ClInclude Include="Scripts\Champions\Senna\Senna.h" />
     <ClInclude Include="Scripts\Champions\Teemo\Teemo.h" />
     <ClInclude Include="Scripts\Champions\Thresh\Thresh.h" />
+    <ClInclude Include="Scripts\Champions\Tristana\Tristana.h" />
     <ClInclude Include="Scripts\Champions\Twitch\Twitch.h" />
     <ClInclude Include="Scripts\Champions\Vayne\Vayne.h" />
     <ClInclude Include="Scripts\Champions\Xerath\Xerath.h" />
@@ -290,7 +291,6 @@
     <ClInclude Include="Syscaller.h" />
     <ClInclude Include="TargetingClient.h" />
     <ClInclude Include="TargetSelector.h" />
-    <ClInclude Include="Tristana.h" />
     <ClInclude Include="UltimateHooks.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="VMTHook.h" />
@@ -323,7 +323,6 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
-    <ClCompile Include="Brand.cpp" />
     <ClCompile Include="JustEvade.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
@@ -354,6 +353,7 @@
     <ClCompile Include="Scripts\Champions\Amumu\Amumu.cpp" />
     <ClCompile Include="Scripts\Champions\Ashe\Ashe.cpp" />
     <ClCompile Include="Scripts\Champions\Blitzcrank\Blitzcrank.cpp" />
+    <ClCompile Include="Scripts\Champions\Brand\Brand.cpp" />
     <ClCompile Include="Scripts\Champions\Ezreal\Ezreal.cpp" />
     <ClCompile Include="Scripts\Champions\Jinx\Jinx.cpp" />
     <ClCompile Include="Scripts\Champions\Kaisa\Kaisa.cpp" />
@@ -363,6 +363,7 @@
     <ClCompile Include="Scripts\Champions\Syndra\syndra.cpp" />
     <ClCompile Include="Scripts\Champions\Teemo\Teemo.cpp" />
     <ClCompile Include="Scripts\Champions\Thresh\Thresh.cpp" />
+    <ClCompile Include="Scripts\Champions\Tristana\Tristana.cpp" />
     <ClCompile Include="Scripts\Champions\Twitch\Twitch.cpp" />
     <ClCompile Include="Scripts\Champions\Vayne\Vayne.cpp" />
     <ClCompile Include="Scripts\Champions\Xerath\Xerath.cpp" />
@@ -376,7 +377,6 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Syscaller.cpp" />
     <ClCompile Include="TargetingClient.cpp" />
-    <ClCompile Include="Tristana.cpp" />
     <ClCompile Include="UltimateHooks.cpp" />
     <ClCompile Include="VMTHook.cpp" />
     <ClCompile Include="zoom.cpp" />

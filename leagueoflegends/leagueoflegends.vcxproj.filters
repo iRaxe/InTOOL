@@ -558,11 +558,11 @@
     <ClInclude Include="Scripts\Champions\Teemo\Teemo.h">
       <Filter>Scripts\Champions\Teemo</Filter>
     </ClInclude>
-    <ClInclude Include="Brand.h">
-      <Filter>Scripts\Champions\New\Brand</Filter>
-    </ClInclude>
-    <ClInclude Include="Tristana.h">
+    <ClInclude Include="Scripts\Champions\Tristana\Tristana.h">
       <Filter>Scripts\Champions\New\Tristana</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Champions\Brand\Brand.h">
+      <Filter>Scripts\Champions\New\Brand</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -807,11 +807,11 @@
     <ClCompile Include="Scripts\Champions\Teemo\Teemo.cpp">
       <Filter>Scripts\Champions\Teemo</Filter>
     </ClCompile>
-    <ClCompile Include="Brand.cpp">
-      <Filter>Scripts\Champions\New\Brand</Filter>
-    </ClCompile>
-    <ClCompile Include="Tristana.cpp">
+    <ClCompile Include="Scripts\Champions\Tristana\Tristana.cpp">
       <Filter>Scripts\Champions\New\Tristana</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Champions\Brand\Brand.cpp">
+      <Filter>Scripts\Champions\New\Brand</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,10 @@
-#include "stdafx.h"
+#include "../Awareness.h"
+#include "../Damage.h"
+#include "../stdafx.h"
+#include "../TargetSelector.h"
+#include "../../../Orbwalker.h"
 #include "Brand.h"
 
-#include "Awareness.h"
-#include "Damage.h"
-#include "Orbwalker.h"
 
 using namespace UPasta::SDK;
 using namespace UPasta::Plugins::Brand;

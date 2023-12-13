@@ -16,6 +16,7 @@ namespace AmumuConfig
 
     namespace AmumuHarass {
         inline CheckBox* UseQ;
+        inline CheckBox* UseW;
         inline CheckBox* UseE;
         inline Slider* minMana;
     }
@@ -70,12 +71,17 @@ namespace AmumuDamages
     }
 
     namespace WSpell {
-        inline float dmgSkillArray[2] = { 0, 7 };
+        inline float dmgSkillArray[6] = { 0, 7, 7, 7, 7, 7 };
         inline float additionalPercentageAP = 0.85f;
     }
 
+    namespace ESpell {
+        inline float dmgSkillArray[6] = { 0, 65, 100, 135, 170, 205 };
+        inline float additionalPercentageAP = 0.50f;
+    }
+
     namespace RSpell {
-        inline float dmgSkillArray[4] = { 0, 275, 400, 525 };
-        inline float additionalPercentageAP = 1.0f;
+        inline float dmgSkillArray[4] = { 0, 200, 300, 400 };
+        inline float additionalPercentageAP = 0.8f;
     }
 }
