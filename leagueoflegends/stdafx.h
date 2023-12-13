@@ -71,7 +71,7 @@ using json = nlohmann::json;
 
 #define DEFINE_RVA(address) ((uintptr_t)((uintptr_t)globals::moduleBase + (uintptr_t)address)
 #define CLASS_GETTER(returnType, name, offset) \
-[[nodiscard]] inline returnType name() const noexcept \
+[[nodiscard]] inline returnType name() noexcept \
 { \
 	return *reinterpret_cast<returnType*>(std::uintptr_t(this) + offset); \
 }

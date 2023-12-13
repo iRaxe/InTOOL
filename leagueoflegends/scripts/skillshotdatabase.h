@@ -79,6 +79,8 @@ struct SkillShotDB
 	Skillshot BlitzcrankR;
 	Skillshot BrandQ;
 	Skillshot BrandW;
+	Skillshot BrandE;
+	Skillshot BrandR;
 	Skillshot BraumQ;
 	Skillshot BraumR;
 	Skillshot CaitlynQ;

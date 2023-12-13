@@ -18,7 +18,7 @@ namespace UPasta
 
 		namespace Damage
 		{
-			float CalculateSkillDamage(SpellIndex spellIndex, Object* pEnemy, const std::vector<float>& dmgSkillArray, DamageType dmgType, float additionalPercentageAP = 0.0f, float additionalPercentageAD = 0.0f);
+			float CalculateSkillDamage(SpellIndex spellIndex, Object* pEnemy, float* dmgSkillArray, DamageType dmgType, float additionalPercentageAP = 0.0f, float additionalPercentageAD = 0.0f);
 			float CalculateAutoAttackDamage(Object* source, Object* target);
 			float CalculatePhysicalDamage(Object* source, Object* target, float amount);
 			float CalculateMagicalDamage(Object* source, Object* target, float amount);

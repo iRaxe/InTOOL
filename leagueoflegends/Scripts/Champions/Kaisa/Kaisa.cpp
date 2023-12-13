@@ -56,16 +56,13 @@ private:
         return KaisaDamages::RSpell::Rrange[Rlevel];
     }
 
-    const std::vector<float> qDmgSkillVector = arrayToVector(std::begin(KaisaDamages::QSpell::dmgSkillArray), std::end(KaisaDamages::QSpell::dmgSkillArray));
-    const std::vector<float> wDmgSkillVector = arrayToVector(std::begin(KaisaDamages::WSpell::dmgSkillArray), std::end(KaisaDamages::WSpell::dmgSkillArray));
-
     float q_dmg(Object* pEnemy) const {
-        return Damage::CalculateSkillDamage(SpellIndex::Q, pEnemy, qDmgSkillVector, Physical, KaisaDamages::QSpell::additionalPercentageAP, KaisaDamages::QSpell::additionalPercentageAD);
+        return Damage::CalculateSkillDamage(SpellIndex::Q, pEnemy, KaisaDamages::QSpell::dmgSkillArray, Physical, KaisaDamages::QSpell::additionalPercentageAP, KaisaDamages::QSpell::additionalPercentageAD);
     }
 
     float w_dmg(Object* pEnemy) const {
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
-        return Damage::CalculateSkillDamage(SpellIndex::W, pEnemy, wDmgSkillVector, Magical, 0.0f, KaisaDamages::QSpell::additionalPercentageAD);
+        return Damage::CalculateSkillDamage(SpellIndex::W, pEnemy, KaisaDamages::WSpell::dmgSkillArray, Magical, 0.0f, KaisaDamages::QSpell::additionalPercentageAD);
     }
 
 public:

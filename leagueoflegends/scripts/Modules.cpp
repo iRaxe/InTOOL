@@ -1,7 +1,11 @@
 #include "../Awareness.h"
+#include "../Evade.h"
+#include "../JustEvade.h"
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 #include "../Orbwalker.h"
+#include "Champions/Brand/Brand.h"
+#include "Champions/Tristana/Tristana.h"
 
 namespace Modules
 {
@@ -31,6 +35,7 @@ namespace Modules
 			TargetSelector::Initialize();
 			UPasta::SDK::Awareness::Functions::Initialize();
 			Orbwalker::Init();
+			Evade::Core::Initalize();
 		}
 	}
 
@@ -40,10 +45,18 @@ namespace Modules
 
 		void Init()
 		{
-			activeChampModule = ChampionModuleManager::GetModule(globals::localPlayer->GetName());
-			if (!activeChampModule) return;
+			if (globals::localPlayer->GetName() == "Brand") {
+				UPasta::Plugins::Brand::Events::Initialize();
+			}
+			else if (globals::localPlayer->GetName() == "Tristana") {
+				UPasta::Plugins::Tristana::Events::Initialize();
+			}
+			else {
+				activeChampModule = ChampionModuleManager::GetModule(globals::localPlayer->GetName());
+				if (!activeChampModule) return;
 
-			activeChampModule->Initialize();
+				activeChampModule->Initialize();
+			}
 		}
 
 		void Update()

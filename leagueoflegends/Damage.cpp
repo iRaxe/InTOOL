@@ -5,11 +5,8 @@ namespace UPasta
 {
 	namespace SDK
 	{
-		float Damage::CalculateSkillDamage(SpellIndex spellIndex, Object* pEnemy, const std::vector<float>& dmgSkillArray, DamageType dmgType, float additionalPercentageAP, float additionalPercentageAD)
+		float Damage::CalculateSkillDamage(SpellIndex spellIndex, Object* pEnemy, float* dmgSkillArray, DamageType dmgType, float additionalPercentageAP, float additionalPercentageAD)
 		{
-			if (globals::localPlayer != nullptr && pEnemy != nullptr && Engine::GetSpellState(spellIndex) == 0)
-				return -9999;
-
 			const int levelSpell = globals::localPlayer->GetSpellBySlotId(spellIndex)->GetLevel();
 
 			const float skillDamage = dmgSkillArray[levelSpell];

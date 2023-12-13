@@ -12,7 +12,7 @@ namespace UPasta::SDK::OrbwalkerConfig
     inline CheckBox* statusHarassMode;
     inline CheckBox* statusFleeMode;
 
-	inline KeyBind* comboKey;
+    inline KeyBind* comboKey;
     inline KeyBind* laneClearKey;
     inline KeyBind* fastClearKey;
     inline KeyBind* lastHitKey;
@@ -21,7 +21,7 @@ namespace UPasta::SDK::OrbwalkerConfig
 
     inline CheckBox* status;
     inline CheckBox* showHeroes;
-	inline CheckBox* showSelf; 
+    inline CheckBox* showSelf;
     inline CheckBox* showAllies;
     inline CheckBox* showEnemies;
 
@@ -67,6 +67,9 @@ public:
     static void OnHarass();
     static void OnClear();
     static void OnWndProc(UINT msg, WPARAM param);
+    static void AttackTarget(Object* obj);
+    static bool CanCastAfterAttack();
+
     static inline void Reset() { _last_aa = 0; }
 
 };

@@ -192,6 +192,7 @@
     <ClInclude Include="DecryptMemoryPages.h" />
     <ClInclude Include="DestroyEvents.h" />
     <ClInclude Include="Awarenesss.h" />
+    <ClInclude Include="Evade.h" />
     <ClInclude Include="Experience.h" />
     <ClInclude Include="fa_solid_900.h" />
     <ClInclude Include="FindHiddenModule.h" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Info.h" />
     <ClInclude Include="InitializeEvents.h" />
     <ClInclude Include="json.hpp" />
+    <ClInclude Include="JustEvade.h" />
     <ClInclude Include="Kernel.h" />
     <ClInclude Include="KeyBind.h" />
     <ClInclude Include="kiero\kiero.h" />
@@ -261,14 +263,19 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="roboto_font.h" />
     <ClInclude Include="scripts\championmodule.h" />
+    <ClInclude Include="Scripts\Champions\Amumu\Amumu.h" />
     <ClInclude Include="Scripts\Champions\Ashe\Ashe.h" />
+    <ClInclude Include="Scripts\Champions\Blitzcrank\Blitzcrank.h" />
+    <ClInclude Include="Scripts\Champions\Brand\Brand.h" />
     <ClInclude Include="Scripts\Champions\Ezreal\Ezreal.h" />
     <ClInclude Include="Scripts\Champions\Jinx\Jinx.h" />
     <ClInclude Include="Scripts\Champions\Kaisa\Kaisa.h" />
     <ClInclude Include="Scripts\Champions\KogMaw\KogMaw.h" />
     <ClInclude Include="Scripts\Champions\Nautilius\Nautilus.h" />
     <ClInclude Include="Scripts\Champions\Senna\Senna.h" />
+    <ClInclude Include="Scripts\Champions\Teemo\Teemo.h" />
     <ClInclude Include="Scripts\Champions\Thresh\Thresh.h" />
+    <ClInclude Include="Scripts\Champions\Tristana\Tristana.h" />
     <ClInclude Include="Scripts\Champions\Twitch\Twitch.h" />
     <ClInclude Include="Scripts\Champions\Vayne\Vayne.h" />
     <ClInclude Include="Scripts\Champions\Xerath\Xerath.h" />
@@ -299,6 +306,7 @@
     <ClCompile Include="Damage.cpp" />
     <ClCompile Include="DestroyEvents.cpp" />
     <ClCompile Include="Awarenesss.cpp" />
+    <ClCompile Include="Evade.cpp" />
     <ClCompile Include="Eventmanager.h" />
     <ClCompile Include="Experience.cpp" />
     <ClCompile Include="global\Engine.cpp" />
@@ -315,6 +323,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="InitializeEvents.cpp" />
+    <ClCompile Include="JustEvade.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
     <ClCompile Include="kiero\minhook\src\buffer.c" />
@@ -341,7 +350,10 @@
     <ClCompile Include="Rect.cpp" />
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="render\renderfunctions.cpp" />
+    <ClCompile Include="Scripts\Champions\Amumu\Amumu.cpp" />
     <ClCompile Include="Scripts\Champions\Ashe\Ashe.cpp" />
+    <ClCompile Include="Scripts\Champions\Blitzcrank\Blitzcrank.cpp" />
+    <ClCompile Include="Scripts\Champions\Brand\Brand.cpp" />
     <ClCompile Include="Scripts\Champions\Ezreal\Ezreal.cpp" />
     <ClCompile Include="Scripts\Champions\Jinx\Jinx.cpp" />
     <ClCompile Include="Scripts\Champions\Kaisa\Kaisa.cpp" />
@@ -349,7 +361,9 @@
     <ClCompile Include="Scripts\Champions\Nautilius\Nautilus.cpp" />
     <ClCompile Include="Scripts\Champions\Senna\Senna.cpp" />
     <ClCompile Include="Scripts\Champions\Syndra\syndra.cpp" />
+    <ClCompile Include="Scripts\Champions\Teemo\Teemo.cpp" />
     <ClCompile Include="Scripts\Champions\Thresh\Thresh.cpp" />
+    <ClCompile Include="Scripts\Champions\Tristana\Tristana.cpp" />
     <ClCompile Include="Scripts\Champions\Twitch\Twitch.cpp" />
     <ClCompile Include="Scripts\Champions\Vayne\Vayne.cpp" />
     <ClCompile Include="Scripts\Champions\Xerath\Xerath.cpp" />

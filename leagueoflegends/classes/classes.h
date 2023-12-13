@@ -188,6 +188,7 @@ public:
 	std::vector<Vector3> GetFutureSegments();
 	Vector3 GetSegment(int index);
 	Vector3 GetPosition();
+	float GetVelocity();
 	Vector3 GetTargetPosition();
 	Vector3 GetMouseClickPosition();
 	Vector3 GetPathStart();
@@ -218,6 +219,12 @@ class SpellData
 public:
 	std::string GetName();
 	std::string GetTexturePath();
+	float GetMaxCastRange();
+	float GetCastRadius();
+	float GetLineWidth();
+	float GetCastSpeed();
+	float GetDelay();
+	float GetCastTime();
 	Vector3 GetSpellEndPos();
 	float GetManaCostByLevel(int level);
 	CooldownArray* GetCooldownArray();
@@ -247,11 +254,13 @@ public:
 class Missile
 {
 public:
+	DWORD GetHandle();
 	MissileData* GetMissileData();
 	int GetMissileSrcId();
 	Vector3 GetSpellStartPos();
 	Vector3 GetSpellPos();
 	Vector3 GetSpellEndPos();
+	float GetSpellSpeed();
 };
 
 class SpellInfo

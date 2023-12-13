@@ -89,10 +89,12 @@ void Skillshot::PopulateSpellsDB()
 	database.BelVethR = SkillshotManager::RegisterSpell(SP_STRING("BelVeth"), R, Skillshot(275, 500, FLT_MAX, 1.0, SkillshotCircle, {}));
 	database.BardQ = SkillshotManager::RegisterSpell(SP_STRING("Bard"), Q, Skillshot(950, 60, 1500, 0.25, SkillshotLine, {}));
 	database.BardR = SkillshotManager::RegisterSpell(SP_STRING("Bard"), R, Skillshot(3400, 350, 2100, 0.5, SkillshotCircle, {}));
-	database.BlitzcrankQ = SkillshotManager::RegisterSpell(SP_STRING("Blitzcrank"), Q, Skillshot(1150, 70, 1800, 0.25, SkillshotLine, {}));
+	database.BlitzcrankQ = SkillshotManager::RegisterSpell(SP_STRING("Blitzcrank"), Q, Skillshot(1020, 60, 1600, 0.25, SkillshotLine, {CollidableObjects::Objects}));
 	database.BlitzcrankR = SkillshotManager::RegisterSpell(SP_STRING("Blitzcrank"), R, Skillshot(0, 600, FLT_MAX, 0.25, SkillshotCircle, {}));
-	database.BrandQ = SkillshotManager::RegisterSpell(SP_STRING("Brand"), Q, Skillshot(1050, 60, 1600, 0.25, SkillshotLine, {}));
+	database.BrandQ = SkillshotManager::RegisterSpell(SP_STRING("Brand"), Q, Skillshot(1050, 60, 1600, 0.25, SkillshotLine, { CollidableObjects::Objects }));
 	database.BrandW = SkillshotManager::RegisterSpell(SP_STRING("Brand"), W, Skillshot(900, 250, FLT_MAX, 0.85, SkillshotCircle, {}));
+	database.BrandE = SkillshotManager::RegisterSpell(SP_STRING("Brand"), E, Skillshot(675, 450, 1600, 0.25, SkillshotNone, {}));
+	database.BrandR = SkillshotManager::RegisterSpell(SP_STRING("Brand"), R, Skillshot(750, 600, 2500, 0.25, SkillshotNone, {}));
 	database.BraumQ = SkillshotManager::RegisterSpell(SP_STRING("Braum"), Q, Skillshot(1000, 70, 1700, 0.25, SkillshotLine, {}));
 	database.BraumR = SkillshotManager::RegisterSpell(SP_STRING("Braum"), R, Skillshot(1250, 115, 1400, 0.5, SkillshotLine, {}));
 	database.CaitlynQ = SkillshotManager::RegisterSpell(SP_STRING("Caitlyn"), Q, Skillshot(1250, 90, 2200, 0.625, SkillshotLine, {}));

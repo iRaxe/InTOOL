@@ -182,7 +182,7 @@ public:
         TwitchConfig::TwitchSpellsSettings::DrawIfReady = spellsMenu->AddCheckBox("DrawIfReady", "Draw SpellSlots Only If Ready", true);
 
         const auto miscMenu = additionalMenu->AddMenu("Hp bar", "Damage Drawings");
-        TwitchConfig::TwitchHPBAR::DrawEDamage = miscMenu->AddCheckBox("DrawRDamage", "Draw R Damage", true);
+        TwitchConfig::TwitchHPBAR::DrawEDamage = miscMenu->AddCheckBox("DrawRDamage", "Draw E Damage", true);
     }
 
     static float Twitch_dmgE(Object* pEnemy)
@@ -500,7 +500,7 @@ public:
         if (TwitchConfig::TwitchHPBAR::DrawEDamage->Value == true) {
             for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
                 if (!hero) continue;
-                if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable() and hero->GetPosition().Distance(globals::localPlayer->GetPosition()) <= eRange())
+                if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable())
                     DrawDamage(hero);
             }
         }

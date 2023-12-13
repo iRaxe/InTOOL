@@ -77,8 +77,6 @@ namespace UPasta::SDK::Awareness
 
             inline Slider* qualityDraw;
 
-        	inline CheckBox* showMissiles;
-            inline CheckBox* showMissilesAnimation;
             inline CheckBox* showBoundingRadius;
             inline CheckBox* showAARadius;
             inline CheckBox* showAARadiusTurrets;
@@ -133,8 +131,7 @@ namespace UPasta::SDK::Awareness
         {
             void DrawRadius(Vector3 worldPos, float radius, uintptr_t color, float thickness, bool takeHeightInConsideration = Configs::Radius::showHeight->Value, bool glow = Configs::Radius::rainbowMode->Value);
             void DrawSpell(SpellCast* spellCastInfo);
-        	static void ShowMissiles();
-            static void ShowBoundingRadius(Object* obj, int quality);
+        	static void ShowBoundingRadius(Object* obj, int quality);
             static void ShowAARadius(Object* obj, int quality);
             void Initialize();
             void Update();

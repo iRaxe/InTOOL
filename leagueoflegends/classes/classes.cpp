@@ -230,6 +230,10 @@ Vector3 AiManager::GetPosition() {
 	return Engine::ReadVector3((QWORD)this + UPasta::Offsets::AIManager::ServerPosition);
 }
 
+float AiManager::GetVelocity() {
+	return ReadFLOAT(this, UPasta::Offsets::AIManager::Velocity);
+}
+
 Vector3 AiManager::GetTargetPosition() {
 	return Engine::ReadVector3((QWORD)this + UPasta::Offsets::AIManager::TargetPos);
 }
@@ -508,6 +512,11 @@ DWORD Object::GetHandle() {
 	return ReadDWORD(this, UPasta::Offsets::Client::Handle);
 }
 
+DWORD Missile::GetHandle() {
+	return ReadDWORD(this, UPasta::Offsets::Client::Handle);
+}
+
+
 DWORD Object::GetTurretTargetNetworkID() {
 	return ReadDWORD(this, UPasta::Offsets::Turret::TargetNetworkID);
 }
@@ -758,6 +767,34 @@ Vector3 Missile::GetSpellPos() {
 
 Vector3 Missile::GetSpellEndPos() {
 	return Engine::ReadVector3((QWORD)this + UPasta::Offsets::MissileManager::EndPosition);
+}
+
+float Missile::GetSpellSpeed() {
+	return ReadFLOAT(this, UPasta::Offsets::MissileManager::Speed);
+}
+
+float SpellData::GetMaxCastRange() {
+	return ReadFLOAT(this, UPasta::Offsets::SpellData::CastRange);
+}
+
+float SpellData::GetCastRadius() {
+	return ReadFLOAT(this, UPasta::Offsets::SpellData::CastRadius);
+}
+
+float SpellData::GetLineWidth() {
+	return ReadFLOAT(this, UPasta::Offsets::SpellData::LineWidth);
+}
+
+float SpellData::GetCastSpeed() {
+	return ReadFLOAT(this, UPasta::Offsets::SpellData::MissileSpeed);
+}
+
+float SpellData::GetDelay() {
+	return ReadFLOAT(this, UPasta::Offsets::SpellData::DelayCastOffsetPerce);
+}
+
+float SpellData::GetCastTime() {
+	return ReadFLOAT(this, UPasta::Offsets::SpellData::CastTime);
 }
 
 float Object::GetBoundingRadius() {
@@ -1271,6 +1308,7 @@ int ObjectManager::CountMinionsInRange(Alliance team, Vector3 position, float ra
 	int minionsInRange = 0;
 	for (auto minion : ObjectManager::GetMinionsAs(team)) {
 		if (!minion) continue;
+		if (minion->IsJungle()) continue;
 		if (minion->GetPosition().distanceTo(position) > range) continue;
 		minionsInRange++;
 	}
@@ -1283,6 +1321,7 @@ std::vector<Object*> ObjectManager::GetJungleMonsters()
 	for (auto monster : ObjectManager::GetMinions()) {
 		if (!monster) continue;
 		if (!monster->IsJungle()) continue;
+		if (monster->GetCharacterData()->GetObjectTypeHash() == Plants) continue;
 		if (monster->IsAlive() and monster->IsVisible() and monster->IsTargetable() and !monster->IsInvulnerable())
 			possible_targets.push_back(monster);
 	}
