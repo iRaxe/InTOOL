@@ -9,26 +9,26 @@ using namespace UPasta::SDK;
 using namespace UPasta::Plugins::Brand;
 using namespace UPasta::Plugins::Brand::Config;
 
-float gameTime = 0.0f;
+float Brandgametime = 0.0f;
 
-float QCastedTime = 0.0f;
-[[nodiscard]] bool isTimeToCastQ() {
-	return gameTime > QCastedTime + database.BrandQ.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+float BrandQCastedTime = 0.0f;
+[[nodiscard]] bool isTimeToCastBrandQ() {
+	return Brandgametime > BrandQCastedTime + database.BrandQ.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
 }
 
-float WCastedTime = 0.0f;
-[[nodiscard]] bool isTimeToCastW() {
-	return gameTime > WCastedTime + database.BrandW.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+float BrandWCastedTime = 0.0f;
+[[nodiscard]] bool isTimeToCastBrandW() {
+	return Brandgametime > BrandWCastedTime + database.BrandW.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
 }
 
-float ECastedTime = 0.0f;
-[[nodiscard]] bool isTimeToCastE() {
-	return gameTime > ECastedTime + database.BrandE.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+float BrandECastedTime = 0.0f;
+[[nodiscard]] bool isTimeToCastBrandE() {
+	return Brandgametime > BrandECastedTime + database.BrandE.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
 }
 
-float RCastedTime = 0.0f;
-[[nodiscard]] bool isTimeToCastR() {
-	return gameTime > RCastedTime + database.BrandR.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+float BrandRCastedTime = 0.0f;
+[[nodiscard]] bool isTimeToCastBrandR() {
+	return Brandgametime > BrandRCastedTime + database.BrandR.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
 }
 
 Object* Functions::GetAblazedTarget(float range)
@@ -61,7 +61,7 @@ inline bool Functions::HasBrandPassive(Object* obj) {
 	return true;
 }
 
-void Events::InitializeMenu()
+void Functions::InitializeMenu()
 {
 	const auto BrandMenu = Menu::CreateMenu("vezBrand", "Champion Settings");
 
@@ -127,7 +127,7 @@ void Events::InitializeMenu()
 }
 
 void Events::Initialize() {
-	TryCatch(InitializeMenu(), "Error initializing the menu");
+	TryCatch(Functions::InitializeMenu(), "Error initializing the menu");
 	TryCatch(Subscribe(), "Error subscribing to events");
 }
 
@@ -153,20 +153,20 @@ void Functions::UseQ(Object* obj) {
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
-	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastQ()) return;
+	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastBrandQ()) return;
 
 	if (obj->GetDistanceTo(globals::localPlayer) > BrandSpellsSettings::GetQRange()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
 		Engine::CastSpell(SpellIndex::Q, obj->GetPosition());
-		QCastedTime = gameTime;
+		BrandQCastedTime = Brandgametime;
 		return;
 	}
 
 	Modules::prediction::PredictionOutput qPrediction;
 	if (GetPrediction(database.BrandQ, qPrediction)) {
 		Engine::CastSpell(SpellIndex::Q, qPrediction.position);
-		QCastedTime = gameTime;
+		BrandQCastedTime = Brandgametime;
 	}
 }
 
@@ -178,20 +178,20 @@ void Functions::UseW(Object* obj) {
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
-	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastW()) return;
+	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastBrandW()) return;
 
 	if (obj->GetDistanceTo(globals::localPlayer) > BrandSpellsSettings::GetWRange()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
 		Engine::CastSpell(SpellIndex::W, obj->GetPosition());
-		WCastedTime = gameTime;
+		BrandWCastedTime = Brandgametime;
 		return;
 	}
 
 	Modules::prediction::PredictionOutput wPrediction;
 	if (GetPrediction(database.BrandW, wPrediction)) {
 		Engine::CastSpell(SpellIndex::W, wPrediction.position);
-		WCastedTime = gameTime;
+		BrandWCastedTime = Brandgametime;
 	}
 }
 
@@ -203,12 +203,12 @@ void Functions::UseE(Object* obj) {
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
-	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastE()) return;
+	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastBrandE()) return;
 
 	if (obj->GetDistanceTo(globals::localPlayer) > BrandSpellsSettings::GetERange()) return;
 
 	Engine::CastSpell(SpellIndex::E, obj);
-	ECastedTime = gameTime;
+	BrandECastedTime = Brandgametime;
 }
 
 void Functions::UseR(Object* obj) {
@@ -219,12 +219,12 @@ void Functions::UseR(Object* obj) {
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
-	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastR()) return;
+	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastBrandR()) return;
 
 	if (obj->GetDistanceTo(globals::localPlayer) > BrandSpellsSettings::GetRRange()) return;
 
 	Engine::CastSpell(SpellIndex::R, obj);
-	RCastedTime = gameTime;
+	BrandRCastedTime = Brandgametime;
 }
 
 void Functions::DrawSpellRadius(float range) {
@@ -281,42 +281,42 @@ void Functions::DrawDamageOnPos(Object* obj) {
 
 	float yOffset = 0;
 
-	if (isTimeToCastQ()) {
+	if (isTimeToCastBrandQ()) {
 		const float qDamage = Damages::QSpell::GetDamage(obj);
 
 		render::RenderTextWorld("Q: " + std::to_string(qDamage), Vector3(dmgPos.x, dmgPos.y - yOffset, dmgPos.z), 16, COLOR_WHITE, false); yOffset += 20;
 	}
 
-	if (isTimeToCastW()) {
+	if (isTimeToCastBrandW()) {
 		const float wDamage = Damages::WSpell::GetDamage(obj);
 		const float wDamageAblazed = Damages::WSpell::GetDamageAblazed(obj);
 		const float finalDamage = HasBrandPassive(obj) ? wDamageAblazed : wDamage;
 		render::RenderTextWorld("W: " + std::to_string(ceil(finalDamage)), Vector3(dmgPos.x, dmgPos.y - yOffset, dmgPos.z), 16, COLOR_WHITE, false); yOffset += 20;
 	}
 
-	if (isTimeToCastE()) {
+	if (isTimeToCastBrandE()) {
 		const float eDamage = Damages::ESpell::GetDamage(obj);
 		render::RenderTextWorld("E: " + std::to_string(ceil(eDamage)), Vector3(dmgPos.x, dmgPos.y - yOffset, dmgPos.z), 16, COLOR_WHITE, false); yOffset += 20;
 	}
 
-	if (isTimeToCastR()) {
+	if (isTimeToCastBrandR()) {
 		const float rDamage = Damages::RSpell::GetDamage(obj);
 		render::RenderTextWorld("R: " + std::to_string(ceil(rDamage)), Vector3(dmgPos.x, dmgPos.y - yOffset, dmgPos.z), 16, COLOR_WHITE, false);
 	}
 }
 
 void Events::OnDraw() {
-	if (BrandSpellsSettings::DrawQ->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastQ() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
+	if (BrandSpellsSettings::DrawQ->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastBrandQ() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
 		Functions::DrawSpellRadius(BrandSpellsSettings::GetQRange());
 
-	if (BrandSpellsSettings::DrawW->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastW() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
+	if (BrandSpellsSettings::DrawW->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastBrandW() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
 		Functions::DrawSpellRadius(BrandSpellsSettings::GetWRange());
 
-	if (BrandSpellsSettings::DrawE->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastE() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
+	if (BrandSpellsSettings::DrawE->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastBrandE() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
 		Functions::DrawSpellRadius(BrandSpellsSettings::GetERange());
 
-	if (BrandSpellsSettings::DrawR->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastR() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
-		Functions::DrawSpellRadius(1500.0f);
+	if (BrandSpellsSettings::DrawR->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastBrandR() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
+		Functions::DrawSpellRadius(BrandSpellsSettings::GetRRange());
 
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 		if (!hero) continue;
@@ -336,7 +336,7 @@ void Events::OnGameUpdate() {
 	if (globals::localPlayer == nullptr) return;
 	if (!globals::localPlayer->IsAlive()) return;
 
-	gameTime = Engine::GetGameTime();
+	Brandgametime = Engine::GetGameTime();
 
 	Modes::Killsteal();
 	// TODO: HANDLE IS EVADING SPELL
@@ -344,34 +344,53 @@ void Events::OnGameUpdate() {
 
 void Events::OnWndProc(UINT msg, WPARAM param) {
 	if (param == OrbwalkerConfig::comboKey->Key) {
-		Modes::Combo();
+		switch (msg) {
+			case WM_KEYDOWN: Modes::Combo(); break;
+			case WM_KEYUP: break;
+		}
 	}
-	if (param == OrbwalkerConfig::fastClearKey->Key || OrbwalkerConfig::laneClearKey->Key) {
-		Modes::Clear();
-	}
+
 	if (param == OrbwalkerConfig::harassKey->Key) {
-		Modes::Harass();
+		switch (msg) {
+			case WM_KEYDOWN: Modes::Harass(); break;
+			case WM_KEYUP: break;
+		}
 	}
+
+	if (param == OrbwalkerConfig::laneClearKey->Key) {
+		switch (msg) {
+			case WM_KEYDOWN: Modes::Clear(); break;
+			case WM_KEYUP: break;
+		}
+	}
+
+	if (param == OrbwalkerConfig::fastClearKey->Key) {
+		switch (msg) {
+			case WM_KEYDOWN: Modes::Clear(); break;
+			case WM_KEYUP: break;
+		}
+	}
+
 }
 
 void Modes::Combo() {
 	if (!Orbwalker::CanCastAfterAttack()) return;
 
-	if (BrandCombo::UseW->Value == true && isTimeToCastW()) {
+	if (BrandCombo::UseW->Value == true && isTimeToCastBrandW()) {
 		const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetWRange());
 		if (wTarget != nullptr) {
 			Functions::UseW(wTarget);
 		}
 	}
 
-	if (BrandCombo::UseE->Value == true && isTimeToCastE()) {
+	if (BrandCombo::UseE->Value == true && isTimeToCastBrandE()) {
 		const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetERange());
 		if (eTarget != nullptr) {
 			Functions::UseE(eTarget);
 		}
 	}
 
-	if (BrandCombo::UseQ->Value == true && isTimeToCastQ()) {
+	if (BrandCombo::UseQ->Value == true && isTimeToCastBrandQ()) {
 		const auto ablazedTarget = Functions::GetAblazedTarget(BrandSpellsSettings::GetQRange());
 		if (BrandCombo::UseQ2->Value == true && ablazedTarget != nullptr) {
 			Functions::UseQ(ablazedTarget);
@@ -384,7 +403,7 @@ void Modes::Combo() {
 	}
 
 	const int heroesInRange = ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), BrandSpellsSettings::GetRRange());
-	if (BrandCombo::UseR->Value == true && isTimeToCastR() && BrandCombo::GetMinimumEnemies() <= heroesInRange) {
+	if (BrandCombo::UseR->Value == true && isTimeToCastBrandR() && BrandCombo::GetMinimumEnemies() <= heroesInRange) {
 		const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetRRange());
 		if (rTarget != nullptr) {
 			Functions::UseR(rTarget);
@@ -399,7 +418,7 @@ void Modes::Clear() {
 	if (minionsInRange > 0) {
 		if (BrandClear::GetMinimumMana() >= globals::localPlayer->GetPercentMana()) return;
 
-		if (BrandClear::UseW->Value && isTimeToCastW()) {
+		if (BrandClear::UseW->Value && isTimeToCastBrandW()) {
 			const auto wTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetWRange(), Alliance::Enemy);
 			if (wTarget != nullptr) {
 				const auto minionsAroundWTarget = ObjectManager::CountMinionsInRange(Alliance::Enemy, wTarget->GetPosition(), database.BrandW.GetRadius());
@@ -409,7 +428,7 @@ void Modes::Clear() {
 			}
 		}
 
-		if (BrandClear::UseE->Value && isTimeToCastE()) {
+		if (BrandClear::UseE->Value && isTimeToCastBrandE()) {
 			const auto eTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetERange(), Alliance::Enemy);
 			if (eTarget != nullptr) {
 				const auto minionsAroundWTarget = ObjectManager::CountMinionsInRange(Alliance::Enemy, eTarget->GetPosition(), database.BrandW.GetRadius());
@@ -424,21 +443,21 @@ void Modes::Clear() {
 		if (jungleMonstersInRange > 0) {
 			if (BrandJungle::GetMinimumMana() >= globals::localPlayer->GetPercentMana()) return;
 
-			if (BrandJungle::UseE->Value && isTimeToCastW()) {
+			if (BrandJungle::UseW->Value && isTimeToCastBrandW()) {
 				const auto wMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetWRange());
 				if (wMonster != nullptr) {
 					Functions::UseW(wMonster);
 				}
 			}
 
-			if (BrandJungle::UseE->Value && isTimeToCastE()) {
+			if (BrandJungle::UseE->Value && isTimeToCastBrandE()) {
 				const auto eMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetERange());
 				if (eMonster != nullptr) {
 					Functions::UseE(eMonster);
 				}
 			}
 
-			if (BrandJungle::UseQ->Value && isTimeToCastQ()) {
+			if (BrandJungle::UseQ->Value && isTimeToCastBrandQ()) {
 				const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetQRange());
 				if (qMonster != nullptr) {
 					Functions::UseQ(qMonster);
@@ -452,21 +471,21 @@ void Modes::Harass() {
 	if (!Orbwalker::CanCastAfterAttack()) return;
 	if (BrandHarass::GetMinimumMana() >= globals::localPlayer->GetPercentMana()) return;
 
-	if (BrandHarass::UseW->Value && isTimeToCastW()) {
+	if (BrandHarass::UseW->Value && isTimeToCastBrandW()) {
 		const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetWRange());
 		if (wTarget != nullptr) {
 			Functions::UseW(wTarget);
 		}
 	}
 
-	if (BrandHarass::UseE->Value && isTimeToCastE()) {
+	if (BrandHarass::UseE->Value && isTimeToCastBrandE()) {
 		const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetERange());
 		if (eTarget != nullptr) {
 			Functions::UseE(eTarget);
 		}
 	}
 
-	if (BrandHarass::UseQ->Value && isTimeToCastQ()) {
+	if (BrandHarass::UseQ->Value && isTimeToCastBrandQ()) {
 		const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), BrandSpellsSettings::GetQRange());
 		if (qTarget != nullptr) {
 			Functions::UseQ(qTarget);
@@ -483,19 +502,19 @@ void Modes::Killsteal() {
 		if (hero->IsInvulnerable()) continue;
 
 		const float heroHealth = hero->ReadClientStat(Object::Health) + hero->ReadClientStat(Object::Shield);
-		if (BrandKillsteal::UseE->Value && isTimeToCastQ() && heroHealth < Damages::ESpell::GetDamage(hero)) {
+		if (BrandKillsteal::UseE->Value && isTimeToCastBrandQ() && heroHealth < Damages::ESpell::GetDamage(hero)) {
 			Functions::UseE(hero);
 			continue;
 		}
-		if (BrandKillsteal::UseW->Value && isTimeToCastQ() && heroHealth < Damages::WSpell::GetDamage(hero)) {
+		if (BrandKillsteal::UseW->Value && isTimeToCastBrandW() && heroHealth < Damages::WSpell::GetDamage(hero)) {
 			Functions::UseW(hero);
 			continue;
 		}
-		if (BrandKillsteal::UseQ->Value && isTimeToCastQ() && heroHealth < Damages::QSpell::GetDamage(hero)) {
+		if (BrandKillsteal::UseQ->Value && isTimeToCastBrandE() && heroHealth < Damages::QSpell::GetDamage(hero)) {
 			Functions::UseQ(hero);
 			continue;
 		}
-		if (BrandKillsteal::UseR->Value && isTimeToCastQ() && heroHealth < Damages::RSpell::GetDamage(hero)) {
+		if (BrandKillsteal::UseR->Value && isTimeToCastBrandR() && heroHealth < Damages::RSpell::GetDamage(hero)) {
 			Functions::UseR(hero);
 			break;
 		}

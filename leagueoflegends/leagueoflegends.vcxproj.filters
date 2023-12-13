@@ -215,6 +215,15 @@
     <Filter Include="Scripts\Champions\Amumu">
       <UniqueIdentifier>{0ec2c327-731b-4727-8b2c-a2fe1dc9295f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Champions\New">
+      <UniqueIdentifier>{34f48dcf-07d6-4f5c-aa85-9bbaf5120614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\New\Brand">
+      <UniqueIdentifier>{dfffd4c3-c092-4da1-84e6-b2d56f289122}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\New\Tristana">
+      <UniqueIdentifier>{d29c6fe0-f970-48b5-9a8a-3cac47d6542e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -550,7 +559,10 @@
       <Filter>Scripts\Champions\Teemo</Filter>
     </ClInclude>
     <ClInclude Include="Brand.h">
-      <Filter>Scripts\Champions\SDK</Filter>
+      <Filter>Scripts\Champions\New\Brand</Filter>
+    </ClInclude>
+    <ClInclude Include="Tristana.h">
+      <Filter>Scripts\Champions\New\Tristana</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -796,7 +808,10 @@
       <Filter>Scripts\Champions\Teemo</Filter>
     </ClCompile>
     <ClCompile Include="Brand.cpp">
-      <Filter>Scripts\Champions\SDK</Filter>
+      <Filter>Scripts\Champions\New\Brand</Filter>
+    </ClCompile>
+    <ClCompile Include="Tristana.cpp">
+      <Filter>Scripts\Champions\New\Tristana</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

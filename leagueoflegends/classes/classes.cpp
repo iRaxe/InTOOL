@@ -1321,6 +1321,7 @@ std::vector<Object*> ObjectManager::GetJungleMonsters()
 	for (auto monster : ObjectManager::GetMinions()) {
 		if (!monster) continue;
 		if (!monster->IsJungle()) continue;
+		if (monster->GetCharacterData()->GetObjectTypeHash() == Plants) continue;
 		if (monster->IsAlive() and monster->IsVisible() and monster->IsTargetable() and !monster->IsInvulnerable())
 			possible_targets.push_back(monster);
 	}

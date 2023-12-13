@@ -481,7 +481,7 @@ namespace Evade
 		//render::RenderLineWorld(spell.startPos, spell.endPos, COLOR_BLUE, 3.0f);
 
 
-		Engine::PrintChat(spell.displayName + " StartPOS X: " + std::to_string(spell.startPos.x) + " StartPOS Y: " + std::to_string(spell.startPos.y) + " StartPOS Z: " + std::to_string(spell.startPos.z) + std::to_string(spell.endPos.x) + std::to_string(spell.endPos.y));
+		//Engine::PrintChat(spell.displayName + " StartPOS X: " + std::to_string(spell.startPos.x) + " StartPOS Y: " + std::to_string(spell.startPos.y) + " StartPOS Z: " + std::to_string(spell.startPos.z) + std::to_string(spell.endPos.x) + std::to_string(spell.endPos.y));
 		//MessageBoxA(0, (to_string(spell.startPos.x) + "\n" + to_string(spell.startPos.y) + "\n" + to_string(spell.startPos.z) + "\n\n\n\n" + to_string(spell.endPos.x) + "\n" + to_string(spell.endPos.y) + "\n" + to_string(spell.endPos.z)).c_str(), "1", 0);
 
 		/*if (spell.exception && spell.spell->EndPosition.x != 0 && spell.spell->EndPosition.y != 0) {
@@ -897,7 +897,7 @@ namespace Evade
 					{
 						if (Compare(castInfo->GetProcessSpellInfo()->GetSpellData()->GetName(), s.name, true))
 						{
-							LOG("%s", castInfo->GetProcessSpellInfo()->GetSpellData()->GetName().c_str());
+							//LOG("%s", castInfo->GetProcessSpellInfo()->GetSpellData()->GetName().c_str());
 							addedSpells.push_back(castInfo->GetCasterHandle());
 							s.startTime = GameTimer;
 							s.obj = champ.obj;

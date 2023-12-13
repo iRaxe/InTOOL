@@ -290,6 +290,7 @@
     <ClInclude Include="Syscaller.h" />
     <ClInclude Include="TargetingClient.h" />
     <ClInclude Include="TargetSelector.h" />
+    <ClInclude Include="Tristana.h" />
     <ClInclude Include="UltimateHooks.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="VMTHook.h" />
@@ -375,6 +376,7 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Syscaller.cpp" />
     <ClCompile Include="TargetingClient.cpp" />
+    <ClCompile Include="Tristana.cpp" />
     <ClCompile Include="UltimateHooks.cpp" />
     <ClCompile Include="VMTHook.cpp" />
     <ClCompile Include="zoom.cpp" />

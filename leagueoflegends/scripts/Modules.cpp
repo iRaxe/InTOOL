@@ -5,6 +5,7 @@
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 #include "../Orbwalker.h"
+#include "../Tristana.h"
 
 namespace Modules
 {
@@ -46,6 +47,9 @@ namespace Modules
 		{
 			if (globals::localPlayer->GetName() == "Brand") {
 				UPasta::Plugins::Brand::Events::Initialize();
+			}
+			else if (globals::localPlayer->GetName() == "Tristana") {
+				UPasta::Plugins::Tristana::Events::Initialize();
 			}
 			else {
 				activeChampModule = ChampionModuleManager::GetModule(globals::localPlayer->GetName());
