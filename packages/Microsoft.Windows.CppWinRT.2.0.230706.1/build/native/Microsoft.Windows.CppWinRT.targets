@@ -132,7 +132,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
             <_FilesToDelete Include="$(GeneratedFilesDir)**"/>
             <_FilesToDelete Include="$(CppWinRTMergedDir)**"/>
             <_FilesToDelete Include="$(CppWinRTUnmergedDir)**"/>
-            <_FilesToDelete Include="$(CppWinRTProjectWinMD)"/>
+            <_FilesToDelete Include="$(CppWinRTProjectWinMD)" Condition="'$(CppWinRTGenerateWindowsMetadata)' == 'true'"/>
         </ItemGroup>
         <Delete Files="@(_FilesToDelete)"/>
     </Target>
@@ -192,14 +192,19 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <!-- Target used only to evaluate CppWinRTGenerateWindowsMetadata if it doesn't already have a value -->
     <Target Name="CppWinRTComputeGenerateWindowsMetadata"
-            DependsOnTargets="CppWinRTComputeXamlGeneratedMidlInputs;GetCppWinRTProjectWinMDReferences;$(CppWinRTComputeGenerateWindowsMetadataDependsOn)">
+            DependsOnTargets="GetCppWinRTProjectWinMDReferences;CppWinRTComputeXamlGeneratedMidlInputs;$(CppWinRTComputeGenerateWindowsMetadataDependsOn)">
+
+        <ItemGroup>
+            <_IncludedIdlForComputeGenerateWindowsMetadata Remove="@(_IncludedIdlForComputeGenerateWindowsMetadata)" />
+            <_IncludedIdlForComputeGenerateWindowsMetadata Include="@(Midl)" Condition="'%(Midl.ExcludedFromBuild)' != 'true'" />
+        </ItemGroup>
 
         <PropertyGroup>
             <!-- For static libraries, only idl causes a winmd to be generated. 
                  For exe/dll, static libraries that produce a WinMD will be merged, 
                  so they also cause a WinMD to be generated-->
-            <CppWinRTGenerateWindowsMetadata Condition="'$(ConfigurationType)' != 'StaticLibrary' AND '@(CppWinRTStaticProjectWinMDReferences)@(Midl)'!= ''">true</CppWinRTGenerateWindowsMetadata>
-            <CppWinRTGenerateWindowsMetadata Condition="'$(ConfigurationType)' == 'StaticLibrary' AND '@(Midl)'!= ''">true</CppWinRTGenerateWindowsMetadata>
+            <CppWinRTGenerateWindowsMetadata Condition="'$(ConfigurationType)' != 'StaticLibrary' AND '@(CppWinRTStaticProjectWinMDReferences)@(_IncludedIdlForComputeGenerateWindowsMetadata)'!= ''">true</CppWinRTGenerateWindowsMetadata>
+            <CppWinRTGenerateWindowsMetadata Condition="'$(ConfigurationType)' == 'StaticLibrary' AND '@(_IncludedIdlForComputeGenerateWindowsMetadata)'!= ''">true</CppWinRTGenerateWindowsMetadata>
 
             <!-- At this point we checked all cases where we do generate a WinMD.
                  The remaining option is no WinMD. -->
@@ -345,11 +350,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <!-- Calculates the input files and metadata directories to be passed to MdMerge -->
     <Target Name="GetCppWinRTMdMergeInputs"
-                DependsOnTargets="CppWinRTComputeXamlGeneratedMidlInputs;CppWinRTResolveReferences;"
-                Returns="@(CppWinRTMdMergeMetadataDirectories);@(CppWinRTMdMergeInputs)">
+            DependsOnTargets="CppWinRTResolveReferences"
+            Returns="@(CppWinRTMdMergeMetadataDirectories);@(CppWinRTMdMergeInputs)">
         <ItemGroup>
             <_MdMergeInputs Remove="@(_MdMergeInputs)"/>
-            <_MdMergeInputs Include="@(Midl)">
+            <_MdMergeInputs Include="@(Midl)" Condition="'%(Midl.ExcludedFromBuild)' != 'true'">
                 <WinMDPath>%(Midl.OutputDirectory)%(Midl.MetadataFileName)</WinMDPath>
                 <MdMergeOutputFile>$(CppWinRTProjectWinMD)</MdMergeOutputFile>
             </_MdMergeInputs>
@@ -387,7 +392,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         <ItemGroup>
             <Midl Remove="$(XamlMetaDataProviderIdl)" />
             <Midl Include="$(XamlMetaDataProviderIdl)">
-                <DisableReferences Condition="$(_DisableReferences)">>true</DisableReferences>
+                <DisableReferences Condition="$(_DisableReferences)">true</DisableReferences>
             </Midl>
         </ItemGroup>
     </Target>
@@ -470,7 +475,10 @@ $(XamlMetaDataProviderPch)
             <_MidlReferences Include="@(CppWinRTPlatformWinMDReferences)"/>
             <_MidlReferencesDistinct Remove="@(_MidlReferencesDistinct)" />
             <_MidlReferencesDistinct Include="@(_MidlReferences->'%(WinMDPath)'->Distinct())" />
-            <Midl Condition="'%(Midl.DisableReferences)'==''">
+            <Midl Condition="'%(Midl.NoMidl)'!='false'">
+                <AdditionalOptions>%(Midl.AdditionalOptions) /nomidl</AdditionalOptions>
+            </Midl>
+            <Midl Condition="'%(Midl.DisableReferences)'=='' and '%(Midl.NoMidl)'!='false'">
                 <AdditionalOptions>%(Midl.AdditionalOptions) %40"$(CppWinRTMidlResponseFile)"</AdditionalOptions>
             </Midl>
         </ItemGroup>
@@ -799,7 +807,8 @@ $(XamlMetaDataProviderPch)
             Text="Please retarget to 10.0.17709.0 or later, or rename your PCH to 'pch.h'."/>
         <PropertyGroup Condition="('$(CppWinRTOverrideSDKReferences)' == 'true') or ('$(TargetPlatformVersion)' &gt; '10.0.17708.0')">
             <CppWinRTUsePrefixes Condition="'$(CppWinRTUsePrefixes)' == ''">true</CppWinRTUsePrefixes>
-            <CppWinRTPrecompiledHeader Condition="'$(CppWinRTPrecompiledHeader)' == ''">$(_PCH)</CppWinRTPrecompiledHeader>
+            <CppWinRTPrecompiledHeader Condition="'$(CppWinRTPrecompiledHeader)' == '' and '%(CLCompile.PrecompiledHeader)' != 'NotUsing'">$(_PCH)</CppWinRTPrecompiledHeader>
+            <CppWinRTPrecompiledHeader Condition="'$(CppWinRTPrecompiledHeader)' == '' and '%(CLCompile.PrecompiledHeader)' == 'NotUsing'">.</CppWinRTPrecompiledHeader>
         </PropertyGroup>
         <PropertyGroup>
             <CppWinRTCommandUsePrefixes Condition="'$(CppWinRTUsePrefixes)' == 'true'">-prefix</CppWinRTCommandUsePrefixes>
@@ -871,13 +880,12 @@ $(XamlMetaDataProviderPch)
     <ItemDefinitionGroup>
         <ClCompile>
             <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
-            <AdditionalOptions Condition="'%(ClCompile.LanguageStandard)' == 'stdcpp17'">%(AdditionalOptions) /await</AdditionalOptions>
+            <AdditionalOptions Condition="'%(ClCompile.LanguageStandard)' == 'stdcpp17' And '$(CppWinRTEnableLegacyCoroutines)' != 'false'">%(AdditionalOptions) /await</AdditionalOptions>
             <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(GeneratedFilesDir)</AdditionalIncludeDirectories>
         </ClCompile>
         <Midl Condition="'$(CppWinRTModernIDL)' != 'false'">
             <AdditionalMetadataDirectories Condition="'%(AdditionalMetadataDirectories)' == '' And '$(WindowsSDK_MetadataFoundationPath)' != ''">$(WindowsSDK_MetadataFoundationPath);%(AdditionalMetadataDirectories)</AdditionalMetadataDirectories>
             <AdditionalMetadataDirectories Condition="'%(AdditionalMetadataDirectories)' == '' And '$(WindowsSDK_MetadataFoundationPath)' == ''">$(WindowsSDK_MetadataPath);%(AdditionalMetadataDirectories)</AdditionalMetadataDirectories>
-            <AdditionalOptions>%(AdditionalOptions) /nomidl</AdditionalOptions>
         </Midl>
         <Link>
             <AdditionalDependencies Condition="'$(CppWinRTLibs)' != 'false'">%(AdditionalDependencies);WindowsApp.lib</AdditionalDependencies>
