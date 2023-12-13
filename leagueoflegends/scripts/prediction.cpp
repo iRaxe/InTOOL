@@ -124,6 +124,25 @@ namespace Modules::prediction
 		return waypoints.front();
 	}
 
+	Vector3 PredictTargetPosition(Object* targetObj, float predictionTime)
+	{
+		const auto aiManager = targetObj->GetAiManager();
+
+		Vector3 currentPosition = aiManager->GetPosition();
+		float velocityMagnitude = aiManager->GetVelocity(); // Velocity magnitude
+
+		
+		Vector3 direction = aiManager->GetDirection().Normalized();
+
+		// Create the velocity vector
+		Vector3 velocityVector = direction * velocityMagnitude;
+
+		// Calculate the predicted position
+		Vector3 predictedPosition = currentPosition + (velocityVector * predictionTime);
+
+		return predictedPosition;
+	}
+
 	bool GetPrediction(Skillshot& skillshot, Modules::prediction::PredictionOutput &out)
 	{
 
@@ -162,7 +181,7 @@ namespace Modules::prediction
 		}
 
 		float travelTime = (distance / skillshot.GetSpeed()) + skillshot.GetCastTime();
-		auto predictedPos = GetObjectPositionAfterTime(targetObj, travelTime, distanceBuffer);
+		auto predictedPos = PredictTargetPosition(targetObj, travelTime);
 
 		distance = predictedPos.Distance(sourcePos);
 		float missileTime = (distance / skillshot.GetSpeed()) + skillshot.GetCastTime();

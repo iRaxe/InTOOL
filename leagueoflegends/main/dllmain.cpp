@@ -9,6 +9,7 @@
 #include "../auth.hpp"
 #include "../Memory.h"
 #include "../Syscaller.h"
+#include <thread>
 
 //#define CONSOLE_ENABLED
 
