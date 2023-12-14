@@ -354,6 +354,7 @@ enum DamageType
 {
 	Physical,
 	Magical,
+	Mixed,
 	True
 };
 

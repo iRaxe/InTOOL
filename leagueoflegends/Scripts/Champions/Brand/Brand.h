@@ -119,33 +119,33 @@ namespace UPasta {
                 namespace QSpell {
                     inline float dmgSkillArray[6] = { 0, 80, 110, 140, 170, 200 };
                     inline float additionalPercentageAP = 0.65f;
-                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSkillDamage(SpellIndex::Q, obj, dmgSkillArray, DamageType::Magical, additionalPercentageAP); }
+                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::Q, obj, dmgSkillArray, additionalPercentageAP); }
                 }
 
                 namespace WSpell {
                     inline float dmgSkillArray[6] = { 0, 75, 120, 165, 210, 255 };
                     inline float additionalPercentageAP = 0.60f;
 
-                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSkillDamage(SpellIndex::W, obj, dmgSkillArray, DamageType::Magical, additionalPercentageAP); }
+                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::W, obj, dmgSkillArray, additionalPercentageAP); }
 
                     inline float dmgSkillArrayAblazed[6] = { 0, 93.75, 150, 206.25, 262.5, 318.75 };
                     inline float additionalPercentageAPAblazed = 0.75f;
 
-                    static float GetDamageAblazed(Object* obj) { return SDK::Damage::CalculateSkillDamage(SpellIndex::W, obj, dmgSkillArray, DamageType::Magical, additionalPercentageAPAblazed); }
+                    static float GetDamageAblazed(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::W, obj, dmgSkillArray, additionalPercentageAPAblazed); }
                 }
 
                 namespace ESpell {
                     inline float dmgSkillArray[6] = { 0, 65, 90, 115, 140, 165 };
                     inline float additionalPercentageAP = 0.50f;
 
-                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSkillDamage(SpellIndex::E, obj, dmgSkillArray, DamageType::Magical, additionalPercentageAP); }
+                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::E, obj, dmgSkillArray, additionalPercentageAP); }
                 }
 
                 namespace RSpell {
                     inline float dmgSkillArray[4] = { 0, 100, 200, 300 };
                     inline float additionalPercentageAP = 0.25f;
 
-                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSkillDamage(SpellIndex::R, obj, dmgSkillArray, DamageType::Magical, additionalPercentageAP); }
+                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::R, obj, dmgSkillArray, additionalPercentageAP); }
                 }
             }
         }

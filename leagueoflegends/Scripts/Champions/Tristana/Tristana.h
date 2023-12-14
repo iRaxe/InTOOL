@@ -136,7 +136,7 @@ namespace UPasta {
                     inline float dmgSkillArray[6] = { 0, 95, 145, 195, 245, 295 };
                     inline float additionalPercentageAP = 0.50f;
 
-                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSkillDamage(SpellIndex::W, obj, dmgSkillArray, DamageType::Magical, additionalPercentageAP); }
+                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::W, obj, dmgSkillArray, additionalPercentageAP); }
                 }
 
                 namespace ESpell {
@@ -149,7 +149,7 @@ namespace UPasta {
 
                     inline float dmgStackADSkillArray[6] = { 0, 21, 24, 27, 30, 33 };
                     inline float additionalDmgStackPercentageAD[6] = { 0, 0.15f, 0.225f, 0.30f, 0.375f, 0.45f };
-                    inline float additionalDmStackPercentageAP = 0.15f;
+                    inline float additionalDmgStackPercentageAP = 0.15f;
 
                     inline float dmgMaxSkillArray[6] = { 0, 205, 235, 264, 293, 323 };
                     inline float additionalDmgMaxPercentageAD[6] = { 0, 1.46f, 2.199f, 2.933f, 3.666f, 4.399f };
@@ -157,12 +157,12 @@ namespace UPasta {
 
                     static float GetDamage(Object* obj)
                     {
-	                    const float magicDamage = SDK::Damage::CalculateSkillDamage(SpellIndex::E, obj, dmgAPSkillArray, DamageType::Magical, additionalDmgAPPercentageAP);
-                        const float minDamage = SDK::Damage::CalculateSkillDamage(SpellIndex::E, obj, dmgADSkillArray, DamageType::Physical, additionalDmgADPercentageAP, additionalDmgADPercentageAD[globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel()]);
-                        const float stackDamage = SDK::Damage::CalculateSkillDamage(SpellIndex::E, obj, dmgStackADSkillArray, DamageType::Physical, additionalDmStackPercentageAP, additionalDmgStackPercentageAD[globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel()]);
+	                    const float magicDamage = SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::E, obj, dmgAPSkillArray, additionalDmgAPPercentageAP);
+                        const float minDamage = SDK::Damage::CalculateSlotMixedDamage<float*, float, float*>(SpellIndex::E, obj, dmgADSkillArray, additionalDmgADPercentageAP, additionalDmgADPercentageAD);
+                        const float stackDamage = SDK::Damage::CalculateSlotMixedDamage<float*, float, float*>(SpellIndex::E, obj, dmgStackADSkillArray, additionalDmgStackPercentageAP, additionalDmgStackPercentageAD);
                         const float stacksDamage = stackDamage * Functions::GetBombStacks(obj);
                         const float defMinDamage = magicDamage + minDamage + stacksDamage;
-                        const float maxDamage = SDK::Damage::CalculateSkillDamage(SpellIndex::E, obj, dmgMaxSkillArray, DamageType::Physical, additionalDmgMaxPercentageAP, additionalDmgMaxPercentageAD[globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel()]);
+                        const float maxDamage = SDK::Damage::CalculateSlotMixedDamage<float*, float, float*>(SpellIndex::E, obj, dmgMaxSkillArray, additionalDmgMaxPercentageAP, additionalDmgMaxPercentageAD);
                         const float defDamage = defMinDamage > maxDamage ? maxDamage : minDamage;
 	                    return defDamage;
                     }
@@ -173,7 +173,7 @@ namespace UPasta {
                     inline float additionalPercentageAP = 1.00f;
                     inline float knockbackDistance[4] = { 0, 600, 800, 1000 };
 
-                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSkillDamage(SpellIndex::R, obj, dmgSkillArray, DamageType::Magical, additionalPercentageAP); }
+                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::R, obj, dmgSkillArray, additionalPercentageAP); }
                 }
             }
         }

@@ -204,25 +204,16 @@ public:
         ThreshConfig::ThreshSpellsSettings::DrawIfReady = spellsMenu->AddCheckBox("DrawIfReady", "Draw SpellSlots Only If Ready", true);
     }
 
-    static float Thresh_dmgQ(Object* pEnemy)
-    {
-        static const std::vector<float> dmgSkillVector = arrayToVector(std::begin(ThreshDamages::QSpell::dmgSkillArray), std::end(ThreshDamages::QSpell::dmgSkillArray));
-
-        return Damage::CalculateSkillDamage(SpellIndex::Q, pEnemy, ThreshDamages::QSpell::dmgSkillArray, Magical, ThreshDamages::QSpell::additionalPercentageAP);
+    static float Thresh_dmgQ(Object* pEnemy) {
+        return Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::Q, pEnemy, ThreshDamages::QSpell::dmgSkillArray, ThreshDamages::QSpell::additionalPercentageAP);
     }
 
-    static float Thresh_dmgE(Object* pEnemy)
-    {
-        static const std::vector<float> dmgSkillVector = arrayToVector(std::begin(ThreshDamages::ESpell::dmgSkillArray), std::end(ThreshDamages::ESpell::dmgSkillArray));
-
-        return Damage::CalculateSkillDamage(SpellIndex::E, pEnemy, ThreshDamages::ESpell::dmgSkillArray, Magical, ThreshDamages::ESpell::additionalPercentageAP);
+    static float Thresh_dmgE(Object* pEnemy) {
+        return Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::E, pEnemy, ThreshDamages::ESpell::dmgSkillArray, ThreshDamages::ESpell::additionalPercentageAP);
     }
 
-    static float Thresh_dmgR(Object* pEnemy)
-    {
-        static const std::vector<float> dmgSkillVector = arrayToVector(std::begin(ThreshDamages::RSpell::dmgSkillArray), std::end(ThreshDamages::RSpell::dmgSkillArray));
-
-        return Damage::CalculateSkillDamage(SpellIndex::R, pEnemy, ThreshDamages::RSpell::dmgSkillArray, Magical, ThreshDamages::RSpell::additionalPercentageAP);
+    static float Thresh_dmgR(Object* pEnemy) {
+        return Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::R, pEnemy, ThreshDamages::RSpell::dmgSkillArray, ThreshDamages::RSpell::additionalPercentageAP);
     }
 
     static float Thresh_shieldW()

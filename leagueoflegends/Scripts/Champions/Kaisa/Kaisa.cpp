@@ -57,12 +57,12 @@ private:
     }
 
     float q_dmg(Object* pEnemy) const {
-        return Damage::CalculateSkillDamage(SpellIndex::Q, pEnemy, KaisaDamages::QSpell::dmgSkillArray, Physical, KaisaDamages::QSpell::additionalPercentageAP, KaisaDamages::QSpell::additionalPercentageAD);
+        return Damage::CalculateSlotMixedDamage<float*, float, float>(SpellIndex::Q, pEnemy, KaisaDamages::QSpell::dmgSkillArray, KaisaDamages::QSpell::additionalPercentageAP, KaisaDamages::QSpell::additionalPercentageAD);
     }
 
     float w_dmg(Object* pEnemy) const {
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
-        return Damage::CalculateSkillDamage(SpellIndex::W, pEnemy, KaisaDamages::WSpell::dmgSkillArray, Magical, 0.0f, KaisaDamages::QSpell::additionalPercentageAD);
+        return Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::W, pEnemy, KaisaDamages::WSpell::dmgSkillArray, KaisaDamages::QSpell::additionalPercentageAD);
     }
 
 public:
