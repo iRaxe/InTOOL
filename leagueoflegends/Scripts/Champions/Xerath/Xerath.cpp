@@ -214,7 +214,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= database.XerathQ.GetRange() && isTimeToCastQ())
         {
-            Engine::CastSpell(SpellIndex::Q);
+            Engine::CastSelf(SpellIndex::Q);
             QCastedTime = gameTime;
         }
     }
@@ -279,13 +279,13 @@ public:
 
                 if (GetPrediction(database.XerathW, wPrediction))
                 {
-                    Engine::CastSpell(SpellIndex::W, wPrediction.position);
+                    Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                     WCastedTime = gameTime;
                 }
             }
             else
             {
-                Engine::CastSpell(SpellIndex::W, pEnemy->GetPosition());
+                Engine::CastToPosition(SpellIndex::W, pEnemy->GetPosition());
                 WCastedTime = gameTime;
             }
         }
@@ -304,13 +304,13 @@ public:
 
                 if (GetPrediction(database.XerathE, ePrediction))
                 {
-                    Engine::CastSpell(SpellIndex::E, ePrediction.position);
+                    Engine::CastToPosition(SpellIndex::E, ePrediction.position);
                     ECastedTime = gameTime;
                 }
             }
             else
             {
-                Engine::CastSpell(SpellIndex::E, pEnemy->GetPosition());
+                Engine::CastToPosition(SpellIndex::E, pEnemy->GetPosition());
                 ECastedTime = gameTime;
             }
         }
@@ -326,7 +326,7 @@ public:
             Modules::prediction::PredictionOutput rPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy,database.XerathR, rPrediction))
             {
-                Engine::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastToPosition(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
             }
         }

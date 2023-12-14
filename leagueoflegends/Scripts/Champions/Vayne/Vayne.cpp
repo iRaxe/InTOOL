@@ -283,7 +283,7 @@ public:
         {
             auto mousePos = globals::localPlayer->GetPosition().Extend(Engine::GetMouseWorldPos(), 300);
 
-            Engine::CastSpell(SpellIndex::Q, mousePos);
+            Engine::CastToPosition(SpellIndex::Q, mousePos);
             QCastedTime = gameTime;
         }
     }
@@ -295,7 +295,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < eRange() && isTimeToCastE())
         {
-            Engine::CastSpell(SpellIndex::E, pEnemy);
+            Engine::CastTargeted(SpellIndex::E, pEnemy);
             ECastedTime = gameTime;
         }
     }
@@ -307,7 +307,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < rRange() && isTimeToCastR())
         {
-            Engine::CastSpell(SpellIndex::R);
+            Engine::CastSelf(SpellIndex::R);
             RCastedTime = gameTime;
         }
     }
@@ -412,7 +412,7 @@ public:
             auto pathEnd = globals::localPlayer->GetPosition().Extend(Engine::GetMouseWorldPos(), 300);
             if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, aaRange()) && isTimeToCastQ())
             {
-                Engine::CastSpell(SpellIndex::Q, pathEnd);
+                Engine::CastToPosition(SpellIndex::Q, pathEnd);
                 QCastedTime = gameTime;
             }
         }

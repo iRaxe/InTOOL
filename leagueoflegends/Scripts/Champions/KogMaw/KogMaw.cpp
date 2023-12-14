@@ -211,13 +211,13 @@ public:
             return;
 
         if (target->IsMinion()) {
-            Engine::CastSpell(SpellIndex::Q, target->GetPosition());
+            Engine::CastToPosition(SpellIndex::Q, target->GetPosition());
             QCastedTime = gameTime;
             return;
         }
 
         if (target->IsJungle() && !(target->GetName().find("Mini") != std::string::npos)) {
-            Engine::CastSpell(SpellIndex::Q, target->GetPosition());
+            Engine::CastToPosition(SpellIndex::Q, target->GetPosition());
             QCastedTime = gameTime;
             return;
         }
@@ -225,7 +225,7 @@ public:
         Modules::prediction::PredictionOutput predOut;
 
         if (GetPrediction(globals::localPlayer, target, database.KogMawQ, predOut)) {
-            Engine::CastSpell(SpellIndex::Q, predOut.position);
+            Engine::CastToPosition(SpellIndex::Q, predOut.position);
             QCastedTime = gameTime;
         }
     }
@@ -234,7 +234,7 @@ public:
         if (globals::localPlayer == nullptr || !isTimeToCastW())
             return;
 
-        Engine::CastSpell(SpellIndex::W);
+        Engine::CastSelf(SpellIndex::W);
         WCastedTime = gameTime;
     }
 
@@ -243,20 +243,20 @@ public:
             return;
 
         if (target->IsMinion()) {
-            Engine::CastSpell(SpellIndex::E, target->GetPosition());
+            Engine::CastToPosition(SpellIndex::E, target->GetPosition());
             ECastedTime = gameTime;
             return;
         }
 
         if (target->IsJungle()) {
-            Engine::CastSpell(SpellIndex::E, target->GetPosition());
+            Engine::CastToPosition(SpellIndex::E, target->GetPosition());
             ECastedTime = gameTime;
             return;
         }
 
         Modules::prediction::PredictionOutput predOut;
         if (GetPrediction(globals::localPlayer, target, database.KogMawE, predOut)) {
-            Engine::CastSpell(SpellIndex::E, predOut.position);
+            Engine::CastToPosition(SpellIndex::E, predOut.position);
             ECastedTime = gameTime;
         }
     }
@@ -268,7 +268,7 @@ public:
         Modules::prediction::PredictionOutput predOut;
 
         if (GetPrediction(globals::localPlayer, target, database.KogMawR, predOut)) {
-            Engine::CastSpell(SpellIndex::R, predOut.position);
+            Engine::CastToPosition(SpellIndex::R, predOut.position);
             RCastedTime = gameTime;
         }
     }

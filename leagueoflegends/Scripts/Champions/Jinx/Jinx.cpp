@@ -224,7 +224,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= qRange())
         {
-            Engine::CastSpell(SpellIndex::Q);
+            Engine::CastSelf(SpellIndex::Q);
             QCastedTime = gameTime;
         }
     }
@@ -240,7 +240,7 @@ public:
 
             if (GetPrediction(database.JinxW, wPrediction))
             {
-                Engine::CastSpell(SpellIndex::W, wPrediction.position);
+                Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -252,7 +252,7 @@ public:
 
         if (pEnemy->GetDistanceTo(globals::localPlayer) <= eRange())
         {
-            Engine::CastSpell(SpellIndex::E);
+            Engine::CastSelf(SpellIndex::E);
             ECastedTime = gameTime;
         }
     }
@@ -261,7 +261,7 @@ public:
         if (globals::localPlayer == nullptr || !isTimeToCastR())
             return;
 
-        Engine::CastSpell(SpellIndex::R);
+        Engine::CastSelf(SpellIndex::R);
         RCastedTime = gameTime;
     }
 

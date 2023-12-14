@@ -245,7 +245,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= qRange())
         {
-            Engine::CastSpell(SpellIndex::Q);
+            Engine::CastSelf(SpellIndex::Q);
             QCastedTime = gameTime;
         }
     }
@@ -259,14 +259,14 @@ public:
         {
 
             if (pEnemy->IsMinion() || pEnemy->IsJungle()) {
-                Engine::CastSpell(SpellIndex::W, pEnemy->GetPosition());
+                Engine::CastToPosition(SpellIndex::W, pEnemy->GetPosition());
                 WCastedTime = gameTime;
                 return;
             }
             Modules::prediction::PredictionOutput wPrediction;
             if (GetPrediction(database.TwitchW, wPrediction))
             {
-                Engine::CastSpell(SpellIndex::W, wPrediction.position);
+                Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -278,7 +278,7 @@ public:
 
         if (pEnemy->GetDistanceTo(globals::localPlayer) <= eRange())
         {
-            Engine::CastSpell(SpellIndex::E);
+            Engine::CastSelf(SpellIndex::E);
             ECastedTime = gameTime;
         }
     }
@@ -287,7 +287,7 @@ public:
         if (globals::localPlayer == nullptr || !isTimeToCastR())
             return;
 
-        Engine::CastSpell(SpellIndex::R);
+        Engine::CastSelf(SpellIndex::R);
         RCastedTime = gameTime;
     }
 
@@ -446,7 +446,7 @@ public:
     void Flee() override {
         if (TwitchConfig::TwitchFlee::UseQ->Value && isTimeToCastQ())
         {
-            Engine::CastSpell(SpellIndex::Q);
+            Engine::CastSelf(SpellIndex::Q);
             ECastedTime = gameTime;
         }
     }

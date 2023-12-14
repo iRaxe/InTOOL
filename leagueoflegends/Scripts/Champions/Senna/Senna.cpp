@@ -302,7 +302,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < qRange() && isTimeToCastQ())
         {
-            Engine::CastSpell(SpellIndex::Q, pEnemy);
+            Engine::CastTargeted(SpellIndex::Q, pEnemy);
             QCastedTime = gameTime;
         }
     }
@@ -315,7 +315,7 @@ public:
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= wRange())
         {
             if (pEnemy->IsMinion() || pEnemy->IsJungle()) {
-                Engine::CastSpell(SpellIndex::W, pEnemy->GetPosition());
+                Engine::CastToPosition(SpellIndex::W, pEnemy->GetPosition());
                 WCastedTime = gameTime;
                 return;
             }
@@ -323,7 +323,7 @@ public:
             Modules::prediction::PredictionOutput wPrediction;
             if (GetPrediction(database.SennaW, wPrediction))
             {
-                Engine::CastSpell(SpellIndex::W, wPrediction.position);
+                Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -392,7 +392,7 @@ public:
                 continue;
 
             if (CanKill(hero, Senna_dmgR(hero)) || (check_count && isEnemyCountSufficient(hero, rPrediction))) {
-                Engine::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastToPosition(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
                 return;
             }
@@ -522,7 +522,7 @@ public:
         if (wTarget != nullptr) {
             if (SennaConfig::SennaFlee::UseE->Value && isTimeToCastE())
             {
-                Engine::CastSpell(SpellIndex::E);
+                Engine::CastSelf(SpellIndex::E);
                 ECastedTime = gameTime;
                 return;
             }

@@ -556,73 +556,118 @@ namespace Engine
 		const auto InputLogic = GetInputLogic();
 		call_function<void>(RVA(UPasta::Offsets::Functions::Spells::NewCastSpell), InputLogic, spellId, castType, 0);
 		UpdateMouseInstancePosition(originalMousePosition);
-		Event::Publish(Event::OnCastSpell);
-
 		return true;
 	}
 
-	bool CastSpell(int spellId, Object* Target) {
-		if (!IsSpellSlotValid(spellId))
-			return false;
-
-		Object* me = globals::localPlayer;
-		Spell* spell = me->GetSpellBySlotId(spellId);
-		if (!spell || !spell->GetSpellInput() || !Target)
-			return false;
-
-		const auto mouseScreenPosition = GetMouseInstancePosition();
-
-		if (Target->GetAiManager()->GetPosition().x || Target->GetAiManager()->GetPosition().y) {
-			const auto posw2s = WorldToScreen(Target->GetAiManager()->GetPosition());
-			UpdateMouseInstancePosition(posw2s);
-		}
-
-		return CastSpellLogic(spellId, SmartCast, mouseScreenPosition);
-	}
-
-	bool CastSpell(int spellId)
+	bool CastSelf(SpellIndex slotID)
 	{
-		if (!IsSpellSlotValid(spellId))
-			return false;
+		Object* localPlayer = globals::localPlayer;
+		if (localPlayer == nullptr) return false;
 
-		Object* me = globals::localPlayer;
-		Spell* spell = me->GetSpellBySlotId(spellId);
-		if (!spell || !spell->GetSpellInput())
-			return false;
+		Spell* spellPtr = localPlayer->GetSpellBySlotId(slotID);
+		if (spellPtr == nullptr) return false;
 
-		const auto mouseScreenPosition = GetMouseInstancePosition();
+		SpellInput* inputLogic = spellPtr->GetSpellInput();
+		if (inputLogic == nullptr) return false;
 
-		if (me->GetAiManager()->GetPosition().x || me->GetAiManager()->GetPosition().y)
-		{
-			const auto posw2s = WorldToScreen(me->GetAiManager()->GetPosition());
-			UpdateMouseInstancePosition(posw2s);
-		}
+		AiManager* localManager = localPlayer->GetAiManager();
+		if (localManager == nullptr) return false;
 
-		return CastSpellLogic(spellId, SelfCast, mouseScreenPosition);
+		Vector3 serverPosition = localManager->GetPosition();
+		if (!serverPosition.IsValid()) return false;
 
+		Vector2 pos2WS = WorldToScreen(serverPosition);
+		if (!pos2WS.IsValid()) return false;
+
+		Vector2 mouseScreenPosition = GetMouseInstancePosition();
+		if (!mouseScreenPosition.IsValid()) return false;
+
+		UpdateMouseInstancePosition(pos2WS);
+		inputLogic->SetCaster(localPlayer->GetHandle());
+		inputLogic->SetTarget(0);
+		inputLogic->SetStartPos(serverPosition);
+		inputLogic->SetEndPos(serverPosition);
+		inputLogic->SetClickedPos(serverPosition);
+		inputLogic->SetUnkPos(serverPosition);
+
+
+		return CastSpellLogic(slotID, SmartCast, mouseScreenPosition);
 	}
 
-	bool CastSpell(int spellId, Vector3 pos)
+	bool CastTargeted(SpellIndex slotID, Object* target)
 	{
-		if (!IsSpellSlotValid(spellId))
-			return false;
+		Object* localPlayer = globals::localPlayer;
+		if (localPlayer == nullptr) return false;
+		if (target == nullptr) return false;
 
-		Object* me = globals::localPlayer;
-		Spell* spell = me->GetSpellBySlotId(spellId);
-		if (!spell || !spell->GetSpellInput() || !pos.IsValid())
-			return false;
+		Spell* spellPtr = localPlayer->GetSpellBySlotId(slotID);
+		if (spellPtr == nullptr) return false;
 
-		const auto mouseScreenPosition = GetMouseInstancePosition();
-		if (pos.x || pos.y)
-		{
-			const auto posw2s = WorldToScreen(pos);
-			UpdateMouseInstancePosition(posw2s);
-		}
+		SpellInput* inputLogic = spellPtr->GetSpellInput();
+		if (inputLogic == nullptr) return false;
 
-		return CastSpellLogic(spellId, SmartCast, mouseScreenPosition);
+		AiManager* myLocalManager = localPlayer->GetAiManager();
+		if (myLocalManager == nullptr) return false;
+		AiManager* hisLocalManager = target->GetAiManager();
+		if (hisLocalManager == nullptr) return false;
 
+		Vector3 myServerPosition = myLocalManager->GetPosition();
+		if (!myServerPosition.IsValid()) return false;
+		Vector3 hisServerPosition = target->GetPosition();
+		if (!hisServerPosition.IsValid()) return false;
+
+		Vector2 pos2WS = WorldToScreen(hisServerPosition);
+		if (!pos2WS.IsValid()) return false;
+
+		Vector2 mouseScreenPosition = GetMouseInstancePosition();
+		if (!mouseScreenPosition.IsValid()) return false;
+
+		UpdateMouseInstancePosition(pos2WS);
+		inputLogic->SetCaster(localPlayer->GetHandle());
+		inputLogic->SetTarget(target->GetHandle());
+		inputLogic->SetStartPos(myServerPosition);
+		inputLogic->SetEndPos(hisServerPosition);
+		inputLogic->SetClickedPos(hisServerPosition);
+		inputLogic->SetUnkPos(hisServerPosition);
+
+		return CastSpellLogic(slotID, SmartCast, mouseScreenPosition);
 	}
-	
+
+	bool CastToPosition(SpellIndex slotID, Vector3 worldPos)
+	{
+		Object* localPlayer = globals::localPlayer;
+		if (localPlayer == nullptr) return false;
+		if (!worldPos.IsValid()) return false;
+
+		Spell* spellPtr = localPlayer->GetSpellBySlotId(slotID);
+		if (spellPtr == nullptr) return false;
+
+		SpellInput* inputLogic = spellPtr->GetSpellInput();
+		if (inputLogic == nullptr) return false;
+
+		AiManager* localManager = localPlayer->GetAiManager();
+		if (localManager == nullptr) return false;
+
+		Vector3 serverPosition = localManager->GetPosition();
+		if (!serverPosition.IsValid()) return false;
+
+		Vector2 pos2WS = WorldToScreen(worldPos);
+		if (!pos2WS.IsValid()) return false;
+
+		Vector2 mouseScreenPosition = GetMouseInstancePosition();
+		if (!mouseScreenPosition.IsValid()) return false;
+
+		UpdateMouseInstancePosition(pos2WS);
+		inputLogic->SetCaster(localPlayer->GetHandle());
+		inputLogic->SetTarget(0);
+		inputLogic->SetStartPos(serverPosition);
+		inputLogic->SetEndPos(worldPos);
+		inputLogic->SetClickedPos(worldPos);
+		inputLogic->SetUnkPos(worldPos);
+
+		return CastSpellLogic(slotID, SmartCast, mouseScreenPosition);
+	}
+
 	bool ReleaseSpell(int spellId, Vector3 pos)
 	{
 		if (!IsSpellSlotValid(spellId))

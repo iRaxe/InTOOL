@@ -128,14 +128,14 @@ public:
                 globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetManaCost() +
                 globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetManaCost() <= globals::localPlayer->GetMana())
             {
-                Engine::CastSpell(SpellIndex::Q, ePrediction.position);
+                Engine::CastToPosition(SpellIndex::Q, ePrediction.position);
                 lastQForECastTime = gameTime;
                 return;
             }
 
             if (lastQForECastTime > gameTime + 0.1f ||  SphereForEExists(ePrediction.position))
             {
-                Engine::CastSpell(SpellIndex::E, ePrediction.position);
+                Engine::CastToPosition(SpellIndex::E, ePrediction.position);
                 lastECastTime = gameTime;
                 return;
             }
@@ -149,13 +149,13 @@ public:
         
         if (w.IsCastable() && (int)w.GetName().size() == 11 && Modules::prediction::GetPrediction(w, wPrediction))
         {
-            Engine::CastSpell(SpellIndex::W, wPrediction.position);
+            Engine::CastToPosition(SpellIndex::W, wPrediction.position);
             return;
         }
 
         if (q.IsCastable() && (q.GetStacks() > 0 || q.GetName().size() == 7) && Modules::prediction::GetPrediction(q, qPrediction))
         {
-            Engine::CastSpell(SpellIndex::Q, qPrediction.position);
+            Engine::CastToPosition(SpellIndex::Q, qPrediction.position);
             return;
         }
 
@@ -166,7 +166,7 @@ public:
                 { ObjectType::Monster_Epic, ObjectType::Monster_Dragon }, false);
             if (monster && monster == Engine::GetSelectedObject())
             {
-                Engine::CastSpell(SpellIndex::W, monster->GetPosition());
+                Engine::CastToPosition(SpellIndex::W, monster->GetPosition());
                 lastW1CastTime = gameTime;
                 return;
             }
@@ -174,14 +174,14 @@ public:
             auto sphere = ObjectManager::GetObjectInRange(w.GetRange(), SP_STRING("SyndraSphere"), { ObjectType::Special }, {}, true);
             if (sphere && (sphere != lastESphere || gameTime > lastECastTime + 0.4f))
             {
-                Engine::CastSpell(SpellIndex::W, sphere->GetPosition());
+                Engine::CastToPosition(SpellIndex::W, sphere->GetPosition());
                 lastW1CastTime = gameTime;
                 return;
             }
 
             if (monster)
             {
-                Engine::CastSpell(SpellIndex::W, monster->GetPosition());
+                Engine::CastToPosition(SpellIndex::W, monster->GetPosition());
                 lastW1CastTime = gameTime;
                 return;
             }

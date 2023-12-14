@@ -279,7 +279,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < aaRange() && isTimeToCastQ())
         {
-            Engine::CastSpell(SpellIndex::Q, globals::localPlayer);
+            Engine::CastSelf(SpellIndex::Q);
             QCastedTime = gameTime;
         }
     }
@@ -294,7 +294,7 @@ public:
             Modules::prediction::PredictionOutput wPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.AsheW, wPrediction))
             {
-                Engine::CastSpell(SpellIndex::W, wPrediction.position);
+                Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -310,7 +310,7 @@ public:
             Modules::prediction::PredictionOutput rPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.AsheR, rPrediction))
             {
-                Engine::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastToPosition(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
             }
         }

@@ -221,7 +221,7 @@ public:
 
                 if (GetPrediction(database.NautilusQ, qPrediction))
                 {
-                    Engine::CastSpell(SpellIndex::Q, qPrediction.position);
+                    Engine::CastToPosition(SpellIndex::Q, qPrediction.position);
                     QCastedTime = gameTime;
                 }
             }
@@ -235,7 +235,7 @@ public:
 
         if (pEnemy && gameTime > WCastedTime + database.NautilusW.GetCastTime())
         {
-        	Engine::CastSpell(SpellIndex::W);
+        	Engine::CastSelf(SpellIndex::W);
             WCastedTime = gameTime;
         }
     }
@@ -247,7 +247,7 @@ public:
 
         if (pEnemy && gameTime > ECastedTime + database.NautilusE.GetCastTime())
         {
-            Engine::CastSpell(SpellIndex::E);
+            Engine::CastSelf(SpellIndex::E);
             ECastedTime = gameTime;
         }
     }
@@ -261,7 +261,7 @@ public:
         {
             if (Engine::MenuItemContains(NautilusConfig::r_whitelist, pEnemy->GetName().c_str()))
             {
-                Engine::CastSpell(SpellIndex::R, pEnemy);
+                Engine::CastTargeted(SpellIndex::R, pEnemy);
                 RCastedTime = gameTime;
             }
         }
@@ -355,7 +355,7 @@ public:
 	        const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.NautilusQ.GetRange());
             if (qMonster && gameTime > QCastedTime + database.NautilusQ.GetCastTime())
             {
-                Engine::CastSpell(SpellIndex::Q, qMonster->GetPosition());
+                Engine::CastToPosition(SpellIndex::Q, qMonster->GetPosition());
                 QCastedTime = gameTime;
             }
         }
@@ -403,7 +403,7 @@ public:
                 Engine::IsWall(mousePos) 
                 && mousePos.Distance(globals::localPlayer->GetPosition()) <= database.NautilusQ.GetRange())
 	        {
-                Engine::CastSpell(SpellIndex::Q, Engine::GetMouseWorldPos());
+                Engine::CastToPosition(SpellIndex::Q, Engine::GetMouseWorldPos());
                 QCastedTime = gameTime;
 	        }
         }

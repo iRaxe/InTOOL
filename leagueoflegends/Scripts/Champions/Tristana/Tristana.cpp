@@ -179,6 +179,7 @@ void Events::Subscribe() {
 	TryCatch(Event::Subscribe(Event::OnGameTick, &OnGameUpdate), "Error subscribing to OnGameTick event");
 	TryCatch(Event::Subscribe(Event::OnWndProc, &OnWndProc), "Error subscribing to OnWndProc event");
 	TryCatch(Event::Subscribe(Event::OnBeforeAttack, &OnBeforeAttack), "Error subscribing to OnBeforeAttack event");
+	TryCatch(Event::Subscribe(Event::OnCastSpell, &OnCastSpell), "Error subscribing to OnCastSpell event");
 }
 
 void Events::Unsubscribe() {
@@ -186,6 +187,7 @@ void Events::Unsubscribe() {
 	TryCatch(Event::UnSubscribe(Event::OnGameTick, &OnGameUpdate), "Error unsubscribing to OnGameTick event");
 	TryCatch(Event::UnSubscribe(Event::OnWndProc, &OnWndProc), "Error unsubscribing to OnWndProc event");
 	TryCatch(Event::UnSubscribe(Event::OnBeforeAttack, &OnBeforeAttack), "Error unsubscribing to OnBeforeAttack event");
+	TryCatch(Event::UnSubscribe(Event::OnCastSpell, &OnCastSpell), "Error unsubscribing to OnCastSpell event");
 }
 
 void Functions::UseQ(Object* obj) {
@@ -200,7 +202,7 @@ void Functions::UseQ(Object* obj) {
 
 	if (obj->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetQRange()) return;
 
-	Engine::CastSpell(SpellIndex::Q);
+	Engine::CastSelf(SpellIndex::Q);
 	QCastedTime = gameTime;
 }
 
@@ -217,14 +219,14 @@ void Functions::UseW(Object* obj) {
 	if (obj->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetWRange()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
-		Engine::CastSpell(SpellIndex::W, obj->GetPosition());
+		Engine::CastToPosition(SpellIndex::W, obj->GetPosition());
 		WCastedTime = gameTime;
 		return;
 	}
 
 	Modules::prediction::PredictionOutput wPrediction;
 	if (GetPrediction(database.TristanaW, wPrediction)) {
-		Engine::CastSpell(SpellIndex::W, wPrediction.position);
+		Engine::CastToPosition(SpellIndex::W, wPrediction.position);
 		WCastedTime = gameTime;
 	}
 }
@@ -241,7 +243,7 @@ void Functions::UseE(Object* obj) {
 
 	if (obj->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetERange()) return;
 
-	Engine::CastSpell(SpellIndex::E, obj);
+	Engine::CastTargeted(SpellIndex::E, obj);
 	ECastedTime = gameTime;
 }
 
@@ -257,7 +259,7 @@ void Functions::UseR(Object* obj) {
 
 	if (obj->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetRRange()) return;
 
-	Engine::CastSpell(SpellIndex::R, obj);
+	Engine::CastTargeted(SpellIndex::R, obj);
 	RCastedTime = gameTime;
 }
 
@@ -370,29 +372,29 @@ void Events::OnGameUpdate() {
 void Events::OnWndProc(UINT msg, WPARAM param) {
 	if (param == OrbwalkerConfig::comboKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: Modes::Combo(); break;
-		case WM_KEYUP: break;
+			case WM_KEYDOWN: Modes::Combo(); break;
+			case WM_KEYUP: break;
 		}
 	}
 
 	if (param == OrbwalkerConfig::harassKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: Modes::Harass(); break;
-		case WM_KEYUP: break;
+			case WM_KEYDOWN: Modes::Harass(); break;
+			case WM_KEYUP: break;
 		}
 	}
 
 	if (param == OrbwalkerConfig::laneClearKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: Modes::Clear(); break;
-		case WM_KEYUP: break;
+			case WM_KEYDOWN: Modes::Clear(); break;
+			case WM_KEYUP: break;
 		}
 	}
 
 	if (param == OrbwalkerConfig::fastClearKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: Modes::Clear(); break;
-		case WM_KEYUP: break;
+			case WM_KEYDOWN: Modes::Clear(); break;
+			case WM_KEYUP: break;
 		}
 	}
 
@@ -575,6 +577,22 @@ void Events::OnBeforeAttack() {
 			if (qTarget != nullptr) {
 				Functions::UseQ(qTarget);
 			}
+		}
+	}
+}
+
+void Events::OnCastSpell(SpellCast* spellCastInfo) {
+	if (TristanaCombo::UseE->Value == false) return;
+	if (Engine::GetSpellState(SpellIndex::E) != 0) return;
+	if (spellCastInfo == nullptr) return;
+	if (spellCastInfo->GetCasterHandle() != globals::localPlayer->GetHandle()) return;
+	if (spellCastInfo->GetSpellId() != SpellIndex::W) return;
+
+	const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetERange());
+	if (eTarget != nullptr) {
+		if (eTarget->GetDistanceTo(globals::localPlayer) <= TristanaSpellsSettings::GetERange()) {
+			Engine::CastTargeted(SpellIndex::E, eTarget);
+			ECastedTime = gameTime;
 		}
 	}
 }

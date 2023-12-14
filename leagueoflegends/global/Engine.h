@@ -103,12 +103,16 @@ namespace Engine
 	void TryRightClick(Vector2 pos);
 	void IssueClick(Vector2 pos);
 	void IssueMove(Vector2 pos);
-	bool CastSpell(int spellId, Object* Target);
-	bool CastSpell(int spellId);
-	bool CastSpell(int spellId, Vector3 pos);
-	bool ReleaseSpell(int spellId, Vector3 pos);
 
-	void OldCastSpell(int spellId, Vector3 pos);
+	uintptr_t GetMouseInstance();
+	Vector2 GetMouseInstancePosition();
+	void UpdateMouseInstancePosition(Vector2 newPosition);
+
+	bool CastSelf(SpellIndex slotID);
+	bool CastTargeted(SpellIndex slotID, Object* target);
+	bool CastToPosition(SpellIndex slotID, Vector3 worldPos);
+	
+	bool ReleaseSpell(int spellId, Vector3 pos);
 
 	bool CanSendInput();
 

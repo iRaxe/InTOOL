@@ -32,10 +32,10 @@ namespace render
 			__try { Event::Subscribe(Event::OnBeforeAttack, Modules::Champions::DoAfterAttack); }
 			__except (1) { LOG("[Event Handler - Add] Error in DoAfterAttack "); }
 
-			__try { Event::Subscribe(Event::OnCreateSpell, Modules::Champions::DoCreateMissile); }
+			__try { Event::Subscribe(Event::OnCastSpell, Modules::Champions::DoCreateMissile); }
 			__except (1) { LOG("[Event Handler - Add] Error in DoCreateMissile "); }
 
-			__try { Event::Subscribe(Event::OnDeleteSpell, Modules::Champions::DoDeleteMissile); }
+			__try { Event::Subscribe(Event::OnFinishCast, Modules::Champions::DoDeleteMissile); }
 			__except (1) { LOG("[Event Handler - Add] Error in DoDeleteMissile "); }
 
 			LOG("OnDraw triggered");

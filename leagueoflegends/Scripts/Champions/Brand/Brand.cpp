@@ -158,14 +158,14 @@ void Functions::UseQ(Object* obj) {
 	if (obj->GetDistanceTo(globals::localPlayer) > BrandSpellsSettings::GetQRange()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
-		Engine::CastSpell(SpellIndex::Q, obj->GetPosition());
+		Engine::CastToPosition(SpellIndex::Q, obj->GetPosition());
 		BrandQCastedTime = Brandgametime;
 		return;
 	}
 
 	Modules::prediction::PredictionOutput qPrediction;
 	if (GetPrediction(database.BrandQ, qPrediction)) {
-		Engine::CastSpell(SpellIndex::Q, qPrediction.position);
+		Engine::CastToPosition(SpellIndex::Q, qPrediction.position);
 		BrandQCastedTime = Brandgametime;
 	}
 }
@@ -183,14 +183,14 @@ void Functions::UseW(Object* obj) {
 	if (obj->GetDistanceTo(globals::localPlayer) > BrandSpellsSettings::GetWRange()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
-		Engine::CastSpell(SpellIndex::W, obj->GetPosition());
+		Engine::CastToPosition(SpellIndex::W, obj->GetPosition());
 		BrandWCastedTime = Brandgametime;
 		return;
 	}
 
 	Modules::prediction::PredictionOutput wPrediction;
 	if (GetPrediction(database.BrandW, wPrediction)) {
-		Engine::CastSpell(SpellIndex::W, wPrediction.position);
+		Engine::CastToPosition(SpellIndex::W, wPrediction.position);
 		BrandWCastedTime = Brandgametime;
 	}
 }
@@ -207,7 +207,7 @@ void Functions::UseE(Object* obj) {
 
 	if (obj->GetDistanceTo(globals::localPlayer) > BrandSpellsSettings::GetERange()) return;
 
-	Engine::CastSpell(SpellIndex::E, obj);
+	Engine::CastTargeted(SpellIndex::E, obj);
 	BrandECastedTime = Brandgametime;
 }
 
@@ -223,7 +223,7 @@ void Functions::UseR(Object* obj) {
 
 	if (obj->GetDistanceTo(globals::localPlayer) > BrandSpellsSettings::GetRRange()) return;
 
-	Engine::CastSpell(SpellIndex::R, obj);
+	Engine::CastTargeted(SpellIndex::R, obj);
 	BrandRCastedTime = Brandgametime;
 }
 

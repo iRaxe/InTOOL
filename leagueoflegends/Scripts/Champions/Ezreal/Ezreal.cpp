@@ -284,7 +284,7 @@ public:
             Modules::prediction::PredictionOutput qPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealQ, qPrediction))
             {
-                Engine::CastSpell(SpellIndex::Q, qPrediction.position);
+                Engine::CastToPosition(SpellIndex::Q, qPrediction.position);
                 QCastedTime = gameTime;
             }
         }
@@ -300,7 +300,7 @@ public:
             Modules::prediction::PredictionOutput wPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealW, wPrediction))
             {
-                Engine::CastSpell(SpellIndex::W, wPrediction.position);
+                Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -313,7 +313,7 @@ public:
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < eRange() && isTimeToCastE())
         {
-            Engine::CastSpell(SpellIndex::E, Engine::GetMouseWorldPos());
+            Engine::CastToPosition(SpellIndex::E, Engine::GetMouseWorldPos());
             ECastedTime = gameTime;
         }
     }
@@ -328,7 +328,7 @@ public:
             Modules::prediction::PredictionOutput rPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealR, rPrediction))
             {
-                Engine::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastToPosition(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
             }
         }
@@ -458,7 +458,7 @@ public:
             const Vector3 pathEnd = Engine::GetMouseWorldPos();
             if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f) && isTimeToCastE())
             {
-                Engine::CastSpell(SpellIndex::E, Engine::GetMouseWorldPos());
+                Engine::CastToPosition(SpellIndex::E, Engine::GetMouseWorldPos());
                 ECastedTime = gameTime;
             }
         }

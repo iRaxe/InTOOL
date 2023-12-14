@@ -184,13 +184,13 @@ public:
         if (target && target->GetDistanceTo(globals::localPlayer) < qRange())
         {
             if (target->IsMinion()) {
-                Engine::CastSpell(SpellIndex::Q, target->GetPosition());
+                Engine::CastToPosition(SpellIndex::Q, target->GetPosition());
                 QCastedTime = gameTime;
                 return;
             }
 
             if (target->IsJungle() && !(target->GetName().find("Mini") != std::string::npos)) {
-                Engine::CastSpell(SpellIndex::Q, target->GetPosition());
+                Engine::CastToPosition(SpellIndex::Q, target->GetPosition());
                 QCastedTime = gameTime;
                 return;
             }
@@ -198,7 +198,7 @@ public:
             Modules::prediction::PredictionOutput predOut;
 
             if (GetPrediction(globals::localPlayer, target, database.AmumuQ, predOut)) {
-                Engine::CastSpell(SpellIndex::Q, predOut.position);
+                Engine::CastToPosition(SpellIndex::Q, predOut.position);
                 QCastedTime = gameTime;
             }
         }
@@ -213,11 +213,11 @@ public:
         bool isAuraOfDespairActive = HasAuraOfDespairBuff();
 
         if (enemiesInRange > 0 && !isAuraOfDespairActive) {
-            Engine::CastSpell(SpellIndex::W);
+            Engine::CastSelf(SpellIndex::W);
             WCastedTime = gameTime;
         }
         else if (enemiesInRange == 0 && isAuraOfDespairActive) {
-            Engine::CastSpell(SpellIndex::W);
+            Engine::CastSelf(SpellIndex::W);
             WCastedTime = gameTime;
         }
     }
@@ -227,7 +227,7 @@ public:
             return;
 
         if (target && target->GetDistanceTo(globals::localPlayer) < eRange()) {
-            Engine::CastSpell(SpellIndex::E);
+            Engine::CastSelf(SpellIndex::E);
             ECastedTime = gameTime;
         }
     }
@@ -238,7 +238,7 @@ public:
 
         if (target && target->GetDistanceTo(globals::localPlayer) < rRange())
         {
-            Engine::CastSpell(SpellIndex::R);
+            Engine::CastSelf(SpellIndex::R);
             RCastedTime = gameTime;
         }
     }
@@ -328,12 +328,12 @@ public:
             // Toggle W basierend auf Bedingungen
             if ((enemiesInRange > 0 || jungleMonstersInRange > 0) && !isAuraOfDespairActive) {
                 // Toggle W aktivieren
-                Engine::CastSpell(SpellIndex::W);
+                Engine::CastSelf(SpellIndex::W);
                 WCastedTime = gameTime;
             }
             else if ((enemiesInRange == 0 && jungleMonstersInRange == 0) && isAuraOfDespairActive) {
                 // Toggle W deaktivieren, wenn keine Gegner in Reichweite sind und Aura aktiv ist
-                Engine::CastSpell(SpellIndex::W);
+                Engine::CastSelf(SpellIndex::W);
                 WCastedTime = gameTime;
             }
 

@@ -263,7 +263,7 @@ public:
             Modules::prediction::PredictionOutput qPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.ThreshQ, qPrediction))
             {
-                Engine::CastSpell(SpellIndex::Q, qPrediction.position);
+                Engine::CastToPosition(SpellIndex::Q, qPrediction.position);
                 QCastedTime = gameTime;
             }
         }
@@ -279,7 +279,7 @@ public:
             Modules::prediction::PredictionOutput wPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.ThreshW, wPrediction))
             {
-                Engine::CastSpell(SpellIndex::W, wPrediction.position);
+                Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -295,7 +295,7 @@ public:
             Modules::prediction::PredictionOutput ePrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.ThreshE, ePrediction))
             {
-                Engine::CastSpell(SpellIndex::E, ePrediction.position);
+                Engine::CastToPosition(SpellIndex::E, ePrediction.position);
                 WCastedTime = gameTime;
             }
         }
@@ -317,9 +317,9 @@ public:
             {
                 const auto allyPos = enemyPos.Extend(ally->GetPosition(), 800);
                 if (Modules::prediction::IsSpecificObjectInWay(ally->GetPosition(), enemyPos, globals::localPlayer, database.ThreshE.GetRadius()))
-                    Engine::CastSpell(SpellIndex::E, allyPos);
+                    Engine::CastToPosition(SpellIndex::E, allyPos);
                 else if (pEnemy->GetDistanceTo(ally) < globals::localPlayer->GetDistanceTo(ally))
-                    Engine::CastSpell(SpellIndex::E, enemyPos);
+                    Engine::CastToPosition(SpellIndex::E, enemyPos);
             }
             else
             {
@@ -328,9 +328,9 @@ public:
                 {
                     const auto allyPos = enemyPos.Extend(allyTower->GetPosition(), 800);
                     if (Modules::prediction::IsSpecificObjectInWay(allyTower->GetPosition(), enemyPos, globals::localPlayer, database.ThreshE.GetRadius()))
-                        Engine::CastSpell(SpellIndex::E, allyPos);
+                        Engine::CastToPosition(SpellIndex::E, allyPos);
                     else if (pEnemy->GetDistanceTo(allyTower) < globals::localPlayer->GetDistanceTo(allyTower))
-                        Engine::CastSpell(SpellIndex::E, enemyPos);
+                        Engine::CastToPosition(SpellIndex::E, enemyPos);
                 }
                 else
                 {
@@ -339,10 +339,10 @@ public:
                     {
                         //Use for pull to thresh
                         const auto pullPos = enemyPos.Extend(globals::localPlayer->GetPosition(), 800);
-                        Engine::CastSpell(SpellIndex::E, pullPos);
+                        Engine::CastToPosition(SpellIndex::E, pullPos);
                     }
                     else
-                        Engine::CastSpell(SpellIndex::E, enemyPos);
+                        Engine::CastToPosition(SpellIndex::E, enemyPos);
                 }
             }
             ECastedTime = gameTime;
@@ -359,7 +359,7 @@ public:
             Modules::prediction::PredictionOutput rPrediction;
             if (GetPrediction(globals::localPlayer, pEnemy, database.ThreshR, rPrediction))
             {
-                Engine::CastSpell(SpellIndex::R, rPrediction.position);
+                Engine::CastToPosition(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
             }
         }
@@ -464,7 +464,7 @@ public:
             const Vector3 pathEnd = Engine::GetMouseWorldPos();
             if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f) && isTimeToCastE())
             {
-                Engine::CastSpell(SpellIndex::E, Engine::GetMouseWorldPos());
+                Engine::CastToPosition(SpellIndex::E, Engine::GetMouseWorldPos());
                 ECastedTime = gameTime;
             }
         }

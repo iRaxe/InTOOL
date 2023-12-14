@@ -13,23 +13,25 @@ public:
 		OnGameStart,
 		OnGameTick,
 
-		OnCreateSpell,
-		OnImpactSpell,
-		OnDeleteSpell,
-		OnCreateObject,
-		OnDeleteObject,
-		OnIssueOrder,
-		OnIssueMove,
-		OnCastSpell,
-		OnSpellCast,
-		OnDoCast,
-		OnDoCastDelayed,
 		OnProcessSpell,
-		OnPlayAnimation,
+
+		OnCastSpell,
+		OnImpactSpell,
 		OnFinishCast,
-		OnStopCast,
+
 		OnBeforeAttack,
 		OnAfterAttack,
+
+		OnCreateObject,
+		OnDeleteObject,
+
+		OnIssueMove,
+
+		OnDoCast,
+		OnDoCastDelayed,
+		OnPlayAnimation,
+		
+		
 		OnReleaseSpell,
 		OnGapCloserSpell,
 		OnInterruptibleSpell,

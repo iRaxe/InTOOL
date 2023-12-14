@@ -230,7 +230,7 @@ public:
         auto handleSpellCast = [&](Skillshot spellData) {
             Modules::prediction::PredictionOutput prediction;
             if (GetPrediction(globals::localPlayer, pEnemy, spellData, prediction))
-                Engine::CastSpell(spellID, prediction.position);
+                Engine::CastToPosition(spellID, prediction.position);
             };
 
         switch (spellID) {
@@ -244,7 +244,7 @@ public:
             WCastedTime = gameTime;
             break;
         case E:
-            Engine::CastSpell(E, Engine::GetMouseWorldPos());
+            Engine::CastToPosition(E, Engine::GetMouseWorldPos());
             ECastedTime = gameTime;
             break;
         case R:
@@ -270,7 +270,7 @@ public:
         {
             if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 0 && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 1)
             {
-                Engine::CastSpell(SpellIndex::Q);
+                Engine::CastSelf(SpellIndex::Q);
             }
         }
     }
@@ -282,7 +282,7 @@ public:
             const auto attackedTarget = Engine::GetSelectedObject();
             if (attackedTarget != nullptr)
             {
-                Engine::CastSpell(SpellIndex::E);
+                Engine::CastSelf(SpellIndex::E);
             }
 
         }
@@ -291,7 +291,7 @@ public:
         {
             if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange())== 0 && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 1)
             {
-                Engine::CastSpell(SpellIndex::Q);
+                Engine::CastSelf(SpellIndex::Q);
             }
         }
 
@@ -303,7 +303,7 @@ public:
         if (KaisaConfig::EConfig::ComboE->Value == 1 && database.KaisaE.IsCastable())
         {
             if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
-                Engine::CastSpell(SpellIndex::E);
+                Engine::CastSelf(SpellIndex::E);
         }
 
         if (KaisaConfig::WConfig::ComboW->Value == 0 && database.KaisaW.IsCastable())
@@ -357,7 +357,7 @@ public:
                                 {
                                     highestDistance = Vector3(pX, pY, pZ).distanceTo(rTarget->GetPosition());
                                     bestPoint = Vector3(pX, pY, pZ);
-                                    Engine::CastSpell(R, bestPoint);
+                                    Engine::CastToPosition(R, bestPoint);
                                     RCastedTime = gameTime;
                                 }
 
@@ -367,7 +367,7 @@ public:
                                 highestDistance = Vector3(pX, pY, pZ).distanceTo(rTarget->GetPosition());
                                 bestPoint = Vector3(pX, pY, pZ);
 
-                                Engine::CastSpell(R, bestPoint);
+                                Engine::CastToPosition(R, bestPoint);
                                 RCastedTime = gameTime;
                             }
 
@@ -395,7 +395,7 @@ public:
 
             if (KaisaConfig::KaisaClear::UseQ->Value == true && database.KaisaQ.IsCastable())
             {
-                Engine::CastSpell(SpellIndex::Q);
+                Engine::CastSelf(SpellIndex::Q);
             }
         }
 
@@ -467,7 +467,7 @@ public:
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 350.0f))
                     {
-                        Engine::CastSpell(SpellIndex::E);
+                        Engine::CastSelf(SpellIndex::E);
                     }
                 }
             }
@@ -489,7 +489,7 @@ public:
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
                     if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 350.0f))
                     {
-                        Engine::CastSpell(SpellIndex::E);
+                        Engine::CastSelf(SpellIndex::E);
                     }
                 }
             }

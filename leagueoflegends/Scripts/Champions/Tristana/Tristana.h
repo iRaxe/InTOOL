@@ -84,6 +84,7 @@ namespace UPasta {
                 void OnGameUpdate();
                 void OnWndProc(UINT msg, WPARAM param);
                 void OnBeforeAttack();
+                void OnCastSpell(SpellCast* spellCastInfo);
 
                 void OnDraw();
                 void OnCreateMissile(Object* unit);
@@ -91,7 +92,7 @@ namespace UPasta {
                 void OnCreateObject(Object* unit);
                 void OnDeleteObject(Object* unit);
                 void OnIssueOrder(Object* unit, OrbwalkState order, Vector3* position, Object* target);
-                void OnCastSpell(void* spellbook, SpellInfo* pSpellInfo, SpellIndex slot, Vector3* _end_position, Vector3* _start_position, DWORD netId);
+                //void OnCastSpell(void* spellbook, SpellInfo* pSpellInfo, SpellIndex slot, Vector3* _end_position, Vector3* _start_position, DWORD netId);
                 void OnSpellCast(SpellIndex slot);
                 void OnDoCast(SpellInfo* castInfo, SpellData* spellData);
                 void OnDoCastDelayed(SpellInfo* castInfo, SpellData* spellData);

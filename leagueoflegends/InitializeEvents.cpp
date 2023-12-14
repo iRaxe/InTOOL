@@ -56,7 +56,7 @@ namespace UPasta
 				{
 					switch (state) {
 						case 12:
-							Event::Publish(Event::OnCreateSpell, spellCastInfo);
+							Event::Publish(Event::OnCastSpell, spellCastInfo);
 						break;
 
 						case 13:
@@ -64,7 +64,7 @@ namespace UPasta
 						break;
 
 						case 17:
-							Event::Publish(Event::OnDeleteSpell, spellCastInfo);
+							Event::Publish(Event::OnFinishCast, spellCastInfo);
 						break;
 					}
 				}
