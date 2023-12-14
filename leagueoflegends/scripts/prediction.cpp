@@ -52,7 +52,7 @@ namespace Modules::prediction
 				}
 			}
 		}
-		else if (sourceObject->IsHero()) {
+		else if (sourceObject->IsMinion()) {
 			for (auto minion : ObjectManager::GetMinionsAs(team)) {
 				if (!minion) continue;
 				if (IsSpecificObjectInWay(sourcePos, targetPos, sourceObject, pathRadius)) {
@@ -124,25 +124,36 @@ namespace Modules::prediction
 		return waypoints.front();
 	}
 
-	Vector3 PredictTargetPosition(Object* targetObj, float predictionTime)
+	Vector3 PredictTargetPosition(Object* targetObj, float predictionTime) {
+
+		const auto path = targetObj->GetAiManager()->GetFutureSegments();
+		const int countSegments = static_cast<int>(path.size());
+		if (countSegments <= 0)
+			return targetObj->GetAiManager()->GetPosition();
+
+		const auto aiManager = targetObj->GetAiManager();
+		for (int i = 0; i < countSegments; i++)
+		{
+			Vector3 currentPosition = path[i];
+			const float velocityMagnitude = aiManager->GetVelocity();
+			const Vector3 velocityVector = currentPosition * velocityMagnitude;
+			const Vector3 predictedPosition = currentPosition + (velocityVector * predictionTime);
+			return predictedPosition;
+		}
+		
+		return targetObj->GetAiManager()->GetPosition();
+	}
+
+	/*Vector3 PredictTargetPosition(Object* targetObj, float predictionTime)
 	{
 		const auto aiManager = targetObj->GetAiManager();
-
 		Vector3 currentPosition = aiManager->GetPosition();
 		float velocityMagnitude = aiManager->GetVelocity(); // Velocity magnitude
-
-		
 		Vector3 direction = aiManager->GetDirection().Normalized();
-
-		// Create the velocity vector
 		Vector3 velocityVector = direction * velocityMagnitude;
-
-		// Calculate the predicted position
 		Vector3 predictedPosition = currentPosition + (velocityVector * predictionTime);
-
-
 		return predictedPosition;
-	}
+	}*/
 
 	bool GetPrediction(Skillshot& skillshot, Modules::prediction::PredictionOutput &out)
 	{

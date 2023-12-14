@@ -142,7 +142,6 @@ void Events::Unsubscribe() {
 	TryCatch(Event::UnSubscribe(Event::OnDraw, &OnDraw), "Error unsubscribing to OnDraw event");
 	TryCatch(Event::UnSubscribe(Event::OnGameTick, &OnGameUpdate), "Error unsubscribing to OnGameTick event");
 	TryCatch(Event::UnSubscribe(Event::OnWndProc, &OnWndProc), "Error unsubscribing to OnWndProc event");
-
 	//TryCatch(Event::UnSubscribe(Event::OnProcessSpell, &OnProcessSpell), "Error unsubscribing to OnProcessSpell event");
 }
 

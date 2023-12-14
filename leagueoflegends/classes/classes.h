@@ -394,6 +394,7 @@ public:
 	bool IsInAARange();
 	bool CanCastSpell(int slotId);
 	bool HasBuff(const char* buffname);
+	bool IsFacing(Object* secondObj, float angle);
 	Vector3 GetPosition();
 	Buff* GetBuffByName(std::string name);
 	Buff* GetBuffByType(BuffType type);
@@ -503,7 +504,6 @@ public:
 	};
 
 	TYPE GetType();
-	HeroStatsCollectionManager* GetHeroStats();
 };
 
 class ObjectManager

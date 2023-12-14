@@ -973,6 +973,21 @@ bool Object::HasBuff(const char* buffname) {
 	return Engine::Read<bool>(RVA(UPasta::Offsets::Functions::Stats::HasBuff)), this, 0, RealNameInHash(buffname);
 }
 
+bool Object::IsFacing(Object* secondObj, float angle)
+{
+	if (this == nullptr) return false;
+	if (secondObj == nullptr) return false;
+
+	const int currentSegment = this->GetAiManager()->GetCurrentSegment();
+	const Vector3 segmentToCheck = this->GetAiManager()->GetSegment(currentSegment);
+	if (!segmentToCheck.IsValid()) return false;
+
+	const Vector3 directionPos = this->GetAiManager()->GetPosition().Extend(segmentToCheck, 400.0f);
+	if (!directionPos.IsValid()) return false;
+
+	return render::AngleBetween3point(this->GetAiManager()->GetPosition(), directionPos, secondObj->GetAiManager()->GetPosition()) <= angle / 2;
+}
+
 int Object::GetBuffListSize() {
 	return static_cast<int>((QWORD)this->GetBuffManagerEntriesEnd() - (QWORD)this->GetBuffManager()) / static_cast<int>(
 		sizeof(QWORD));

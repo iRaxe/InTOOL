@@ -426,6 +426,7 @@ public:
         Killsteal();
         AntiGapCloser(); 
         AntiMelee();
+        
         //LOG("AAAA %s", globals::localPlayer->GetSpellBySlotId(0)->GetSpellInfo()->GetSpellData()->GetTexturePath().c_str());
 
         //LOG("%f", Functions::GetSpellRange(globals::localPlayer->GetSpellBySlotId(1)));
