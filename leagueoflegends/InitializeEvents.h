@@ -7,7 +7,7 @@ namespace UPasta
 		namespace Initialization
 		{
 			void OnInject();
-			void OnProcessManagement(uintptr_t state, SpellCast* cast);
+			void OnProcessManagement(int state, SpellCast* spellCastInfo);
 			void OnDraw();
 			void OnGameTick();
 			void OnMenu();

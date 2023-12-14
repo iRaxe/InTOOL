@@ -4,6 +4,7 @@
 #include "Experience.h"
 #include "LastHitDamage.h"
 #include "LastPosition.h"
+#include "ListManager.h"
 #include "Path.h"
 #include "Sidebar.h"
 
@@ -25,6 +26,34 @@ void Awarenesss::InitializeWardPosDrawingsMenu()
 	Configs::EnemyTracker::showWardRange = WardPosMenu->AddCheckBox("showWardRange", "Show ward range", true);
 }
 
+//TODO: MOVE IN A PROPER FILE
+void Awarenesss::PushCooldowns(int state, SpellCast* spellCastInfo) {
+	if (spellCastInfo == nullptr) return;
+	if (state != 12) return;
+	if (spellCastInfo->GetCasterHandle() == globals::localPlayer->GetHandle()) return;
+	if (spellCastInfo->IsAutoAttack()) return;
+
+	const auto caster = ObjectManager::GetClientByHandle(spellCastInfo->GetCasterHandle());
+	if (caster == nullptr) return;
+	if (!caster->IsHero()) return;
+	if (caster->IsAlly()) return;
+
+	const auto spellID = spellCastInfo->GetSpellId();
+	if (spellID < 0 || spellID > 5) return;
+
+	Spell* spell = caster->GetSpellBySlotId(spellID);
+	if (spell == nullptr) return;
+
+	const int spellLevel = spell->GetLevel();
+	if (spellLevel == 0) return;
+
+	const auto cooldownValue = spell->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(spellLevel)->GetBaseCooldown();
+
+	const auto reduction = 100 / (100 + caster->ReadClientStat(Object::AbilityHaste));
+	const auto readyAt = Engine::GetGameTime() + cooldownValue * reduction;
+	ListManager::Functions::InsertCooldown(caster, spellID, readyAt);
+}
+
 void Awarenesss::Initialize()
 {
 	HPBar::InitializeMenu();
@@ -36,4 +65,6 @@ void Awarenesss::Initialize()
 	Sidebar::InitializeMenu();
 
 	InitializeWardPosDrawingsMenu();
+	TryCatch(Event::Subscribe(Event::OnProcessSpell, &PushCooldowns), "Error subscribing to OnProcessSpell event for cooldowns");
+
 }

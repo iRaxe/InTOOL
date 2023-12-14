@@ -10,79 +10,15 @@ inline uintptr_t pOnProcessSpellCast;
 
 inline VMTHook VMTHOnProcessSpellCast[10];
 
-//int __fastcall hkOnProcessSpellCast(void* spell_book, void* edx, SpellCast* spellCastInfo) noexcept
-int __fastcall hkOnProcessSpellCast(void* spell_book, void* edx, SpellCast* spellCastInfo, uintptr_t* obj)
+__int64 __fastcall hkOnProcessSpellCast(__int64 spell_book, int state, SpellCast* spellCastInfo, __int64 a6) noexcept
 {
-	static auto fn = reinterpret_cast<int(__fastcall*)(void*, void*, SpellCast*, uintptr_t*)>(pOnProcessSpellCast);
-	if (spellCastInfo != nullptr)
-	{
-		const auto caster = ObjectManager::GetClientByHandle(spellCastInfo->GetCasterHandle());
-		if (caster != nullptr)
-		{
-			if (!caster->IsAlly() || !spellCastInfo->IsAutoAttack()) {
-				Event::Publish(Event::OnProcessSpell, obj, spellCastInfo);
+	//STATE 12: ONCREATE | 13: ONSPELLIMPACT | 17: ONDELETE
+	auto res = reinterpret_cast<__int64(*)(__int64, int, SpellCast*, __int64)>(pOnProcessSpellCast)(spell_book, state, spellCastInfo, a6);
 
-				const auto spellID = spellCastInfo->GetSpellId();
-				if (spellID >= 0 && spellID <= 5)
-				{
-					Spell* spell = caster->GetSpellBySlotId(spellID);
-					const int spellLevel = spell->GetLevel();
-					const auto cooldownValue = spell->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(spellLevel)->GetBaseCooldown();
+	Event::Publish(Event::OnProcessSpell, state, spellCastInfo);
 
-					const auto reduction = 100 / (100 + caster->ReadClientStat(Object::AbilityHaste));
-					const auto readyAt = Engine::GetGameTime() + cooldownValue * reduction;
-					UPasta::SDK::ListManager::Functions::InsertCooldown(caster, spellID, readyAt);
-				}
-			}
-		}
-	}
-	return fn(spell_book, edx, spellCastInfo, obj);
+	return res;
 }
-
-/*int __fastcall hkOnProcessSpellCast(void* spell_book, void* edx, SpellCast* spellCastInfo)
-{
-	static auto fn = reinterpret_cast<int(__fastcall*)(void*, void*, int,  SpellCast*)>(pOnProcessSpellCast);
-	LOG("%d", state);
-	const int onDelete = reinterpret_cast<int>(edx);
-	if (onDelete == 1649932128)
-	{
-		LOG("ONDELETE TRIGGERED");
-	}
-	
-	if (spellCastInfo != nullptr)
-	{
-
-		// Estrai il nome del campione da spell_book
-		const auto charScriptPtr = *(uintptr_t*)((uintptr_t)spell_book + 0x90);
-		const auto charScriptName = *(char**)(charScriptPtr + 0x8);
-
-		const std::string fullNameStr(charScriptName); // Converte char* in std::string
-		const std::string charName = fullNameStr.substr(10); // Rimuovi i primi 10 caratteri (la lunghezza di "CharScript")
-
-		// Estrai le informazioni sul cast dell'abilità
-		SpellInfo* spellInfo = spellCastInfo->GetProcessSpellInfo();
-		const auto spellData = spellInfo->GetSpellData();
-		const auto spellName = spellData->GetName();
-
-		// Ottieni il numero dello slot dell'abilità
-		const int spellSlot = Engine::getCooldownData<int>(charName, spellName);
-		if (spellSlot >= 0)
-		{
-			Object* spellCaster = Engine::GetPlayerPointer(charName);
-			Spell* spell = spellCaster->GetSpellBySlotId(spellSlot);
-			const int spellLevel = spell->GetLevel();
-			const auto cooldownValue = spell->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(spellLevel)->GetBaseCooldown();
-
-			// Calcola il tempo di prontezza
-			const auto reduction = 100 / (100 + spellCaster->GetAbilityHaste());
-			const auto readyAt = Engine::GetGameTime() + cooldownValue * reduction;
-			UPasta::SDK::ListManager::Functions::InsertCooldown(spellCaster, spellSlot, readyAt);
-		}
-		return fn(spell_book, edx, state,  spellCastInfo);
-	}
-
-	return fn(spell_book, edx,  spellCastInfo);
-}*/
 
 inline void HookOnProcessSpellCast()
 {
@@ -93,8 +29,7 @@ inline void HookOnProcessSpellCast()
 		for (Object* obj : *globals::heroManager)
 		{
 			uintptr_t dwOnProcessSpell = (uintptr_t)obj + UPasta::Offsets::Events::Spellcast::ProcessIndex;
-			pOnProcessSpellCast = VMTHOnProcessSpellCast[i].Hook((void*)dwOnProcessSpell, 29, (uintptr_t)&hkOnProcessSpellCast);
-			//LOG("\nSuccessfully hooked OnProcessSpellCast of: %s", obj->GetName().c_str());
+			pOnProcessSpellCast = VMTHOnProcessSpellCast[i].Hook((void*)dwOnProcessSpell, 30, (uintptr_t)&hkOnProcessSpellCast);
 			i++;
 
 		}

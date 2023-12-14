@@ -426,7 +426,6 @@ public:
         Killsteal();
         AntiGapCloser(); 
         AntiMelee();
-        Engine::PrintChat(std::to_string(globals::localPlayer->GetActiveSpellCast()->GetSpellId()));
         //LOG("AAAA %s", globals::localPlayer->GetSpellBySlotId(0)->GetSpellInfo()->GetSpellData()->GetTexturePath().c_str());
 
         //LOG("%f", Functions::GetSpellRange(globals::localPlayer->GetSpellBySlotId(1)));

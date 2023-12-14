@@ -38,36 +38,33 @@ namespace UPasta
 				__except (1) { LOG("[Event Handler - Add] Error in hooking OnProcessSpellSound"); }
 			}
 
-			void OnProcessManagement(uintptr_t state, SpellCast* cast)
-			{
-				if (cast->GetCasterHandle() != globals::localPlayer->GetHandle()) return;
-				if (cast->IsAutoAttack())
+			void OnProcessManagement(int state, SpellCast* spellCastInfo) {
+				if (spellCastInfo == nullptr) return;
+				if (spellCastInfo->IsAutoAttack())
 				{
-					switch ((int)state) {
-						case 0:
-						case 1344:
-							Event::Publish(Event::OnBeforeAttack);
+					switch (state) {
+						case 12:
+							Event::Publish(Event::OnBeforeAttack, spellCastInfo);
 						break;
 
-						case 50:
-						case 107:
-						case 119:
-							Event::Publish(Event::OnAfterAttack);
+						case 17:
+							Event::Publish(Event::OnAfterAttack, spellCastInfo);
 						break;
 					}
 				}
 				else
 				{
-					switch ((int)state) {
-						case 0:
-						case 1344:
-							Event::Publish(Event::OnCreateMissile);
+					switch (state) {
+						case 12:
+							Event::Publish(Event::OnCreateSpell, spellCastInfo);
 						break;
 
-						case 50:
-						case 107:
-						case 119:
-							Event::Publish(Event::OnDeleteMissile);
+						case 13:
+							Event::Publish(Event::OnImpactSpell, spellCastInfo);
+						break;
+
+						case 17:
+							Event::Publish(Event::OnDeleteSpell, spellCastInfo);
 						break;
 					}
 				}

@@ -6,6 +6,7 @@ class Awarenesss
 	static inline ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize;
 
 	static void InitializeWardPosDrawingsMenu();
+	static void PushCooldowns(int state, SpellCast* spellCastInfo);
 
 public:
 	class HPBar;

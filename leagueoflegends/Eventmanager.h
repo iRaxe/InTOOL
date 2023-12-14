@@ -13,8 +13,9 @@ public:
 		OnGameStart,
 		OnGameTick,
 
-		OnCreateMissile,
-		OnDeleteMissile,
+		OnCreateSpell,
+		OnImpactSpell,
+		OnDeleteSpell,
 		OnCreateObject,
 		OnDeleteObject,
 		OnIssueOrder,

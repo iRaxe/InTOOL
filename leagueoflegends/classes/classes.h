@@ -503,7 +503,7 @@ public:
 	};
 
 	TYPE GetType();
-
+	HeroStatsCollectionManager* GetHeroStats();
 };
 
 class ObjectManager
@@ -609,3 +609,5 @@ public:
 
 	static Object* GetClientByHandle(DWORD handle);
 };
+
+

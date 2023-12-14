@@ -443,7 +443,6 @@ namespace Engine
 		return spellId >= 14;
 	}
 
-
 	float GetStat(Object* obj, StatEnum Stat, StatType Type)
 	{
 		auto v2 = (float*)obj + 0xA4;
