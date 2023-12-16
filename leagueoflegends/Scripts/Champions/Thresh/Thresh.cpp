@@ -335,7 +335,7 @@ public:
                 else
                 {
 
-                    if (Thresh_dmgQ(pEnemy) + Thresh_dmgE(pEnemy) + Thresh_dmgR(pEnemy) > pEnemy->ReadClientStat(Object::Health))
+                    if (Thresh_dmgQ(pEnemy) + Thresh_dmgE(pEnemy) + Thresh_dmgR(pEnemy) > pEnemy->GetHealth())
                     {
                         //Use for pull to thresh
                         const auto pullPos = enemyPos.Extend(globals::localPlayer->GetPosition(), 800);
@@ -403,7 +403,7 @@ public:
             /*if (ThreshConfig::ThreshClear::UseQ->Value == true && database.ThreshQ.IsCastable())
             {
                 const auto qTarget = TargetSelector::Functions::GetEnemyMinionInRange(qRange());
-                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Thresh_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->GetHealth() < Thresh_dmgQ(qTarget))
                     Thresh_UseQ(qTarget);
             }*/
         }
@@ -453,7 +453,7 @@ public:
         if (ThreshConfig::ThreshLastHit::UseQ->Value == true && database.ThreshQ.IsCastable())
         {
             const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),qRange(), Alliance::Enemy);
-            if (minion != nullptr && minion->ReadClientStat(Object::Health) < Thresh_dmgQ(minion))
+            if (minion != nullptr && minion->GetHealth() < Thresh_dmgQ(minion))
                 Thresh_UseQ(minion);
         }
     }
@@ -462,7 +462,7 @@ public:
         if (ThreshConfig::ThreshFlee::UseE->Value == true && database.ThreshE.IsCastable())
         {
             const Vector3 pathEnd = Engine::GetMouseWorldPos();
-            if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f) && isTimeToCastE())
+            if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 750.0f && isTimeToCastE())
             {
                 Engine::CastToPosition(SpellIndex::E, Engine::GetMouseWorldPos());
                 ECastedTime = gameTime;
@@ -476,7 +476,7 @@ public:
             if (ThreshConfig::ThreshKillsteal::UseQ->Value == true && database.ThreshQ.IsCastable())
             {
                 const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
-                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Thresh_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->GetHealth() < Thresh_dmgQ(qTarget))
                 {
                     Thresh_UseQ(qTarget);
                 }
@@ -485,7 +485,7 @@ public:
             if (ThreshConfig::ThreshKillsteal::UseR->Value == true && database.ThreshR.IsCastable())
             {
                 const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange());
-                if (rTarget != nullptr && rTarget->ReadClientStat(Object::Health) < Thresh_dmgR(rTarget))
+                if (rTarget != nullptr && rTarget->GetHealth() < Thresh_dmgR(rTarget))
                 {
                     Thresh_UseR(rTarget);
                 }
@@ -512,7 +512,7 @@ public:
                 if (target != nullptr)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f))
+                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 750.0f)
                     {
                         Thresh_UseE(target);
                     }
@@ -531,10 +531,10 @@ public:
                 if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 750.0f) continue;
                 if (!Engine::MenuItemContains(ThreshConfig::ThreshAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))
+                if (target != nullptr && target->GetDistanceTo(globals::localPlayer) < target->GetRealAttackRange())
                 {
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
-                    if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 750.0f))
+                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 750.0f)
                     {
                         Thresh_UseE(target);
                     }
@@ -570,18 +570,6 @@ public:
                     {
                         Thresh_UseQ(object);
                     }
-                }
-            }
-            //Laneclear mode
-            if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Clear)
-            {
-                const auto object = Engine::GetSelectedObject();
-                if (object != nullptr && object->IsBuilding())
-                {
-                   /* if (ThreshConfig::ThreshClear::UseW->Value == true && database.ThreshW.IsCastable() && Thresh_HasEnoughMana(ThreshConfig::ThreshClear::minMana->Value))
-                    {
-                        Thresh_UseW(object);
-                    }*/
                 }
             }
             //Harass mode

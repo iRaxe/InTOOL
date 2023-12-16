@@ -1,15 +1,21 @@
 #pragma once
-#include <string>
 
 namespace Engine
 {
 	extern void* spoof_trampoline;
 
 	template <typename ReturnType, typename... Args>
-	ReturnType call_function(uintptr_t func, Args... args);
+	ReturnType call_function(uintptr_t func, auto... args) {
+		using func_t = ReturnType(__fastcall*)(decltype(args)...);
+		return spoof_call(spoof_trampoline, (func_t)func, std::forward<decltype(args)>(args)...);
+	}
 
-	template <size_t Index, typename ReturnType, typename... Args>
-	ReturnType call_virtual(void* instance, Args... args);
+	template <size_t Index, typename ReturnType>
+	ReturnType call_virtual(void* instance, auto... args) {
+		using fn = ReturnType(__fastcall*)(void*, decltype(args)...);
+		auto function = (*std::bit_cast<fn**>(instance))[Index];
+		return function(instance, std::forward<decltype(args)>(args)...);
+	}
 
 	template <typename T, typename U>
 	T Read(U addr);

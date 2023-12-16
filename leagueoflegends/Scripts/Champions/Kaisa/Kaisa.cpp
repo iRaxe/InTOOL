@@ -353,7 +353,7 @@ public:
                         {
                             if (KaisaConfig::RConfig::Rcond3->Value == 1)
                             {
-                                if (!Vector3(pX, pY, pZ).IsUnderEnemyTower())
+                               // if (!Vector3(pX, pY, pZ).IsUnderEnemyTower())
                                 {
                                     highestDistance = Vector3(pX, pY, pZ).distanceTo(rTarget->GetPosition());
                                     bestPoint = Vector3(pX, pY, pZ);
@@ -437,7 +437,7 @@ public:
                 const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),KaisaConfig::KaisaKillsteal::wksRange->Value);
                 if (wTarget != nullptr
                     && wTarget->GetDistanceTo(globals::localPlayer) <= KaisaConfig::KaisaKillsteal::wksRange->Value
-                    && wTarget->ReadClientStat(Object::Health) < w_dmg(wTarget))
+                    && wTarget->GetHealth() < w_dmg(wTarget))
                 {
                     Kaisa_UseAbility(wTarget, W);
                 }
@@ -465,7 +465,7 @@ public:
                 if (target != nullptr)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 350.0f))
+                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 350.0f)
                     {
                         Engine::CastSelf(SpellIndex::E);
                     }
@@ -484,10 +484,10 @@ public:
                 if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 450.0f) continue;
                 if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))
+                if (target != nullptr && target->GetDistanceTo(globals::localPlayer) < target->GetRealAttackRange())
                 {
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
-                    if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, 350.0f))
+                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 350.0f)
                     {
                         Engine::CastSelf(SpellIndex::E);
                     }

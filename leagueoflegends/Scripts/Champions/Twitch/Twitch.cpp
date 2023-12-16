@@ -198,9 +198,9 @@ public:
                 const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
                 float base = levelSpell * 10 + 10;
                 const int eDMG = 15 + (levelSpell - 1) * 5;
-                float attackDamage = base + (eDMG + (globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * 0.35f) * stacks);
+                float attackDamage = base + (eDMG + (globals::localPlayer->GetBonusAttackDamage() * 0.35f) * stacks);
                 const float pDMG = Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, attackDamage);
-                float abilityPowerDamage = (globals::localPlayer->ReadClientStat(Object::AbilityPower) * .30) * stacks;
+                float abilityPowerDamage = (globals::localPlayer->GetAbilityPower() * .30) * stacks;
 
                 const float aDMG = Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, abilityPowerDamage);
                 return pDMG + aDMG;
@@ -225,14 +225,14 @@ public:
 
         const Vector2 screenPos = Engine::GetHpBarPosition(pEnemy);
 
-        const float endOffset2 = TwitchDamages::xOffset + pEnemy->ReadClientStat(Object::Health) / pEnemy->ReadClientStat(Object::MaxHealth) * TwitchDamages::widthMultiplier;
+        const float endOffset2 = TwitchDamages::xOffset + pEnemy->GetHealth() / pEnemy->GetMaxHealth() * TwitchDamages::widthMultiplier;
         const float damage = Twitch_dmgE(pEnemy);
-        const float startOffset2 = max(endOffset2 - (damage / pEnemy->ReadClientStat(Object::MaxHealth) * TwitchDamages::widthMultiplier), TwitchDamages::xOffset);
+        const float startOffset2 = max(endOffset2 - (damage / pEnemy->GetMaxHealth() * TwitchDamages::widthMultiplier), TwitchDamages::xOffset);
 
         const ImVec2 topLeft = CalculateTopLeft(Vector2(screenPos.x + startOffset2, screenPos.y));
         const ImVec2 bottomRight = CalculateBottomRight(screenPos, endOffset2);
 
-        const float targetHealth = pEnemy->ReadClientStat(Object::Health);
+        const float targetHealth = pEnemy->GetHealth();
         const bool canKill = damage > targetHealth;
         const auto drawColor = canKill ? COLOR_GREEN : COLOR_RED;
         render::RenderRect(topLeft, bottomRight, drawColor, 0.0f, 0, 1.0f, true);
@@ -304,7 +304,7 @@ public:
             const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
             if (eTarget != nullptr)
             {
-                const bool canKillTarget = eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget);
+                const bool canKillTarget = eTarget->GetHealth() + eTarget->GetShield() < Twitch_dmgE(eTarget);
                 const bool shouldUseE = TwitchConfig::TwitchCombo::UseEWithStacks->Value && hasEnoughStacks(eTarget, TwitchConfig::TwitchCombo::minStacks->Value);
 
                 if (canKillTarget || shouldUseE) {
@@ -354,7 +354,7 @@ public:
                 {
                     if (!minion) continue;
                     if (minion->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > eRange()) continue;
-                    if (minion->ReadClientStat(Object::Health) < Twitch_dmgE(minion)) {
+                    if (minion->GetHealth() < Twitch_dmgE(minion)) {
                         kill_count++;
                         if (kill_count >= TwitchConfig::TwitchClear::minMinion->Value) {
                             Twitch_UseE(minion);
@@ -384,10 +384,10 @@ public:
                     if (monster->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > wRange()) continue;
 
                     float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, monster);
-                    totalAAsNeeded += std::ceil(monster->ReadClientStat(Object::Health) / AAdamage);
+                    totalAAsNeeded += std::ceil(monster->GetHealth() / AAdamage);
 
-                    if (monster->ReadClientStat(Object::Health) > highestHp) {
-                        highestHp = monster->ReadClientStat(Object::Health);
+                    if (monster->GetHealth() > highestHp) {
+                        highestHp = monster->GetHealth();
                         highestHpMonster = monster;
                     }
 
@@ -399,7 +399,7 @@ public:
 
                 if (TwitchConfig::TwitchJungle::UseE->Value && isTimeToCastE()) {
                     for (const auto& monster : ObjectManager::GetJungleMonsters()) {
-                        if (monster != nullptr && (monster->ReadClientStat(Object::Health) + monster->ReadClientStat(Object::Shield) < Twitch_dmgE(monster) ||
+                        if (monster != nullptr && (monster->GetHealth() + monster->GetShield() < Twitch_dmgE(monster) ||
                             (TwitchConfig::TwitchJungle::UseEWithStacks->Value && hasEnoughStacks(monster, TwitchConfig::TwitchJungle::minStacks->Value)))) {
                             Twitch_UseE(monster);
                             break;
@@ -429,7 +429,7 @@ public:
             const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
             if (eTarget != nullptr)
             {
-                const bool canKillTarget = eTarget->ReadClientStat(Object::Health) + eTarget->ReadClientStat(Object::Shield) < Twitch_dmgE(eTarget);
+                const bool canKillTarget = eTarget->GetHealth() + eTarget->GetShield() < Twitch_dmgE(eTarget);
                 const bool shouldUseE = TwitchConfig::TwitchCombo::UseEWithStacks->Value && hasEnoughStacks(eTarget, TwitchConfig::TwitchHarass::minStacks->Value);
 
                 if (canKillTarget || shouldUseE) {
@@ -458,7 +458,7 @@ public:
             for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
                 if (!hero) continue;
                 if (hero->GetPosition().Distance(globals::localPlayer->GetPosition()) > eRange() + hero->GetBoundingRadius() / 2) continue;
-                if (hero->ReadClientStat(Object::Health) + hero->ReadClientStat(Object::Shield) < Twitch_dmgE(hero)) {
+                if (hero->GetHealth() + hero->GetShield() < Twitch_dmgE(hero)) {
                     Twitch_UseE(hero);
                     break;
                 }

@@ -29,6 +29,27 @@ typedef unsigned long long QWORD;
 #define STB_IMAGE_IMPLEMENTATION
 #define TryCatch(function, catchError) __try {function;} __except (1){	LOG(catchError); }
 #define Compare(x, y, z) StringCompare(x, y, z)
+
+
+#define CONCAT(a, b) a##b
+#define PAD_NAME(n) CONCAT(pad, n)
+#define PAD(size) \
+private: \
+    std::byte PAD_NAME(__LINE__)[size]; \
+public:
+
+#define CLASS_GETTER(returnType, name, offset) \
+[[nodiscard]] inline returnType name() const noexcept \
+{ \
+	return *reinterpret_cast<returnType*>((QWORD)this + offset); \
+}
+
+#define CLASS_GETTER_P(returnType, name, offset) \
+[[nodiscard]] inline returnType* name() const noexcept \
+{ \
+	return reinterpret_cast<returnType*>((QWORD)this + offset); \
+}
+
 bool StringContains(std::string strA, std::string strB, bool ignore_case = false);
 bool StringContains(std::wstring strA, std::wstring strB, bool ignore_case = false);
 bool StringCompare(std::string strA, std::string strB, bool ignore_case = false);

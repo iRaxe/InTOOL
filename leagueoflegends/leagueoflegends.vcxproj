@@ -189,13 +189,10 @@
     <ClInclude Include="Cooldowns.h" />
     <ClInclude Include="Damage.h" />
     <ClInclude Include="decompress.h" />
-    <ClInclude Include="DecryptMemoryPages.h" />
-    <ClInclude Include="DestroyEvents.h" />
     <ClInclude Include="Awarenesss.h" />
     <ClInclude Include="Evade.h" />
     <ClInclude Include="Experience.h" />
     <ClInclude Include="fa_solid_900.h" />
-    <ClInclude Include="FindHiddenModule.h" />
     <ClInclude Include="font_awesome_5.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="global\colors.h" />
@@ -225,10 +222,8 @@
     <ClInclude Include="imgui_freetype.h" />
     <ClInclude Include="imgui_notify.h" />
     <ClInclude Include="Info.h" />
-    <ClInclude Include="InitializeEvents.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="JustEvade.h" />
-    <ClInclude Include="Kernel.h" />
     <ClInclude Include="KeyBind.h" />
     <ClInclude Include="kiero\kiero.h" />
     <ClInclude Include="kiero\minhook\include\MinHook.h" />
@@ -243,9 +238,7 @@
     <ClInclude Include="LastPosition.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="ListManager.h" />
-    <ClInclude Include="makesyscall.h" />
     <ClInclude Include="ManagerTemplate.h" />
-    <ClInclude Include="Memory.h" />
     <ClInclude Include="mem\mem.h" />
     <ClInclude Include="mem\spoof_call.h" />
     <ClInclude Include="NewMenu.h" />
@@ -288,10 +281,8 @@
     <ClInclude Include="Sidebar.h" />
     <ClInclude Include="Slider.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Syscaller.h" />
     <ClInclude Include="TargetingClient.h" />
     <ClInclude Include="TargetSelector.h" />
-    <ClInclude Include="UltimateHooks.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="VMTHook.h" />
     <ClInclude Include="zoom.h" />
@@ -304,7 +295,6 @@
     <ClCompile Include="Colorpicker.cpp" />
     <ClCompile Include="Cooldowns.cpp" />
     <ClCompile Include="Damage.cpp" />
-    <ClCompile Include="DestroyEvents.cpp" />
     <ClCompile Include="Awarenesss.cpp" />
     <ClCompile Include="Evade.cpp" />
     <ClCompile Include="Eventmanager.h" />
@@ -322,7 +312,6 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Info.cpp" />
-    <ClCompile Include="InitializeEvents.cpp" />
     <ClCompile Include="JustEvade.cpp" />
     <ClCompile Include="KeyBind.cpp" />
     <ClCompile Include="kiero\kiero.cpp" />
@@ -337,7 +326,6 @@
     <ClCompile Include="ListManager.cpp" />
     <ClCompile Include="main\dllmain.cpp" />
     <ClCompile Include="ManagerTemplate.cpp" />
-    <ClCompile Include="Memory.cpp" />
     <ClCompile Include="mem\mem.cpp" />
     <ClCompile Include="NewMenu.cpp" />
     <ClCompile Include="MenuComponent.cpp" />
@@ -375,9 +363,7 @@
     <ClCompile Include="Sidebar.cpp" />
     <ClCompile Include="Slider.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Syscaller.cpp" />
     <ClCompile Include="TargetingClient.cpp" />
-    <ClCompile Include="UltimateHooks.cpp" />
     <ClCompile Include="VMTHook.cpp" />
     <ClCompile Include="zoom.cpp" />
   </ItemGroup>

@@ -8,6 +8,7 @@ namespace UPasta {
         namespace Tristana {
             namespace Config
             {
+
                 using namespace UPasta::SDK;
 
                 namespace TristanaCombo {
@@ -132,12 +133,13 @@ namespace UPasta {
 
             namespace Damages
             {
-              
                 namespace WSpell {
                     inline float dmgSkillArray[6] = { 0, 95, 145, 195, 245, 295 };
                     inline float additionalPercentageAP = 0.50f;
 
-                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::W, obj, dmgSkillArray, additionalPercentageAP); }
+                    static float GetDamage(Object* obj) {
+	                    return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::W, obj, dmgSkillArray, additionalPercentageAP);
+                    }
                 }
 
                 namespace ESpell {

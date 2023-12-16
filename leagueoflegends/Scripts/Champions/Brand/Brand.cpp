@@ -256,8 +256,8 @@ void Functions::DrawDamageOnHPBar(Object* obj) {
 	static constexpr float xOffset = -46.0f;
 	static constexpr float widthMultiplier = 105;
 
-	const float objHealth = obj->ReadClientStat(Object::Health);
-	const float objMaxHealth = obj->ReadClientStat(Object::MaxHealth);
+	const float objHealth = obj->GetHealth();
+	const float objMaxHealth = obj->GetMaxHealth();
 	const float endOffset2 = xOffset + objHealth / objMaxHealth * widthMultiplier;
 	const float startOffset2 = max(endOffset2 - (comboDamage / objMaxHealth * widthMultiplier), xOffset);
 
@@ -318,6 +318,7 @@ void Events::OnDraw() {
 	if (BrandSpellsSettings::DrawR->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastBrandR() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
 		Functions::DrawSpellRadius(BrandSpellsSettings::GetRRange());
 
+	auto nig = 0;
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 		if (!hero) continue;
 		if (hero->GetDistanceTo(globals::localPlayer) > 1500.0f) continue;
@@ -329,7 +330,15 @@ void Events::OnDraw() {
 		if (BrandSpellsSettings::DrawHPDamage->Value == true) {
 			Functions::DrawDamageOnHPBar(hero);
 		}
+
+		if (Modules::prediction::IsSpecificObjectInWay(globals::localPlayer->GetPosition(), Engine::GetMouseWorldPos(), hero, 300)) 	{
+			nig++;
+		}
 	}
+
+	render::RenderLineWorld(globals::localPlayer->GetPosition(), Engine::GetMouseWorldPos(), COLOR_RED, 2.0f);
+	render::RenderTextWorld(std::to_string(nig), Engine::GetMouseWorldPos(), 30.0f, COLOR_WHITE, true);
+
 }
 
 void Events::OnGameUpdate() {
@@ -501,7 +510,7 @@ void Modes::Killsteal() {
 		if (hero->GetPosition().Distance(globals::localPlayer->GetPosition()) > BrandSpellsSettings::GetWRange() + hero->GetBoundingRadius() / 2) continue;
 		if (hero->IsInvulnerable()) continue;
 
-		const float heroHealth = hero->ReadClientStat(Object::Health) + hero->ReadClientStat(Object::Shield);
+		const float heroHealth = hero->GetHealth() + hero->GetShield();
 		if (BrandKillsteal::UseE->Value && isTimeToCastBrandQ() && heroHealth < Damages::ESpell::GetDamage(hero)) {
 			Functions::UseE(hero);
 			continue;

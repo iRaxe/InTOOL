@@ -71,17 +71,16 @@ namespace Evade
 {
 	std::list<int> addedSpells;
 
-
 	void Core::Initalize() {
 		InitSpells();
 		InitializeMenu();
-		//InitEvadeSpells();
+		Subscribe();
+		BoundingRadius = globals::localPlayer->GetBoundingRadius() + 15;
 
 		for (auto hero : *globals::heroManager) {
 			if (hero->IsAlly())				continue;
 
-			for (Champ spell : SpellDB)
-			{
+			for (Champ spell : SpellDB) {
 				if (hero->GetName() == spell.hero)
 				{
 					LOG("Added %s as champion to evade", hero->GetName().c_str());
@@ -91,8 +90,7 @@ namespace Evade
 			}
 		}
 
-		for (auto& hero : ChampsInGame)
-		{
+		for (auto& hero : ChampsInGame) {
 			if (hero.obj->GetName() == "Sylas") {
 				LOG("Found Sylas in game, loopin through ally spells for add in evade list");
 				for (auto teamate : *globals::heroManager) {
@@ -109,10 +107,20 @@ namespace Evade
 				break;
 			}
 		}
+	}
 
-		BoundingRadius = globals::localPlayer->GetBoundingRadius() + 15;
-		Event::Subscribe(Event::OnProcessSpell, &OnProcessSpell);
-		Event::Subscribe(Event::OnDraw, &OnDraw);
+	void Core::Subscribe() {
+		TryCatch(Event::Subscribe(Event::OnDraw, &OnDraw), "Error subscribing to OnWndProc event");
+		TryCatch(Event::Subscribe(Event::OnGameTick, &OnGameUpdate), "Error subscribing to OnGameUpdate event");
+		TryCatch(Event::Subscribe(Event::OnWndProc, &OnWndProc), "Error subscribing to OnWndProc event");
+		TryCatch(Event::Subscribe(Event::OnProcessSpell, &OnProcessSpell), "Error subscribing to OnProcessSpell event");
+	}
+
+	void Core::Unsubscribe() {
+		TryCatch(Event::UnSubscribe(Event::OnDraw, &OnDraw), "Error unsubscribing to OnDraw event");
+		TryCatch(Event::UnSubscribe(Event::OnGameTick, &OnGameUpdate), "Error unsubscribing to OnGameTick event");
+		TryCatch(Event::UnSubscribe(Event::OnWndProc, &OnWndProc), "Error unsubscribing to OnWndProc event");
+		TryCatch(Event::UnSubscribe(Event::OnProcessSpell, &OnProcessSpell), "Error unsubscribing to OnBeforeAttack event");
 	}
 
 	void Core::InitializeMenu()
@@ -124,18 +132,41 @@ namespace Evade
 		evadeMissiles = EvadeMenu->AddCheckBox("evadeMissiles", "Evade Missiles", true);
 		forceEvade = EvadeMenu->AddCheckBox("forceEvade", "Force Evade", true);
 	}
-	float lastChanged = 0;
 
+	float lastChanged = 0;
 	void Core::OnDraw()
 	{
-		if (!Engine::IsChatOpen() && GetKeyState(0x4B) && lastChanged < GetTickCount()) { // K
-			EvadeConfig::evadeSpells->Value = !EvadeConfig::evadeSpells->Value;
-			lastChanged = GetTickCount() + 100;
-			DetectedSkillshots.clear();
-			Engine::PrintChat("Evade: " + std::string((EvadeConfig::evadeSpells->Value ? "ON" : "OFF")));
+		for (Spell spell : DetectedSkillshots)
+		{
+			if (spell.endPos.IsValid() && spell.startPos.IsValid()) {
+				if (spell.type == SpellType::circular)
+					render::RenderCircleWorld(spell.endPos, 50, spell.radius, ImColor(255, 255, 255), 1);
+				else if (spell.type == SpellType::linear)
+					render::RenderPolygonWorld(spell.path, ImColor(255, 255, 255), 1);
+				else
+					render::RenderPolygonWorld(spell.path, COLOR_RED	, 1);
+			}
 		}
+		render::RenderCircleWorld(MyHeroPos, 50, 200, COLOR_YELLOW, 3);
+		render::RenderCircleWorld(SafePos, 50, 200, COLOR_GREEN, 3);
+		render::RenderCircleWorld(GetExtendedSafePos(Engine::GetMouseWorldPos()), 50, 200, COLOR_BLUE, 3);
+		render::RenderCircleWorld(PreviousPos, 50, 200, COLOR_BLACK, 3);
+		
+		if (IsSafePos(MyHeroPos, 300))
+			render::RenderTextWorld("SAFE ZONE", globals::localPlayer->GetPosition(), 24.0f, COLOR_GREEN, true);
+		
+	}
+
+	void Core::OnGameUpdate() {
+		if (globals::localPlayer == nullptr) return;
+		if (!globals::localPlayer->IsAlive()) return;
+
 		GameTimer = Engine::GetGameTime();
 
+		if (Evading)
+		{
+			Engine::PrintChat(CHAT_COLOR("#72ff72", "Loooool"));			
+		}
 		auto it = DetectedSkillshots.begin();
 		while (it != DetectedSkillshots.end()) {
 			if (!IsValid(*it)) {
@@ -175,13 +206,11 @@ namespace Evade
 		}
 
 
-		if (!EnabledSkillshots.empty())
-		{
+		if (!EnabledSkillshots.empty()) {
 			EnabledSkillshots.clear();
 		}
 
-		if (!DangerSkillshots.empty())
-		{
+		if (!DangerSkillshots.empty()) {
 			DangerSkillshots.clear();
 		}
 
@@ -190,32 +219,9 @@ namespace Evade
 			if (spell.path.IsInside(globals::localPlayer->GetAiManager()->GetPosition())) {
 				DangerSkillshots.emplace_back(spell);
 			}
-
 			EnabledSkillshots.emplace_back(spell);
 		}
 
-		for (Spell spell : DetectedSkillshots)
-		{
-			if (spell.endPos.IsValid() && spell.startPos.IsValid()) {
-				if (spell.type == SpellType::circular)
-					render::RenderCircleWorld(spell.endPos, 50, spell.radius, ImColor(255, 255, 255), 1);
-				//render.draw_circle(spell.endPos, spell.radius);
-				else if (spell.type == SpellType::linear)
-					/*if (spell.useMissile)
-						Render::Rect(spell.currPos, spell.endPos, spell.radius, 1, ImColor(255, 255, 255));
-					else*/
-					render::RenderPolygonWorld(spell.path, ImColor(255, 255, 255), 1);
-					//render::RenderLineWorld(spell.startPos, spell.endPos, COLOR_RED, 5.0F);
-
-					//render::RenderLineWorld(spell.startPos, spell.endPos, ImColor(255, 255, 255), 1);
-					//Render::Rect(spell.startPos, spell.endPos, spell.radius, 1, ImColor(255, 255, 255));
-				else
-					render::RenderPolygonWorld(spell.path, COLOR_RED	, 1);
-
-					//Render::Polygon(spell.path, ImColor(255, 255, 255), 1);
-			}
-
-		}
 
 		if (DetectedSkillshots.empty())
 		{
@@ -224,35 +230,45 @@ namespace Evade
 			Evading = false;
 		}
 
-		render::RenderCircleWorld(globals::localPlayer->GetPosition(), 50, globals::localPlayer->GetBoundingRadius(), ImColor(255, 255, 255), 1);
-
-		if (!Evading && !IsDangerous(PreviousPos) && globals::localPlayer->GetAiManager()->IsMoving() && IsDangerous(globals::localPlayer->GetAiManager()->GetPathEnd()))	{
+		if (!Evading && !IsDangerous(PreviousPos) && IsDangerous(globals::localPlayer->GetAiManager()->GetPathEnd())) {
 			SetEvading(true);
 			MoveToPos(globals::localPlayer->GetAiManager()->GetPathEnd().Extend(globals::localPlayer->GetPosition(), BoundingRadius));
 		}
 
 		StartEvading();
+
+		// TODO: HANDLE IS EVADING SPELL
 	}
 
+	void Core::OnWndProc(UINT msg, WPARAM param) {
+		if (param == 0x4B) {
+			switch (msg) {
+			case WM_KEYDOWN: 			
+				EvadeConfig::evadeSpells->Value = !EvadeConfig::evadeSpells->Value;
+				lastChanged = GetTickCount() + 100;
+				DetectedSkillshots.clear();
+				Engine::PrintChat("Evade: " + std::string((EvadeConfig::evadeSpells->Value ? "ON" : "OFF")));
+				break;
+			case WM_KEYUP: break;
+			}
+		}
+	}
 
 	bool Core::IsValid(Spell& s)
 	{
-		if (s.spell && s.path.Points.size() > 0)
-		{
-			if ((s.startTime + s.range / s.speed + s.delay + s.time + s.delayBR) > GameTimer)
-			{
-					if (s.type == linear || s.type == threeway)
-					{
+		if (s.spell && s.path.Points.size() > 0) {
+			if ((s.startTime + s.range / s.speed + s.delay + s.time + s.delayBR) > GameTimer) {
+					if (s.type == linear || s.type == threeway) {
 						float rng = s.speed * (GameTimer - s.startTime - s.delay);
 						Vector3 sP = s.startPos.Extend(s.endPos, rng);
 						s.currPos = sP;
 						s.path = Geometry::Rectangle(sP, s.endPos, s.radius).ToPolygon(BoundingRadius);
 					}
 			}
-			else
-			{
+			else {
 				return false;
 			}
+
 			return true;
 		}
 		return false;
@@ -284,14 +300,11 @@ namespace Evade
 			return;
 
 		Vector3 p = pos.Extend(MyHeroPos, -BoundingRadius);
-		//Vector2 path = riot_render->WorldToScreen();
-		if (Engine::GetGameTime() - LastClick > 1000 / 80) {
+		if (Engine::GetGameTime() > LastClick) {
 			LastClick = Engine::GetGameTime();
-			if (globals::localPlayer->GetPosition().distanceTo(pos) > 75)
-			{
-				Engine::IssueMove(Engine::WorldToScreen(p));
-				return;
-			}
+
+			Engine::IssueMove(Engine::WorldToScreen(pos));
+			Engine::PrintChat(CHAT_COLOR("#72ff72", "TRYING"));
 		}
 	}
 
@@ -355,8 +368,7 @@ namespace Evade
 			return;
 		}
 
-		if (DetectedSkillshots.size() > 0)
-		{
+		if (!DetectedSkillshots.empty()) {
 			int result = 0;
 			for (Spell& spell : DetectedSkillshots)
 				result += CoreManager(spell);
@@ -374,13 +386,8 @@ namespace Evade
 				}
 
 				ints = filter(ints, [&](const Vector3& pos) { return !IsDangerous(pos) && !Engine::IsWall(pos); });
-				if (ints.size() > 0)
-				{
-					ints.sort([&](Vector3 const& a, Vector3 const& b)
-						{
-							//float ms = Local->MovementSpeed * Local->MovementSpeed;
-							return MyHeroPos.DistanceSquared(a) < MyHeroPos.DistanceSquared(b);
-						});
+				if (!ints.empty()) {
+					ints.sort([&](Vector3 const& a, Vector3 const& b)	{ return MyHeroPos.DistanceSquared(a) < MyHeroPos.DistanceSquared(b); });
 					Vector3 movePos = PrependVector(MyHeroPos, ints.front(), BoundingRadius / 2);
 					MoveToPos(movePos);
 				}
@@ -401,27 +408,29 @@ namespace Evade
 		float distance = MyHeroPos.distanceTo(pos);
 		std::list<Vector3>positions;
 		for (auto minion : *globals::minionManager) {
-			if (minion->IsAlly() && minion->IsAlive() && minion->IsVisible() && minion->ReadClientStat(Object::MaxHealth) > 5) {
-				Vector3 minionPos = minion->GetPosition();
-				if (MyHeroPos.distanceTo(minionPos) <= distance) {
-					positions.emplace_back(minionPos);
-				}
+			if (minion == nullptr) continue;
+			if (minion->IsAlly()) continue;
+			if (!minion->IsTargetable()) continue;
+			if (minion->GetMaxHealth() < 5) continue;
+
+			Vector3 minionPos = minion->GetPosition();
+			if (MyHeroPos.distanceTo(minionPos) <= distance) {
+				positions.emplace_back(minionPos);
 			}
 		}
 
 		for (int i = 1; i < 8; i++) {
 			bool collision = false;
+
 			Vector3 ext = MyHeroPos.Append(MyHeroPos, pos, BoundingRadius * i);
-			if (i > 1 && !Engine::IsWall(ext) || i == 1)
-			{
-				for (Vector3& minionPos : positions)
-				{
-					if (ext.distanceTo(minionPos) <= BoundingRadius)
-					{
+			if (i > 1 && !Engine::IsWall(ext) || i == 1) {
+				for (Vector3& minionPos : positions) {
+					if (ext.distanceTo(minionPos) <= BoundingRadius) {
 						collision = true;
 						break;
 					}
 				}
+
 				if (!collision)
 					return ext;
 			}
@@ -433,16 +442,17 @@ namespace Evade
 		return 0;
 	}
 
-	int Core::CoreManager(Spell s)
-	{
+	int Core::CoreManager(Spell s) {
 		if (s.path.IsInside(MyHeroPos)) {
 			if (OldTimer != NewTimer) {
 				Vector3 safePos = GetBestEvadePos(DangerSkillshots, s.radius, 1);
 				int result = 0;
 				if (safePos.IsValid()) {
+
 					ExtendedPos = GetExtendedSafePos(safePos);
 					SafePos = safePos;
-					render::RenderLineWorld(globals::localPlayer->GetPosition(), safePos, COLOR_GREEN, 3.0f);
+					Engine::PrintChat(CHAT_COLOR("#72ff72", "ASSIGNED SAFE POS"));
+
 					Evading = true;
 				}
 				else {
@@ -452,7 +462,7 @@ namespace Evade
 						{
 							ExtendedPos = GetExtendedSafePos(dodgePos);
 							SafePos = dodgePos;
-							render::RenderLineWorld(globals::localPlayer->GetPosition(), dodgePos, COLOR_BLUE, 3.0f);
+							Engine::PrintChat(CHAT_COLOR("#72ff72", "ASSIGNED EXTENDED POS"));
 
 							Evading = true;
 						}
@@ -478,31 +488,14 @@ namespace Evade
 	{
 		if (!spell.obj || !spell.spell)
 			return;
-		//render::RenderLineWorld(spell.startPos, spell.endPos, COLOR_BLUE, 3.0f);
-
-
-		//Engine::PrintChat(spell.displayName + " StartPOS X: " + std::to_string(spell.startPos.x) + " StartPOS Y: " + std::to_string(spell.startPos.y) + " StartPOS Z: " + std::to_string(spell.startPos.z) + std::to_string(spell.endPos.x) + std::to_string(spell.endPos.y));
-		//MessageBoxA(0, (to_string(spell.startPos.x) + "\n" + to_string(spell.startPos.y) + "\n" + to_string(spell.startPos.z) + "\n\n\n\n" + to_string(spell.endPos.x) + "\n" + to_string(spell.endPos.y) + "\n" + to_string(spell.endPos.z)).c_str(), "1", 0);
-
-		/*if (spell.exception && spell.spell->EndPosition.x != 0 && spell.spell->EndPosition.y != 0) {
-			spell.startPos = spell.spell->EndPosition;
-			spell.endPos = spell.spell->EndPosition;
-		}
-		else {
-			spell.startPos = spell.spell->StartPosition;
-			spell.endPos = spell.spell->EndPosition;
-		}*/
-		//MessageBoxA(0, (to_string(spell.spell->StartPosition.x) + "\n" + to_string(spell.spell->StartPosition.y) + "\n" + to_string(spell.spell->StartPosition.z) + "\n\n\n\n" + to_string(spell.spell->EndPosition.x) + "\n" + to_string(spell.spell->EndPosition.y) + "\n" + to_string(spell.spell->EndPosition.z)).c_str(), "2", 0);
 
 		spell.endPos = CalculateEndPos(spell);
-		//MessageBoxA(0, (to_string(spell.spell->StartPosition.x) + "\n" + to_string(spell.spell->StartPosition.y) + "\n" + to_string(spell.spell->StartPosition.z) + "\n\n\n\n" + to_string(spell.spell->EndPosition.x) + "\n" + to_string(spell.spell->EndPosition.y) + "\n" + to_string(spell.spell->EndPosition.z)).c_str(), "3", 0);
 
 		if (spell.followEnemy)
 			spell.startPos = spell.obj->GetPosition();
 
 		spell.path = GetPath(spell);
 
-		// If correctly made a polygon
 		if (spell.path.Points.empty())
 			return;
 
@@ -517,12 +510,10 @@ namespace Evade
 			}
 		}
 
-		if (!exists)
-		{
+		if (!exists) {
 			DetectedSkillshots.emplace_back(spell);
 			if (spell.type == threeway) {
-				for (int i = 0; i < 2; i++)
-				{
+				for (int i = 0; i < 2; i++) {
 					Spell tspell = spell;
 					if (i == 0) {
 						tspell.endPos = spell.endPos.Rotate(spell.startPos, DEG2RAD(spell.angle));
@@ -530,16 +521,21 @@ namespace Evade
 					else if (i == 1) {
 						tspell.endPos = spell.endPos.Rotate(spell.startPos, -DEG2RAD(spell.angle));
 					}
+
 					spell.path = Geometry::Rectangle(tspell.startPos, tspell.endPos, tspell.radius).ToPolygon(BoundingRadius);
 					DetectedSkillshots.emplace_back(tspell);
 				}
 			}
 		}
+
 		NewTimer = GameTimer;
 	}
 
 	float Core::GetMovementSpeed(bool extra, EvadeSpell evadeSpell)	{
-		float moveSpeed = globals::localPlayer->ReadClientStat(Object::MovementSpeed);
+		Object* localPlayer = globals::localPlayer;
+		if (localPlayer == nullptr) return false;
+
+		float moveSpeed = localPlayer->GetMovementSpeed();
 		if (!extra)
 			return moveSpeed;
 
@@ -565,11 +561,11 @@ namespace Evade
 		float diff = GameTimer - spell.startTime;
 		Vector3 pos = myPos.Append(myPos, pos1, 99999);
 		if (spell.speed != MathHuge && spell.type == linear || spell.type == threeway) {
-			if (spell.delay > 0 && diff <= spell.delay)
-			{
+			if (spell.delay > 0 && diff <= spell.delay) {
 				myPos = (myPos).Extend(pos, (spell.delay - diff) * moveSpeed);
 				if (!spell.path.IsInside(myPos))
 					return false;
+
 				Vector3 va = (pos - myPos).Normalized() * moveSpeed;
 				Vector3 vb = (spell.endPos - spell.startPos).Normalized() * spell.speed;
 				Vector3 da = (myPos - spell.startPos);
@@ -578,8 +574,7 @@ namespace Evade
 				float b = 2 * da.DotProduct(db);
 				float c = da.DotProduct(da) - std::pow((spell.radius + BoundingRadius * 2), 2);
 				float delta = float(b * b - 4 * a * c);
-				if (delta >= 0)
-				{
+				if (delta >= 0) {
 					float rtDelta = std::sqrtf(delta);
 					float t1 = (-b + rtDelta) / (2 * a);
 					float t2 = (-b - rtDelta) / (2 * a);
@@ -589,107 +584,98 @@ namespace Evade
 				return false;
 			}
 		}
+
 		float t = max(0, float(spell.range / spell.speed + spell.delay - diff));
 		return spell.path.IsInside(myPos.Extend(pos, moveSpeed * t));
 	}
 
 	bool Core::IsSafePos(Vector3 pos, int extra)	{
 		for (Spell& s : DetectedSkillshots) {
-			if (s.path.IsInside(pos) || IsAboutToHit(s, pos, extra) || isNearEnemy(pos, 550) || isNearMinion(pos, 300))
+			if (s.path.IsInside(pos) || IsAboutToHit(s, pos, extra) || isNearEnemy(pos, 550) || isNearMinion(pos, 300)) {
 				return false;
+			}
+
+			break;
 		}
 		return true;
 	}
 
-
 	float Core::GetDistanceToChampions(Vector3 pos)	{
+		if (!pos.IsValid()) return 0;
+
 		float minDist = FLT_MAX;
 
 		for (auto hero : *globals::heroManager) {
-			if (hero != nullptr && hero->IsVisible() && hero->IsAlive() && hero->IsEnemy()) {
-				float dist = hero->GetPosition().distanceTo(pos);
-				minDist = min(minDist, dist);
-			}
+			if (hero == nullptr) continue;
+			if (hero->IsAlly()) continue;
+			if (!hero->IsTargetable()) continue;
+
+			float dist = hero->GetPosition().distanceTo(pos);
+			minDist = min(minDist, dist);
 		}
 
 		return minDist;
-	}
-
-	bool Core::isNearEnemy(Vector3 pos, float distance)	{
-		float curDistToEnemies = GetDistanceToChampions(globals::localPlayer->GetPosition());
-		float posDistToEnemies = GetDistanceToChampions(pos);
-
-		if (curDistToEnemies < distance) {
-			if (curDistToEnemies > posDistToEnemies)
-				return true;
-		}
-		else {
-			if (posDistToEnemies < distance)
-				return true;
-		}
-		return false;
 	}
 
 	float Core::GetDistanceToMinions(Vector3 pos) {
+		if (!pos.IsValid()) return 0;
+
 		float minDist = FLT_MAX;
 
 		for (auto minion : *globals::minionManager) {
-			if (minion != NULL && minion->IsVisible() && minion->IsAlive() && minion->MaxHealth > 5)
-			{
-				float dist = minion->GetPosition().distanceTo(pos);
+			if (minion == nullptr) continue;
+			if (minion->IsAlly()) continue;
+			if (!minion->IsTargetable()) continue;
+			if (minion->GetMaxHealth() < 5) continue;
 
-				minDist = min(minDist, dist);
-			}
+			float dist = minion->GetPosition().distanceTo(pos);
+			minDist = min(minDist, dist);
 		}
+
 		return minDist;
-	}
-
-	bool Core::isNearMinion(Vector3 pos, float distance) {
-		float curDistToEnemies = GetDistanceToMinions(globals::localPlayer->GetPosition());
-		float posDistToEnemies = GetDistanceToMinions(pos);
-
-		if (curDistToEnemies < distance) {
-			if (curDistToEnemies > posDistToEnemies)
-				return true;
-		}
-		else {
-			if (posDistToEnemies < distance)
-				return true;
-		}
-		return false;
 	}
 
 	float Core::GetDistanceToTurrets(Vector3 pos) {
 		float minDist = FLT_MAX;
 
 		for (Object* turret : *globals::turretManager) {
-			if (turret != NULL && turret->IsAlive() && turret->IsEnemy()) {
-				float distToTurret = pos.distanceTo(turret->GetPosition());
-				minDist = min(minDist, distToTurret);
-			}
+			if (turret == nullptr) continue;
+			if (turret->IsAlly()) continue;
+			if (!turret->IsTargetable()) continue;
+
+			float distToTurret = pos.distanceTo(turret->GetPosition());
+			minDist = min(minDist, distToTurret);
 		}
+
 		return minDist;
 	}
 
-	float Core::GetPositionValue(Vector3 pos) {
-		float posValue = pos.distanceTo(Engine::GetMouseWorldPos());
-		float turretRange = 875 + BoundingRadius;
-		float distanceToTurrets = GetDistanceToTurrets(pos);
-		if (turretRange > distanceToTurrets)
-			posValue += 5 * (turretRange - distanceToTurrets);
-		return posValue;
+	bool Core::isNearEnemy(Vector3 pos, float distance) {
+		Object* localPlayer = globals::localPlayer;
+		if (localPlayer == nullptr) return false;
+
+		float curDistToEnemies = GetDistanceToChampions(localPlayer->GetPosition());
+		float posDistToEnemies = GetDistanceToChampions(pos);
+
+		return curDistToEnemies < distance && curDistToEnemies > posDistToEnemies || posDistToEnemies < distance;
+	}
+
+	bool Core::isNearMinion(Vector3 pos, float distance) {
+		Object* localPlayer = globals::localPlayer;
+		if (localPlayer == nullptr) return false;
+
+		float curDistToEnemies = GetDistanceToMinions(localPlayer->GetPosition());
+		float posDistToEnemies = GetDistanceToMinions(pos);
+
+		return curDistToEnemies < distance && curDistToEnemies > posDistToEnemies || posDistToEnemies < distance;
 	}
 
 	bool Core::sortBest(Vector3 a, Vector3 b) {
-		if (a.DistanceSquared(MyHeroPos) < b.DistanceSquared(MyHeroPos)) return true;
-		else if (a.DistanceSquared(MyHeroPos) > b.DistanceSquared(MyHeroPos)) return false;
-
-		return false;
+		return a.DistanceSquared(MyHeroPos) < b.DistanceSquared(MyHeroPos);
 	}
 
 	Vector3 Core::GetBestEvadePos(std::list<Spell> spells, float radius, int mode) {
 		std::list<Vector3> points;
-
 		std::list<Geometry::Polygon> polygons;
 
 		for (Spell spell : spells) {
@@ -698,39 +684,24 @@ namespace Evade
 
 		std::list<Geometry::Polygon> danger_polygons = polygons;
 
-		int posChecked = 0;
-		int maxPosToCheck = 60;
-		int posRadius = 50;
-		int radiusIndex = 0;
-
-		for (Geometry::Polygon poly : danger_polygons)
-		{
-			render::RenderPolygonWorld(poly, COLOR_YELLOW, 5.0f);
-			for (size_t i = 0; i < poly.Points.size(); ++i)
-			{
+		for (Geometry::Polygon poly : danger_polygons) {
+			for (size_t i = 0; i < poly.Points.size(); ++i) {
 				auto startPos = poly.Points[i];
 				auto endPos = poly.Points[(i == poly.Points.size() - 1) ? 0 : i + 1];
 
 				auto my_position = MyHeroPos;
 				auto original = my_position.ProjectOn(startPos, endPos).SegmentPoint;
-
 				auto distSqr = original.DistanceSquared(my_position);
 
-				if (distSqr <= 360000)
-				{
-
+				if (distSqr <= 360000) {
 					auto side_distance = endPos.DistanceSquared(startPos);
 					auto direction = (endPos - startPos).Normalized();
 					int step = (distSqr < 200 * 200 && side_distance > 90 * 90) ? 7 : 0;
 
-					for (int j = -step; j <= step; j++)
-					{
+					for (int j = -step; j <= step; j++) {
 						auto candidate = original + direction * (j * 20);
-						Vector3 extended = MyHeroPos.Append(MyHeroPos, candidate, BoundingRadius);
 						candidate = MyHeroPos.Append(MyHeroPos, candidate, 5);
-
-						if (!IsDangerous(candidate) && !Engine::IsWall(candidate))
-						{
+						if (!IsDangerous(candidate) && !Engine::IsWall(candidate)) {
 							points.push_back(candidate);
 						}
 					}
@@ -738,25 +709,21 @@ namespace Evade
 			}
 		}
 
-		if (points.size() > 0) {
+		if (!points.empty()) {
 			Vector3 tempMyHeroPos = MyHeroPos;
 			float tempRB = radius + BoundingRadius;
 			Vector3 tempMPos = Engine::GetMouseWorldPos();
 
-			try
-			{
-				if (mode == 1) {
-					points.sort(sortBest);
-				}
-				else if (mode == 2) {
-					points.sort([&tempMyHeroPos, &tempRB, &tempMPos](Vector3 const& a, Vector3 const& b)
-						{
-							Vector3 mPos = tempMyHeroPos.Extend(tempMPos, tempRB);
-							return a.DistanceSquared(mPos) <= b.DistanceSquared(mPos);
-						});
-				}
+			if (mode == 1) {
+				points.sort(sortBest);
 			}
-			catch (std::exception const&) {}
+			else if (mode == 2) {
+				points.sort([&tempMyHeroPos, &tempRB, &tempMPos](Vector3 const& a, Vector3 const& b){
+						Vector3 mPos = tempMyHeroPos.Extend(tempMPos, tempRB);
+						return a.DistanceSquared(mPos) <= b.DistanceSquared(mPos);
+					});
+			}
+
 			return points.front();
 		}
 
@@ -790,47 +757,22 @@ namespace Evade
 				if (spellInfo.collision) {
 					for (Object* minion : *globals::minionManager)
 					{
-						if (minion->GetNetId() - (unsigned int)0x40000000 > 0x100000)
-							continue;
-						if (minion && minion->IsTargetable() && minion->IsEnemy())
-						{
-							Vector3 minionPos = minion->GetPosition();
-							if (minionPos.distanceTo(startPos) <= range && minion->MaxHealth > 295 && minion->Health > 5)
-							{
-								Vector3 col = minionPos.ProjectOn(startPos, placementPos).SegmentPoint;
-								if (col.IsValid() && col.distanceTo(minionPos) < ((minion->GetBoundingRadius()) / 2 + spellInfo.radius))
-								{
-									minions.emplace_back(minionPos);
-								}
+						if (minion == nullptr) continue;
+						if (minion->IsAlly()) continue;
+						if (!minion->IsTargetable()) continue;
+
+						Vector3 minionPos = minion->GetPosition();
+						if (minionPos.distanceTo(startPos) <= range && minion->GetMaxHealth() > 295 && minion->GetHealth() > 5) {
+							Vector3 col = minionPos.ProjectOn(startPos, placementPos).SegmentPoint;
+							if (col.IsValid() && col.distanceTo(minionPos) < ((minion->GetBoundingRadius()) / 2 + spellInfo.radius)) {
+								minions.emplace_back(minionPos);
 							}
 						}
 					}
 				}
-				if (spellInfo.collision || spellInfo.collisionWC) {
-					for (Object* minion : *globals::heroManager)
-					{
-						if (minion->GetNetId() - (unsigned int)0x40000000 > 0x100000)
-							continue;
-						if (minion && minion->IsTargetable() && minion->GetNetId() != globals::localPlayer->GetNetId() && minion->IsEnemy())
-						{
-							Vector3 minionPos = minion->GetPosition();
-							if (minionPos.distanceTo(startPos) <= range && minion->MaxHealth > 295 && minion->Health > 5)
-							{
-								Vector3 col = minionPos.ProjectOn(startPos, placementPos).SegmentPoint;
-								if (col.IsValid() && col.distanceTo(minionPos) < ((minion->GetBoundingRadius()) / 2 + spellInfo.radius))
-								{
-									minions.emplace_back(minionPos);
-								}
-							}
-						}
-					}
-				}
-				if (minions.size() > 0)
-				{
-					minions.sort([&](Vector3 const& a, Vector3 const& b)
-						{
-							return a.DistanceSquared(startPos) < b.DistanceSquared(startPos);
-						});
+
+				if (!minions.empty()) {
+					minions.sort([&](Vector3 const& a, Vector3 const& b){ return a.DistanceSquared(startPos) < b.DistanceSquared(startPos); });
 					float range2 = startPos.distanceTo(minions.front());
 					endPos = (startPos).Extend(placementPos, range2);
 					spellInfo.range = range2;
@@ -846,82 +788,71 @@ namespace Evade
 
 	Geometry::Polygon Core::GetPath(Spell& spell)
 	{
-		if (spell.type == linear || spell.type == polygon)
-		{
+		if (spell.type == linear || spell.type == polygon) {
 			return Geometry::Rectangle(spell.startPos, spell.endPos, spell.radius).ToPolygon(BoundingRadius);
 		}
-		else if (spell.type == zone) {
+		if (spell.type == zone) {
 			return Geometry::Rectangle(spell.endPos.Extend(spell.startPos, -spell.radiusEx), spell.endPos, spell.radius).ToPolygon(BoundingRadius);
 		}
-		else if (spell.type == rectangular)
-		{
+		if (spell.type == rectangular) {
 			Vector3 dir = (spell.endPos - spell.startPos).Perpendicular().Normalized() * (400);
 			spell.startPos = spell.endPos - dir;
 			spell.endPos = spell.endPos + dir;
 
 			return Geometry::Rectangle(spell.startPos, spell.endPos, spell.radius / 2).ToPolygon(BoundingRadius);
 		}
-		else if (spell.type == circular)
-		{
+		if (spell.type == circular) {
 			return Geometry::Circle(spell.endPos, spell.radius).ToPolygon();
 		}
-		else if (spell.type == arc)
-		{
+		if (spell.type == arc) {
 			return Geometry::Arc(spell.startPos, spell.endPos, spell.radius).ToPolygon();
 		}
-		else if (spell.type == ring)
-		{
+		if (spell.type == ring) {
 			return Geometry::Ring(spell.endPos, spell.radius, spell.radiusEx).ToPolygon();
 		}
-		else if (spell.type == conic)
-		{
+		if (spell.type == conic) {
 			return Geometry::Sector(spell.startPos, spell.endPos - spell.startPos, spell.angle * M_PI / 180.0f, spell.range).ToPolygon(BoundingRadius);
 		}
-		else if (spell.type == threeway)
-		{
+		if (spell.type == threeway) {
 			return Geometry::Rectangle(spell.startPos, spell.endPos, spell.radius).ToPolygon(BoundingRadius);
 		}
+
 		return Geometry::Rectangle(spell.startPos, spell.endPos, spell.radius).ToPolygon(BoundingRadius);
 	}
 
-	void Core::OnProcessSpell(void* spellBook, SpellCast* castInfo) {
-		if (castInfo != nullptr)
-		{
-			if (castInfo->IsAutoAttack()) return;
-			const auto caster = ObjectManager::GetClientByHandle(castInfo->GetCasterHandle());
-			if (caster != nullptr)
-			{
-				for (Champ& champ : ChampsInGame)
-				{
-					for (Spell& s : champ.spells)
-					{
-						if (Compare(castInfo->GetProcessSpellInfo()->GetSpellData()->GetName(), s.name, true))
-						{
-							//LOG("%s", castInfo->GetProcessSpellInfo()->GetSpellData()->GetName().c_str());
-							addedSpells.push_back(castInfo->GetCasterHandle());
-							s.startTime = GameTimer;
-							s.obj = champ.obj;
-							s.spell = castInfo->GetProcessSpellInfo();
-							if ((s.type != circular && s.type != ring) && s.range == 0 && castInfo->GetProcessSpellInfo()->GetSpellData()->GetMaxCastRange() != 0)
-								s.range = (castInfo->GetProcessSpellInfo()->GetSpellData()->GetMaxCastRange());
-							s.startPos = castInfo->GetStartPosition();
-							s.endPos = castInfo->GetEndPosition();
-							s.radiusRes = castInfo->GetProcessSpellInfo()->GetSpellData()->GetCastRadius();
-							if (s.radius == 0 && castInfo->GetProcessSpellInfo()->GetSpellData()->GetCastRadius() != 0)
-								s.radius = s.radiusRes;
-							//s.speed = castInfo->BasicAttackSpellData->Resource->MissileSpeed;
-							if (s.type != circular)
-								s.speed = castInfo->GetProcessSpellInfo()->GetSpellData()->GetCastSpeed() == 0 ? MathHuge : castInfo->GetProcessSpellInfo()->GetSpellData()->GetCastSpeed();
-							OnSpellCast(s);
-						}
+	void Core::OnProcessSpell(int state, SpellCast* spellCastInfo) {
+		if (spellCastInfo == nullptr) return;
+		if (spellCastInfo->GetCasterHandle() == globals::localPlayer->GetHandle()) return;
 
-					}
+		const auto caster = ObjectManager::GetClientByHandle(spellCastInfo->GetCasterHandle());
+		if (caster == nullptr) return;
+		if (!caster->IsHero()) return;
+		if (caster->IsAlly()) return;
+
+		for (Champ& champ : ChampsInGame) {
+			for (Spell& s : champ.spells) {
+				if (Compare(spellCastInfo->GetProcessSpellInfo()->GetSpellData()->GetName(), s.name, true)) {
+					addedSpells.push_back(spellCastInfo->GetCasterHandle());
+					s.startTime = GameTimer;
+					s.obj = champ.obj;
+					s.spell = spellCastInfo->GetProcessSpellInfo();
+					if ((s.type != circular && s.type != ring) && s.range == 0 && spellCastInfo->GetProcessSpellInfo()->GetSpellData()->GetMaxCastRange() != 0)
+						s.range = (spellCastInfo->GetProcessSpellInfo()->GetSpellData()->GetMaxCastRange());
+					s.startPos = spellCastInfo->GetStartPosition();
+					s.endPos = spellCastInfo->GetEndPosition();
+					s.radiusRes = spellCastInfo->GetProcessSpellInfo()->GetSpellData()->GetCastRadius();
+					if (s.radius == 0 && spellCastInfo->GetProcessSpellInfo()->GetSpellData()->GetCastRadius() != 0)
+						s.radius = s.radiusRes;
+					if (s.type != circular)
+						s.speed = spellCastInfo->GetProcessSpellInfo()->GetSpellData()->GetCastSpeed() == 0 ? MathHuge : spellCastInfo->GetProcessSpellInfo()->GetSpellData()->GetCastSpeed();
+
+					OnSpellCast(s);
 				}
 			}
 		}
 	}
 	
-
+	//TODO
 	void Core::InitSpells()
 	{
 		{

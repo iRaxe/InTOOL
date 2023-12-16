@@ -1,6 +1,4 @@
 #pragma once
-#include "../stdafx.h"
-
 
 class LolString
 {
@@ -51,7 +49,6 @@ public:
 	std::string GetName();
 };
 
-
 class ItemListObject
 {
 public:
@@ -69,7 +66,8 @@ public:
 class Perk
 {
 public:
-	PerkID GetId();
+	CLASS_GETTER_P(PerkID, GetId, UPasta::Offsets::Perks::PerkID);
+
 	std::string GetName();
 	std::string GetRawName();
 	std::string GetRawDescription();
@@ -84,7 +82,7 @@ public:
 class Cooldown
 {
 public:
-	float GetBaseCooldown();
+	CLASS_GETTER(float, GetBaseCooldown, 0x0);
 };
 
 class CooldownArray
@@ -185,31 +183,35 @@ public:
 class AiManager
 {
 public:
+	CLASS_GETTER(bool, IsMoving, UPasta::Offsets::AIManager::Path::IsMoving);
+	CLASS_GETTER(bool, IsDashing, UPasta::Offsets::AIManager::Path::IsDashing);
+	CLASS_GETTER(bool, IsNotDashing, UPasta::Offsets::AIManager::Path::IsNotDashing);
+
+	CLASS_GETTER(int, GetCurrentSegment, UPasta::Offsets::AIManager::Path::PassedWayPoints);
+	CLASS_GETTER(int, GetSegmentsCount, UPasta::Offsets::AIManager::Path::SegmentsCount);
+
+	CLASS_GETTER(float, GetDashSpeed, UPasta::Offsets::AIManager::Path::DashSpeed);
+	CLASS_GETTER(float, GetMovementSpeed, UPasta::Offsets::AIManager::Path::MovementSpeed);
+	CLASS_GETTER(float, GetVelocity, UPasta::Offsets::AIManager::Velocity);
+
 	std::vector<Vector3> GetFutureSegments();
 	Vector3 GetSegment(int index);
 	Vector3 GetPosition();
-	float GetVelocity();
 	Vector3 GetTargetPosition();
 	Vector3 GetMouseClickPosition();
 	Vector3 GetPathStart();
 	Vector3 GetDashStart();
 	Vector3 GetPathEnd();
 	Vector3 GetDirection();
-
-	bool IsMoving();
-	bool IsDashing();
-	bool IsNotDashing();
-	int GetCurrentSegment();
-	int GetSegmentsCount();
-	float GetDashSpeed();
-	float GetMovementSpeed();
 };
 
 class CharacterData
 {
 public:
-	float GetSize();
-	ChampionID GetHeroID();
+	CLASS_GETTER(float, GetSize, UPasta::Offsets::CharData::Size);
+	CLASS_GETTER(ChampionID, GetHeroID, UPasta::Offsets::CharData::HeroID);
+
+
 	QWORD GetObjectTypeHash();
 	QWORD GetObjectTypeHashDetailed();
 };
@@ -217,17 +219,20 @@ public:
 class SpellData
 {
 public:
+
+	CLASS_GETTER_P(CooldownArray, GetCooldownArray, 0x2F0);
+
+	CLASS_GETTER(float, GetMaxCastRange, UPasta::Offsets::SpellData::CastRange);
+	CLASS_GETTER(float, GetCastRadius, UPasta::Offsets::SpellData::CastRadius);
+	CLASS_GETTER(float, GetLineWidth, UPasta::Offsets::SpellData::LineWidth);
+	CLASS_GETTER(float, GetCastSpeed, UPasta::Offsets::SpellData::MissileSpeed);
+	CLASS_GETTER(float, GetDelay, UPasta::Offsets::SpellData::DelayCastOffsetPerce);
+	CLASS_GETTER(float, GetCastTime, UPasta::Offsets::SpellData::CastTime);
+
 	std::string GetName();
 	std::string GetTexturePath();
-	float GetMaxCastRange();
-	float GetCastRadius();
-	float GetLineWidth();
-	float GetCastSpeed();
-	float GetDelay();
-	float GetCastTime();
 	Vector3 GetSpellEndPos();
 	float GetManaCostByLevel(int level);
-	CooldownArray* GetCooldownArray();
 };
 
 
@@ -254,13 +259,14 @@ public:
 class Missile
 {
 public:
-	DWORD GetHandle();
+	CLASS_GETTER(DWORD, GetHandle, UPasta::Offsets::Client::Handle);
+	CLASS_GETTER(float, GetSpellSpeed, UPasta::Offsets::MissileManager::Speed);
+
 	MissileData* GetMissileData();
 	int GetMissileSrcId();
 	Vector3 GetSpellStartPos();
 	Vector3 GetSpellPos();
 	Vector3 GetSpellEndPos();
-	float GetSpellSpeed();
 };
 
 class SpellInfo
@@ -288,46 +294,56 @@ public:
 class Spell
 {
 public:
+	CLASS_GETTER(int, GetLevel, UPasta::Offsets::SpellBook::SpellSlot::Level);
+	CLASS_GETTER(int, GetStacks, UPasta::Offsets::SpellBook::SpellSlot::Stacks);
+
+	CLASS_GETTER(float, GetCooldownTimer, UPasta::Offsets::SpellBook::SpellSlot::Cooldown);
+	CLASS_GETTER(float, GetTotalCooldown, UPasta::Offsets::SpellBook::SpellSlot::TotalCooldown);
+
+	bool IsReady() { return this->GetRelativeCooldown() == 0.0f;	};
+	std::string GetName() { return this->GetSpellInfo()->GetSpellData()->GetName(); }
 	std::string_view GetTextureName();
-	int GetLevel();
-	float GetCooldownTimer();
 	float GetCooldown();
-	int GetStacks();
-	float GetTotalCooldown();
 	float GetRelativeCooldown();
 	SpellInput* GetSpellInput();
 	SpellInfo* GetSpellInfo();
-	bool IsReady();
-	std::string GetName();
 	float GetManaCost();
 };
 
 class SpellCast
 {
 public:
+	CLASS_GETTER(DWORD, GetCasterHandle, UPasta::Offsets::SpellCast::CasterHandle);
+
+	CLASS_GETTER(int, GetSpellId, UPasta::Offsets::SpellCast::SlotID);
+
+	CLASS_GETTER(float, GetCastTime, UPasta::Offsets::SpellCast::CastedAtTime);
+
+	CLASS_GETTER(bool, IsAutoAttack, UPasta::Offsets::SpellCast::IsBasicAttack);
+	CLASS_GETTER(bool, IsSpell, UPasta::Offsets::SpellCast::IsSpell);
+
 	SpellInfo* GetSpellInfo();
 	SpellInfo* GetProcessSpellInfo();
-	int GetSpellId();
-	bool IsAutoAttack();
-	bool IsSpell();
-	float GetCastTime();
 	std::string GetCasterName();
 	Vector3 GetStartPosition();
 	Vector3 GetEndPosition();
 	Vector3 GetMousePosition();
-	DWORD GetCasterHandle();
 };
 
 class Buff
 {
 public:
+	CLASS_GETTER(BuffType, GetType, UPasta::Offsets::BuffManager::BuffType);
+
+	CLASS_GETTER(float, GetStartTime, UPasta::Offsets::BuffManager::BuffEntryBuffStartTime);
+	CLASS_GETTER(float, GetEndTime, UPasta::Offsets::BuffManager::BuffEntryBuffEndTime);
+
+	CLASS_GETTER(int, GetStacksAlt, UPasta::Offsets::BuffManager::BuffEntryBuffCountAlt);
+	CLASS_GETTER(int, GetStacks, UPasta::Offsets::BuffManager::BuffEntryBuffCount);
+
+	int GetMaxStacks() { return max(this->GetStacksAlt(), this->GetStacks()); }
+
 	std::string GetName();
-	BuffType GetType();
-	float GetStartTime();
-	float GetEndTime();
-	int GetStacksAlt();
-	int GetStacks();
-	int GetMaxStacks();
 	bool isActive();
 };
 
@@ -355,122 +371,152 @@ struct ManagerTemplate
 class Object
 {
 public:
-	bool IsVisible();
-	bool IsAlive();
-	bool IsTargetable();
-	bool IsInvulnerable();
-	bool IsCursed();
-	bool HasSummonerSpell(SummonerSpells summSpellToFind);
-	bool HasConqueror();
-	bool IsCastingSpell();
-	bool CanAttack();
-	bool CanCast();
-	bool CanMove();
-	bool IsEnemy();
-	bool IsLocalPlayer();
-	bool IsAlly();
-	bool IsJungle();
-	bool IsValidTarget();
-	bool IsRespawnMarker();
-	bool IsMelee();
-	bool IsRanged();
-	bool IsHero();
-	bool IsSpecial();
-	bool IsMinion();
-	bool IsSiegeMinion();
-	bool IsVoidMinion();
-	bool IsRangedMinion();
-	bool IsMeleeMinion();
-	bool IsSuperMinion();
-	bool IsMonster();
-	bool IsDragon();
-	bool IsWard();
-	bool IsEpicMonster();
-	bool IsTurret();
-	bool IsBuilding();
-	bool IsInRange(Vector3 pos, float radius);
-	bool IsUnderEnemyTower();
-	bool IsUnderAllyTower();
-	bool IsInAARange();
-	bool CanCastSpell(int slotId);
-	bool HasBuff(const char* buffname);
-	bool IsFacing(Object* secondObj, float angle);
-	Vector3 GetPosition();
-	Buff* GetBuffByName(std::string name);
-	Buff* GetBuffByType(BuffType type);
-	int GetBuffListSize();
-	int GetTeam();
-	int GetLevel();
-	unsigned int GetNetId();
+	CLASS_GETTER(DWORD, GetHandle, UPasta::Offsets::Client::Handle);
+	CLASS_GETTER(DWORD, GetTurretTargetNetworkID, UPasta::Offsets::Turret::TargetNetworkID);
+
+	CLASS_GETTER(unsigned short, GetActionState, UPasta::Offsets::AttackableUnit::State);
+
+	CLASS_GETTER(int, GetNetId, UPasta::Offsets::Client::Index);
+	CLASS_GETTER(int, GetLevel, UPasta::Offsets::Client::Level);
+	CLASS_GETTER(float, GetExperience, UPasta::Offsets::Client::Experience);
+
+	CLASS_GETTER(float, GetAttackRange, UPasta::Offsets::Client::AttackRange);
+
+	CLASS_GETTER(float, GetHealth, UPasta::Offsets::AttackableUnit::Health);
+	CLASS_GETTER(float, GetBonusHealth, UPasta::Offsets::AttackableUnit::BonusHealth);
+	CLASS_GETTER(float, GetMaxHealth, UPasta::Offsets::AttackableUnit::MaxHealth);
+	CLASS_GETTER(float, GetLifeRegeneration, UPasta::Offsets::Client::LifeRegeneration);
+
+	CLASS_GETTER(float, GetMana, UPasta::Offsets::AttackableUnit::Mana);
+	CLASS_GETTER(float, GetMaxMana, UPasta::Offsets::AttackableUnit::MaxMana);
+
+	CLASS_GETTER(float, GetBaseAttackDamage, UPasta::Offsets::Client::BaseAttackDamage);
+	CLASS_GETTER(float, GetBonusAttackDamage, UPasta::Offsets::Client::BonusAttackDamage);
+
+	CLASS_GETTER(float, GetAbilityHaste, UPasta::Offsets::Client::AbilityHaste);
+
+	CLASS_GETTER(float, GetLethality, UPasta::Offsets::Client::Lethality);
+
+	CLASS_GETTER(float, GetArmorPenetrationFlat, UPasta::Offsets::Client::ArmorPenetrationFlat);
+
+	CLASS_GETTER(float, GetMagicPenetrationFlat, UPasta::Offsets::Client::MagicPenetrationFlat);
+	CLASS_GETTER(float, GetMagicPenetrationMultiplier, UPasta::Offsets::Client::MagicPenetrationMultiplier);
+
+	CLASS_GETTER(float, GetAbilityPower, UPasta::Offsets::Client::AbilityPower);
+
+	CLASS_GETTER(float, GetBonusArmor, UPasta::Offsets::Client::BonusArmor);
+	CLASS_GETTER(float, GetBaseArmor, UPasta::Offsets::Client::BaseArmor);
+
+	CLASS_GETTER(float, GetShield, UPasta::Offsets::Client::Shield);
+	CLASS_GETTER(float, GetPhysicalShield, UPasta::Offsets::Client::PhysicalShield);
+	CLASS_GETTER(float, GetMagicalShield, UPasta::Offsets::Client::MagicalShield);
+
+	CLASS_GETTER(float, GetCritFlat, UPasta::Offsets::Client::CritFlat);
+	CLASS_GETTER(float, GetCritMultiplier, UPasta::Offsets::Client::CritMultiplier);
+
+	CLASS_GETTER(float, GetAttackSpeed, UPasta::Offsets::Client::AttackSpeedMulti);
+
+	CLASS_GETTER(float, GetBonusMagicResist, UPasta::Offsets::Client::BonusMagicResist);
+	CLASS_GETTER(float, GetTotalMagicResist, UPasta::Offsets::Client::TotalMagicResist);
+
+	CLASS_GETTER(float, GetMovementSpeed, UPasta::Offsets::Client::MovementSpeed);
+
+	CLASS_GETTER(float, GetAmmo, UPasta::Offsets::Client::Ammo);
+	CLASS_GETTER(float, GetMaxAmmo, UPasta::Offsets::Client::MaxAmmo);
+
+	CLASS_GETTER(float, GetScaleMulti, UPasta::Offsets::Client::ScaleMulti);
+
+	CLASS_GETTER(bool, IsVisible, UPasta::Offsets::AttackableUnit::Visibility);
+	CLASS_GETTER(bool, IsTargetable, UPasta::Offsets::AttackableUnit::Targetable);
+	CLASS_GETTER(bool, IsInvulnerable, UPasta::Offsets::AttackableUnit::Invulnerability);
+
 	float GetBoundingRadius();
 	float GetAttackDelay();
 	float GetAttackWindup();
-	float GetEffectiveHealth(int damageType);
-	float GetRealAttackRange();
-	float GetDistanceTo(Object* obj);
-	float GetPercentHealth();
-	unsigned short GetActionState();
-	float GetExperience();
-	float GetMana();
-	float GetMaxMana();
-	float GetPercentMana();
-	float GetAttackDamage();
+
+	float GetEffectiveHealth(DamageType damageType);
+	float GetAttackDamage() { return this->GetBaseAttackDamage() + this->GetBonusAttackDamage(); }
+	float GetTotalArmor() { return this->GetBaseArmor() + this->GetBonusArmor(); }
+
+	float GetRealAttackRange() { return this->GetAttackRange() + this->GetBoundingRadius(); }
+	float GetPercentHealth() { return 100 * this->GetHealth() / this->GetMaxHealth() > 100 ? 100 : 100 * this->GetHealth() / this->GetMaxHealth(); }
+	float GetPercentMana() { return 100 * this->GetMana() / this->GetMaxMana() > 100 ? 100 : 100 * this->GetMana() / this->GetMaxMana(); }
+
+	bool IsAlive();
+	bool IsLocalPlayer();
+
+	CLASS_GETTER(int, GetTeam, UPasta::Offsets::BaseObject::Team);
+	bool IsJungle() { return this->GetTeam() == 300; }
+	bool IsAlly();
+	bool IsEnemy() { return !this->IsAlly(); }
+	bool IsValidTarget() { return this->IsVisible() && this->IsAlive() && this->IsEnemy() && this->IsTargetable(); }
+
+	bool HasSummonerSpell(SummonerSpells summSpellToFind);
+	bool IsCasting();
+
+	//TODO: DEPRECATE ACTIONSTATE, USELESS.
+
+	bool CanAttack() { return this->GetActionState() & ActionState::CanAttack && !this->GetBuffByName("KaisaE"); }
+	bool CanCast() { return this->GetActionState() & ActionState::CanCast; }
+	bool CanMove() { return this->GetActionState() & ActionState::CanMove; }
+
+	bool CanCastSpell(SpellIndex slotId);
+
+	CLASS_GETTER(CombatType, GetCombatType, UPasta::Offsets::Client::CombatType);
+	bool IsMelee() { return this->GetCombatType() == CombatType::Melee; }
+	bool IsRanged() { return this->GetCombatType() == CombatType::Ranged; }
+
+
+	bool IsHero() { return this->GetType() == AIHeroClient; }
+	bool IsMinion() { return this->GetType() == AIMinionClient; }
+	bool IsTurret() { return this->GetType() == AITurretClient; }
+	bool IsInhibitor() { return this->GetType() == BarracksDampener; }
+	bool IsNexus() { return this->GetType() == HQ; }
+	bool IsMissile() { return this->GetType() == MissileClient; }
+	bool IsParticle() { return this->GetType() == obj_GeneralParticleEmitter; }
+
+	CharacterData* GetCharacterData();
+	bool IsRespawnMarker() { return this->GetCharacterData()->GetObjectTypeHash() == RespawnMarker; }
+	bool IsSpecial() { return this->GetCharacterData()->GetObjectTypeHash() == Special; }
+	bool IsWard() { return this->GetCharacterData()->GetObjectTypeHash() == Ward; }
+	bool IsSiegeMinion() { return this->GetCharacterData()->GetObjectTypeHash() == Minion_Lane_Siege; }
+	bool IsVoidMinion() { return this->GetCharacterData()->GetObjectTypeHash() == Special_Void; }
+	bool IsRangedMinion() {	return this->GetCharacterData()->GetObjectTypeHash() == Minion_Lane_Ranged; }
+	bool IsMeleeMinion() { return this->GetCharacterData()->GetObjectTypeHash() == Minion_Lane_Melee; }
+	bool IsSuperMinion() { return this->GetCharacterData()->GetObjectTypeHash() == Minion_Lane_Super; }
+	bool IsMonster() { return this->GetCharacterData()->GetObjectTypeHash() == Monster; }
+	bool IsEpicMonster() { return this->GetCharacterData()->GetObjectTypeHash() == Monster_Epic; }
+	bool IsDragon() { return this->GetCharacterData()->GetObjectTypeHash() == Monster_Dragon; }
+
+	Vector3 GetPosition();
+
+	float GetDistanceTo(Object* obj) { return this->GetPosition().Distance(obj->GetPosition()); }
+	bool IsUnderTower(Alliance team);
+	bool IsFacing(Object* secondObj, float angle);
+
+	bool IsInAARange();
+
+	QWORD* GetBuffManagerEntriesEnd();
+	BuffManager* GetBuffManager();
+	Buff* GetBuffByName(std::string name);
+	Buff* GetBuffByType(BuffType type);
+	int GetBuffListSize();
+
+	bool HasBuff(const char* buffname);
+	bool IsCursed() { return this->GetBuffByName("cursedtouch"); }
+	bool HasConqueror() { return this->GetBuffByName("ASSETS/Perks/Styles/Precision/Conqueror/ConquerorEnrage.lua"); }
 	std::string GetName();
 	std::string GetClassicName();
-	BuffManager* GetBuffManager();
-	DWORD GetHandle();
-	DWORD GetTurretTargetNetworkID();
-	QWORD* GetBuffManagerEntriesEnd();
 	SpellCast* GetActiveSpellCast();
 	Spell* GetSpellBySlotId(int slotId);
 	Missile* GetMissileByIndex();
-	CharacterData* GetCharacterData();
-	AiManager* GetAiManager();
-	CombatType GetCombatType();
-	HeroInventory* GetHeroInventory();
-	Perks* GetHeroPerks();
-	CharacterDataStack* GetCharacterDataStack();
-	CharacterStateIntermediate* GetCharacterStateIntermediate();
 
-	enum StatType {
-		AttackRange,
-		Health,
-		BonusHealth,
-		MaxHealth,
-		LifeRegeneration,
-		Mana,
-		MaxMana,
-		BaseAttackDamage,
-		BonusAttackDamage,
-		TotalAttackDamage,
-		AbilityHaste,
-		Lethality,
-		ArmorPenetrationFlat,
-		MagicPenetrationFlat,
-		MagicPenetrationMultiplier,
-		AbilityPower,
-		BaseArmor,
-		BonusArmor,
-		TotalArmor,
-		Shield,
-		PhysicalShield,
-		MagicalShield,
-		CritFlat,
-		CritMultiplier,
-		AttackSpeed,
-		BonusMagicResist,
-		TotalMagicResist,
-		MovementSpeed,
-		Ammo,
-		MaxAmmo,
-		ScaleMulti,
-		Experience,
-		Level,
-		Visibility,
-		Targetable,
-		Invulnerability
-	};
-	float ReadClientStat(StatType s);
+	AiManager* GetAiManager();
+
+	CLASS_GETTER_P(HeroInventory, GetHeroInventory, UPasta::Offsets::ItemManager::ItemManagerInstance);
+	CLASS_GETTER_P(Perks, GetHeroPerks, UPasta::Offsets::Perks::PerksManagerInstance);
+	CLASS_GETTER_P(CharacterDataStack, GetCharacterDataStack, UPasta::Offsets::CharData::CharDataInstance);
+	CLASS_GETTER_P(CharacterStateIntermediate, GetCharacterStateIntermediate, UPasta::Offsets::CharacterStateIntermediate::oCharacterStateIntermediate);
 
 	enum TYPE : DWORD {
 		NeutralMinionCamp = 0xFE7449A3,
@@ -528,8 +574,9 @@ public:
 	uintptr_t* vtable;
 	std::map<uintptr_t, Missile*> missile_map;
 	std::map<uintptr_t, Object*> units_map;
-	int GetListSize();
 	Object* GetIndex(int index);
+	CLASS_GETTER(int, GetListSize, UPasta::Offsets::Instance::Lists::ManagerListSize);
+
 
 	class iterator
 	{

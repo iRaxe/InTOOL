@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../stdafx.h"
+#include "structs.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
@@ -255,8 +256,6 @@ struct Vector3
     std::string ToString() {
         return std::to_string(this->x) + "\n" + std::to_string(this->y) + "\n" + std::to_string(this->z);
     }
-
-    bool IsUnderEnemyTower();
 
     float DistanceSquared(Vector3 const& to) const;
 

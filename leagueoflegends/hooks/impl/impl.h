@@ -5,6 +5,14 @@ namespace hooks
 	namespace impl
 	{
 		extern HWND windowDX;
+		void AssignGlobalLists();
+		void InitMainFunctions();
+		void OnGameUpdate();
+		void OnWndProc(UINT msg, WPARAM param);
+		void HookFunctions();
+		void SubscribeToMainEvents();
+		void UnSubscribeFromMainEvents();
+		void Dispose();
 		void Init();
 			
 	}

@@ -86,7 +86,7 @@ private:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float AttackDMG = SennaDamages::QSpell::additionalPercentageAD;
         const float DMG = SennaDamages::QSpell::dmgSkillArray[levelSpell];
-        const float pDMG = (DMG + (globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * AttackDMG));
+        const float pDMG = (DMG + (globals::localPlayer->GetBonusAttackDamage() * AttackDMG));
         const float PhsyDMG = Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, pDMG);
         return PhsyDMG;
 
@@ -100,7 +100,7 @@ private:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float AttackDMG = SennaDamages::WSpell::additionalPercentageAD;
         const float DMG = SennaDamages::WSpell::dmgSkillArray[levelSpell];
-        const float pDMG = (DMG + (globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * AttackDMG));
+        const float pDMG = (DMG + (globals::localPlayer->GetBonusAttackDamage() * AttackDMG));
         const float PhsyDMG = Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, pDMG);
         return PhsyDMG;
 
@@ -115,8 +115,8 @@ private:
         const float AttackDMG = SennaDamages::RSpell::additionalPercentageAD;
         const float APDMG = SennaDamages::RSpell::additionalPercentageAP;
         const float DMG = SennaDamages::RSpell::dmgSkillArray[levelSpell];
-        const float pDMG = (DMG + (globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * AttackDMG));
-        const float aDMG = ((globals::localPlayer->ReadClientStat(Object::AbilityPower) * APDMG));
+        const float pDMG = (DMG + (globals::localPlayer->GetBonusAttackDamage() * AttackDMG));
+        const float aDMG = ((globals::localPlayer->GetAbilityPower() * APDMG));
         const float PhsyDMG = Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, pDMG);
         const float APPDMG = Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, aDMG);
         return PhsyDMG + APPDMG;
@@ -126,8 +126,8 @@ private:
     static bool CanKill(Object* target, float damageCalculation)
     {
         if (target == nullptr) return false;
-        const float targetHealth = target->ReadClientStat(Object::Health);
-        const float targetShield = target->ReadClientStat(Object::Shield);
+        const float targetHealth = target->GetHealth();
+        const float targetShield = target->GetShield();
         return targetHealth + targetShield < damageCalculation;
     }
 
@@ -150,11 +150,11 @@ private:
             std::sort(possible_targets.begin(), possible_targets.end(),
                 [](Object* pFirst, Object* pSecond) -> bool
                 {
-                    auto health_first = pFirst->ReadClientStat(Object::Health);
-                    auto max_health_first = pFirst->ReadClientStat(Object::MaxHealth);
+                    auto health_first = pFirst->GetHealth();
+                    auto max_health_first = pFirst->GetMaxHealth();
 
-                    auto health_second = pSecond->ReadClientStat(Object::Health);
-                    auto max_health_second = pSecond->ReadClientStat(Object::MaxHealth);
+                    auto health_second = pSecond->GetHealth();
+                    auto max_health_second = pSecond->GetMaxHealth();
 
                     auto autos_first = health_first / max_health_first;
                     auto autos_second = health_second / max_health_second;
@@ -171,7 +171,7 @@ private:
         Object* heroToReturn = nullptr;
         for (auto hero : GetHeroesThatNeedsHeal()) {
             if (!hero) continue;
-            const float heroHPPercent = hero->ReadClientStat(Object::Health) / hero->ReadClientStat(Object::MaxHealth) * 100;
+            const float heroHPPercent = hero->GetHealth() / hero->GetMaxHealth() * 100;
 
             if (!heroToReturn && heroHPPercent <= SennaConfig::SennaAuto::MinHealth->Value and hero->IsAlive() and hero->IsTargetable()) {
                 heroToReturn = hero;
@@ -283,14 +283,14 @@ public:
 
         const Vector2 screenPos = Engine::GetHpBarPosition(pEnemy);
 
-        const float endOffset2 = SennaDamages::xOffset + pEnemy->ReadClientStat(Object::Health) / pEnemy->ReadClientStat(Object::MaxHealth) * SennaDamages::widthMultiplier;
+        const float endOffset2 = SennaDamages::xOffset + pEnemy->GetHealth() / pEnemy->GetMaxHealth() * SennaDamages::widthMultiplier;
         const float damage = Senna_dmgR(pEnemy);
-        const float startOffset2 = max(endOffset2 - (damage / pEnemy->ReadClientStat(Object::MaxHealth) * SennaDamages::widthMultiplier), SennaDamages::xOffset);
+        const float startOffset2 = max(endOffset2 - (damage / pEnemy->GetMaxHealth() * SennaDamages::widthMultiplier), SennaDamages::xOffset);
 
         const ImVec2 topLeft = CalculateTopLeft(Vector2(screenPos.x + startOffset2, screenPos.y));
         const ImVec2 bottomRight = CalculateBottomRight(screenPos, endOffset2);
 
-        // const float targetHealth = pEnemy->ReadClientStat(Object::Health);
+        // const float targetHealth = pEnemy->GetHealth();
         const auto drawColor = CanKill(pEnemy, damage) ? COLOR_GREEN : COLOR_RED;
         render::RenderRect(topLeft, bottomRight, drawColor, 0.0f, 0, 1.0f, true);
     }
@@ -358,7 +358,7 @@ public:
 
     void TryQHealAlly() {
         if (!SennaConfig::SennaAuto::AutoHeal->Value || !SennaConfig::SennaCombo::UseQAlly->Value && OrbwalkState::Attack) return;
-        const float manaPercent = globals::localPlayer->ReadClientStat(Object::Mana) / globals::localPlayer->ReadClientStat(Object::MaxMana) * 100;
+        const float manaPercent = globals::localPlayer->GetMana() / globals::localPlayer->GetMaxMana() * 100;
         if (SennaConfig::SennaAuto::MinManaHeal->Value > manaPercent) return;
         if (!isTimeToCastQ()) return;
 
@@ -454,7 +454,7 @@ public:
                 const auto wMinion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), wRange(), Alliance::Enemy);
                 if (wMinion != nullptr) {
                     float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, wMinion);
-                    if (wMinion != nullptr && AAdamage * 2 < wMinion->ReadClientStat(Object::Health)) {
+                    if (wMinion != nullptr && AAdamage * 2 < wMinion->GetHealth()) {
                         Senna_UseW(wMinion);
                     }
                 }
@@ -466,7 +466,7 @@ public:
                 const auto wJungle = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
                 if (wJungle != nullptr) {
                     const float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, wJungle);
-                    if (AAdamage * 2 < wJungle->ReadClientStat(Object::Health)) {
+                    if (AAdamage * 2 < wJungle->GetHealth()) {
                         Senna_UseW(wJungle);
                     }
                 }

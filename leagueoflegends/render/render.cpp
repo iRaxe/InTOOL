@@ -15,34 +15,6 @@ namespace render
 		initAngles();
 	}
 
-	void DoOnDraw()
-	{
-		static bool loaded = false;
-		if (!loaded)
-		{
-			__try { Event::Subscribe(Event::OnDraw, Modules::Champions::RenderUpdate); }
-			__except (1) { LOG("[Event Handler - Add] Error in champions drawings"); }
-
-			__try { Event::Subscribe(Event::OnDraw, UPasta::SDK::Awareness::Functions::Update); }
-			__except (1) { LOG("[Event Handler - Add] Error in awareness drawings"); }
-
-			__try { Event::Subscribe(Event::OnBeforeAttack, Modules::Champions::DoBeforeAttack); }
-			__except (1) { LOG("[Event Handler - Add] Error in DoBeforeAttack "); }
-
-			__try { Event::Subscribe(Event::OnBeforeAttack, Modules::Champions::DoAfterAttack); }
-			__except (1) { LOG("[Event Handler - Add] Error in DoAfterAttack "); }
-
-			__try { Event::Subscribe(Event::OnCastSpell, Modules::Champions::DoCreateMissile); }
-			__except (1) { LOG("[Event Handler - Add] Error in DoCreateMissile "); }
-
-			__try { Event::Subscribe(Event::OnFinishCast, Modules::Champions::DoDeleteMissile); }
-			__except (1) { LOG("[Event Handler - Add] Error in DoDeleteMissile "); }
-
-			LOG("OnDraw triggered");
-			loaded = true;
-		}
-	}
-
 	void Update()
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -57,7 +29,6 @@ namespace render
 		ImGui::SetWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
 
 		Event::Publish(Event::OnDraw); 
-		DoOnDraw();
 		
 
 		ImGuiWindow* window = ImGui::GetCurrentWindow();

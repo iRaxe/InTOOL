@@ -58,8 +58,8 @@ Object* TargetSelector::FindBestTarget(Vector3 from, float range) {
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
 				auto damage_second = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pSecond, my_aa);;
 
-				auto health_first = pFirst->ReadClientStat(Object::Health);
-				auto health_second = pSecond->ReadClientStat(Object::Health);
+				auto health_first = pFirst->GetHealth();
+				auto health_second = pSecond->GetHealth();
 
 				auto autos_first = health_first / damage_first;
 				auto autos_second = health_second / damage_second;
@@ -100,8 +100,8 @@ Object* TargetSelector::FindBestMinion(Vector3 from, float range, Alliance team)
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
 				auto damage_second = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pSecond, my_aa);;
 
-				auto health_first = pFirst->ReadClientStat(Object::Health);
-				auto health_second = pSecond->ReadClientStat(Object::Health);
+				auto health_first = pFirst->GetHealth();
+				auto health_second = pSecond->GetHealth();
 
 				auto autos_first = health_first / damage_first;
 				auto autos_second = health_second / damage_second;
@@ -138,8 +138,8 @@ Object* TargetSelector::FindBestJungle(Vector3 from, float range) {
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
 				auto damage_second = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pSecond, my_aa);;
 
-				auto health_first = pFirst->ReadClientStat(Object::Health);
-				auto health_second = pSecond->ReadClientStat(Object::Health);
+				auto health_first = pFirst->GetHealth();
+				auto health_second = pSecond->GetHealth();
 
 				auto autos_first = health_first / damage_first;
 				auto autos_second = health_second / damage_second;
@@ -177,8 +177,8 @@ Object* TargetSelector::FindTurret(Vector3 from, float range, Alliance team) {
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
 				auto damage_second = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pSecond, my_aa);;
 
-				auto health_first = pFirst->ReadClientStat(Object::Health);
-				auto health_second = pSecond->ReadClientStat(Object::Health);
+				auto health_first = pFirst->GetHealth();
+				auto health_second = pSecond->GetHealth();
 
 				auto autos_first = health_first / damage_first;
 				auto autos_second = health_second / damage_second;
@@ -216,8 +216,8 @@ Object* TargetSelector::FindInhibitor(Vector3 from, float range, Alliance team) 
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
 				auto damage_second = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pSecond, my_aa);;
 
-				auto health_first = pFirst->ReadClientStat(Object::Health);
-				auto health_second = pSecond->ReadClientStat(Object::Health);
+				auto health_first = pFirst->GetHealth();
+				auto health_second = pSecond->GetHealth();
 
 				auto autos_first = health_first / damage_first;
 				auto autos_second = health_second / damage_second;

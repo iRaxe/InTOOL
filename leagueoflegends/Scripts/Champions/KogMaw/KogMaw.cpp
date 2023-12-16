@@ -83,7 +83,7 @@ private:
             return 0.0f;
 
         const float dmgSkill = KogMawDamages::QSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * KogMawDamages::QSpell::additionalPercentageAP;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * KogMawDamages::QSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
         return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
@@ -99,8 +99,8 @@ private:
             return 0.0f;
 
         const float dmgSkill = KogMawDamages::ESpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * KogMawDamages::ESpell::additionalPercentageAP;
-        const float attackDamageModifier = globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * KogMawDamages::ESpell::additionalPercentageAD;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * KogMawDamages::ESpell::additionalPercentageAP;
+        const float attackDamageModifier = globals::localPlayer->GetBonusAttackDamage() * KogMawDamages::ESpell::additionalPercentageAD;
         const float damage = dmgSkill + abilityPowerModifier + attackDamageModifier;
 
         return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
@@ -114,10 +114,10 @@ private:
             return 0.0f;
 
         const float dmgSkill = KogMawDamages::RSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * KogMawDamages::RSpell::additionalPercentageAP;
-        const float attackDamageModifier = globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * KogMawDamages::RSpell::additionalPercentageAD;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * KogMawDamages::RSpell::additionalPercentageAP;
+        const float attackDamageModifier = globals::localPlayer->GetBonusAttackDamage() * KogMawDamages::RSpell::additionalPercentageAD;
         float damage = dmgSkill + abilityPowerModifier + attackDamageModifier;
-        const float targetHPPercent = target->ReadClientStat(Object::Health) / target->ReadClientStat(Object::MaxHealth) * 100;
+        const float targetHPPercent = target->GetHealth() / target->GetMaxHealth() * 100;
 
         if (targetHPPercent > 40.0f) {
             damage = damage + (damage * (targetHPPercent * KogMawDamages::RSpell::multiplicationFactor) / 100);
@@ -283,7 +283,7 @@ public:
         if (KogMawConfig::KogMawCombo::UseQ->Value && isTimeToCastQ()) {
             const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
             if (qTarget != nullptr) {
-	            if (qTarget->ReadClientStat(Object::TotalArmor) >= qMinArmor()) {
+	            if (qTarget->GetTotalArmor() >= qMinArmor()) {
 	            	CastQSpell(qTarget);
 	            }
             }
@@ -319,7 +319,7 @@ public:
         if (KogMawConfig::KogMawHarass::UseQ->Value && isTimeToCastQ()) {
             const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
             if (qTarget != nullptr) {
-                if (qTarget->ReadClientStat(Object::TotalArmor) >= qMinArmor()) {
+                if (qTarget->GetTotalArmor() >= qMinArmor()) {
                     CastQSpell(qTarget);
                 }
             }
@@ -351,7 +351,7 @@ public:
         {
             if (KogMawConfig::KogMawClear::UseQ->Value && isTimeToCastQ()) {
                 const auto qMinion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), qRange(), Alliance::Enemy);
-                if (qMinion != nullptr && qMinion->ReadClientStat(Object::Health) < KogQDamage(qMinion)) {
+                if (qMinion != nullptr && qMinion->GetHealth() < KogQDamage(qMinion)) {
                     CastQSpell(qMinion);
                     return;
                 }
@@ -393,7 +393,7 @@ public:
             if (KogMawConfig::KogMawLastHit::UseQ->Value && isTimeToCastQ())
             {
                 const auto qMinion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), qRange(), Alliance::Enemy);
-                if (qMinion != nullptr && qMinion->ReadClientStat(Object::Health) < KogQDamage(qMinion)) {
+                if (qMinion != nullptr && qMinion->GetHealth() < KogQDamage(qMinion)) {
                     CastQSpell(qMinion);
                 }
             }

@@ -120,7 +120,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = XerathDamages::QSpell::dmgSkillQ[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalSkillDamage = XerathDamages::QSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -135,7 +135,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = XerathDamages::WSpell::dmgSkillW[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalSkillDamage = XerathDamages::WSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -150,7 +150,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = XerathDamages::ESpell::dmgSkillE[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalSkillDamage = XerathDamages::ESpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -165,7 +165,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = XerathDamages::RSpell::dmgSkillR[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalSkillDamage = XerathDamages::RSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -228,7 +228,7 @@ public:
         {
             float rangeCharged = Xerath_QRange();
 
-            float moveSpeed = (pEnemy->ReadClientStat(Object::MovementSpeed) > 1) ? pEnemy->ReadClientStat(Object::MovementSpeed) : 350.0f;
+            float moveSpeed = (pEnemy->GetMovementSpeed() > 1) ? pEnemy->GetMovementSpeed() : 350.0f;
             if (pEnemy->GetDistanceTo(globals::localPlayer) <= 750.0f - moveSpeed * database.XerathQ.GetCastTime() + 50.0f)
             {
 	            if (pEnemy->IsHero())
@@ -491,13 +491,13 @@ public:
 
         if (XerathConfig::XerathLastHit::UseW->Value == true && database.XerathW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange()); Xerath_dmgW(wTarget) > wTarget->ReadClientStat(Object::Health))
+            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange()); Xerath_dmgW(wTarget) > wTarget->GetHealth())
                 Xerath_UseW(wTarget);
         }
 
         if (XerathConfig::XerathLastHit::UseE->Value == true && database.XerathE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()); Xerath_dmgE(eTarget) > eTarget->ReadClientStat(Object::Health))
+            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()); Xerath_dmgE(eTarget) > eTarget->GetHealth())
                 Xerath_UseE(eTarget);
         }
     }
@@ -520,7 +520,7 @@ public:
             if (XerathConfig::XerathKillsteal::UseQ->Value == true && database.XerathQ.IsCastable())
             {
                 const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathQ.GetRange());
-                if (qTarget && qTarget->ReadClientStat(Object::Health) < Xerath_dmgQ(qTarget))
+                if (qTarget && qTarget->GetHealth() < Xerath_dmgQ(qTarget))
                 {
                     if (!IsCastingQ())
                     {
@@ -536,7 +536,7 @@ public:
             if (XerathConfig::XerathKillsteal::UseE->Value == true && database.XerathE.IsCastable())
             {
                 const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange());
-                if (eTarget && eTarget->ReadClientStat(Object::Health) < Xerath_dmgE(eTarget))
+                if (eTarget && eTarget->GetHealth() < Xerath_dmgE(eTarget))
                 {
                     Xerath_UseE(eTarget);
                 }
@@ -545,7 +545,7 @@ public:
             if (XerathConfig::XerathKillsteal::UseW->Value == true && database.XerathW.IsCastable())
             {
                 const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange());
-                if (wTarget && wTarget->ReadClientStat(Object::Health) < Xerath_dmgW(wTarget))
+                if (wTarget && wTarget->GetHealth() < Xerath_dmgW(wTarget))
                 {
                     Xerath_UseW(wTarget);
                 }
@@ -568,7 +568,7 @@ public:
                 if (target)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, database.XerathE.GetRange()))
+                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < database.XerathE.GetRange())
                         Xerath_UseE(target);
                 }
             }

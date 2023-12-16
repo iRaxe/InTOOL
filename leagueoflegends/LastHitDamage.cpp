@@ -24,7 +24,7 @@ void Awarenesss::LastHitDamage::Draw() {
 		const ImVec2 bottomRight = CalculateBottomRight(screenPos, (60 * minion->GetPercentHealth()) / 100);
 
 		const float damage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
-		const float minionHealth = minion->ReadClientStat(Object::Health);
+		const float minionHealth = minion->GetHealth();
 		const bool canKill = damage > minionHealth;
 
 		const auto drawColor = canKill ? COLOR_GREEN : COLOR_RED;

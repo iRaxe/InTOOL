@@ -34,7 +34,7 @@ namespace UPasta
 				if constexpr (std::is_pointer_v<ADMulti>) attackDamageMultiplier = additionalPercentageAD[levelSpell];
 				else attackDamageMultiplier = additionalPercentageAD;
 
-				const float attackDamage = globals::localPlayer->ReadClientStat(Object::BonusAttackDamage);
+				const float attackDamage = globals::localPlayer->GetBonusAttackDamage();
 				const float attackDamageModifier = attackDamageMultiplier * attackDamage;
 				const float physicalDamage = spellslotDamage + attackDamageModifier;
 
@@ -53,7 +53,7 @@ namespace UPasta
 				if constexpr (std::is_pointer_v<APMulti>) abilityPowerMultiplier = additionalPercentageAP[levelSpell];
 				else abilityPowerMultiplier = additionalPercentageAP;
 
-				const float abilityPower = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+				const float abilityPower = globals::localPlayer->GetAbilityPower();
 				const float abilityPowerModifier = abilityPowerMultiplier * abilityPower;
 				const float magicalDamage = spellslotDamage + abilityPowerModifier;
 
@@ -82,10 +82,10 @@ namespace UPasta
 				if constexpr (std::is_pointer_v<ADMulti>) attackDamageMultiplier = additionalPercentageAD[levelSpell];
 				else attackDamageMultiplier = additionalPercentageAD;
 
-				const float abilityPower = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+				const float abilityPower = globals::localPlayer->GetAbilityPower();
 				const float abilityPowerModifier = abilityPowerMultiplier * abilityPower;
 
-				const float attackDamage = globals::localPlayer->ReadClientStat(Object::BonusAttackDamage);
+				const float attackDamage = globals::localPlayer->GetBonusAttackDamage();
 				const float attackDamageModifier = attackDamageMultiplier * attackDamage;
 
 				return spellslotDamage + abilityPowerModifier + attackDamageModifier;

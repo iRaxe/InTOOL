@@ -227,7 +227,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = AsheDamages::WSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->ReadClientStat(Object::TotalAttackDamage);
+        const float attackDamage = globals::localPlayer->GetAttackDamage();
         const float additionalAttackDamageSkillDamage = AsheDamages::WSpell::additionalPercentageAD;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage);
@@ -242,7 +242,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = AsheDamages::RSpell::dmgSkillArray[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalAbilityPowerSkillDamage = AsheDamages::RSpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
@@ -286,7 +286,7 @@ public:
 
     void Ashe_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable() || AsheConfig::AsheSpellsSettings::UseWIfFullAASpeed->Value && globals::localPlayer->ReadClientStat(Object::AttackSpeed) > 2.0f)
+        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable() || AsheConfig::AsheSpellsSettings::UseWIfFullAASpeed->Value && globals::localPlayer->GetAttackSpeed() > 2.0f)
             return;
 
         if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < wRange() && isTimeToCastW())
@@ -367,66 +367,12 @@ public:
             }
     }
 
-
-    void DrawStatsTest(Object* test) {
-        float yOffset = 0;  // Inizializza l'offset
-
-        render::RenderTextWorld("AttackRange: " + std::to_string(test->ReadClientStat(Object::AttackRange)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("Health: " + std::to_string(test->ReadClientStat(Object::Health)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("BonusHealth: " + std::to_string(test->ReadClientStat(Object::BonusHealth)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MaxHealth: " + std::to_string(test->ReadClientStat(Object::MaxHealth)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("LifeRegeneration: " + std::to_string(test->ReadClientStat(Object::LifeRegeneration)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("Mana: " + std::to_string(test->ReadClientStat(Object::Mana)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MaxMana: " + std::to_string(test->ReadClientStat(Object::MaxMana)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("BaseAttackDamage: " + std::to_string(test->ReadClientStat(Object::BaseAttackDamage)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("BonusAttackDamage: " + std::to_string(test->ReadClientStat(Object::BonusAttackDamage)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("AbilityHaste: " + std::to_string(test->ReadClientStat(Object::AbilityHaste)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("Lethality: " + std::to_string(test->ReadClientStat(Object::Lethality)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("ArmorPenetrationFlat: " + std::to_string(test->ReadClientStat(Object::ArmorPenetrationFlat)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("MagicPenetrationFlat: " + std::to_string(test->ReadClientStat(Object::MagicPenetrationFlat)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MagicPenetrationMultiplier: " + std::to_string(test->ReadClientStat(Object::MagicPenetrationMultiplier)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("AbilityPower: " + std::to_string(test->ReadClientStat(Object::AbilityPower)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("BonusArmor: " + std::to_string(test->ReadClientStat(Object::BonusArmor)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("TotalArmor: " + std::to_string(test->ReadClientStat(Object::TotalArmor)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("Shield: " + std::to_string(test->ReadClientStat(Object::Shield)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("PhysicalShield: " + std::to_string(test->ReadClientStat(Object::PhysicalShield)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MagicalShield: " + std::to_string(test->ReadClientStat(Object::MagicalShield)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("CritFlat: " + std::to_string(test->ReadClientStat(Object::CritFlat)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("CritMultiplier: " + std::to_string(test->ReadClientStat(Object::CritMultiplier)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-    	render::RenderTextWorld("AtackSpeedMulti: " + std::to_string(test->ReadClientStat(Object::AttackSpeed)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("BonusMagicResist: " + std::to_string(test->ReadClientStat(Object::BonusMagicResist)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("TotalMagicResist: " + std::to_string(test->ReadClientStat(Object::TotalMagicResist)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("MovementSpeed: " + std::to_string(test->ReadClientStat(Object::MovementSpeed)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("Ammo: " + std::to_string(test->ReadClientStat(Object::Ammo)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("MaxAmmo: " + std::to_string(test->ReadClientStat(Object::MaxAmmo)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-    	render::RenderTextWorld("ScaleMulti: " + std::to_string(test->ReadClientStat(Object::ScaleMulti)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-        render::RenderTextWorld("Experience: " + std::to_string(test->ReadClientStat(Object::Experience)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-        render::RenderTextWorld("Level: " + std::to_string(test->ReadClientStat(Object::Level)), Vector3(test->GetPosition().x, test->GetPosition().y + yOffset, test->GetPosition().z), 16.0f, COLOR_WHITE, true); yOffset += 20;
-
-    }
-
     void Update() override
     {
         gameTime = Engine::GetGameTime();
         Killsteal();
         AntiGapCloser(); 
         AntiMelee();
-        
         //LOG("AAAA %s", globals::localPlayer->GetSpellBySlotId(0)->GetSpellInfo()->GetSpellData()->GetTexturePath().c_str());
 
         //LOG("%f", Functions::GetSpellRange(globals::localPlayer->GetSpellBySlotId(1)));
@@ -492,7 +438,7 @@ public:
             if (AsheConfig::AsheClear::UseW->Value == true && database.AsheW.IsCastable() && ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange()) >= AsheConfig::AsheClear::minWMinions->Value && AsheConfig::AsheSpellsSettings::wCastMode->Value == 0)
             {
                 const auto wTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), wRange(), Alliance::Enemy);
-                if (wTarget != nullptr && wTarget->ReadClientStat(Object::Health) < Ashe_dmgW(wTarget) && Ashe_CanCastW(wTarget))
+                if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget) && Ashe_CanCastW(wTarget))
                     Ashe_UseW(wTarget);
             }
         }
@@ -545,7 +491,7 @@ public:
         if (AsheConfig::AsheLastHit::UseW->Value == true && database.AsheW.IsCastable())
         {
             const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
-            if (wTarget != nullptr && wTarget->ReadClientStat(Object::Health) < Ashe_dmgW(wTarget))
+            if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget))
                 Ashe_UseW(wTarget);
         }
     }
@@ -566,7 +512,7 @@ public:
             if (AsheConfig::AsheKillsteal::UseW->Value == true && database.AsheW.IsCastable())
             {
                 const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
-                if (wTarget != nullptr && wTarget->ReadClientStat(Object::Health) < Ashe_dmgW(wTarget))
+                if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget))
                 {
                     Ashe_UseW(wTarget);
                 }
@@ -578,7 +524,7 @@ public:
                 if (rTarget != nullptr
                     && rTarget->GetDistanceTo(globals::localPlayer) > AsheConfig::AsheSpellsSettings::minRDistance->Value
                     && rTarget->GetDistanceTo(globals::localPlayer) < AsheConfig::AsheSpellsSettings::maxRDistance->Value
-                    && rTarget->ReadClientStat(Object::Health) < Ashe_dmgR(rTarget))
+                    && rTarget->GetHealth() < Ashe_dmgR(rTarget))
                 {
                     Ashe_UseR(rTarget);
                 }
@@ -621,7 +567,7 @@ public:
                 if (target->GetDistanceTo(globals::localPlayer) > wRange()) continue;
                 if (!Engine::MenuItemContains(AsheConfig::AsheAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->IsInRange(globals::localPlayer->GetPosition(), target->GetRealAttackRange()))
+                if (target != nullptr && target->GetDistanceTo(globals::localPlayer) < target->GetRealAttackRange())
                 {
                 	Ashe_UseW(target);
                 }

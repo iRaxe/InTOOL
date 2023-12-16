@@ -120,7 +120,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = YorickDamages::QSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->ReadClientStat(Object::TotalAttackDamage);
+        const float attackDamage = globals::localPlayer->GetAttackDamage();
         const float additionalAttackDamageSkillDamage = YorickDamages::QSpell::additionalPercentageAD;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage);
@@ -135,7 +135,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = YorickDamages::ESpell::dmgSkillArray[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalAbilityPowerSkillDamage = YorickDamages::ESpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
@@ -176,7 +176,7 @@ public:
         int gravesToReturn = 0;
         for (auto objToFind : ObjectManager::GetMinions()) {
             if (!objToFind) continue;
-            if (!objToFind->IsInRange(globals::localPlayer->GetPosition(), database.YorickR.GetMaxRange())) continue;
+            if (!objToFind->GetDistanceTo(globals::localPlayer) > database.YorickR.GetMaxRange()) continue;
 
             if (objToFind->GetName() != "TestCubeRender10Vision") continue;
             gravesToReturn++;
@@ -313,7 +313,7 @@ public:
 
             if (const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),globals::localPlayer->GetRealAttackRange() + 50.0f, Alliance::Enemy);
                 YorickConfig::YorickLastHit::UseQ->Value == true
-                && minion && minion->ReadClientStat(Object::Health) < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
+                && minion && minion->GetHealth() < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
             {
                 Yorick_UseQ(minion);
             }
@@ -374,7 +374,7 @@ public:
             return;
 
         if (YorickConfig::YorickLastHit::UseQ->Value == true && database.YorickQ.IsCastable())
-            if (const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),database.YorickQ.GetRange(), Alliance::Enemy); minion->ReadClientStat(Object::Health) < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
+            if (const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),database.YorickQ.GetRange(), Alliance::Enemy); minion->GetHealth() < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
                 Yorick_UseQ(minion);
     }
 
@@ -394,7 +394,7 @@ public:
         if (YorickConfig::YorickKillsteal::UseQ->Value == true && database.YorickQ.IsCastable())
         {
             if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickQ.GetRange());
-                qTarget && qTarget->ReadClientStat(Object::Health) < Yorick_dmgQ(qTarget))
+                qTarget && qTarget->GetHealth() < Yorick_dmgQ(qTarget))
             {
                 Yorick_UseQ(qTarget);
             }
@@ -403,7 +403,7 @@ public:
         if (YorickConfig::YorickKillsteal::UseE->Value == true && database.YorickE.IsCastable())
         {
             if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetRange());
-                eTarget && eTarget->ReadClientStat(Object::Health) < Yorick_dmgE(eTarget))
+                eTarget && eTarget->GetHealth() < Yorick_dmgE(eTarget))
             {
                 Yorick_UseE(eTarget);
             }
@@ -425,7 +425,7 @@ public:
                 if (target)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, database.YorickW.GetRange()))
+                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < database.YorickW.GetRange())
                     {
                         Yorick_UseW(target);
                     }

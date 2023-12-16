@@ -1,6 +1,5 @@
 #include "../Awareness.h"
 #include "../Damage.h"
-#include "../stdafx.h"
 #include "../TargetSelector.h"
 #include "Vayne.h"
 
@@ -221,7 +220,7 @@ public:
 
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = VayneDamages::QSpell::additionalPercentageAD[levelSpell - 1];
-        const float abilityPowerDamage = globals::localPlayer->ReadClientStat(Object::AbilityPower);
+        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
         const float additionalAbilityPowerSkillDamage = VayneDamages::QSpell::additionalPercentageAP;
 
         const float totalDamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, pEnemy) + (100 * skillDamage) + (abilityPowerDamage * additionalAbilityPowerSkillDamage);
@@ -237,7 +236,7 @@ public:
         const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = VayneDamages::ESpell::dmgSkillArray[levelSpell];
 
-        const float attackDamage = globals::localPlayer->ReadClientStat(Object::BonusAttackDamage);
+        const float attackDamage = globals::localPlayer->GetBonusAttackDamage();
         const float additionalAttackDamageSkillDamage = VayneDamages::ESpell::additionalPercentageAD;
 
         const float bonusSkillDamage = VayneDamages::ESpell::bonusdmgSkillArray[levelSpell];
@@ -355,7 +354,7 @@ public:
             if (VayneConfig::VayneClear::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 0)
             {
                 const auto qTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),aaRange(), Alliance::Enemy);
-                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Vayne_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->GetHealth() < Vayne_dmgQ(qTarget))
                     Vayne_UseQ(qTarget);
             }
         }
@@ -410,7 +409,7 @@ public:
         if (VayneConfig::VayneFlee::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0)
         {
             auto pathEnd = globals::localPlayer->GetPosition().Extend(Engine::GetMouseWorldPos(), 300);
-            if (pathEnd.IsValid() && globals::localPlayer->IsInRange(pathEnd, aaRange()) && isTimeToCastQ())
+            if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < aaRange() && isTimeToCastQ())
             {
                 Engine::CastToPosition(SpellIndex::Q, pathEnd);
                 QCastedTime = gameTime;
@@ -431,7 +430,7 @@ public:
             if (VayneConfig::VayneKillsteal::UseE->Value == true && database.VayneE.IsCastable())
             {
                 const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
-                if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Vayne_dmgE(eTarget))
+                if (eTarget != nullptr && eTarget->GetHealth() < Vayne_dmgE(eTarget))
                 {
                     Vayne_UseE(eTarget);
                 }
@@ -440,7 +439,7 @@ public:
             if (VayneConfig::VayneKillsteal::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0)
             {
                 const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),aaRange());
-                if (qTarget != nullptr && qTarget->ReadClientStat(Object::Health) < Vayne_dmgQ(qTarget))
+                if (qTarget != nullptr && qTarget->GetHealth() < Vayne_dmgQ(qTarget))
                 {
                     Vayne_UseQ(qTarget);
                 }
@@ -532,7 +531,7 @@ public:
                 {
                     if (object->IsMinion())
                     {
-                        if (VayneConfig::VayneClear::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1 && object->ReadClientStat(Object::Health) < Vayne_dmgQ(object))
+                        if (VayneConfig::VayneClear::UseQ->Value == true && Engine::GetSpellState(SpellIndex::Q) == 0 && VayneConfig::VayneSpellsSettings::qCastMode->Value == 1 && object->GetHealth() < Vayne_dmgQ(object))
                         {
                             if (!Vayne_HasEnoughMana(VayneConfig::VayneClear::minMana->Value)) return;
 

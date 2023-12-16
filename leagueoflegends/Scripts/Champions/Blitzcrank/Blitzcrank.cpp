@@ -77,7 +77,7 @@ private:
             return 0.0f;
 
         const float dmgSkill = BlitzcrankDamages::QSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * BlitzcrankDamages::QSpell::additionalPercentageAP;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * BlitzcrankDamages::QSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
         return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
@@ -91,7 +91,7 @@ private:
             return 0.0f;
 
         const float dmgSkill = BlitzcrankDamages::RSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * BlitzcrankDamages::RSpell::additionalPercentageAP;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * BlitzcrankDamages::RSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
         return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
@@ -318,7 +318,7 @@ public:
             if (BlitzcrankConfig::BlitzcrankKillsteal::UseQ->Value && isTimeToCastQ()) {
                 const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
                 if (qTarget != nullptr) {
-                    if (qTarget->ReadClientStat(Object::Health) < BlitzcrankQDamage(qTarget)) {
+                    if (qTarget->GetHealth() < BlitzcrankQDamage(qTarget)) {
                         CastQSpell(qTarget);
                     }
                 }
@@ -327,7 +327,7 @@ public:
             if (BlitzcrankConfig::BlitzcrankKillsteal::UseR->Value && isTimeToCastR()) {
                 const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
                 if (rTarget != nullptr) {
-                    if (rTarget->ReadClientStat(Object::Health) < BlitzcrankRDamage(rTarget)) {
+                    if (rTarget->GetHealth() < BlitzcrankRDamage(rTarget)) {
                         CastRSpell(rTarget);
                     }
                 }

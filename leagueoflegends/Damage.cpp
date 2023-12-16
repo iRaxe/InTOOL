@@ -9,13 +9,13 @@ float Damage::CalculateAutoAttackDamage(Object* source, Object* target) {
 	auto rawTrueDamage = 0.0f;
 	auto calculatedPhysicalDamage = 0.0f;
 	auto calculatedMagicalDamage = 0.0f;
-	auto rawTotalDamage = source->ReadClientStat(Object::TotalAttackDamage);
+	auto rawTotalDamage = source->GetAttackDamage();
 	//auto targetFlags = target->Flags();
 	//auto sourceFlags = source->Flags();
 
 	//if (targetFlags && GameObjectFlags_AIMinionClient) {
 	if (target->IsMinion()) {
-		if (target->ReadClientStat(Object::MaxHealth) <= 6.0f) {
+		if (target->GetMaxHealth() <= 6.0f) {
 			return 1.0f;
 		}
 	}
@@ -60,8 +60,8 @@ float Damage::CalculatePhysicalDamage(Object* source, Object* target, float amou
 		percentArmorPenetration = 0.7f;
 	}
 
-	const auto armor = target->ReadClientStat(Object::BaseArmor);
-	const auto bonusArmor = target->ReadClientStat(Object::BonusArmor);
+	const auto armor = target->GetBaseArmor();
+	const auto bonusArmor = target->GetBonusArmor();
 
 	const auto adjustedArmor = armor * percentArmorPenetration - bonusArmor * (1.0f - percentBonusArmorPenetration) - flatArmorPenetration;
 
@@ -89,7 +89,7 @@ float Damage::CalculateMagicalDamage(Object* source, Object* target, float amoun
 	const auto characterState = source->GetCharacterStateIntermediate();
 	const auto flatMagicPenetration = characterState->ReadClientStat(CharacterStateIntermediate::FlatMagicPenetration);
 	const auto percentMagicPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PercentMagicPenetration);
-	const auto magicResist = target->ReadClientStat(Object::TotalMagicResist);
+	const auto magicResist = target->GetTotalMagicResist();
 
 	float bonusTrueDamage = 0.0f;
 	if (target->IsCursed()) {
@@ -136,7 +136,7 @@ DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* targe
 				if (target->GetBuffByName("MoltenShield")) {
 					auto spell = target->GetSpellBySlotId(2);
 					static const float annieShield[] = { 0, 60, 95, 130, 165, 200 };
-					result.Percent *= 1.0f - (annieShield[spell->GetLevel()] + 0.40f * target->ReadClientStat(Object::AbilityPower)) / 100.0f;
+					result.Percent *= 1.0f - (annieShield[spell->GetLevel()] + 0.40f * target->GetAbilityPower()) / 100.0f;
 				}
 			}},
 			{"Braum", [&]() {
@@ -150,7 +150,7 @@ DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* targe
 				if (target->GetBuffByName("GalioW")) {
 					auto spell = target->GetSpellBySlotId(1);
 					static const float galioShield[] = { 0, 0.25f, 0.30f, 0.35f, 0.40f, 0.45f };
-					result.Percent *= 1.0f - (galioShield[spell->GetLevel()] + (0.12f * target->ReadClientStat(Object::MagicPenetrationMultiplier)));
+					result.Percent *= 1.0f - (galioShield[spell->GetLevel()] + (0.12f * target->GetMagicPenetrationMultiplier()));
 				}
 			}},
 			// Add other heroes similarly...
@@ -194,20 +194,20 @@ DamageOnHitResult Damage::ComputeDamageOnHit(Object* source, Object* target)
 				result.PhysicalDamage += 20;
 		}},
 		{ItemsDatabase::Blade_of_the_Ruined_King, [&]() {
-			auto itemDamage = target->ReadClientStat(Object::Health) * 0.08f;
+			auto itemDamage = target->GetHealth() * 0.08f;
 			if (target->IsMinion()) {
 				itemDamage = min(itemDamage, 60.0f);
 			}
 			result.PhysicalDamage += max(itemDamage, 15.0f);
 		}},
 		{ItemsDatabase::Nashors_Tooth, [&]() {
-			result.MagicalDamage += 15.0f + 0.15f * source->ReadClientStat(Object::AbilityPower);
+			result.MagicalDamage += 15.0f + 0.15f * source->GetAbilityPower();
 		}},
 		{ItemsDatabase::Recurve_Bow, [&]() {
 			result.PhysicalDamage += 15.0f;
 		}},
 		{ItemsDatabase::Titanic_Hydra, [&]() {
-			result.PhysicalDamage += source->GetBuffByName("itemtitanichydracleavebuff") ? 40.0f + 0.1f * source->ReadClientStat(Object::MaxHealth) : 5.0f + 0.01f * source->ReadClientStat(Object::MaxHealth);
+			result.PhysicalDamage += source->GetBuffByName("itemtitanichydracleavebuff") ? 40.0f + 0.1f * source->GetMaxHealth() : 5.0f + 0.01f * source->GetMaxHealth();
 		}},
 		{ItemsDatabase::Dead_Mans_Plate, [&]() {
 			auto buff = source->GetBuffByName("dreadnoughtmomentumbuff");
@@ -237,13 +237,13 @@ DamageOnHitResult Damage::ComputeDamageOnHit(Object* source, Object* target)
 	std::unordered_map<std::string, std::function<void()>> sourceBuffHandlers = {
 		{"akalipweapon", [&]() {
 			static float values[18] = { 35, 38, 41, 44, 47, 50, 53, 62, 71, 80, 89, 98, 107, 122, 137, 152, 167, 182 };
-			result.MagicalDamage += values[min(source->GetLevel() - 1, 17U)] + 0.6f * source->ReadClientStat(Object::BonusAttackDamage) + 0.55f * source->ReadClientStat(Object::AbilityPower);
+			result.MagicalDamage += values[min(source->GetLevel() - 1, 17U)] + 0.6f * source->GetBonusAttackDamage() + 0.55f * source->GetAbilityPower();
 		}},
 		{"sonaqprocattacker", [&]() {
-			result.MagicalDamage += 5.0f + 5.0f * source->GetSpellBySlotId(0)->GetLevel() + 0.3f * target->ReadClientStat(Object::AbilityPower);
+			result.MagicalDamage += 5.0f + 5.0f * source->GetSpellBySlotId(0)->GetLevel() + 0.3f * target->GetAbilityPower();
 		}},
 		{"NamiE", [&]() {
-			result.MagicalDamage += 5.0f + 15.0f * source->GetSpellBySlotId(2)->GetLevel() + 0.2f * target->ReadClientStat(Object::AbilityPower);
+			result.MagicalDamage += 5.0f + 15.0f * source->GetSpellBySlotId(2)->GetLevel() + 0.2f * target->GetAbilityPower();
 		}},
 		{"itemangelhandbuff", [&]() {
 			static float values[18] = { 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f };
@@ -266,7 +266,7 @@ DamageOnHitResult Damage::ComputeDamageOnHit(Object* source, Object* target)
 		{"vaynetumblebonus", [&]() {
 			auto spell = source->GetSpellBySlotId(0);
 			float qBonus[6] = { 0, 0.75f, 0.85f, 0.95f, 1.05f, 1.15f };
-			result.PhysicalDamage += source->ReadClientStat(Object::TotalAttackDamage) * qBonus[spell->GetLevel()];
+			result.PhysicalDamage += source->GetAttackDamage() * qBonus[spell->GetLevel()];
 		}},
 	};
 	if (source->IsHero())

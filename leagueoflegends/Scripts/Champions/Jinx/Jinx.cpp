@@ -207,7 +207,7 @@ public:
             {
                 const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
                 const int eDMG = levelSpell * 5 + 10;
-                const float sDMG = (eDMG + (globals::localPlayer->ReadClientStat(Object::BonusAttackDamage) * .35) + globals::localPlayer->ReadClientStat(Object::AbilityPower) * .30) * stacks;
+                const float sDMG = (eDMG + (globals::localPlayer->GetBonusAttackDamage() * .35) + globals::localPlayer->GetAbilityPower() * .30) * stacks;
 
                 return Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, sDMG);
             }
@@ -334,7 +334,7 @@ public:
             && isTimeToCastE())
         {
             const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
-            if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Jinx_dmgE(eTarget)) {
+            if (eTarget != nullptr && eTarget->GetHealth() < Jinx_dmgE(eTarget)) {
                 Jinx_UseE(eTarget);
             }
         }
@@ -354,7 +354,7 @@ public:
             if (JinxConfig::JinxKillsteal::UseE->Value && isTimeToCastE())
             {
                 const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
-                if (eTarget != nullptr && eTarget->ReadClientStat(Object::Health) < Jinx_dmgE(eTarget))
+                if (eTarget != nullptr && eTarget->GetHealth() < Jinx_dmgE(eTarget))
                 {
                     Jinx_UseE(eTarget);
                 }

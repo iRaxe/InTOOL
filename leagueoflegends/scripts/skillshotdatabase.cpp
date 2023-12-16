@@ -42,7 +42,7 @@ std::string Skillshot::GetName() const {
 }
 
 bool Skillshot::IsCastable() const {
-	return globals::localPlayer->CanCastSpell(this->slotIndex);
+	return globals::localPlayer->CanCastSpell(static_cast<SpellIndex>(this->slotIndex));
 }
 
 bool Skillshot::IsLearned() const {
@@ -155,7 +155,7 @@ void Skillshot::PopulateSpellsDB()
 	database.JhinW = SkillshotManager::RegisterSpell(SP_STRING("Jhin"), W, Skillshot(2550, 40, 5000, 0.75, SkillshotLine, {}));
 	database.JhinE = SkillshotManager::RegisterSpell(SP_STRING("Jhin"), E, Skillshot(750, 130, 1600, 0.25, SkillshotCircle, {}));
 	database.JhinR = SkillshotManager::RegisterSpell(SP_STRING("Jhin"), R, Skillshot(3500, 80, 5000, 0.25, SkillshotLine, {}));
-	database.JinxW = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), W, Skillshot(1450, 60, 3300, max(0.4f, 0.6f - ((globals::localPlayer->ReadClientStat(Object::AttackSpeed) - 1) * 0.25f / 2.5f)), SkillshotLine, { CollidableObjects::Objects }));
+	database.JinxW = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), W, Skillshot(1450, 60, 3300, max(0.4f, 0.6f - ((globals::localPlayer->GetAttackSpeed() - 1) * 0.25f / 2.5f)), SkillshotLine, { CollidableObjects::Objects }));
 	database.JinxE = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), E, Skillshot(900, 80, 1100, 1.5, SkillshotCircle, {}));
 	database.JinxR = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), R, Skillshot(12500, 140, 1700, 0.6, SkillshotLine, {}));
 	database.KaisaQ = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), Q, Skillshot(600, 600, FLT_MAX, 0.4, SkillshotNone, {}));
@@ -284,7 +284,7 @@ void Skillshot::PopulateSpellsDB()
 	database.TaliyahE = SkillshotManager::RegisterSpell(SP_STRING("Taliyah"), E, Skillshot(800, 0, 2000, 0.45, SkillshotCone, {}));
 	database.TaliyahR = SkillshotManager::RegisterSpell(SP_STRING("Taliyah"), R, Skillshot(3000, 120, 1700, 1, SkillshotLine, {}));
 	database.TalonW = SkillshotManager::RegisterSpell(SP_STRING("Talon"), W, Skillshot(650, 75, 2500, 0.25, SkillshotCone, {}));
-	database.TwitchQ = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), Q, Skillshot(globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetRealAttackRange(), globals::localPlayer->ReadClientStat(Object::AttackSpeed), 0.5, SkillshotNone, { }));
+	database.TwitchQ = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), Q, Skillshot(globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetAttackSpeed(), 0.5, SkillshotNone, { }));
 	database.TwitchW = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), W, Skillshot(950, 100, 1500, 3.00, SkillshotCircle, {}));
 	database.TwitchE = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), E, Skillshot(1200, 110, 2000, 0.25, SkillshotNone, {}));
 	database.TwitchR = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), R, Skillshot(globals::localPlayer->GetRealAttackRange() + 300.0f, globals::localPlayer->GetRealAttackRange() + 300.0f, 5000, 0, SkillshotNone, {}));

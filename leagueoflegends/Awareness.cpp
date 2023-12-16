@@ -430,7 +430,7 @@ namespace UPasta
 							const Vector2 worldPlayer2D = Vector2(worldPlayer.x, worldPlayer.z);
 							Vector2 diffVec = worldPlayer2D - pathEnd2D;
 							diffVec.Normalized();
-							diffVec.Multiply(globals::localPlayer->ReadClientStat(Object::MovementSpeed));
+							diffVec.Multiply(globals::localPlayer->GetMovementSpeed());
 
 							const Vector2 destPos = diffVec;
 							const float dX = destPos.x;

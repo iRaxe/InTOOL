@@ -49,7 +49,7 @@ void Awarenesss::PushCooldowns(int state, SpellCast* spellCastInfo) {
 
 	const auto cooldownValue = spell->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(spellLevel)->GetBaseCooldown();
 
-	const auto reduction = 100 / (100 + caster->ReadClientStat(Object::AbilityHaste));
+	const auto reduction = 100 / (100 + caster->GetAbilityHaste());
 	const auto readyAt = Engine::GetGameTime() + cooldownValue * reduction;
 	ListManager::Functions::InsertCooldown(caster, spellID, readyAt);
 }

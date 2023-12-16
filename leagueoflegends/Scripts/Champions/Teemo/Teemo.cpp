@@ -73,7 +73,7 @@ private:
             return 0.0f;
 
         const float dmgSkill = TeemoDamages::QSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * TeemoDamages::QSpell::additionalPercentageAP;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * TeemoDamages::QSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
         return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
@@ -87,7 +87,7 @@ private:
             return 0.0f;
 
         const float dmgSkill = TeemoDamages::RSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * TeemoDamages::RSpell::additionalPercentageAP;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * TeemoDamages::RSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
         return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
@@ -292,7 +292,7 @@ public:
             if (TeemoConfig::TeemoKillsteal::UseQ->Value && isTimeToCastQ()) {
                 const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
                 if (qTarget != nullptr) {
-                    if (qTarget->ReadClientStat(Object::Health) < TeemoQDamage(qTarget)) {
+                    if (qTarget->GetHealth() < TeemoQDamage(qTarget)) {
                         CastQSpell(qTarget);
                     }
                 }
@@ -301,7 +301,7 @@ public:
             if (TeemoConfig::TeemoKillsteal::UseR->Value && isTimeToCastR()) {
                 const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
                 if (rTarget != nullptr) {
-                    if (rTarget->ReadClientStat(Object::Health) < TeemoRDamage(rTarget)) {
+                    if (rTarget->GetHealth() < TeemoRDamage(rTarget)) {
                         CastRSpell(rTarget);
                     }
                 }

@@ -88,7 +88,7 @@ private:
             return 0.0f;
 
         const float dmgSkill = AmumuDamages::QSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * AmumuDamages::QSpell::additionalPercentageAP;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * AmumuDamages::QSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
         return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
@@ -102,7 +102,7 @@ private:
             return 0.0f;
 
         const float dmgSkill = AmumuDamages::RSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->ReadClientStat(Object::AbilityPower) * AmumuDamages::RSpell::additionalPercentageAP;
+        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * AmumuDamages::RSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
         return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
@@ -360,7 +360,7 @@ public:
             if (AmumuConfig::AmumuKillsteal::UseQ->Value && isTimeToCastQ()) {
                 const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
                 if (qTarget != nullptr) {
-                    if (qTarget->ReadClientStat(Object::Health) < AmumuQDamage(qTarget)) {
+                    if (qTarget->GetHealth() < AmumuQDamage(qTarget)) {
                         CastQSpell(qTarget);
                     }
                 }
@@ -369,7 +369,7 @@ public:
             if (AmumuConfig::AmumuKillsteal::UseR->Value && isTimeToCastR()) {
                 const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
                 if (rTarget != nullptr) {
-                    if (rTarget->ReadClientStat(Object::Health) < AmumuRDamage(rTarget)) {
+                    if (rTarget->GetHealth() < AmumuRDamage(rTarget)) {
                         CastRSpell(rTarget);
                     }
                 }

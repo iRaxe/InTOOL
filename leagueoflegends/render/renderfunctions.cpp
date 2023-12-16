@@ -280,36 +280,31 @@ namespace render
 		constexpr int MAX_POINTS = 100;
 		ImVec2 points[MAX_POINTS];
 
-		numPoints = min(numPoints, MAX_POINTS - 1);
+		numPoints = min(numPoints, MAX_POINTS);
 
-		static std::vector<float> sines, cosines;
-		CalculateSinesAndCosines(numPoints, sines, cosines);
-
-		const float currentTime = Engine::GetGameTime(); // Ottieni il tempo corrente di ImGui
-
-		for (int i = 0; i <= numPoints; ++i) {
-			const float cosTheta = cosines[i % numPoints];
-			const float sinTheta = sines[i % numPoints];
-
-			const Vector3 worldSpace = {worldPos.x + radius * cosTheta, worldPos.y, worldPos.z - radius * sinTheta};
+		float theta{ 0.f };
+		for (size_t i{ 0 }; i < numPoints; i++) {
+			const Vector3 worldSpace = { worldPos.x + radius * cos(theta), worldPos.y, worldPos.z - radius * sin(theta) };
 			const ImVec2 screenSpace = Engine::WorldToScreen(worldSpace).ToImVec();
-
 			points[i] = ImVec2(screenSpace.x, screenSpace.y);
+			theta += IM_PI * 2 / numPoints;
 		}
 
 		if (filled)
 			window->DrawList->AddConvexPolyFilled(points, numPoints, ImGui::GetColorU32(ConvertColor(fillColor)) * transparency);
 		else
-			window->DrawList->AddPolyline(points, numPoints + 1, ImGui::GetColorU32(ConvertColor(color)), true, thickness);
+			window->DrawList->AddPolyline(points, numPoints, ImGui::GetColorU32(ConvertColor(color)), true, thickness);
 
 		if (glow) {
+			const float currentTime = Engine::GetGameTime();
+
 			for (int i = 0; i < numPoints; ++i) {
 				ImVec2 p1 = points[i];
 				ImVec2 p2 = points[i + 1];
 				for (int j = 1; j <= 1; ++j) {
 					constexpr float rainbowSpeed = 0.5f;
 					float hue = fmodf(currentTime * rainbowSpeed + static_cast<float>(i) / numPoints, 1.0f);
-					ImVec4 rainbowColor = ImColor::HSV(hue, 1.0f, 1.0f); // Genera il colore HSV
+					ImVec4 rainbowColor = ImColor::HSV(hue, 1.0f, 1.0f);
 					const ImU32 glowColorRainbow = ImGui::ColorConvertFloat4ToU32(rainbowColor);
 					window->DrawList->AddLine(p1, p2, glowColorRainbow, thickness + j * 1);
 				}

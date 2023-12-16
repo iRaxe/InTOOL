@@ -330,7 +330,6 @@ namespace UPasta
 			static uintptr_t constexpr ServerPosition = 0x414;
 			static uintptr_t constexpr Velocity = 0x02B8;
 			static uintptr_t constexpr TargetPos = 0x14;
-			static uintptr_t constexpr DashSpeed = 0x300;
 
 			namespace Path
 			{

@@ -334,9 +334,13 @@ namespace Evade
 		inline float LastClick = 0.0f;
 
 		void InitSpells();
+		void Subscribe();
+		void Unsubscribe();
 		void InitializeMenu();
 		void OnDraw();
-		void OnProcessSpell(void* spellBook, SpellCast* castInfo);
+		void OnGameUpdate();
+		void OnWndProc(UINT msg, WPARAM param);
+		void OnProcessSpell(int state, SpellCast* spellCastInfo);
 		void Initalize();
 
 
@@ -372,10 +376,7 @@ namespace Evade
 		float GetDistanceToMinions(Vector3 pos);
 		bool isNearMinion(Vector3 pos, float distance);
 		float GetDistanceToTurrets(Vector3 pos);
-		float GetPositionValue(Vector3 pos);
 		bool sortBest(Vector3 a, Vector3 b);
-		// PositionInfo InitPositionInfo(Vector3 pos, float extraDelayBuffer, float extraEvadeDistance, Vector3 lastMovePos, Spell lowestEvadeTimeSpell);
-		// float GetClosestDistanceApproac(Spell spell, Vector3 pos, float speed, float delay, Vector3 heroPos, float extraDist);
 		bool IsAboutToHit(Spell& spell, Vector3 pos1, int extra);
 		float GetMovementSpeed(bool extra, EvadeSpell evadeSpell);
 

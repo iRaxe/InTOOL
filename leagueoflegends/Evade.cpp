@@ -24,7 +24,7 @@ static bool CanHeroEvade(Missile* missile, Vector3 evadePos) {
 
 	float evadeTime = 0;
 	float spellHitTime = 0;
-	float speed = me->ReadClientStat(Object::MovementSpeed);
+	float speed = me->GetMovementSpeed();
 	float delay = 0.0;
 	auto castRadius = missile->GetSpellStartPos().distanceTo(missile->GetSpellEndPos());
 	auto evadeRadius = heroPos.distanceTo(evadePos);

@@ -15,19 +15,6 @@ namespace Engine
 		spoof_trampoline = (void*)mem::ScanModInternal((char*)"\xFF\x23", (char*)"xx", (char*)globals::moduleBase);
 	}
 
-	template <typename ReturnType, typename... Args>
-	ReturnType call_function(uintptr_t func, Args... args) {
-		using func_t = ReturnType(__fastcall*)(Args...);
-		return spoof_call(spoof_trampoline, (func_t)func, std::forward<Args>(args)...);
-	}
-
-	template <size_t Index, typename ReturnType, typename... Args>
-	ReturnType call_virtual(void* instance, Args... args) {
-		using fn = ReturnType(__fastcall*)(void*, Args...);
-		auto function = (*static_cast<fn**>(instance))[Index];
-		return function(instance, std::forward<Args>(args)...);
-	}
-
 	template <typename T, typename U>
 	T Read(U addr) {
 		return *reinterpret_cast<T*>((uintptr_t)addr);
@@ -275,7 +262,7 @@ namespace Engine
 	Vector2 GetHpBarPosition(Object* obj)
 	{
 		Vector3 hpBarPos = obj->GetPosition();
-		const float hpBarHeight = Read<float>(obj->GetCharacterData() + UPasta::Offsets::CharData::Size) * obj->ReadClientStat(Object::ScaleMulti);
+		const float hpBarHeight = Read<float>(obj->GetCharacterData() + UPasta::Offsets::CharData::Size) * obj->GetScaleMulti();
 		hpBarPos.y += hpBarHeight;
 
 		auto screenPos = WorldToScreen(hpBarPos);
@@ -714,7 +701,7 @@ namespace Engine
 		if (!CanSendInput() || obj == nullptr) return;
 
 		Vector3 headPos = obj->GetPosition();
-		const float objectHeight = *(float*)(obj->GetCharacterData() + UPasta::Offsets::CharData::Size) * obj->ReadClientStat(Object::ScaleMulti);
+		const float objectHeight = *(float*)(obj->GetCharacterData() + UPasta::Offsets::CharData::Size) * obj->GetScaleMulti();
 		headPos.y += objectHeight - 50.0f;
 
 		auto screenPos = WorldToScreen(headPos);

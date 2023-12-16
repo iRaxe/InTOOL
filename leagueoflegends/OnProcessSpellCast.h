@@ -16,6 +16,34 @@ __int64 __fastcall hkOnProcessSpellCast(__int64 spell_book, int state, SpellCast
 	auto res = reinterpret_cast<__int64(*)(__int64, int, SpellCast*, __int64)>(pOnProcessSpellCast)(spell_book, state, spellCastInfo, a6);
 
 	Event::Publish(Event::OnProcessSpell, state, spellCastInfo);
+	if (spellCastInfo->IsAutoAttack())
+	{
+		switch (state) {
+		case 12:
+			Event::Publish(Event::OnBeforeAttack, spellCastInfo);
+			break;
+
+		case 17:
+			Event::Publish(Event::OnAfterAttack, spellCastInfo);
+			break;
+		}
+	}
+	else
+	{
+		switch (state) {
+		case 12:
+			Event::Publish(Event::OnCastSpell, spellCastInfo);
+			break;
+
+		case 13:
+			Event::Publish(Event::OnImpactSpell, spellCastInfo);
+			break;
+
+		case 17:
+			Event::Publish(Event::OnFinishCast, spellCastInfo);
+			break;
+		}
+	}
 
 	return res;
 }

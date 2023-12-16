@@ -5,6 +5,8 @@
 #include "../../../Orbwalker.h"
 #include "Tristana.h"
 
+#include "../Amumu/Amumu.h"
+
 using namespace UPasta::SDK;
 using namespace UPasta::Plugins::Tristana;
 using namespace UPasta::Plugins::Tristana::Config;
@@ -291,8 +293,8 @@ void Functions::DrawDamageOnHPBar(Object* obj) {
 	static constexpr float xOffset = -46.0f;
 	static constexpr float widthMultiplier = 105;
 
-	const float objHealth = obj->ReadClientStat(Object::Health);
-	const float objMaxHealth = obj->ReadClientStat(Object::MaxHealth);
+	const float objHealth = obj->GetHealth();
+	const float objMaxHealth = obj->GetMaxHealth();
 	const float endOffset2 = xOffset + objHealth / objMaxHealth * widthMultiplier;
 	const float startOffset2 = max(endOffset2 - (comboDamage / objMaxHealth * widthMultiplier), xOffset);
 
@@ -493,7 +495,7 @@ void Modes::Killsteal() {
 		if (hero->GetPosition().Distance(globals::localPlayer->GetPosition()) > TristanaSpellsSettings::GetWRange() + hero->GetBoundingRadius() / 2) continue;
 		if (hero->IsInvulnerable()) continue;
 
-		const float heroHealth = hero->ReadClientStat(Object::Health) + hero->ReadClientStat(Object::Shield);
+		const float heroHealth = hero->GetHealth() + hero->GetShield();
 		if (TristanaKillsteal::UseR->Value && isTimeToCastR() && heroHealth < Damages::RSpell::GetDamage(hero)) {
 			Functions::UseR(hero);
 			break;

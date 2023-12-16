@@ -3,7 +3,7 @@
 #include "Awareness.h"
 #include "Damage.h"
 #include "TargetSelector.h"
-
+#include "JustEvade.h"
 static bool is_kalista = false;
 
 int Orbwalker::GetLatency(int extra) {
@@ -16,7 +16,7 @@ bool Orbwalker::CanAttack() {
 
 bool Orbwalker::CanMove() {
 	if (is_kalista) return true;
-	return GetTickCount64() >= max(_last_action, (_last_aa + (globals::localPlayer->GetAttackWindup() * 1000))); //
+	return GetTickCount64() >= max(_last_action, (_last_aa + (globals::localPlayer->GetAttackWindup() * 1000))); //&& !Evade::Core::Evading; //
 }
 
 bool Orbwalker::CanCastAfterAttack() {

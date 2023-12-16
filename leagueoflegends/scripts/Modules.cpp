@@ -22,8 +22,6 @@ namespace Modules
 	{
 		ObjectManager::Update();
 
-		Event::Publish(Event::OnGameTick);
-
 		__try { Champions::Update(); }
 		__except (1) { LOG("ERROR IN SCRIPTS -> CHAMPIONS UPDATE"); }
 	}
@@ -35,7 +33,7 @@ namespace Modules
 			TargetSelector::Initialize();
 			UPasta::SDK::Awareness::Functions::Initialize();
 			Orbwalker::Init();
-			Evade::Core::Initalize();
+			//Evade::Core::Initalize();
 		}
 	}
 

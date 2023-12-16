@@ -47,6 +47,8 @@ namespace Modules::prediction
 		if (sourceObject->IsHero()) {
 			for (auto hero : ObjectManager::GetHeroesAs(team)) {
 				if (!hero) continue;
+				if (hero == sourceObject) continue;
+
 				if (IsSpecificObjectInWay(sourcePos, targetPos, sourceObject, pathRadius)) {
 					nCount += 1;
 				}
@@ -91,7 +93,7 @@ namespace Modules::prediction
 	{
 		const auto aiManager = obj->GetAiManager();
 
-		float speed = obj->ReadClientStat(Object::MovementSpeed);
+		float speed = obj->GetMovementSpeed();
 		if (aiManager->IsDashing())
 		{
 			speed = aiManager->GetDashSpeed();

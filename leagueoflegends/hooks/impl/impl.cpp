@@ -5,7 +5,7 @@
 #include "../../Orbwalker.h"
 #include "../../imgui_freetype.h"
 #include "../../imgui_notify.h"
-#include "../../InitializeEvents.h"
+#include "../../OnProcessSpellCast.h"
 
 namespace hooks
 {
@@ -15,8 +15,7 @@ namespace hooks
 
 		bool _init = false;
 
-		void Inits()
-		{
+		void AssignGlobalLists() {
 			globals::localPlayer = *(Object**)(globals::moduleBase + UPasta::Offsets::Instance::LocalPlayer);
 			globals::heroManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::HeroList);
 			globals::minionManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::MinionList);
@@ -25,72 +24,135 @@ namespace hooks
 			globals::attackableManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::AttackableList);
 			globals::objManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::ObjManager);
 			globals::missileManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::MissileList);
+		}
 
-			UPasta::EventsManager::Initialization::OnInject();
+		void InitMainFunctions() {
+			TryCatch(Skillshot::PopulateSpellsDB(), "Error in populating spells database");
+			TryCatch(Engine::Init(), "Error in initializing functions");
+			TryCatch(UPasta::SDK::Menu::Initialize(), "Error in initializing menu");
+			TryCatch(render::Init(), "Error in initializing render features");
+			TryCatch(Modules::Init(), "Error in initializing scripts");
+			TryCatch(UPasta::SDK::ListManager::Functions::Initialize(), "Error in initializing sdk functions");
+		}
+
+		void OnGameUpdate() {
+			TryCatch(UPasta::SDK::ListManager::Functions::Refresh(), "Error in listmanager update");
+			TryCatch(Modules::Update();, "Error in scripts update");
+			TryCatch(render::Update(), "Error in render update");
+			TryCatch(UPasta::SDK::Menu::OnDraw(), "Error in menu update");
+		}
+
+		void OnWndProc(UINT msg, WPARAM param) {
+			//globals::scripts::orbwalker::orbwalkState = OrbwalkState::Off
+			if (param == UPasta::SDK::OrbwalkerConfig::comboKey->Key && UPasta::SDK::OrbwalkerConfig::statusComboMode->Value) {
+				switch (msg) {
+					case WM_KEYDOWN: globals::scripts::orbwalker::orbwalkState = OrbwalkState::Attack; break;
+					case WM_KEYUP: break;
+				}
+			}
+
+			if (param == UPasta::SDK::OrbwalkerConfig::harassKey->Key && UPasta::SDK::OrbwalkerConfig::statusLaneClearMode->Value) {
+				switch (msg) {
+				case WM_KEYDOWN: globals::scripts::orbwalker::orbwalkState = OrbwalkState::Clear; break;
+				case WM_KEYUP: break;
+				}
+			}
+
+			if (param == UPasta::SDK::OrbwalkerConfig::laneClearKey->Key && UPasta::SDK::OrbwalkerConfig::statusFastClearMode->Value) {
+				switch (msg) {
+					case WM_KEYDOWN: globals::scripts::orbwalker::orbwalkState = OrbwalkState::FastClear; break;
+					case WM_KEYUP: break;
+				}
+			}
+
+			if (param == UPasta::SDK::OrbwalkerConfig::fastClearKey->Key && UPasta::SDK::OrbwalkerConfig::statusHarassMode->Value) {
+				switch (msg) {
+					case WM_KEYDOWN: globals::scripts::orbwalker::orbwalkState = OrbwalkState::Harass; break;
+					case WM_KEYUP: break;
+				}
+			}
+
+			if (param == UPasta::SDK::OrbwalkerConfig::fastClearKey->Key && UPasta::SDK::OrbwalkerConfig::statusLastHitMode->Value) {
+				switch (msg) {
+					case WM_KEYDOWN: globals::scripts::orbwalker::orbwalkState = OrbwalkState::Lasthit; break;
+					case WM_KEYUP: break;
+				}
+			}
+
+			if (param == UPasta::SDK::OrbwalkerConfig::fastClearKey->Key && UPasta::SDK::OrbwalkerConfig::statusFleeMode->Value) {
+				switch (msg) {
+					case WM_KEYDOWN:globals::scripts::orbwalker::orbwalkState = OrbwalkState::Flee; break;
+					case WM_KEYUP: break;
+				}
+			}
+
+			if (param == VK_SHIFT) {
+				switch (msg) {
+					case WM_KEYDOWN: globals::menuOpen = true; break;
+					case WM_KEYUP: globals::menuOpen = false; break;
+				}
+			}
+
+			if (param == VK_DELETE && Engine::IsGameFocused()) {
+				switch (msg) {
+					case WM_KEYDOWN: Dispose(); globals::eject = true; break;
+					case WM_KEYUP: break;
+				}
+			}
+		}
+
+		void HookFunctions() {
+			TryCatch(HookOnProcessSpellCast(), " Error in hooking OnProcessSpellSound");
+		}
+
+		//TODO: REMOVE THE SUBTOMAINEVENTS (PLACEHOLDER FOR OLD CHAMP TEMPLATE)
+		void SubscribeToMainEvents() {
+			TryCatch(Event::Subscribe(Event::OnGameTick, OnGameUpdate), "Error in champions drawings");
+
+			TryCatch(Event::Subscribe(Event::OnDraw, Modules::Champions::RenderUpdate), "Error in champions drawings");
+			TryCatch(Event::Subscribe(Event::OnDraw, UPasta::SDK::Awareness::Functions::Update), "Error in awareness drawings");
+
+			TryCatch(Event::Subscribe(Event::OnBeforeAttack, Modules::Champions::DoBeforeAttack), "Error in DoBeforeAttack");
+			TryCatch(Event::Subscribe(Event::OnAfterAttack, Modules::Champions::DoAfterAttack), "Error in DoAfterAttack");
+
+			TryCatch(Event::Subscribe(Event::OnCastSpell, Modules::Champions::DoCreateMissile), "Error in DoCreateMissile");
+			TryCatch(Event::Subscribe(Event::OnFinishCast, Modules::Champions::DoDeleteMissile), "Error in DoDeleteMissile");
+
+			TryCatch(Event::Subscribe(Event::OnWndProc, &OnWndProc), "Error subscribing to OnWndProc event");
+		}
+
+		void UnSubscribeFromMainEvents() {
+			TryCatch(Event::UnSubscribe(Event::OnGameTick, OnGameUpdate), "Error in unsubscribing from champions drawings");
+			TryCatch(Event::UnSubscribe(Event::OnDraw, Modules::Champions::RenderUpdate), "Error in unsubscribing from champions drawings");
+			TryCatch(Event::UnSubscribe(Event::OnWndProc, &OnWndProc), "Error unsubscribing from OnWndProc event");
+		}
+
+		void Dispose() {
+			TryCatch(UPasta::SDK::Menu::Dispose(), " Error in saving menu configs");
+			TryCatch(UnHookOnProcessSpellCast(), " Error in unhooking OnProcessSpellSound");
+			TryCatch(UnSubscribeFromMainEvents(), " Error in unsubscribing from events");
+		}
+
+		void Inits()
+		{
+			AssignGlobalLists();
+			InitMainFunctions();
+			HookFunctions();
+			SubscribeToMainEvents();
 
 			RECT windowRect;
-			if (GetWindowRect(windowDX, &windowRect))
-			{
+			if (GetWindowRect(windowDX, &windowRect)) {
 				globals::windowWidth = (float)abs(windowRect.right - windowRect.left);
 				globals::windowHeight = (float)abs(windowRect.bottom - windowRect.top);
 			}
 
-
 			Engine::PrintChat(CHAT_COLOR("#72ff72", "Loooool now u are going to get rekt"));
 			globals::hookResponse = true;
-
-			LOG("%s hooked", globals::renderType);
 		}
 
-		void Updates()
-		{
-			__try { UPasta::SDK::ListManager::Functions::Refresh(); }
-			__except (1) { LOG("ERROR IN LISTMANAGER UPDATE"); }
-
-			__try { Modules::Update(); }
-			__except (1) { LOG("ERROR IN SCRIPTS UPDATE"); }
-
-			__try { render::Update(); }
-			__except (1) { LOG("ERROR IN RENDER UPDATE"); }
-
-			__try { UPasta::SDK::Menu::OnDraw(); }
-			__except (1) { LOG("ERROR IN MENU UPDATE"); }
-
-		}
-
+		
 		bool KeyChecks()
 		{
-			if (GetAsyncKeyState(VK_DELETE) & 1)
-			{
-				UPasta::SDK::Menu::Dispose();
-				UPasta::EventsManager::Dispose();
-
-				globals::eject = true;
-				return true;
-			}
-
-			if (GetAsyncKeyState(VK_SHIFT)) {
-				globals::menuOpen = true;
-			}
-			else {
-				globals::menuOpen = false;
-			}
-
-			globals::scripts::orbwalker::orbwalkState = OrbwalkState::Off;
-
-			if (UPasta::SDK::OrbwalkerConfig::comboKey->Value && UPasta::SDK::OrbwalkerConfig::statusComboMode->Value)
-				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Attack;
-			if (UPasta::SDK::OrbwalkerConfig::laneClearKey->Value && UPasta::SDK::OrbwalkerConfig::statusLaneClearMode->Value)
-				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Clear;
-			if (UPasta::SDK::OrbwalkerConfig::fastClearKey->Value && UPasta::SDK::OrbwalkerConfig::statusFastClearMode->Value)
-				globals::scripts::orbwalker::orbwalkState = OrbwalkState::FastClear;
-			if (UPasta::SDK::OrbwalkerConfig::harassKey->Value && UPasta::SDK::OrbwalkerConfig::statusHarassMode->Value)
-				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Harass;
-			if (UPasta::SDK::OrbwalkerConfig::lastHitKey->Value && UPasta::SDK::OrbwalkerConfig::statusLastHitMode->Value)
-				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Lasthit;
-			if (UPasta::SDK::OrbwalkerConfig::fleeKey->Value && UPasta::SDK::OrbwalkerConfig::statusFleeMode->Value)
-				globals::scripts::orbwalker::orbwalkState = OrbwalkState::Flee;
-
 			return false;
 		}
 
@@ -132,8 +194,6 @@ namespace hooks
 		//DX9
 		HRESULT __stdcall EndScene(LPDIRECT3DDEVICE9 pDevice)
 		{
-			if (globals::eject) return o_endSceneDX9(pDevice);
-
 			if (!_init)
 			{
 				D3DDEVICE_CREATION_PARAMETERS params;
@@ -155,30 +215,28 @@ namespace hooks
 				_init = true;
 			}
 
-			if (Engine::IsGameFocused())
+			if (globals::eject)
 			{
-				if (KeyChecks())
-				{
-					SetWindowLongPtr(windowDX, GWLP_WNDPROC, (LONG_PTR)o_wndProcDX);
+				SetWindowLongPtr(windowDX, GWLP_WNDPROC, (LONG_PTR)o_wndProcDX);
 
-					ImGui_ImplDX9_Shutdown();
-					ImGui_ImplWin32_Shutdown();
-					ImGui::DestroyContext();
+				ImGui_ImplDX9_Shutdown();
+				ImGui_ImplWin32_Shutdown();
+				ImGui::DestroyContext();
 
-					HRESULT result = o_endSceneDX9(pDevice);
+				HRESULT result = o_endSceneDX9(pDevice);
 
-					kiero::shutdown();
-					pDevice->Release();
+				kiero::shutdown();
+				pDevice->Release();
 
-					return result;
-				}
+				return result;
 			}
 
 			ImGui_ImplDX9_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			Updates();
+			Event::Publish(Event::OnGameTick);
+
 
 			//ImGui::EndFrame();
 			ImGui::Render();
@@ -239,32 +297,28 @@ namespace hooks
 					return o_presentDX(pSwapChain, SyncInterval, Flags);
 			}
 
-			if (Engine::IsGameFocused())
+			if (globals::eject)
 			{
-				if (KeyChecks())
-				{
-					SetWindowLongPtr(windowDX, GWLP_WNDPROC, (LONG_PTR)o_wndProcDX);
+				SetWindowLongPtr(windowDX, GWLP_WNDPROC, (LONG_PTR)o_wndProcDX);
 
-					ImGui_ImplDX11_Shutdown();
-					ImGui_ImplWin32_Shutdown();
-					ImGui::DestroyContext();
+				ImGui_ImplDX11_Shutdown();
+				ImGui_ImplWin32_Shutdown();
+				ImGui::DestroyContext();
 
-					HRESULT result = o_presentDX(pSwapChain, SyncInterval, Flags);
+				HRESULT result = o_presentDX(pSwapChain, SyncInterval, Flags);
 
-					kiero::shutdown();
-					pDeviceDX11->Release();
-					globals::eject = true;
+				kiero::shutdown();
+				pDeviceDX11->Release();
+				globals::eject = true;
 
-					return result;
-
-				}
+				return result;
 			}
 
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			Updates();
+			Event::Publish(Event::OnGameTick);
 
 			ImGui::EndFrame();
 			ImGui::Render();
