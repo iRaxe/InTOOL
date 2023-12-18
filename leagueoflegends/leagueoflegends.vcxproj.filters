@@ -224,6 +224,9 @@
     <Filter Include="Scripts\Champions\New\Tristana">
       <UniqueIdentifier>{d29c6fe0-f970-48b5-9a8a-3cac47d6542e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Champions\New\Yone">
+      <UniqueIdentifier>{5430b667-7b99-4d0a-8985-076c0794598b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -564,6 +567,9 @@
     <ClInclude Include="Scripts\Champions\Brand\Brand.h">
       <Filter>Scripts\Champions\New\Brand</Filter>
     </ClInclude>
+    <ClInclude Include="Yone.h">
+      <Filter>Scripts\Champions\New\Yone</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -812,6 +818,9 @@
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Brand\Brand.cpp">
       <Filter>Scripts\Champions\New\Brand</Filter>
+    </ClCompile>
+    <ClCompile Include="Yone.cpp">
+      <Filter>Scripts\Champions\New\Yone</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

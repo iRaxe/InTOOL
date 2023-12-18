@@ -6,10 +6,11 @@
 #include "../Orbwalker.h"
 #include "Champions/Brand/Brand.h"
 #include "Champions/Tristana/Tristana.h"
+#include "../Yone.h"
 
 namespace Modules
 {
-	
+
 	static float gameTime = 0.0f;
 
 	void Init()
@@ -49,6 +50,9 @@ namespace Modules
 			else if (globals::localPlayer->GetName() == "Tristana") {
 				UPasta::Plugins::Tristana::Events::Initialize();
 			}
+			else if (globals::localPlayer->GetName() == "Yone") {
+				UPasta::Plugins::Yone::Events::Initialize();
+			}
 			else {
 				activeChampModule = ChampionModuleManager::GetModule(globals::localPlayer->GetName());
 				if (!activeChampModule) return;
@@ -85,7 +89,7 @@ namespace Modules
 
 		void RenderUpdate()
 		{
-			if (!activeChampModule) 
+			if (!activeChampModule)
 				return;
 
 			activeChampModule->Render();

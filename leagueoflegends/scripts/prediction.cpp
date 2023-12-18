@@ -3,7 +3,7 @@
 
 namespace Modules::prediction
 {
-	bool CheckCollision(Vector3 sourcePos, Vector3 targetPos, Object* sourceObject, Object* targetObject, Skillshot &skillshot)
+	bool CheckCollision(Vector3 sourcePos, Vector3 targetPos, Object* sourceObject, Object* targetObject, Skillshot& skillshot)
 	{
 		if (skillshot.IsCollidableWith(CollidableObjects::Objects) && Modules::prediction::IsAnyObjectInWay(sourcePos, targetPos, sourceObject, targetObject, skillshot.GetRadius()))
 			return false;
@@ -47,8 +47,6 @@ namespace Modules::prediction
 		if (sourceObject->IsHero()) {
 			for (auto hero : ObjectManager::GetHeroesAs(team)) {
 				if (!hero) continue;
-				if (hero == sourceObject) continue;
-
 				if (IsSpecificObjectInWay(sourcePos, targetPos, sourceObject, pathRadius)) {
 					nCount += 1;
 				}
@@ -84,7 +82,7 @@ namespace Modules::prediction
 					return true;
 			}
 			return false;
-		};
+			};
 
 		return objectInWay(*globals::minionManager) || objectInWay(*globals::heroManager);
 	}
@@ -98,12 +96,12 @@ namespace Modules::prediction
 		{
 			speed = aiManager->GetDashSpeed();
 		}
-		
+
 		std::vector<Vector3> waypoints = { obj->GetAiManager()->GetPosition() };
 		auto futureWaypoints = aiManager->GetFutureSegments();
 		for (auto waypoint : futureWaypoints)
 			waypoints.push_back(waypoint);
-		
+
 		const int waypointsSize = (int)waypoints.size();
 
 		if (!waypointsSize || !time || !aiManager->IsMoving())
@@ -122,11 +120,11 @@ namespace Modules::prediction
 				return waypoints[i];
 			distance = distance - waydistance;
 		}
-		
+
 		return waypoints.front();
 	}
 
-	Vector3 PredictTargetPosition(Object* targetObj, float predictionTime) {
+	Vector3 PredictTargetPosition2(Object* targetObj, float predictionTime) {
 
 		const auto path = targetObj->GetAiManager()->GetFutureSegments();
 		const int countSegments = static_cast<int>(path.size());
@@ -142,12 +140,13 @@ namespace Modules::prediction
 			const Vector3 predictedPosition = currentPosition + (velocityVector * predictionTime);
 			return predictedPosition;
 		}
-		
+
 		return targetObj->GetAiManager()->GetPosition();
 	}
 
-	/*Vector3 PredictTargetPosition(Object* targetObj, float predictionTime)
+	Vector3 PredictTargetPosition(Object* targetObj, float predictionTime)
 	{
+
 		const auto aiManager = targetObj->GetAiManager();
 		Vector3 currentPosition = aiManager->GetPosition();
 		float velocityMagnitude = aiManager->GetVelocity(); // Velocity magnitude
@@ -155,19 +154,19 @@ namespace Modules::prediction
 		Vector3 velocityVector = direction * velocityMagnitude;
 		Vector3 predictedPosition = currentPosition + (velocityVector * predictionTime);
 		return predictedPosition;
-	}*/
+	}
 
-	bool GetPrediction(Skillshot& skillshot, Modules::prediction::PredictionOutput &out)
+	bool GetPrediction(Skillshot& skillshot, Modules::prediction::PredictionOutput& out)
 	{
 
-		auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),skillshot.GetMaxRange());
-		if (!target) 
+		auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), skillshot.GetMaxRange());
+		if (!target)
 			return false;
 
 		return GetPrediction(globals::localPlayer, target, skillshot, out);
 	}
 
-	bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot &skillshot, Modules::prediction::PredictionOutput& out)
+	bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot& skillshot, Modules::prediction::PredictionOutput& out)
 	{
 		const auto sourcePos = sourceObj->GetAiManager()->GetPosition();
 		const auto targetAiManager = targetObj->GetAiManager();
@@ -184,7 +183,7 @@ namespace Modules::prediction
 			out.position = GetObjectPositionAfterTime(targetObj, skillshot.GetCastTime(), distanceBuffer);
 			return CheckCollision(sourcePos, out.position, sourceObj, targetObj, skillshot);
 		}
-		
+
 		auto waypoints = targetAiManager->GetFutureSegments();
 		const int waypointsSize = (int)waypoints.size();
 
@@ -215,7 +214,7 @@ namespace Modules::prediction
 		}
 
 		out.position = predictedPos;
-		
+
 		if (Engine::IsWall(out.position))
 		{
 			return false;

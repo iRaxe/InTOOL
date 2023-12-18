@@ -285,6 +285,7 @@
     <ClInclude Include="TargetSelector.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="VMTHook.h" />
+    <ClInclude Include="Yone.h" />
     <ClInclude Include="zoom.h" />
   </ItemGroup>
   <ItemGroup>
@@ -365,6 +366,7 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TargetingClient.cpp" />
     <ClCompile Include="VMTHook.cpp" />
+    <ClCompile Include="Yone.cpp" />
     <ClCompile Include="zoom.cpp" />
   </ItemGroup>
   <ItemGroup>
