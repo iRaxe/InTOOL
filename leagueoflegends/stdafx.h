@@ -51,12 +51,19 @@
 #include "global/utils.h"
 #include "global/leagueobfuscation.h"
 #include "classes/classes.h"
+
 #include "global/Engine.h"
+
 #include "render/render.h"
+//Era buono qua sopra :(
 #include "global/globals.h"
+
 #include "global/targetver.h"
+
 #include "scripts/championmodule.h"
+
 #include "scripts/skillshotdatabase.h"
+
 #include "scripts/Modules.h"
 
 #include "hooks/hooks.h"
@@ -70,6 +77,7 @@ using json = nlohmann::json;
 #define RVA2(address) (globals::moduleBase + address)
 
 #define DEFINE_RVA(address) ((uintptr_t)((uintptr_t)globals::moduleBase + (uintptr_t)address)
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #define M_PI_F (float)M_PI

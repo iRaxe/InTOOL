@@ -17,9 +17,6 @@ namespace Engine
 		return function(instance, std::forward<decltype(args)>(args)...);
 	}
 
-	template <typename T, typename U>
-	T Read(U addr);
-
 	template<typename T>
 	void PrintChat(T value);
 	void PrintChat(void* address);

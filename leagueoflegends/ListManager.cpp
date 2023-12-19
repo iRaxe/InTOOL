@@ -13,9 +13,9 @@ namespace UPasta
 			{
 				void PopulateSpellsMap()
 				{
-					for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+					for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
 					{
-						const auto obj = globals::heroManager->GetIndex(i);
+						const auto obj = ObjectManager::GetHeroList()->GetIndex(i);
 						if (obj != nullptr && obj->GetName() != "PracticeTool_TargetDummy")
 						{
 							if (obj->IsAlly()) continue;
@@ -55,15 +55,15 @@ namespace UPasta
 
 				void PopulatePlayersMap()
 				{
-					for (int i = 0; i < globals::heroManager->GetListSize(); ++i)
+					for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); ++i)
 					{
-						auto obj = globals::heroManager->GetIndex(i);
+						auto obj = ObjectManager::GetHeroList()->GetIndex(i);
 
 						if (IsValidPtr(obj) && obj && !playersMap.contains(obj))
 							playersMap[obj] = i;
 					}
 
-					if (playersMap.size() > globals::heroManager->GetListSize())
+					if (playersMap.size() > ObjectManager::GetHeroList()->GetListSize())
 						playersMap.clear();
 				}
 
@@ -93,15 +93,15 @@ namespace UPasta
 
 				void PopulateMinionsMap()
 				{
-					for (int i = 0; i < globals::minionManager->GetListSize(); ++i)
+					for (int i = 0; i < ObjectManager::GetMinionList()->GetListSize(); ++i)
 					{
-						auto obj = globals::minionManager->GetIndex(i);
+						auto obj = ObjectManager::GetMinionList()->GetIndex(i);
 
 						if (IsValidPtr(obj) && obj && !playersMap.contains(obj))
 							minionsMap[obj] = i;
 					}
 
-					if (minionsMap.size() > globals::minionManager->GetListSize())
+					if (minionsMap.size() > ObjectManager::GetMinionList()->GetListSize())
 						minionsMap.clear();
 				}
 
@@ -136,15 +136,15 @@ namespace UPasta
 
 				void PopulateTurretsMap()
 				{
-					for (int i = 0; i < globals::turretManager->GetListSize(); ++i)
+					for (int i = 0; i < ObjectManager::GetTurretsList()->GetListSize(); ++i)
 					{
-						auto obj = globals::turretManager->GetIndex(i);
+						auto obj = ObjectManager::GetTurretsList()->GetIndex(i);
 
 						if (IsValidPtr(obj) && obj && !turretsMap.contains(obj))
 							turretsMap[obj] = i;
 					}
 
-					if (turretsMap.size() > globals::turretManager->GetListSize())
+					if (turretsMap.size() > ObjectManager::GetTurretsList()->GetListSize())
 						turretsMap.clear();
 				}
 
@@ -173,15 +173,15 @@ namespace UPasta
 
 				void PopulateInhibitorsMap()
 				{
-					for (int i = 0; i < globals::inhibitorsManager->GetListSize(); ++i)
+					for (int i = 0; i < ObjectManager::GetInhibitorsList()->GetListSize(); ++i)
 					{
-						auto obj = globals::inhibitorsManager->GetIndex(i);
+						auto obj = ObjectManager::GetInhibitorsList()->GetIndex(i);
 
 						if (IsValidPtr(obj) && obj && !inhibitorsMap.contains(obj))
 							inhibitorsMap[obj] = i;
 					}
 
-					if (inhibitorsMap.size() > globals::inhibitorsManager->GetListSize())
+					if (inhibitorsMap.size() > ObjectManager::GetInhibitorsList()->GetListSize())
 						inhibitorsMap.clear();
 				}
 
@@ -247,19 +247,19 @@ namespace UPasta
 
 				void Refresh()
 				{
-					__try { if (playersMap.size() < globals::heroManager->GetListSize())	PopulatePlayersMaps(); }
+					__try { if (playersMap.size() < ObjectManager::GetHeroList()->GetListSize())	PopulatePlayersMaps(); }
 					__except (1) { LOG("[MAPS] Error in refreshing players maps"); }
 
-					__try { if (minionsMap.size() < globals::heroManager->GetListSize())	PopulateMinionsMaps(); }
+					__try { if (minionsMap.size() < ObjectManager::GetHeroList()->GetListSize())	PopulateMinionsMaps(); }
 					__except (1) { LOG("[MAPS] Error in refreshing minions maps"); }
 
-					__try { if (turretsMap.size() < globals::heroManager->GetListSize())	PopulateTurretsMaps(); }
+					__try { if (turretsMap.size() < ObjectManager::GetHeroList()->GetListSize())	PopulateTurretsMaps(); }
 					__except (1) { LOG("[MAPS] Error in refreshing turrets maps"); }
 
-					__try { if (inhibitorsMap.size() < globals::heroManager->GetListSize())	PopulateInhibitorsMaps(); }
+					__try { if (inhibitorsMap.size() < ObjectManager::GetHeroList()->GetListSize())	PopulateInhibitorsMaps(); }
 					__except (1) { LOG("[MAPS] Error in refreshing inhibitors maps"); }
 
-					/*__try { if (missileMap.size() < globals::heroManager->GetListSize())	PopulateMissilesMap(); }
+					/*__try { if (missileMap.size() < ObjectManager::GetHeroList()->GetListSize())	PopulateMissilesMap(); }
 					__except (1) { LOG("[MAPS] Error in refreshing missiles map"); }*/
 				}
 

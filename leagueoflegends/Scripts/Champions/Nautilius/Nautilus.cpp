@@ -84,9 +84,9 @@ public:
         const auto qWhitelistMenu = whitelistMenu->AddMenu("Q Whitelist Settings", "Q Whitelist Settings");
         const auto rWhitelistMenu = whitelistMenu->AddMenu("R Whitelist Settings", "R Whitelist Settings");
 
-        for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+        for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
         {
-            auto obj = globals::heroManager->GetIndex(i);
+            auto obj = ObjectManager::GetHeroList()->GetIndex(i);
             if (obj != nullptr && obj->IsEnemy())
             {
                 const auto q_checkbox = qWhitelistMenu->AddCheckBox(obj->GetName().c_str(),
@@ -150,13 +150,13 @@ public:
 
     static float Nautilus_dmgQ(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusQ.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.NautilusQ.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = NautilusDamages::QSpell::dmgSkillQ[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalSkillDamage = NautilusDamages::QSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -165,13 +165,13 @@ public:
 
     static float Nautilus_dmgW(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.NautilusW.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = NautilusDamages::WSpell::dmgSkillW[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalSkillDamage = NautilusDamages::WSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -180,13 +180,13 @@ public:
 
     static float Nautilus_dmgE(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusE.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.NautilusE.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = NautilusDamages::ESpell::dmgSkillE[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalSkillDamage = NautilusDamages::ESpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -195,13 +195,13 @@ public:
 
     static float Nautilus_dmgR(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusR.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.NautilusR.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = NautilusDamages::RSpell::dmgSkillR[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalSkillDamage = NautilusDamages::RSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -210,7 +210,7 @@ public:
 
     void Nautilus_UseQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusQ.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.NautilusQ.IsCastable())
             return;
 
         if (pEnemy && gameTime > QCastedTime + database.NautilusQ.GetCastTime())
@@ -230,7 +230,7 @@ public:
 
     void Nautilus_UseW(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.NautilusW.IsCastable())
             return;
 
         if (pEnemy && gameTime > WCastedTime + database.NautilusW.GetCastTime())
@@ -242,7 +242,7 @@ public:
 
     void Nautilus_UseE(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusE.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.NautilusE.IsCastable())
             return;
 
         if (pEnemy && gameTime > ECastedTime + database.NautilusE.GetCastTime())
@@ -254,7 +254,7 @@ public:
 
     void Nautilus_UseR(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.NautilusR.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.NautilusR.IsCastable())
             return;
 
         if (pEnemy && gameTime > RCastedTime + database.NautilusR.GetCastTime())
@@ -281,13 +281,13 @@ public:
         {
             if (NautilusConfig::NautilusCombo::UseR->Value == true && database.NautilusR.IsCastable())
             {
-	            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusR.GetRange()))
+	            if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusR.GetRange()))
                 {
                     Nautilus_UseR(rTarget);
                 }
             }
 
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusQ.GetRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusQ.GetRange()))
             {
                 if (!qTarget->CanMove() && database.NautilusQ.IsCastable())
                 {
@@ -308,7 +308,7 @@ public:
         {
             if (NautilusConfig::NautilusCombo::UseQ->Value == true && database.NautilusQ.IsCastable())
             {
-	            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusQ.GetRange()))
+	            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusQ.GetRange()))
                 {
                     Nautilus_UseQ(qTarget);
                 }
@@ -318,7 +318,7 @@ public:
             {
                 if (NautilusConfig::NautilusCombo::UseW->Value == true && database.NautilusW.IsCastable())
                 {
-	                if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusW.GetRange()))
+	                if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusW.GetRange()))
                     {
                         Nautilus_UseW(wTarget);
                     }
@@ -326,7 +326,7 @@ public:
 
                 if (NautilusConfig::NautilusCombo::UseE->Value == true && database.NautilusE.IsCastable())
                 {
-	                if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusE.GetRange()))
+	                if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusE.GetRange()))
                     {
                         Nautilus_UseE(eTarget);
                     }
@@ -334,7 +334,7 @@ public:
 
                 if (NautilusConfig::NautilusCombo::UseR->Value == true && database.NautilusR.IsCastable())
                 {
-	                if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusR.GetRange()))
+	                if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusR.GetRange()))
                     {
                         Nautilus_UseR(rTarget);
                     }
@@ -347,12 +347,12 @@ public:
 
     void Clear() override
     {
-        if (globals::localPlayer->GetPercentMana() < NautilusConfig::NautilusJungle::minMana->Value)
+        if (ObjectManager::GetLocalPlayer()->GetPercentMana() < NautilusConfig::NautilusJungle::minMana->Value)
             return;
 
         if (NautilusConfig::NautilusJungle::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-	        const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.NautilusQ.GetRange());
+	        const auto qMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), database.NautilusQ.GetRange());
             if (qMonster && gameTime > QCastedTime + database.NautilusQ.GetCastTime())
             {
                 Engine::CastToPosition(SpellIndex::Q, qMonster->GetPosition());
@@ -362,20 +362,20 @@ public:
         
         if (NautilusConfig::NautilusJungle::UseW->Value == true && database.NautilusW.IsCastable())
         {
-	        if (const auto wMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.NautilusW.GetRange()))
+	        if (const auto wMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), database.NautilusW.GetRange()))
                 Nautilus_UseW(wMonster);
         }
     }
 
     void Harass() override
     {
-        if (globals::localPlayer->GetPercentMana() < NautilusConfig::NautilusHarass::minMana->Value)
+        if (ObjectManager::GetLocalPlayer()->GetPercentMana() < NautilusConfig::NautilusHarass::minMana->Value)
             return;
         
 
         if (NautilusConfig::NautilusHarass::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-	        if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusQ.GetRange()))
+	        if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusQ.GetRange()))
             {
                 if (NautilusConfig::NautilusHarass::UseQDive->Value == true && qTarget->IsUnderTower(Alliance::Enemy) || !qTarget->IsUnderTower(Alliance::Enemy))
 					Nautilus_UseQ(qTarget);
@@ -384,7 +384,7 @@ public:
 
         if (NautilusConfig::NautilusHarass::UseE->Value == true && database.NautilusE.IsCastable())
         {
-	        if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusE.GetRange()))
+	        if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusE.GetRange()))
             {
                 Nautilus_UseE(eTarget);
             }
@@ -401,7 +401,7 @@ public:
         {
 	        if (const auto mousePos = Engine::GetMouseWorldPos(); 
                 Engine::IsWall(mousePos) 
-                && mousePos.Distance(globals::localPlayer->GetPosition()) <= database.NautilusQ.GetRange())
+                && mousePos.Distance(ObjectManager::GetLocalPlayer()->GetPosition()) <= database.NautilusQ.GetRange())
 	        {
                 Engine::CastToPosition(SpellIndex::Q, Engine::GetMouseWorldPos());
                 QCastedTime = gameTime;
@@ -414,7 +414,7 @@ public:
 
         if (NautilusConfig::NautilusKillsteal::UseQ->Value == true && database.NautilusQ.IsCastable())
         {
-	        const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusQ.GetRange());
+	        const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusQ.GetRange());
             if (qTarget && qTarget->GetHealth() < Nautilus_dmgQ(qTarget))
             {
                 Nautilus_UseQ(qTarget);
@@ -423,7 +423,7 @@ public:
 
         if (NautilusConfig::NautilusKillsteal::UseE->Value == true && database.NautilusE.IsCastable())
         {
-	        const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusE.GetRange());
+	        const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusE.GetRange());
             if (eTarget && eTarget->GetHealth() < Nautilus_dmgE(eTarget))
             {
                 Nautilus_UseE(eTarget);
@@ -432,7 +432,7 @@ public:
 
         if (NautilusConfig::NautilusKillsteal::UseR->Value == true && database.NautilusR.IsCastable())
         {
-	        const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.NautilusR.GetRange());
+	        const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.NautilusR.GetRange());
             if (rTarget && rTarget->GetHealth() < Nautilus_dmgR(rTarget))
             {
                 Nautilus_UseR(rTarget);
@@ -447,14 +447,14 @@ public:
             for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
                 if (!target) continue;
-                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > database.NautilusE.GetRange()) continue;
+                if (target->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > database.NautilusE.GetRange()) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
 
                 if (target)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < database.NautilusE.GetRange())
+                    if (pathEnd.IsValid() && ObjectManager::GetLocalPlayer()->GetPosition().distanceTo(pathEnd) < database.NautilusE.GetRange())
                         Nautilus_UseE(target);
                 }
             }
@@ -482,16 +482,16 @@ public:
     {
         if (NautilusConfig::NautilusCombo::engageModeKey->Value == true)
         {
-            Vector2 screenPos = Engine::WorldToScreen(globals::localPlayer->GetPosition());
+            Vector2 screenPos = Engine::WorldToScreen(ObjectManager::GetLocalPlayer()->GetPosition());
             render::RenderText("Engage Mode: ON", screenPos.ToImVec(), 18.0f, COLOR_RED, true);
         }
 
         if (NautilusConfig::NautilusDrawings::DrawQ->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && database.NautilusQ.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.NautilusQ.GetRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), database.NautilusQ.GetRange(), COLOR_WHITE, 1.0f);
         if (NautilusConfig::NautilusDrawings::DrawE->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && database.NautilusE.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.NautilusE.GetRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), database.NautilusE.GetRange(), COLOR_WHITE, 1.0f);
         if (NautilusConfig::NautilusDrawings::DrawR->Value == true && (NautilusConfig::NautilusDrawings::DrawIfReady->Value == true && database.NautilusR.IsCastable() || NautilusConfig::NautilusDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.NautilusR.GetRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), database.NautilusR.GetRange(), COLOR_WHITE, 1.0f);
     }
 };
 

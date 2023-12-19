@@ -16,7 +16,7 @@ float GetSpellHitTime(Missile* missile, Vector3 pos) {
 }
 
 static bool CanHeroEvade(Missile* missile, Vector3 evadePos) {
-	auto me = globals::localPlayer;
+	auto me = ObjectManager::GetLocalPlayer();
 	if (!me)
 		return false;
 
@@ -37,7 +37,7 @@ static bool CanHeroEvade(Missile* missile, Vector3 evadePos) {
 }
 
 Vector3 getEvadePos(const Vector3& current, float width, Missile* missile) {
-	auto self = globals::localPlayer;
+	auto self = ObjectManager::GetLocalPlayer();
 	if (!self)
 		return Vector3(0, 0, 0);
 
@@ -123,31 +123,31 @@ Vector3 test = Vector3(0, 0, 0);
 Vector3 test1 = Vector3(0, 0, 0);
 void Evade2::TryMove(Missile* missile)
 {
-	Vector3 textPos = Vector3(globals::localPlayer->GetPosition().x, globals::localPlayer->GetPosition().y + 30, globals::localPlayer->GetPosition().z);
-	Vector3 pos2 = getEvadePos(globals::localPlayer->GetPosition(), 70.0f, missile);
+	Vector3 textPos = Vector3(ObjectManager::GetLocalPlayer()->GetPosition().x, ObjectManager::GetLocalPlayer()->GetPosition().y + 30, ObjectManager::GetLocalPlayer()->GetPosition().z);
+	Vector3 pos2 = getEvadePos(ObjectManager::GetLocalPlayer()->GetPosition(), 70.0f, missile);
 	bool canEvade = CanHeroEvade(missile, pos2);
 	render::RenderTextWorld(canEvade ? "GG" : "NOTGG", textPos, 24, canEvade ? COLOR_GREEN : COLOR_RED, true);
 
 	_state = DODGING;
-	render:render::RenderLineWorld(globals::localPlayer->GetPosition(), pos2, COLOR_YELLOW, 5.0F);
+	render:render::RenderLineWorld(ObjectManager::GetLocalPlayer()->GetPosition(), pos2, COLOR_YELLOW, 5.0F);
 	Engine::IssueMove(Engine::WorldToScreen(pos2));
 
-	if (globals::localPlayer->GetPosition().distanceTo(pos2) < 10.0f)
+	if (ObjectManager::GetLocalPlayer()->GetPosition().distanceTo(pos2) < 10.0f)
 		_state = IDLE;
 
 	return;
 }
 
 void Evade2::OnDraw() {
-	auto me = globals::localPlayer;
+	auto me = ObjectManager::GetLocalPlayer();
 	if (!me) return;
 
 	if (!UPasta::SDK::EvadeConfig::status->Value) return;
 
-	render::RenderTextWorld(UPasta::SDK::EvadeConfig::statusToggle->Value ? "EVADE: ON" : "EVADE: OFF", globals::localPlayer->GetPosition(),24, UPasta::SDK::EvadeConfig::statusToggle->Value ? COLOR_GREEN : COLOR_RED, true);
+	render::RenderTextWorld(UPasta::SDK::EvadeConfig::statusToggle->Value ? "EVADE: ON" : "EVADE: OFF", ObjectManager::GetLocalPlayer()->GetPosition(),24, UPasta::SDK::EvadeConfig::statusToggle->Value ? COLOR_GREEN : COLOR_RED, true);
 	
 	if (UPasta::SDK::EvadeConfig::showMissiles->Value) {
-		for (auto& missileClient : globals::missileManager->missile_map)
+		for (auto& missileClient : ObjectManager::GetMissileList()->missile_map)
 		{
 			uintptr_t network_id = missileClient.first;
 			Missile* missile = missileClient.second;
@@ -155,7 +155,7 @@ void Evade2::OnDraw() {
 			if (IsNotZeroPtr(missile) && IsValidPtr(missile) && missile && !missile->GetMissileData()->IsAutoAttack())
 			{
 				auto missilePos = missile->GetSpellPos().ToGround();
-				if (missilePos.Distance(globals::localPlayer->GetPosition()) > 1500.0f)
+				if (missilePos.Distance(ObjectManager::GetLocalPlayer()->GetPosition()) > 1500.0f)
 					return;
 
 				auto startPos = missile->GetSpellStartPos().ToGround();
@@ -182,13 +182,13 @@ void Evade2::OnDraw() {
 }
 
 void Evade2::OnTick() {
-	auto me = globals::localPlayer;
+	auto me = ObjectManager::GetLocalPlayer();
 	if (!me) return;
 	if (!me->IsAlive()) return;
 }
 
 void Evade2::OnCastSound(uintptr_t state, SpellCast* cast) {
-	if (cast->GetCasterHandle() == globals::localPlayer->GetHandle()) return;
+	if (cast->GetCasterHandle() == ObjectManager::GetLocalPlayer()->GetHandle()) return;
 	if (cast->IsAutoAttack()) return;
 	const auto caster = ObjectManager::GetClientByHandle(cast->GetCasterHandle());
 	if (caster->IsAlly()) return;

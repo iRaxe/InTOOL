@@ -32,10 +32,10 @@ POINT p; //for cursor pos
 void resetZoom()
 {
     WriteProcessMemory(processHandle, (LPVOID)(zoomAddress), &zoomValueReset, sizeof(float), 0);
-    WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 264), &leftNrightReset, sizeof(float), 0);
-    WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 260), &leftNrightReset, sizeof(float), 0);
+    WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x108), &leftNrightReset, sizeof(float), 0);
+    WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x104), &leftNrightReset, sizeof(float), 0);
     leftNright = leftNrightReset;
-    WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 268), &upNdownReset, sizeof(float), 0);
+    WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x10C), &upNdownReset, sizeof(float), 0);
     upNdown = upNdownReset;
 }
 
@@ -62,10 +62,10 @@ void startZoom()
 			if (shouldWrite)
 			{
 				if (angleCamera != 90.0f)
-					WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 260), &angleCamera, sizeof(float), 0);
+					WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x104), &angleCamera, sizeof(float), 0);
 
 				float zero = 0.0f;
-				WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 264), &zero, sizeof(float), 0);
+				WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x108), &zero, sizeof(float), 0);
 			}
 
 			if (useKeyboard)//keyboard
@@ -94,13 +94,13 @@ void startZoom()
 				if (GetAsyncKeyState(VK_LEFT)) // LEFT ARROW
 				{
 					leftNright += rotationSpeed;
-					WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 264), &leftNright, sizeof(float), 0);
+					WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x108), &leftNright, sizeof(float), 0);
 				}
 
 				if (GetAsyncKeyState(VK_RIGHT)) // RIGHT ARROW
 				{
 					leftNright -= rotationSpeed;
-					WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 264), &leftNright, sizeof(float), 0);
+					WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x108), &leftNright, sizeof(float), 0);
 				}
 
 				if (GetAsyncKeyState(VK_UP)) // UP ARROW
@@ -108,7 +108,7 @@ void startZoom()
 					if (upNdown < 89)
 					{
 						upNdown += rotationSpeed;
-						WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 268), &upNdown, sizeof(float), 0);
+						WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x10C), &upNdown, sizeof(float), 0);
 					}
 				}
 
@@ -117,7 +117,7 @@ void startZoom()
 					if (upNdown > 17.5)
 					{
 						upNdown -= rotationSpeed;
-						WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 268), &upNdown, sizeof(float), 0);
+						WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x10C), &upNdown, sizeof(float), 0);
 					}
 				}
 
@@ -130,13 +130,13 @@ void startZoom()
 							if (p.x < x / 2)
 							{
 								leftNright += Msensitivity;
-								WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 264), &leftNright, sizeof(float), 0);
+								WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x108), &leftNright, sizeof(float), 0);
 							}
 
 							if (p.x > x / 2)
 							{
 								leftNright -= Msensitivity;
-								WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 264), &leftNright, sizeof(float), 0);
+								WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x108), &leftNright, sizeof(float), 0);
 							}
 
 							if (p.y < y / 2)
@@ -144,7 +144,7 @@ void startZoom()
 								if (upNdown < 89)
 								{
 									upNdown += Msensitivity;
-									WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 268), &upNdown, sizeof(float), 0);
+									WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x10C), &upNdown, sizeof(float), 0);
 								}
 							}
 
@@ -153,7 +153,7 @@ void startZoom()
 								if (upNdown > 17.5)
 								{
 									upNdown -= Msensitivity;
-									WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 268), &upNdown, sizeof(float), 0);
+									WriteProcessMemory(processHandle, (LPVOID)(zoomAddress - 0x10C), &upNdown, sizeof(float), 0);
 								}
 							}
 						}

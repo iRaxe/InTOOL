@@ -11,23 +11,23 @@ int Orbwalker::GetLatency(int extra) {
 }
 
 bool Orbwalker::CanAttack() {
-	return GetTickCount64() >= (_last_aa + (globals::localPlayer->GetAttackDelay() * 1000)); //(Engine::GetGameTime() * 1000)
+	return GetTickCount64() >= (_last_aa + (ObjectManager::GetLocalPlayer()->GetAttackDelay() * 1000)); //(Engine::GetGameTime() * 1000)
 }
 
 bool Orbwalker::CanMove() {
 	if (is_kalista) return true;
-	return GetTickCount64() >= max(_last_action, (_last_aa + (globals::localPlayer->GetAttackWindup() * 1000))); //&& !Evade::Core::Evading; //
+	return GetTickCount64() >= max(_last_action, (_last_aa + (ObjectManager::GetLocalPlayer()->GetAttackWindup() * 1000))); //&& !Evade::Core::Evading; //
 }
 
 bool Orbwalker::CanCastAfterAttack() {
-	const std::string _championName = globals::localPlayer->GetName();
+	const std::string _championName = ObjectManager::GetLocalPlayer()->GetName();
 
 	auto localExtraWindup = 0;
-	if (_championName == "Rengar" && (globals::localPlayer->GetBuffByName("rengarqbase") || globals::localPlayer->GetBuffByName("rengarqemp")))	{
+	if (_championName == "Rengar" && (ObjectManager::GetLocalPlayer()->GetBuffByName("rengarqbase") || ObjectManager::GetLocalPlayer()->GetBuffByName("rengarqemp")))	{
 		localExtraWindup = 200;
 	}
 
-	return (GetTickCount64() + GetLatency() / 2 >= _last_aa + globals::localPlayer->GetAttackDelay() * 1000 + localExtraWindup);
+	return (GetTickCount64() + GetLatency() / 2 >= _last_aa + ObjectManager::GetLocalPlayer()->GetAttackDelay() * 1000 + localExtraWindup);
 }
 
 void Orbwalker::InitializeMenu()
@@ -70,7 +70,7 @@ void Orbwalker::InitializeMenu()
 }
 
 void Orbwalker::Init() {
-	if (globals::localPlayer->GetName() == "Kalista") is_kalista = true;
+	if (ObjectManager::GetLocalPlayer()->GetName() == "Kalista") is_kalista = true;
 	InitializeMenu();
 	Event::Subscribe(Event::OnWndProc, &OnWndProc);
 	Event::Subscribe(Event::OnDraw, &OnDraw);
@@ -123,7 +123,7 @@ void Orbwalker::OnWndProc(UINT msg, WPARAM param) {
 }
 
 void Orbwalker::OnDraw() {
-	auto me = globals::localPlayer;
+	auto me = ObjectManager::GetLocalPlayer();
 	if (!me) return;
 
 	if (!UPasta::SDK::OrbwalkerConfig::status->Value) return;
@@ -194,13 +194,13 @@ void Orbwalker::DrawRange(Object* obj) {
 	if (UPasta::SDK::OrbwalkerConfig::showTurrets->Value and obj->IsTurret())
 	{
 		if (!UPasta::SDK::OrbwalkerConfig::showAlliesTurrets->Value and obj->IsAlly()) {
-			UPasta::SDK::Awareness::Functions::Radius::DrawRadius(obj->GetPosition(), 992.0f + globals::localPlayer->GetBoundingRadius(), COLOR_GREEN, 1.0f);
+			UPasta::SDK::Awareness::Functions::Radius::DrawRadius(obj->GetPosition(), 992.0f + ObjectManager::GetLocalPlayer()->GetBoundingRadius(), COLOR_GREEN, 1.0f);
 			return;
 		}
 
 		if (UPasta::SDK::OrbwalkerConfig::showEnemiesTurrets->Value and obj->IsEnemy()) {
 			auto col = COLOR_GREEN;
-			auto localPlayerNetID = ReadINT(globals::localPlayer, UPasta::Offsets::BaseObject::NetworkID);
+			auto localPlayerNetID = ReadINT(ObjectManager::GetLocalPlayer(), UPasta::Offsets::BaseObject::NetworkID);
 			if (obj->GetTurretTargetNetworkID()) {
 				if (obj->GetTurretTargetNetworkID() == localPlayerNetID)
 					col = COLOR_RED;
@@ -208,7 +208,7 @@ void Orbwalker::DrawRange(Object* obj) {
 					col = COLOR_GREEN;
 			}
 
-			UPasta::SDK::Awareness::Functions::Radius::DrawRadius(obj->GetPosition(), 992.0f + globals::localPlayer->GetBoundingRadius(), col, 1.0f);
+			UPasta::SDK::Awareness::Functions::Radius::DrawRadius(obj->GetPosition(), 992.0f + ObjectManager::GetLocalPlayer()->GetBoundingRadius(), col, 1.0f);
 			return;
 		}
 		return;
@@ -217,7 +217,7 @@ void Orbwalker::DrawRange(Object* obj) {
 
 void Orbwalker::OnTick() {
 	if (_mode == Off) return;
-	auto me = globals::localPlayer;
+	auto me = ObjectManager::GetLocalPlayer();
 	if (!me) return;
 	if (!me->IsAlive()) return;
 
@@ -257,7 +257,7 @@ void Orbwalker::OnTick() {
 }
 
 void Orbwalker::OnCastSound(uintptr_t state, SpellCast* cast) {
-	if (cast->GetCasterHandle() != globals::localPlayer->GetHandle()) return;
+	if (cast->GetCasterHandle() != ObjectManager::GetLocalPlayer()->GetHandle()) return;
 	if (!cast->IsAutoAttack()) return;
 
 	_state = IDLE;
@@ -271,7 +271,7 @@ void Orbwalker::AttackTarget(Object* target) {
 		_last_action = GetTickCount64() + GetLatency();
 		return;
 	}
-	if (target->GetDistanceTo(globals::localPlayer) <= globals::localPlayer->GetRealAttackRange()) {
+	if (target->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= ObjectManager::GetLocalPlayer()->GetRealAttackRange()) {
 		Engine::AttackObject(target->GetPosition());
 		_last_aa = GetTickCount64() + GetLatency();
 		_state = ATTACKING;
@@ -281,7 +281,7 @@ void Orbwalker::AttackTarget(Object* target) {
 }
 
 void Orbwalker::OnCombo() {
-	auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange());
+	auto target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), ObjectManager::GetLocalPlayer()->GetRealAttackRange());
 	if (!target) {
 		Engine::MoveToMousePos();
 		_last_action = GetTickCount64() + GetLatency();
@@ -297,7 +297,7 @@ void Orbwalker::OnCombo() {
 }
 
 void Orbwalker::OnHarass() {
-	auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange());
+	auto target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), ObjectManager::GetLocalPlayer()->GetRealAttackRange());
 	if (!target) {
 		Engine::MoveToMousePos();
 		_last_action = GetTickCount64() + GetLatency();
@@ -319,7 +319,7 @@ void Orbwalker::OnHarass() {
 }
 
 void Orbwalker::OnClear() {
-	auto target = TargetSelector::FindBestLaneClear(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange());
+	auto target = TargetSelector::FindBestLaneClear(ObjectManager::GetLocalPlayer()->GetPosition(), ObjectManager::GetLocalPlayer()->GetRealAttackRange());
 	if (!target) {
 		Engine::MoveToMousePos();
 		_last_action = GetTickCount64() + GetLatency();

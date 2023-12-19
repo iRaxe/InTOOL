@@ -14,23 +14,23 @@ Object* shadowYone = nullptr;
 
 float QCastedTimeYone = 0.0f;
 [[nodiscard]] bool isTimeToCastQYone() {
-	return gameTimeYone > QCastedTimeYone && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+	return gameTimeYone > QCastedTimeYone && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
 }
 
 float WCastedTimeYone = 0.0f;
 [[nodiscard]] bool isTimeToCastWYone() {
-	return gameTimeYone > WCastedTimeYone + database.YoneW.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+	return gameTimeYone > WCastedTimeYone + database.YoneW.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
 }
 
 float ECastedTimeYone = 0.0f;
 [[nodiscard]] bool isTimeToCastEYone() {
-	return gameTimeYone > ECastedTimeYone + 0.22f && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+	return gameTimeYone > ECastedTimeYone + 0.22f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
 }
 
 
 float RCastedTimeYone = 0.0f;
 [[nodiscard]] bool isTimeToCastRYone() {
-	return gameTimeYone > RCastedTimeYone + 0.25f && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+	return gameTimeYone > RCastedTimeYone + 0.25f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
 }
 
 
@@ -49,9 +49,9 @@ void InitializeInterruptibleSpellsMenu(Menu* additionalMenu) {
 	Interuptables::interruptibleMenuCheck = additionalMenu->AddCheckBox("Interupt Spells", "Interupt Spells", true);;
 	auto interruptibleWhitelistMenu = interruptibleMenu->AddMenu("Whitelist Settings", "Whitelist");
 
-	for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+	for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
 	{
-		auto hero = globals::heroManager->GetIndex(i);
+		auto hero = ObjectManager::GetHeroList()->GetIndex(i);
 		if (hero != nullptr && hero->IsEnemy())
 		{
 			if (hero == nullptr) {
@@ -205,9 +205,9 @@ void Events::Unsubscribe() {
 }
 
 bool CanCastSpell(Object* obj, bool TimeToCast) {
-	return globals::localPlayer != nullptr && 
-		globals::localPlayer->IsAlive() &&
-		globals::localPlayer->IsTargetable() && 
+	return ObjectManager::GetLocalPlayer() != nullptr && 
+		ObjectManager::GetLocalPlayer()->IsAlive() &&
+		ObjectManager::GetLocalPlayer()->IsTargetable() && 
 		obj != nullptr &&
 		obj->IsAlive() && 
 		obj->IsTargetable() &&
@@ -258,8 +258,8 @@ bool IsUnderTower(Vector3 pos,Alliance team)
 }
 
 float GetComboDamage(Object* obj) {
-	if (globals::localPlayer == nullptr) return 0;
-	if (!globals::localPlayer->IsAlive()) return 0;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return 0;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return 0;
 	if (obj == nullptr) return 0;
 	if (!obj->IsAlive()) return 0;
 	if (!obj->IsTargetable()) return 0;
@@ -288,7 +288,7 @@ void Functions::UseQ(Object* obj) {
 
 	if (!CanCastSpell(obj, isTimeToCastQYone())) return;
 
-	if (obj->GetDistanceTo(globals::localPlayer) > YoneSpellsSettings::GetQRange()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > YoneSpellsSettings::GetQRange()) return;
 
 	CastPrediction(SpellIndex::Q, database.YoneQ,obj,QCastedTimeYone);
 
@@ -298,7 +298,7 @@ void Functions::UseQ3(Object* obj) {
 
 	if (!CanCastSpell(obj, isTimeToCastQYone())) return;
 
-	if (obj->GetDistanceTo(globals::localPlayer) > YoneSpellsSettings::GetQ3Range()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > YoneSpellsSettings::GetQ3Range()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
 		Engine::CastToPosition(SpellIndex::Q, obj->GetPosition());
@@ -308,8 +308,8 @@ void Functions::UseQ3(Object* obj) {
 
 	Modules::prediction::PredictionOutput Prediction;
 	if (GetPrediction(database.YoneQ2, Prediction)) {
-		const auto pred = globals::localPlayer->GetPosition() + ((Prediction.position - globals::localPlayer->GetPosition()).Normalized() * 450);
-		if (YoneSpellsSettings::useQ3Tower->Value == false and IsUnderTower(pred.Extend(Prediction.position, globals::localPlayer->GetBoundingRadius() / 2), Alliance::Enemy)) { return; }
+		const auto pred = ObjectManager::GetLocalPlayer()->GetPosition() + ((Prediction.position - ObjectManager::GetLocalPlayer()->GetPosition()).Normalized() * 450);
+		if (YoneSpellsSettings::useQ3Tower->Value == false and IsUnderTower(pred.Extend(Prediction.position, ObjectManager::GetLocalPlayer()->GetBoundingRadius() / 2), Alliance::Enemy)) { return; }
 		Engine::CastToPosition(SpellIndex::Q, pred);
 		QCastedTimeYone = gameTimeYone;
 	}
@@ -319,7 +319,7 @@ void Functions::UseQ3(Object* obj) {
 void Functions::UseW(Object* obj) {
 	if (!CanCastSpell(obj, isTimeToCastWYone())) return;
 
-	if (obj->GetDistanceTo(globals::localPlayer) > YoneSpellsSettings::GetWRange()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > YoneSpellsSettings::GetWRange()) return;
 
 	CastPrediction(SpellIndex::W, database.YoneW, obj, WCastedTimeYone);
 }
@@ -327,7 +327,7 @@ void Functions::UseW(Object* obj) {
 void Functions::UseE(Object* obj) {
 	if (!CanCastSpell(obj, isTimeToCastEYone())) return;
 	if (YoneSpellsSettings::useETower->Value == false and IsUnderTower(obj->GetPosition(),Alliance::Enemy)) { return; }
-	if (obj->GetDistanceTo(globals::localPlayer) > YoneSpellsSettings::GetERange()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > YoneSpellsSettings::GetERange()) return;
 
 	Engine::CastToPosition(SpellIndex::E, obj->GetPosition());
 	ECastedTimeYone = gameTimeYone;
@@ -356,7 +356,7 @@ Object* FindBestNiggaTarget(Vector3 from, float range) {
 		std::sort(possible_targets.begin(), possible_targets.end(),
 			[](Object* pFirst, Object* pSecond) -> bool
 			{
-				auto me = globals::localPlayer;
+				auto me = ObjectManager::GetLocalPlayer();
 
 				auto distance_first = me->GetDistanceTo(pFirst);
 				auto distance_second = me->GetDistanceTo(pSecond);
@@ -372,11 +372,11 @@ Object* FindBestNiggaTarget(Vector3 from, float range) {
 
 void EnemiesInALine() {
 	int nig = 0;
-	auto nigga = FindBestNiggaTarget(globals::localPlayer->GetPosition(), database.YoneR.GetRange());
+	auto nigga = FindBestNiggaTarget(ObjectManager::GetLocalPlayer()->GetPosition(), database.YoneR.GetRange());
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 		if (!hero) continue;
 		if (!hero->IsTargetable()) continue;
-		if (!Modules::prediction::IsSpecificObjectInWay(globals::localPlayer->GetPosition(), nigga->GetPosition(), hero, database.YoneR.GetRadius())) continue;
+		if (!Modules::prediction::IsSpecificObjectInWay(ObjectManager::GetLocalPlayer()->GetPosition(), nigga->GetPosition(), hero, database.YoneR.GetRadius())) continue;
 		nig += 1;
 		
 		
@@ -384,8 +384,8 @@ void EnemiesInALine() {
 	if (nig >= YoneSpellsSettings::rEnemyCount->Value)
 	{
 		Modules::prediction::PredictionOutput rPrediction;
-		if (GetPrediction(globals::localPlayer, nigga, database.YoneR, rPrediction)) {
-			auto newPosition = globals::localPlayer->GetPosition().Extend(rPrediction.position, 1000.0f);
+		if (GetPrediction(ObjectManager::GetLocalPlayer(), nigga, database.YoneR, rPrediction)) {
+			auto newPosition = ObjectManager::GetLocalPlayer()->GetPosition().Extend(rPrediction.position, 1000.0f);
 
 			Engine::CastToPosition(SpellIndex::R, newPosition);
 			RCastedTimeYone = gameTimeYone;
@@ -401,7 +401,7 @@ void Functions::UseR(Object* obj, bool override = false) {
 	if (!CanCastSpell(obj, isTimeToCastRYone())) return;
 
 
-	if (obj->GetDistanceTo(globals::localPlayer) > YoneSpellsSettings::GetRRange()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > YoneSpellsSettings::GetRRange()) return;
 
 	//Line segmeant check
 
@@ -426,17 +426,17 @@ void Functions::UseR(Object* obj, bool override = false) {
 }
 
 void Functions::DrawSpellRadius(float range) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
-	if (!globals::localPlayer->IsTargetable()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
 
-	Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), range, COLOR_WHITE, 1.0f);
+	Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), range, COLOR_WHITE, 1.0f);
 	return;
 }
 
 void Functions::DrawDamageOnHPBar(Object* obj) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
@@ -469,8 +469,8 @@ void Functions::DrawDamageOnHPBar(Object* obj) {
 }
 
 void Functions::DrawDamageOnPos(Object* obj) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
@@ -524,7 +524,7 @@ void Events::OnDraw() {
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 		if (!hero) continue;
 		if (!hero->IsTargetable()) continue;
-		if (hero->GetDistanceTo(globals::localPlayer) > 1500.0f) continue;
+		if (hero->GetDistanceTo(ObjectManager::GetLocalPlayer()) > 1500.0f) continue;
 		
 		if (YoneSpellsSettings::DrawPosDamage->Value == true) {
 			Functions::DrawDamageOnPos(hero);
@@ -538,13 +538,13 @@ void Events::OnDraw() {
 
 
 	}
-	/*auto nigga = FindBestNiggaTarget(globals::localPlayer->GetPosition(), database.YoneR.GetRange());
+	/*auto nigga = FindBestNiggaTarget(ObjectManager::GetLocalPlayer()->GetPosition(), database.YoneR.GetRange());
 	if (nigga != nullptr)
 	{
 		render::RenderCircleWorld(nigga->GetPosition(), 50, 300, COLOR_GREEN, 2);
 	}
-	render::RenderLineWorld(globals::localPlayer->GetPosition(), bridge, COLOR_RED, 2);
-	Geometry::Polygon poly = Geometry::Rectangle(globals::localPlayer->GetPosition(), bridge, database.YoneR.GetRadius()).ToPolygon();
+	render::RenderLineWorld(ObjectManager::GetLocalPlayer()->GetPosition(), bridge, COLOR_RED, 2);
+	Geometry::Polygon poly = Geometry::Rectangle(ObjectManager::GetLocalPlayer()->GetPosition(), bridge, database.YoneR.GetRadius()).ToPolygon();
 	render::RenderPolygonWorld(poly, COLOR_ORANGE, 1.0f);
 	render::RenderTextWorld(std::to_string(nig), Engine::GetMouseWorldPos(), 30.0f, COLOR_WHITE, true);*/
 	
@@ -553,7 +553,7 @@ void Events::OnDraw() {
 Object* findShadow() {
 	std::vector<Object*> minions = ObjectManager::GetMinions();
 	for (auto* minion : minions) {
-		if (minion && minion->GetDistanceTo(globals::localPlayer) <= 2000) {
+		if (minion && minion->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= 2000) {
 			std::string minionName = minion->GetName();
 			if (minionName == "TestCubeRender10Vision") {
 				//Engine::PrintChat("Found minion with matching substring: " + minionName);
@@ -566,8 +566,8 @@ Object* findShadow() {
 }
 
 void Events::OnGameUpdate() {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
 
 	gameTimeYone = Engine::GetGameTime();
 	shadowYone = findShadow();
@@ -620,7 +620,7 @@ void Modes::Combo() {
 	//for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 	//	if (!hero) continue;
 
-	//	if (hero->GetPosition().Distance(globals::localPlayer->GetPosition()) > YoneSpellsSettings::GetRRange() + hero->GetBoundingRadius() / 2) continue;
+	//	if (hero->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition()) > YoneSpellsSettings::GetRRange() + hero->GetBoundingRadius() / 2) continue;
 	//	const SpellCast* spell = hero->GetActiveSpellCast()
 	//	if (spell and spell->IsSpell())
 	//	{
@@ -636,7 +636,7 @@ void Modes::Combo() {
 	//}
 
 	//if (YoneSpellsSettings::eBack->Value == true && isTimeToCastEYone() && shadowYone) {
-	//	const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), 1000.00f);
+	//	const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), 1000.00f);
 	//	if (eTarget != nullptr and Functions::EKills(eTarget)) {
 	//		Functions::EOnMark(eTarget);
 	//	}
@@ -644,9 +644,9 @@ void Modes::Combo() {
 	/*EcHeck();*/
 	
 	if (YoneCombo::UseQ3->Value and isTimeToCastQYone()) {
-		auto spell_name = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetName();
+		auto spell_name = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetName();
 		if (spell_name == "YoneQ3") {
-			const auto q3Target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetQ3Range());
+			const auto q3Target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetQ3Range());
 			if (q3Target != nullptr) {
 				Functions::UseQ3(q3Target);
 			}
@@ -655,7 +655,7 @@ void Modes::Combo() {
 	
 
 	if (YoneCombo::UseE->Value == true && isTimeToCastEYone()) {
-		const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetERange());
+		const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetERange());
 		if (eTarget != nullptr and !shadowYone) {
 			Functions::UseE(eTarget);
 
@@ -663,9 +663,9 @@ void Modes::Combo() {
 	}
 
 	if (YoneCombo::UseQ->Value) {
-		const auto spell_name = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetName();
+		const auto spell_name = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetName();
 		if (spell_name != "YoneQ3") {
-			const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetQRange());
+			const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetQRange());
 			if (qTarget != nullptr) {
 				Functions::UseQ(qTarget);
 			}
@@ -673,7 +673,7 @@ void Modes::Combo() {
 	}
 
 	if (YoneCombo::UseW->Value == true && isTimeToCastWYone()) {
-		const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetWRange());
+		const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetWRange());
 		if (wTarget != nullptr) {
 			Functions::UseW(wTarget);
 		}
@@ -681,7 +681,7 @@ void Modes::Combo() {
 
 
 	if (YoneCombo::UseR->Value == true && isTimeToCastRYone()) {
-		const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetRRange());
+		const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetRRange());
 		if (rTarget != nullptr) {
 			Functions::UseR(rTarget);
 
@@ -699,50 +699,50 @@ void Modes::Clear() {
 
 
 
-	const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), YoneSpellsSettings::GetWRange());
+	const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetWRange());
 	if (minionsInRange > 0) {
 
 		if (YoneClear::UseQ->Value && isTimeToCastQYone()) {
-			const auto qTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetQRange(), Alliance::Enemy);
+			const auto qTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetQRange(), Alliance::Enemy);
 			if (qTarget != nullptr) {
 				Functions::UseQ(qTarget);
 			}
 		}
 
 		if (YoneClear::UseQ3->Value && isTimeToCastQYone()) {
-			const auto qTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetQ3Range(), Alliance::Enemy);
+			const auto qTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetQ3Range(), Alliance::Enemy);
 			if (qTarget != nullptr) {
 				Functions::UseQ3(qTarget);
 			}
 		}
 
 		if (YoneClear::UseW->Value && isTimeToCastWYone()) {
-			const auto wTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetWRange(), Alliance::Enemy);
+			const auto wTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetWRange(), Alliance::Enemy);
 			if (wTarget != nullptr) {
 				Functions::UseW(wTarget);
 			}
 		}
 	}
 	else {
-		const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetWRange());
+		const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetWRange());
 		if (jungleMonstersInRange > 0) {
 
 			if (YoneJungle::UseQ->Value && isTimeToCastQYone()) {
-				const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetQRange());
+				const auto qMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetQRange());
 				if (qMonster != nullptr) {
 					Functions::UseQ(qMonster);
 				}
 			}
 
 			if (YoneJungle::UseQ3->Value && isTimeToCastQYone()) {
-				const auto q3Monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetQ3Range());
+				const auto q3Monster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetQ3Range());
 				if (q3Monster != nullptr) {
 					Functions::UseQ3(q3Monster);
 				}
 			}
 
 			if (YoneJungle::UseW->Value && isTimeToCastWYone()) {
-				const auto wMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetWRange());
+				const auto wMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetWRange());
 				if (wMonster != nullptr) {
 					Functions::UseW(wMonster);
 				}
@@ -759,9 +759,9 @@ void Modes::Harass() {
 	}
 
 	if (YoneCombo::UseQ3->Value and isTimeToCastQYone()) {
-		auto spell_name = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetName();
+		auto spell_name = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetName();
 		if (spell_name == "YoneQ3") {
-			const auto q3Target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetQ3Range());
+			const auto q3Target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetQ3Range());
 			if (q3Target != nullptr) {
 				Functions::UseQ3(q3Target);
 			}
@@ -770,7 +770,7 @@ void Modes::Harass() {
 
 
 	if (YoneHarass::UseE->Value == true && isTimeToCastEYone()) {
-		const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetERange());
+		const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetERange());
 		if (eTarget != nullptr and !shadowYone) {
 			Functions::UseE(eTarget);
 
@@ -778,9 +778,9 @@ void Modes::Harass() {
 	}
 
 	if (YoneHarass::UseQ->Value) {
-		const auto spell_name = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetName();
+		const auto spell_name = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetName();
 		if (spell_name != "YoneQ3") {
-			const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetQRange());
+			const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetQRange());
 			if (qTarget != nullptr) {
 				Functions::UseQ(qTarget);
 			}
@@ -788,7 +788,7 @@ void Modes::Harass() {
 	}
 
 	if (YoneHarass::UseW->Value == true && isTimeToCastWYone()) {
-		const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), YoneSpellsSettings::GetWRange());
+		const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetWRange());
 		if (wTarget != nullptr) {
 			Functions::UseW(wTarget);
 		}
@@ -804,7 +804,7 @@ void Modes::Killsteal() {
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 		if (!hero) continue;
 
-		if (hero->GetPosition().Distance(globals::localPlayer->GetPosition()) > YoneSpellsSettings::GetRRange() + hero->GetBoundingRadius() / 2) continue;
+		if (hero->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition()) > YoneSpellsSettings::GetRRange() + hero->GetBoundingRadius() / 2) continue;
 		if (hero->IsInvulnerable()) continue;
 
 
@@ -815,7 +815,7 @@ void Modes::Killsteal() {
 			break;
 		}
 		if (YoneKillsteal::UseQ->Value && isTimeToCastQYone() && heroHealth < Damages::QSpell::GetDamage(hero)) {
-			const auto spell_name = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetName();
+			const auto spell_name = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetName();
 			if (spell_name == "YoneQ3") {
 				Functions::UseQ(hero);
 				break;
@@ -836,12 +836,12 @@ void Modes::Auto() {
 	if (shadowYone)
 	{
 		if (YoneSpellsSettings::eBackAtHp->Value) {
-			const auto eBackTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), 500);
+			const auto eBackTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), 500);
 			if (eBackTarget != nullptr) {
 				if (!CanCastSpell(eBackTarget, isTimeToCastEYone())) return;
-				if (eBackTarget->GetDistanceTo(globals::localPlayer) > YoneSpellsSettings::GetERange() - YoneSpellsSettings::GetQRange()) return;
+				if (eBackTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) > YoneSpellsSettings::GetERange() - YoneSpellsSettings::GetQRange()) return;
 
-				float myHealthPercent = static_cast<float>(globals::localPlayer->GetHealth()) / globals::localPlayer->GetMaxHealth() * 100.0f;
+				float myHealthPercent = static_cast<float>(ObjectManager::GetLocalPlayer()->GetHealth()) / ObjectManager::GetLocalPlayer()->GetMaxHealth() * 100.0f;
 				float healthThresholdPercent = static_cast<float>(YoneSpellsSettings::eBackHealthPercentSlider->Value);
 
 				if (myHealthPercent <= healthThresholdPercent) {
@@ -853,11 +853,11 @@ void Modes::Auto() {
 		}
 
 		if (YoneSpellsSettings::eBackEnemy->Value) {
-			if (ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), YoneSpellsSettings::GetE2Range()) == 0)
+			if (ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), YoneSpellsSettings::GetE2Range()) == 0)
 			{
-				if (globals::localPlayer != nullptr &&
-					globals::localPlayer->IsAlive() &&
-					globals::localPlayer->IsTargetable() &&
+				if (ObjectManager::GetLocalPlayer() != nullptr &&
+					ObjectManager::GetLocalPlayer()->IsAlive() &&
+					ObjectManager::GetLocalPlayer()->IsTargetable() &&
 					Orbwalker::CanCastAfterAttack() &&
 					isTimeToCastEYone())
 				{
@@ -886,7 +886,7 @@ void Events::MyTThing(int state, SpellCast* spellData) {
 	if (Interuptables::interruptibleMenuCheck->Value == false) return;
 	if (spellData == nullptr) return;
 	if (state != 12) return;
-	if (spellData->GetCasterHandle() == globals::localPlayer->GetHandle()) return;
+	if (spellData->GetCasterHandle() == ObjectManager::GetLocalPlayer()->GetHandle()) return;
 	if (spellData->IsAutoAttack()) return;
 
 	const auto caster = ObjectManager::GetClientByHandle(spellData->GetCasterHandle());
@@ -916,7 +916,7 @@ void Events::MyTThing(int state, SpellCast* spellData) {
 				if (Interuptables::selectedSpells[championName][i]) {
 					// Spell is interruptible and selected for interruption
 					LOG("Interruptible Spell Detected: %s is casting %s\n", championName.c_str(), slotName.c_str());
-					auto spell_name = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetName();
+					auto spell_name = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetName();
 					if (spell_name == "YoneQ3") {
 						if (caster != nullptr) {
 							Functions::UseQ3(caster);
@@ -936,7 +936,7 @@ void OnCreateObject(Object* unit) {
 	if (unit == nullptr) {
 		return;
 	}
-	if (unit->GetDistanceTo(globals::localPlayer) <= 500.0f) {
+	if (unit->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= 500.0f) {
 		Engine::PrintChat(unit->GetName());
 		return;
 	}

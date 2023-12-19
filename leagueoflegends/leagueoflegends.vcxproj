@@ -246,6 +246,7 @@
     <ClInclude Include="MenuRenderer.h" />
     <ClInclude Include="MenuSettings.h" />
     <ClInclude Include="ObjectTypeHolder.h" />
+    <ClInclude Include="ObjManager.h" />
     <ClInclude Include="OnProcessSpellCast.h" />
     <ClInclude Include="Orbwalker.h" />
     <ClInclude Include="Path.h" />
@@ -332,6 +333,7 @@
     <ClCompile Include="MenuComponent.cpp" />
     <ClCompile Include="MenuRenderer.cpp" />
     <ClCompile Include="MenuSettings.cpp" />
+    <ClCompile Include="ObjManager.cpp" />
     <ClCompile Include="Orbwalker.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="Plugins.cpp" />

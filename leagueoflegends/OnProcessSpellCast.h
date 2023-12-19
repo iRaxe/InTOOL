@@ -50,19 +50,13 @@ __int64 __fastcall hkOnProcessSpellCast(__int64 spell_book, int state, SpellCast
 
 inline void HookOnProcessSpellCast()
 {
-	for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+	for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
 	{
-		auto obj = globals::heroManager->GetIndex(i);
-
-		for (Object* obj : *globals::heroManager)
-		{
-			uintptr_t dwOnProcessSpell = (uintptr_t)obj + UPasta::Offsets::Events::Spellcast::ProcessIndex;
-			pOnProcessSpellCast = VMTHOnProcessSpellCast[i].Hook((void*)dwOnProcessSpell, 30, (uintptr_t)&hkOnProcessSpellCast);
-			i++;
-
-		}
+		auto obj = ObjectManager::GetHeroList()->GetIndex(i);
+		uintptr_t dwOnProcessSpell = (uintptr_t)obj + UPasta::Offsets::Events::Spellcast::ProcessIndex;
+		pOnProcessSpellCast = VMTHOnProcessSpellCast[i].Hook((void*)dwOnProcessSpell, 30, (uintptr_t)&hkOnProcessSpellCast);
+		i++;
 	}
-	
 }
 
 inline void UnHookOnProcessSpellCast()

@@ -20,17 +20,6 @@ namespace Engine
 		return *reinterpret_cast<T*>((uintptr_t)addr);
 	}
 
-	template <typename Type>
-	Type RPM(const QWORD address)
-	{
-		if (!address)
-			return Type();
-
-		Type buffer;
-
-		return NT_SUCCESS(ReadProcessMemory(GetCurrentProcess(), (LPVOID)address, &buffer, sizeof(Type), NULL)) ? buffer : Type();
-	};
-
 	template<typename T>
 	void PrintChat(T value)
 	{
@@ -277,7 +266,7 @@ namespace Engine
 
 	Object* GetPlayerPointer(const std::string& playerNameToFind)
 	{
-		for (Object* obj : *globals::heroManager)
+		for (Object* obj : *ObjectManager::GetHeroList())
 		{
 			//if (obj->IsAlly()) continue;
 			if (obj->GetName() == playerNameToFind)
@@ -331,7 +320,7 @@ namespace Engine
 		// Ready = 0 || NotAvailable = 4 || Supressed = 8 || NotLearned = 12 || Disabled = 16 || Processing = 24 || Cooldown = 32 || NoMana = 64 || Unknown = 96
 		typedef int(__fastcall* fnGetSpellState)(void*, int, const QWORD&);
 		fnGetSpellState _fnGetSpellState = (fnGetSpellState)(globals::moduleBase + UPasta::Offsets::Functions::Spells::GetSpellState);
-		return _fnGetSpellState(globals::localPlayer + UPasta::Offsets::Client::SpellBookInstance, slotId, NULL);
+		return _fnGetSpellState(ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::SpellBookInstance, slotId, NULL);
 	}
 
 	float GetSpellRange(Spell* spellID)
@@ -396,7 +385,7 @@ namespace Engine
 
 	bool SellItem(InventorySlot* slotID)
 	{
-		auto test = globals::localPlayer->GetSpellBySlotId(SpellIndex::Item1);
+		auto test = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Item1);
 		return call_function<bool>(RVA(UPasta::Offsets::Functions::Shop::SellItem), test);
 	}
 
@@ -458,18 +447,18 @@ namespace Engine
 
 	bool CanUpgradeSpell(int spellId)
 	{
-		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsSpellslotUpgradable), globals::localPlayer, spellId);
+		return call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::IsSpellslotUpgradable), ObjectManager::GetLocalPlayer(), spellId);
 	}
 
 	void UpgradeSpell(int spellId)
 	{
-		if (globals::localPlayer == nullptr || spellId > 3) return;
-		call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::HudUpgradeSpell), globals::localPlayer, spellId);
+		if (ObjectManager::GetLocalPlayer() == nullptr || spellId > 3) return;
+		call_function<bool>(RVA(UPasta::Offsets::Functions::Stats::HudUpgradeSpell), ObjectManager::GetLocalPlayer(), spellId);
 	}
 
 	void GlowObject(Object* obj)
 	{
-		if (globals::localPlayer == nullptr) return;
+		if (ObjectManager::GetLocalPlayer() == nullptr) return;
 		call_function<void>(RVA(UPasta::Offsets::Functions::D3DX::Functions::Riot_RenderPipelineLOL_RenderMouseOvers), obj);
 	}
 
@@ -477,24 +466,24 @@ namespace Engine
 
 	void TryRightClick(Vector2 pos)
 	{
-		float floatCheck1 = *(float*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickFloatCheck1);
-		float floatCheck2 = *(float*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickFloatCheck2);
-		DWORD check = *(DWORD*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickCheck);
+		float floatCheck1 = *(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck1);
+		float floatCheck2 = *(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck2);
+		DWORD check = *(DWORD*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickCheck);
 
-		*(float*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickFloatCheck1) = 0.0f;
-		*(float*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickFloatCheck2) = 0.0f;
-		*(DWORD*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickCheck) = 0x0;
+		*(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck1) = 0.0f;
+		*(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck2) = 0.0f;
+		*(DWORD*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickCheck) = 0x0;
 
 		unsigned int* params = new unsigned int[20];
 		params[17] = (int)pos.x;
 		params[18] = (int)pos.y;
 		params[19] = 2;
 
-		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueRClick), (QWORD*)globals::localPlayer, params);
+		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueRClick), (QWORD*)ObjectManager::GetLocalPlayer(), params);
 
-		*(float*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickFloatCheck1) = floatCheck1;
-		*(float*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickFloatCheck2) = floatCheck2;
-		*(DWORD*)((QWORD)globals::localPlayer + UPasta::Offsets::Client::IssueClickCheck) = check;
+		*(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck1) = floatCheck1;
+		*(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck2) = floatCheck2;
+		*(DWORD*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickCheck) = check;
 		Event::Publish(Event::OnAfterAttack);
 
 	}
@@ -506,12 +495,11 @@ namespace Engine
 		params[18] = (int)pos.y;
 		params[19] = 2;
 
-		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueClick), (QWORD*)globals::localPlayer, params[19], 0, 0, params[17], params[18], 0);
+		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueClick), (QWORD*)ObjectManager::GetLocalPlayer(), params[19], 0, 0, params[17], params[18], 0);
 	}
 
 	void IssueMove(Vector2 pos)
 	{
-		Event::Publish(Event::OnIssueMove, pos);
 		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueMove), (QWORD*)(*(QWORD*)(*(QWORD*)(globals::moduleBase + UPasta::Offsets::Instance::HUD::HudInstance) + UPasta::Offsets::Instance::HUD::Input)), (int)pos.x, (int)pos.y, false, 0, 0);
 	}
 
@@ -548,7 +536,7 @@ namespace Engine
 
 	bool CastSelf(SpellIndex slotID)
 	{
-		Object* localPlayer = globals::localPlayer;
+		Object* localPlayer = ObjectManager::GetLocalPlayer();
 		if (localPlayer == nullptr) return false;
 
 		Spell* spellPtr = localPlayer->GetSpellBySlotId(slotID);
@@ -583,7 +571,7 @@ namespace Engine
 
 	bool CastTargeted(SpellIndex slotID, Object* target)
 	{
-		Object* localPlayer = globals::localPlayer;
+		Object* localPlayer = ObjectManager::GetLocalPlayer();
 		if (localPlayer == nullptr) return false;
 		if (target == nullptr) return false;
 
@@ -622,7 +610,7 @@ namespace Engine
 
 	bool CastToPosition(SpellIndex slotID, Vector3 worldPos)
 	{
-		Object* localPlayer = globals::localPlayer;
+		Object* localPlayer = ObjectManager::GetLocalPlayer();
 		if (localPlayer == nullptr) return false;
 		if (!worldPos.IsValid()) return false;
 
@@ -660,7 +648,7 @@ namespace Engine
 		if (!IsSpellSlotValid(spellId))
 			return false;
 
-		Object* me = globals::localPlayer;
+		Object* me = ObjectManager::GetLocalPlayer();
 		Spell* spell = me->GetSpellBySlotId(spellId);
 		if (!spell || !spell->GetSpellInput() || !pos.IsValid())
 			return false;
@@ -676,15 +664,12 @@ namespace Engine
 		const auto InputLogic = GetInputLogic();
 		call_function<void>(RVA(UPasta::Offsets::Functions::Spells::ReleaseSpell), InputLogic, (QWORD*)0);
 		UpdateMouseInstancePosition(mouseScreenPosition);
-		Event::Publish(Event::OnReleaseSpell);
-
-
 		return true;
 	}
 
 	bool CanSendInput()
 	{
-		return globals::localPlayer->IsAlive() && IsGameFocused() && !IsChatOpen();
+		return ObjectManager::GetLocalPlayer()->IsAlive() && IsGameFocused() && !IsChatOpen();
 	}
 
 	void AttackObject(Vector3 objPos)

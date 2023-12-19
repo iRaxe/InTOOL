@@ -14,18 +14,6 @@ namespace hooks
 		typedef unsigned int UINT;
 
 		bool _init = false;
-
-		void AssignGlobalLists() {
-			globals::localPlayer = *(Object**)(globals::moduleBase + UPasta::Offsets::Instance::LocalPlayer);
-			globals::heroManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::HeroList);
-			globals::minionManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::MinionList);
-			globals::turretManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::TurretList);
-			globals::inhibitorsManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::InhibList);
-			globals::attackableManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::AttackableList);
-			globals::objManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::ObjManager);
-			globals::missileManager = *(ObjectManager**)(globals::moduleBase + UPasta::Offsets::Instance::Lists::MissileList);
-		}
-
 		void InitMainFunctions() {
 			TryCatch(Skillshot::PopulateSpellsDB(), "Error in populating spells database");
 			TryCatch(Engine::Init(), "Error in initializing functions");
@@ -135,7 +123,6 @@ namespace hooks
 
 		void Inits()
 		{
-			AssignGlobalLists();
 			InitMainFunctions();
 			HookFunctions();
 			SubscribeToMainEvents();

@@ -1,3 +1,4 @@
+#include "../ObjManager.h"
 #include "../stdafx.h"
 
 void Skillshot::SetSlotIndex(int slotId) {
@@ -38,11 +39,11 @@ float Skillshot::GetMaxRange() const {
 }
 
 std::string Skillshot::GetName() const {
-	return globals::localPlayer->GetSpellBySlotId(this->slotIndex)->GetName();
+	return ObjectManager::GetLocalPlayer()->GetSpellBySlotId(this->slotIndex)->GetName();
 }
 
 bool Skillshot::IsCastable() const {
-	return globals::localPlayer->CanCastSpell(static_cast<SpellIndex>(this->slotIndex));
+	return ObjectManager::GetLocalPlayer()->CanCastSpell(static_cast<SpellIndex>(this->slotIndex));
 }
 
 bool Skillshot::IsLearned() const {
@@ -54,7 +55,7 @@ bool Skillshot::IsProcessing() const {
 }
 
 int Skillshot::GetStacks() const {
-	return globals::localPlayer->GetSpellBySlotId(this->slotIndex)->GetStacks();
+	return ObjectManager::GetLocalPlayer()->GetSpellBySlotId(this->slotIndex)->GetStacks();
 }
 
 void Skillshot::PopulateSpellsDB()
@@ -155,13 +156,13 @@ void Skillshot::PopulateSpellsDB()
 	database.JhinW = SkillshotManager::RegisterSpell(SP_STRING("Jhin"), W, Skillshot(2550, 40, 5000, 0.75, SkillshotLine, {}));
 	database.JhinE = SkillshotManager::RegisterSpell(SP_STRING("Jhin"), E, Skillshot(750, 130, 1600, 0.25, SkillshotCircle, {}));
 	database.JhinR = SkillshotManager::RegisterSpell(SP_STRING("Jhin"), R, Skillshot(3500, 80, 5000, 0.25, SkillshotLine, {}));
-	database.JinxW = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), W, Skillshot(1450, 60, 3300, max(0.4f, 0.6f - ((globals::localPlayer->GetAttackSpeed() - 1) * 0.25f / 2.5f)), SkillshotLine, { CollidableObjects::Objects }));
+	database.JinxW = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), W, Skillshot(1450, 60, 3300, max(0.4f, 0.6f - ((ObjectManager::GetLocalPlayer()->GetAttackSpeed() - 1) * 0.25f / 2.5f)), SkillshotLine, { CollidableObjects::Objects }));
 	database.JinxE = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), E, Skillshot(900, 80, 1100, 1.5, SkillshotCircle, {}));
 	database.JinxR = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), R, Skillshot(12500, 140, 1700, 0.6, SkillshotLine, {}));
 	database.KaisaQ = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), Q, Skillshot(600, 600, FLT_MAX, 0.4, SkillshotNone, {}));
 	database.KaisaW = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), W, Skillshot(3000, 100, 1750, 0.4, SkillshotLine, {CollidableObjects::Objects}));
 	database.KaisaE = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), E, Skillshot(1000, 1000, 1750, 1.2, SkillshotNone, {}));
-	database.KaisaR = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), R, Skillshot(globals::localPlayer->GetSpellBySlotId(R)->GetLevel() == 3 ? 3000 : globals::localPlayer->GetSpellBySlotId(R)->GetLevel() == 2 ? 2250 : 1500, 525, 1750, 0.4, SkillshotNone, {}));
+	database.KaisaR = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), R, Skillshot(ObjectManager::GetLocalPlayer()->GetSpellBySlotId(R)->GetLevel() == 3 ? 3000 : ObjectManager::GetLocalPlayer()->GetSpellBySlotId(R)->GetLevel() == 2 ? 2250 : 1500, 525, 1750, 0.4, SkillshotNone, {}));
 	database.KalistaQ = SkillshotManager::RegisterSpell(SP_STRING("Kalista"), Q, Skillshot(1150, 40, 2400, 0.25, SkillshotLine, {}));
 	database.KarmaQ = SkillshotManager::RegisterSpell(SP_STRING("Karma"), Q, Skillshot(950, 60, 1700, 0.25, SkillshotLine, {}));
 	database.KarmaQ2 = SkillshotManager::RegisterSpell(SP_STRING("Karma"), Q, Skillshot(950, 80, 1700, 0.25, SkillshotLine, {}));
@@ -178,7 +179,7 @@ void Skillshot::PopulateSpellsDB()
 	database.KledQ = SkillshotManager::RegisterSpell(SP_STRING("Kled"), Q, Skillshot(800, 45, 1600, 0.25, SkillshotLine, {}));
 	database.KledQ2 = SkillshotManager::RegisterSpell(SP_STRING("Kled"), Q, Skillshot(700, 0, 3000, 0.25, SkillshotCone, {}));
 	database.KogMawQ = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), Q, Skillshot(1175, 70, 1650, 0.25, SkillshotLine, {CollidableObjects::Objects}));
-	database.KogMawW = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), W, Skillshot(globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetRealAttackRange(), 1650, 0.25, SkillshotNone, { }));
+	database.KogMawW = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), W, Skillshot(ObjectManager::GetLocalPlayer()->GetRealAttackRange(), ObjectManager::GetLocalPlayer()->GetRealAttackRange(), 1650, 0.25, SkillshotNone, { }));
 	database.KogMawE = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), E, Skillshot(1360, 120, 1400, 0.25, SkillshotLine, {}));
 	database.KogMawR = SkillshotManager::RegisterSpell(SP_STRING("KogMaw"), R, Skillshot(1300, 200, FLT_MAX, 1.1, SkillshotCircle, {}));
 	database.KSanteQ = SkillshotManager::RegisterSpell(SP_STRING("KSante"), Q, Skillshot(465, 75, 1800, 0.25, SkillshotLine, {}));
@@ -254,7 +255,7 @@ void Skillshot::PopulateSpellsDB()
 	database.SejuaniR = SkillshotManager::RegisterSpell(SP_STRING("Sejuani"), R, Skillshot(1300, 120, 1600, 0.25, SkillshotLine, {}));
 	database.SennaQ = SkillshotManager::RegisterSpell(SP_STRING("Senna"), Q, Skillshot(1100, 80, FLT_MAX, 0.4, SkillshotLine, {}));
 	database.SennaW = SkillshotManager::RegisterSpell(SP_STRING("Senna"), W, Skillshot(1300, 100, 1150, 0.25, SkillshotLine, {CollidableObjects::Objects}));
-	database.SennaE = SkillshotManager::RegisterSpell(SP_STRING("Senna"), E, Skillshot(globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetRealAttackRange(), 1750, 0.25, SkillshotNone, {}));
+	database.SennaE = SkillshotManager::RegisterSpell(SP_STRING("Senna"), E, Skillshot(ObjectManager::GetLocalPlayer()->GetRealAttackRange(), ObjectManager::GetLocalPlayer()->GetRealAttackRange(), 1750, 0.25, SkillshotNone, {}));
 	database.SennaR = SkillshotManager::RegisterSpell(SP_STRING("Senna"), R, Skillshot(12500, 180, 20000, 1, SkillshotLine, {}));
 	database.SeraphineQ = SkillshotManager::RegisterSpell(SP_STRING("Seraphine"), Q, Skillshot(900, 350, 1200, 0.25, SkillshotCircle, {}));
 	database.SeraphineE = SkillshotManager::RegisterSpell(SP_STRING("Seraphine"), E, Skillshot(1300, 70, 1200, 0.25, SkillshotLine, {}));
@@ -284,10 +285,10 @@ void Skillshot::PopulateSpellsDB()
 	database.TaliyahE = SkillshotManager::RegisterSpell(SP_STRING("Taliyah"), E, Skillshot(800, 0, 2000, 0.45, SkillshotCone, {}));
 	database.TaliyahR = SkillshotManager::RegisterSpell(SP_STRING("Taliyah"), R, Skillshot(3000, 120, 1700, 1, SkillshotLine, {}));
 	database.TalonW = SkillshotManager::RegisterSpell(SP_STRING("Talon"), W, Skillshot(650, 75, 2500, 0.25, SkillshotCone, {}));
-	database.TwitchQ = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), Q, Skillshot(globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetAttackSpeed(), 0.5, SkillshotNone, { }));
+	database.TwitchQ = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), Q, Skillshot(ObjectManager::GetLocalPlayer()->GetRealAttackRange(), ObjectManager::GetLocalPlayer()->GetRealAttackRange(), ObjectManager::GetLocalPlayer()->GetAttackSpeed(), 0.5, SkillshotNone, { }));
 	database.TwitchW = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), W, Skillshot(950, 100, 1500, 3.00, SkillshotCircle, {}));
 	database.TwitchE = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), E, Skillshot(1200, 110, 2000, 0.25, SkillshotNone, {}));
-	database.TwitchR = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), R, Skillshot(globals::localPlayer->GetRealAttackRange() + 300.0f, globals::localPlayer->GetRealAttackRange() + 300.0f, 5000, 0, SkillshotNone, {}));
+	database.TwitchR = SkillshotManager::RegisterSpell(SP_STRING("Twitch"), R, Skillshot(ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 300.0f, ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 300.0f, 5000, 0, SkillshotNone, {}));
 	database.ThreshQ = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), Q, Skillshot(1100, 70, 1900, 0.5, SkillshotLine, { CollidableObjects::Objects }));
 	database.ThreshW = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), W, Skillshot(950, 150, 1900, 0.5, SkillshotLine, {}));
 	database.ThreshE = SkillshotManager::RegisterSpell(SP_STRING("Thresh"), E, Skillshot(500, 110, 2000, 0.389, SkillshotLine, {}));
@@ -303,7 +304,7 @@ void Skillshot::PopulateSpellsDB()
 	database.VarusR = SkillshotManager::RegisterSpell(SP_STRING("Varus"), R, Skillshot(1200, 120, 1500, 0.25, SkillshotLine, {}));
 	database.VayneQ = SkillshotManager::RegisterSpell(SP_STRING("Vayne"), Q, Skillshot(300, 70, 2200, 0, SkillshotLine, {}));
 	database.VayneE = SkillshotManager::RegisterSpell(SP_STRING("Vayne"), E, Skillshot(550, 70, 2000, 0.25, SkillshotNone, {}));
-	database.VayneR = SkillshotManager::RegisterSpell(SP_STRING("Vayne"), R, Skillshot(globals::localPlayer->GetRealAttackRange(), globals::localPlayer->GetRealAttackRange(), 2000, 0.25, SkillshotNone, {}));
+	database.VayneR = SkillshotManager::RegisterSpell(SP_STRING("Vayne"), R, Skillshot(ObjectManager::GetLocalPlayer()->GetRealAttackRange(), ObjectManager::GetLocalPlayer()->GetRealAttackRange(), 2000, 0.25, SkillshotNone, {}));
 	database.VeigarQ = SkillshotManager::RegisterSpell(SP_STRING("Veigar"), Q, Skillshot(900, 70, 2200, 0.25, SkillshotLine, {}));
 	database.VeigarW = SkillshotManager::RegisterSpell(SP_STRING("Veigar"), W, Skillshot(900, 200, FLT_MAX, 1.25, SkillshotCircle, {}));
 	database.VexQ = SkillshotManager::RegisterSpell(SP_STRING("Vex"), Q, Skillshot(1200, 80, 2200, 0.15, SkillshotCone, {}));

@@ -1,7 +1,5 @@
 #pragma once
-
 #include "../stdafx.h"
-
 namespace globals
 {
 	extern QWORD moduleBase;
@@ -16,16 +14,6 @@ namespace globals
 	extern float windowWidth;
 	extern float windowHeight;
 
-	extern Object* localPlayer;
-	extern ObjectManager* heroManager;
-	extern ObjectManager* minionManager;
-	extern ObjectManager* turretManager;
-	extern ObjectManager* inhibitorsManager;
-	extern ObjectManager* missileManager;
-	extern ObjectManager* attackableManager;
-
-
-	extern ObjectManager* objManager;
 
 	//DX9
 	extern LPDIRECT3DDEVICE9 pDeviceDX9var;

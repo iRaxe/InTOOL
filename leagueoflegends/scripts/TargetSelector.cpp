@@ -52,7 +52,7 @@ Object* TargetSelector::FindBestTarget(Vector3 from, float range) {
 		std::sort(possible_targets.begin(), possible_targets.end(),
 			[](Object* pFirst, Object* pSecond) -> bool
 			{
-				auto me = globals::localPlayer;
+				auto me = ObjectManager::GetLocalPlayer();
 				auto my_aa = me->GetAttackDamage();
 
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
@@ -94,7 +94,7 @@ Object* TargetSelector::FindBestMinion(Vector3 from, float range, Alliance team)
 		std::sort(possible_targets.begin(), possible_targets.end(),
 			[](Object* pFirst, Object* pSecond) -> bool
 			{
-				auto me = globals::localPlayer;
+				auto me = ObjectManager::GetLocalPlayer();
 				auto my_aa = me->GetAttackDamage();
 
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
@@ -132,7 +132,7 @@ Object* TargetSelector::FindBestJungle(Vector3 from, float range) {
 		std::sort(possible_targets.begin(), possible_targets.end(),
 			[](Object* pFirst, Object* pSecond) -> bool
 			{
-				auto me = globals::localPlayer;
+				auto me = ObjectManager::GetLocalPlayer();
 				auto my_aa = me->GetAttackDamage();
 
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
@@ -171,7 +171,7 @@ Object* TargetSelector::FindTurret(Vector3 from, float range, Alliance team) {
 		std::sort(possible_targets.begin(), possible_targets.end(),
 			[](Object* pFirst, Object* pSecond) -> bool
 			{
-				auto me = globals::localPlayer;
+				auto me = ObjectManager::GetLocalPlayer();
 				auto my_aa = me->GetAttackDamage();
 
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);
@@ -210,7 +210,7 @@ Object* TargetSelector::FindInhibitor(Vector3 from, float range, Alliance team) 
 		std::sort(possible_targets.begin(), possible_targets.end(),
 			[](Object* pFirst, Object* pSecond) -> bool
 			{
-				auto me = globals::localPlayer;
+				auto me = ObjectManager::GetLocalPlayer();
 				auto my_aa = me->GetAttackDamage();
 
 				auto damage_first = UPasta::SDK::Damage::CalculatePhysicalDamage(me, pFirst, my_aa);

@@ -116,9 +116,9 @@ public:
         EzrealConfig::EzrealAntiMelee::eMode = antiMeleeMenu->AddList("eMode", "Dash To", std::vector<std::string>{"Near Mouse", "Extend Enemy Dash Position"}, 0);
         EzrealConfig::EzrealAntiMelee::UseE = antiMeleeMenu->AddCheckBox("Use E", "Use SpellSlot E To Mouse", false);
         const auto antiMeleewhitelistMenu = antiMeleeMenu->AddMenu("Whitelist Settings", "Whitelist");
-        for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+        for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
         {
-            auto obj = globals::heroManager->GetIndex(i);
+            auto obj = ObjectManager::GetHeroList()->GetIndex(i);
             if (obj != nullptr && obj->IsEnemy())
             {
                 const auto antiGap_checkbox = antiGapwhitelistMenu->AddCheckBox(obj->GetName().c_str(),
@@ -198,91 +198,91 @@ public:
 
     static float Ezreal_dmgQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.EzrealQ.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.EzrealQ.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = EzrealDamages::QSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = ObjectManager::GetLocalPlayer()->GetAttackDamage();
         const float additionalAttackDamageSkillDamage = EzrealDamages::QSpell::additionalPercentageAD;
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalAbilityPowerSkillDamage = EzrealDamages::QSpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage) + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
-        return Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, totalDamage);
+        return Damage::CalculatePhysicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, totalDamage);
     }
 
     static float Ezreal_dmgW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.EzrealW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.EzrealW.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = EzrealDamages::WSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = ObjectManager::GetLocalPlayer()->GetAttackDamage();
         const float additionalAttackDamageSkillDamage = EzrealDamages::WSpell::additionalPercentageAD;
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalAbilityPowerSkillDamage = EzrealDamages::WSpell::additionalPercentageAP[levelSpell - 1];
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage) + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
-        return Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, totalDamage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, totalDamage);
     }
 
     static float Ezreal_dmgR(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.EzrealR.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.EzrealR.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = EzrealDamages::RSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = ObjectManager::GetLocalPlayer()->GetAttackDamage();
         const float additionalAttackDamageSkillDamage = EzrealDamages::RSpell::additionalPercentageAD;
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalAbilityPowerSkillDamage = EzrealDamages::RSpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage) + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
-        return Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, totalDamage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, totalDamage);
     }
 
     static bool Ezreal_HasEnoughComboMana()
     {
-        if (globals::localPlayer == nullptr)
+        if (ObjectManager::GetLocalPlayer() == nullptr)
             return false;
 
-        const float qSpellManaCost = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetManaCost();
-        const float wSpellManaCost = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetManaCost();
-        const float eSpellManaCost = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetManaCost();
-        const float rSpellManaCost = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetManaCost();
+        const float qSpellManaCost = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetManaCost();
+        const float wSpellManaCost = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetManaCost();
+        const float eSpellManaCost = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E)->GetManaCost();
+        const float rSpellManaCost = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetManaCost();
 
-        if (globals::localPlayer->GetLevel() >= 6)
-            return globals::localPlayer->GetMana() > qSpellManaCost + wSpellManaCost + eSpellManaCost + rSpellManaCost;
+        if (ObjectManager::GetLocalPlayer()->GetLevel() >= 6)
+            return ObjectManager::GetLocalPlayer()->GetMana() > qSpellManaCost + wSpellManaCost + eSpellManaCost + rSpellManaCost;
 
-        return globals::localPlayer->GetMana() > qSpellManaCost + wSpellManaCost + eSpellManaCost;
+        return ObjectManager::GetLocalPlayer()->GetMana() > qSpellManaCost + wSpellManaCost + eSpellManaCost;
     }
 
     static bool Ezreal_HasEnoughMana(float minValue)
     {
-        if (globals::localPlayer == nullptr || EzrealConfig::EzrealSpellsSettings::saveMana->Value && !Ezreal_HasEnoughComboMana())
+        if (ObjectManager::GetLocalPlayer() == nullptr || EzrealConfig::EzrealSpellsSettings::saveMana->Value && !Ezreal_HasEnoughComboMana())
             return false;
 
-        return globals::localPlayer->GetPercentMana() > minValue;
+        return ObjectManager::GetLocalPlayer()->GetPercentMana() > minValue;
     }
 
     void Ezreal_UseQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.EzrealQ.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.EzrealQ.IsCastable())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < qRange() && isTimeToCastQ())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < qRange() && isTimeToCastQ())
         {
             Modules::prediction::PredictionOutput qPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealQ, qPrediction))
+            if (GetPrediction(ObjectManager::GetLocalPlayer(), pEnemy, database.EzrealQ, qPrediction))
             {
                 Engine::CastToPosition(SpellIndex::Q, qPrediction.position);
                 QCastedTime = gameTime;
@@ -292,13 +292,13 @@ public:
 
     void Ezreal_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.EzrealW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.EzrealW.IsCastable())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < wRange() && isTimeToCastW())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < wRange() && isTimeToCastW())
         {
             Modules::prediction::PredictionOutput wPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealW, wPrediction))
+            if (GetPrediction(ObjectManager::GetLocalPlayer(), pEnemy, database.EzrealW, wPrediction))
             {
                 Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
@@ -308,10 +308,10 @@ public:
 
     void Ezreal_UseE(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.EzrealE.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.EzrealE.IsCastable())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < eRange() && isTimeToCastE())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < eRange() && isTimeToCastE())
         {
             Engine::CastToPosition(SpellIndex::E, Engine::GetMouseWorldPos());
             ECastedTime = gameTime;
@@ -320,13 +320,13 @@ public:
 
     void Ezreal_UseR(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.EzrealR.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.EzrealR.IsCastable())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < rRange() && isTimeToCastR())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < rRange() && isTimeToCastR())
         {
             Modules::prediction::PredictionOutput rPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, database.EzrealR, rPrediction))
+            if (GetPrediction(ObjectManager::GetLocalPlayer(), pEnemy, database.EzrealR, rPrediction))
             {
                 Engine::CastToPosition(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
@@ -346,7 +346,7 @@ public:
             switch (EzrealConfig::EzrealSpellsSettings::targetMode->Value)
             {
             case 0: //Inherit
-                if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange()))
+                if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),rRange()))
                     Ezreal_UseR(rTarget);
                 break;
             case 1: //NearMouse
@@ -354,7 +354,7 @@ public:
                     Ezreal_UseR(rTarget2);
                 break;
             case 2: //NearChampion
-                if (const auto rTarget3 = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), 500.0f))
+                if (const auto rTarget3 = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), 500.0f))
                     Ezreal_UseR(rTarget3);
                 break;
             }
@@ -364,21 +364,21 @@ public:
 
     void Combo() override
     {
-        if (EzrealConfig::EzrealCombo::UseR->Value == true && database.EzrealR.IsCastable() && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), EzrealConfig::EzrealSpellsSettings::minRDistance->Value) >= EzrealConfig::EzrealCombo::enemiesInRange->Value)
+        if (EzrealConfig::EzrealCombo::UseR->Value == true && database.EzrealR.IsCastable() && ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), EzrealConfig::EzrealSpellsSettings::minRDistance->Value) >= EzrealConfig::EzrealCombo::enemiesInRange->Value)
         {
-            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange()))
+            if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),rRange()))
                 Ezreal_UseR(rTarget);
         }
 
         if (EzrealConfig::EzrealCombo::UseW->Value == true && database.EzrealW.IsCastable() && EzrealConfig::EzrealSpellsSettings::wCastMode->Value == 0)
         {
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange()))
                 Ezreal_UseW(wTarget);
         }
 
         if (EzrealConfig::EzrealCombo::UseQ->Value == true && database.EzrealQ.IsCastable() && EzrealConfig::EzrealSpellsSettings::qCastMode->Value == 0)
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange()))
                 Ezreal_UseQ(qTarget);
         }
     }
@@ -386,34 +386,34 @@ public:
     void Clear() override
     {
         //Laneclear
-        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) > 0)
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
         {
 
             if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealClear::minMana->Value)) return;
 
             if (EzrealConfig::EzrealClear::UseQ->Value == true && database.EzrealQ.IsCastable())
             {
-                const auto qTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), qRange(), Alliance::Enemy);
+                const auto qTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), Alliance::Enemy);
                 if (qTarget != nullptr && qTarget->GetHealth() < Ezreal_dmgQ(qTarget))
                     Ezreal_UseQ(qTarget);
             }
         }
 
         //Jungleclear
-        else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
+        else if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
         {
             if (!Ezreal_HasEnoughMana(EzrealConfig::EzrealJungle::minMana->Value)) return;
 
             if (EzrealConfig::EzrealJungle::UseW->Value == true && database.EzrealW.IsCastable())
             {
-                const auto wTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
+                const auto wTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
                 if (wTarget != nullptr && (wTarget->GetName().contains("Dragon") || wTarget->GetName().contains("Baron") || wTarget->GetName().contains("Herald")))
                     Ezreal_UseW(wTarget);
             }
 
             if (EzrealConfig::EzrealJungle::UseQ->Value == true && database.EzrealQ.IsCastable())
             {
-                if (const auto qTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), qRange()))
+                if (const auto qTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()))
                     Ezreal_UseQ(qTarget);
             }
         }
@@ -427,13 +427,13 @@ public:
 
         if (EzrealConfig::EzrealHarass::UseW->Value == true && database.EzrealW.IsCastable() && EzrealConfig::EzrealSpellsSettings::wCastMode->Value == 0)
         {
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange()))
                 Ezreal_UseW(wTarget);
         }
 
         if (EzrealConfig::EzrealHarass::UseQ->Value == true && database.EzrealQ.IsCastable() && EzrealConfig::EzrealSpellsSettings::qCastMode->Value == 0)
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange()))
                 Ezreal_UseQ(qTarget);
         }
     }
@@ -445,7 +445,7 @@ public:
 
         if (EzrealConfig::EzrealLastHit::UseQ->Value == true && database.EzrealQ.IsCastable())
         {
-            const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), qRange(), Alliance::Enemy);
+            const auto minion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), Alliance::Enemy);
             if (minion != nullptr && minion->GetHealth() < Ezreal_dmgQ(minion))
                 Ezreal_UseQ(minion);
         }
@@ -456,7 +456,7 @@ public:
         if (EzrealConfig::EzrealFlee::UseE->Value == true && database.EzrealE.IsCastable())
         {
             const Vector3 pathEnd = Engine::GetMouseWorldPos();
-            if (pathEnd.IsValid() && globals::localPlayer->GetDistanceTo(globals::localPlayer) < 750.0f && isTimeToCastE())
+            if (pathEnd.IsValid() && ObjectManager::GetLocalPlayer()->GetDistanceTo(ObjectManager::GetLocalPlayer()) < 750.0f && isTimeToCastE())
             {
                 Engine::CastToPosition(SpellIndex::E, Engine::GetMouseWorldPos());
                 ECastedTime = gameTime;
@@ -469,7 +469,7 @@ public:
         __try {
             if (EzrealConfig::EzrealKillsteal::UseQ->Value == true && database.EzrealQ.IsCastable())
             {
-                const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
+                const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange());
                 if (qTarget != nullptr && qTarget->GetHealth() < Ezreal_dmgQ(qTarget))
                 {
                     Ezreal_UseQ(qTarget);
@@ -478,10 +478,10 @@ public:
 
             if (EzrealConfig::EzrealKillsteal::UseR->Value == true && database.EzrealR.IsCastable())
             {
-                const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange());
+                const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),rRange());
                 if (rTarget != nullptr
-                    && rTarget->GetDistanceTo(globals::localPlayer) > EzrealConfig::EzrealSpellsSettings::minRDistance->Value
-                    && rTarget->GetDistanceTo(globals::localPlayer) < EzrealConfig::EzrealSpellsSettings::maxRDistance->Value
+                    && rTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) > EzrealConfig::EzrealSpellsSettings::minRDistance->Value
+                    && rTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) < EzrealConfig::EzrealSpellsSettings::maxRDistance->Value
                     && rTarget->GetHealth() < Ezreal_dmgR(rTarget))
                 {
                     Ezreal_UseR(rTarget);
@@ -502,7 +502,7 @@ public:
             for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
                 if (!target) continue;
-                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 750.0f) continue;
+                if (target->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > 750.0f) continue;
                 if (!Engine::MenuItemContains(EzrealConfig::EzrealAntiGapCloser::whitelist, target->GetName().c_str())) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
@@ -510,7 +510,7 @@ public:
                 if (target != nullptr)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 750.0f)
+                    if (pathEnd.IsValid() && ObjectManager::GetLocalPlayer()->GetPosition().distanceTo(pathEnd) < 750.0f)
                     {
                         Ezreal_UseE(target);
                     }
@@ -526,13 +526,13 @@ public:
             for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
                 if (!target) continue;
-                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 750.0f) continue;
+                if (target->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > 750.0f) continue;
                 if (!Engine::MenuItemContains(EzrealConfig::EzrealAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->GetDistanceTo(globals::localPlayer) < target->GetRealAttackRange())
+                if (target != nullptr && target->GetDistanceTo(ObjectManager::GetLocalPlayer()) < target->GetRealAttackRange())
                 {
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
-                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 750.0f)
+                    if (pathEnd.IsValid() && ObjectManager::GetLocalPlayer()->GetPosition().distanceTo(pathEnd) < 750.0f)
                     {
                         Ezreal_UseE(target);
                     }
@@ -618,13 +618,13 @@ public:
     {
         __try {
             if (EzrealConfig::EzrealSpellsSettings::DrawQ->Value == true && (EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == true && database.EzrealQ.IsCastable() || EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
 
             if (EzrealConfig::EzrealSpellsSettings::DrawW->Value == true && (EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == true && database.EzrealW.IsCastable() || EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
 
             if (EzrealConfig::EzrealSpellsSettings::DrawE->Value == true && (EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == true && database.EzrealE.IsCastable() || EzrealConfig::EzrealSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
         }
         __except (1)
         {

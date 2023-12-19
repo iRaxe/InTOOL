@@ -130,7 +130,7 @@ void Awarenesss::Sidebar::Draw(bool* p_open) {
 
 	if (ImGui::Begin("Hero awareness", p_open, window_flags))
 	{
-		const auto heroManager = globals::heroManager;
+		const auto heroManager = ObjectManager::GetHeroList();
 		if (!heroManager) return;  // Aggiunto controllo di nullità
 
 		const int champListSize = heroManager->GetListSize();

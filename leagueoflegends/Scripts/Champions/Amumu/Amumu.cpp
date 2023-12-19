@@ -19,29 +19,29 @@ private:
 
 
     [[nodiscard]] bool isTimeToCastQ() const {
-        return gameTime > QCastedTime + database.AmumuQ.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+        return gameTime > QCastedTime + database.AmumuQ.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastW() const {
-        return gameTime > WCastedTime && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+        return gameTime > WCastedTime && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastE() const {
-        return gameTime > ECastedTime && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+        return gameTime > ECastedTime && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastR() const {
-        return gameTime > RCastedTime + database.AmumuR.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+        return gameTime > RCastedTime + database.AmumuR.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
     }
 
     static bool HasAuraOfDespairBuff() {
-        if (globals::localPlayer == nullptr) {
+        if (ObjectManager::GetLocalPlayer() == nullptr) {
             // Handle the case where localPlayer is null (optional)
             return false;
         }
 
         // Assume that localPlayer has a GetBuffByName method
-        Buff* auraOfDespairBuff = globals::localPlayer->GetBuffByName("AuraofDespair");
+        Buff* auraOfDespairBuff = ObjectManager::GetLocalPlayer()->GetBuffByName("AuraofDespair");
         return auraOfDespairBuff != nullptr;
     }
 
@@ -50,7 +50,7 @@ private:
 
         switch (mode) {
         case OrbwalkState::Clear:
-            if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
+            if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(AmumuConfig::AmumuJungle::minMana->Value);
             break;
         case OrbwalkState::Harass:
@@ -60,7 +60,7 @@ private:
             return false;
         }
 
-        return globals::localPlayer->GetPercentMana() > minManaThreshold;
+        return ObjectManager::GetLocalPlayer()->GetPercentMana() > minManaThreshold;
     }
 
     static float qRange() {
@@ -80,32 +80,32 @@ private:
     }
 
     static float AmumuQDamage(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::Q))
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q))
             return -9999;
 
-        const int level = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const int level = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         if (level == 0)
             return 0.0f;
 
         const float dmgSkill = AmumuDamages::QSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * AmumuDamages::QSpell::additionalPercentageAP;
+        const float abilityPowerModifier = ObjectManager::GetLocalPlayer()->GetAbilityPower() * AmumuDamages::QSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
-        return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), target, damage);
     }
 
     static float AmumuRDamage(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::R))
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R))
             return -9999;
-        const int level = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int level = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         if (level == 0)
             return 0.0f;
 
         const float dmgSkill = AmumuDamages::RSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * AmumuDamages::RSpell::additionalPercentageAP;
+        const float abilityPowerModifier = ObjectManager::GetLocalPlayer()->GetAbilityPower() * AmumuDamages::RSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
-        return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), target, damage);
     }
 
 
@@ -178,10 +178,10 @@ public:
 
 
     void CastQSpell(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !isTimeToCastQ())
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !isTimeToCastQ())
             return;
 
-        if (target && target->GetDistanceTo(globals::localPlayer) < qRange())
+        if (target && target->GetDistanceTo(ObjectManager::GetLocalPlayer()) < qRange())
         {
             if (target->IsMinion()) {
                 Engine::CastToPosition(SpellIndex::Q, target->GetPosition());
@@ -197,7 +197,7 @@ public:
 
             Modules::prediction::PredictionOutput predOut;
 
-            if (GetPrediction(globals::localPlayer, target, database.AmumuQ, predOut)) {
+            if (GetPrediction(ObjectManager::GetLocalPlayer(), target, database.AmumuQ, predOut)) {
                 Engine::CastToPosition(SpellIndex::Q, predOut.position);
                 QCastedTime = gameTime;
             }
@@ -205,10 +205,10 @@ public:
     }
 
     void CastWSpell() {
-        if (globals::localPlayer == nullptr || !isTimeToCastW())
+        if (ObjectManager::GetLocalPlayer() == nullptr || !isTimeToCastW())
             return;
 
-        int enemiesInRange = ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange());
+        int enemiesInRange = ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
 
         bool isAuraOfDespairActive = HasAuraOfDespairBuff();
 
@@ -223,20 +223,20 @@ public:
     }
 
     void CastESpell(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !isTimeToCastE())
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !isTimeToCastE())
             return;
 
-        if (target && target->GetDistanceTo(globals::localPlayer) < eRange()) {
+        if (target && target->GetDistanceTo(ObjectManager::GetLocalPlayer()) < eRange()) {
             Engine::CastSelf(SpellIndex::E);
             ECastedTime = gameTime;
         }
     }
 
     void CastRSpell(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !isTimeToCastR())
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !isTimeToCastR())
             return;
 
-        if (target && target->GetDistanceTo(globals::localPlayer) < rRange())
+        if (target && target->GetDistanceTo(ObjectManager::GetLocalPlayer()) < rRange())
         {
             Engine::CastSelf(SpellIndex::R);
             RCastedTime = gameTime;
@@ -250,29 +250,29 @@ public:
 
     void Combo() override {
         if (AmumuConfig::AmumuCombo::UseQ->Value && isTimeToCastQ()) {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr) {
                 CastQSpell(qTarget);
             }
         }
 
         if (AmumuConfig::AmumuCombo::UseW->Value && isTimeToCastW()) {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
                 CastWSpell();
             }
         }
 
         if (AmumuConfig::AmumuCombo::UseE->Value && isTimeToCastE() && AmumuConfig::AmumuSpellsSettings::eMode->Value == 0) {
-            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
             if (eTarget != nullptr) {
                 CastESpell(eTarget);
             }
         }
 
         if (AmumuConfig::AmumuCombo::UseR->Value && isTimeToCastR()) {
-            if (AmumuConfig::AmumuCombo::rMinEnemies->Value <= ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), rRange())) {
-                const auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
+            if (AmumuConfig::AmumuCombo::rMinEnemies->Value <= ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), rRange())) {
+                const auto target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
                 if (target != nullptr) {
                     CastRSpell(target);
                 }
@@ -284,21 +284,21 @@ public:
     {
         if (!HasEnoughMana(OrbwalkState::Harass)) return;
         if (AmumuConfig::AmumuHarass::UseQ->Value && isTimeToCastQ()) {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr) {
                 CastQSpell(qTarget);
             }
         }
 
         if (AmumuConfig::AmumuHarass::UseW->Value && isTimeToCastW()) {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
                 CastWSpell();
             }
         }
 
         if (AmumuConfig::AmumuHarass::UseE->Value && isTimeToCastE()) {
-            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
             if (eTarget != nullptr) {
                 CastESpell(eTarget);
             }
@@ -309,18 +309,18 @@ public:
     void Clear() override {
         if (!HasEnoughMana(OrbwalkState::Clear)) return;
 
-        if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange()) > 0)
+        if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0)
         {
             if (AmumuConfig::AmumuJungle::UseQ->Value && isTimeToCastQ()) {
-                const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), qRange());
+                const auto qMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
                 if (qMonster != nullptr) {
                     CastQSpell(qMonster);
                     return;
                 }
             }
 
-            int enemiesInRange = ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange());
-        	int jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange());
+            int enemiesInRange = ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
+        	int jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
 
             // Check if the "AuraofDespair" Buff aktiv ist
             bool isAuraOfDespairActive = HasAuraOfDespairBuff();
@@ -338,7 +338,7 @@ public:
             }
 
             if (AmumuConfig::AmumuJungle::UseE->Value && isTimeToCastE()) {
-                const auto eMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), eRange());
+                const auto eMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
                 if (eMonster != nullptr) {
                     CastESpell(eMonster);
                     return;
@@ -358,7 +358,7 @@ public:
     void Killsteal() {
         __try {
             if (AmumuConfig::AmumuKillsteal::UseQ->Value && isTimeToCastQ()) {
-                const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+                const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
                 if (qTarget != nullptr) {
                     if (qTarget->GetHealth() < AmumuQDamage(qTarget)) {
                         CastQSpell(qTarget);
@@ -367,7 +367,7 @@ public:
             }
 
             if (AmumuConfig::AmumuKillsteal::UseR->Value && isTimeToCastR()) {
-                const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
+                const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
                 if (rTarget != nullptr) {
                     if (rTarget->GetHealth() < AmumuRDamage(rTarget)) {
                         CastRSpell(rTarget);
@@ -383,7 +383,7 @@ public:
 
     void OnAfterAttack() override {
         if (AmumuConfig::AmumuSpellsSettings::eMode->Value == 1 && isTimeToCastE()) {
-            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
             if (eTarget != nullptr) {
                 CastESpell(eTarget);
             }
@@ -405,9 +405,9 @@ public:
     void Render() override {
         __try {
             if (AmumuConfig::AmumuSpellsSettings::qDraw->Value && (AmumuConfig::AmumuSpellsSettings::DrawIfReady->Value == true && database.AmumuQ.IsCastable() || AmumuConfig::AmumuSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
             if (AmumuConfig::AmumuSpellsSettings::rDraw->Value && (AmumuConfig::AmumuSpellsSettings::DrawIfReady->Value == true && database.AmumuR.IsCastable() || AmumuConfig::AmumuSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
         }
         __except (1)
         {

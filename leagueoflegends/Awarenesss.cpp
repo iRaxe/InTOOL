@@ -30,7 +30,7 @@ void Awarenesss::InitializeWardPosDrawingsMenu()
 void Awarenesss::PushCooldowns(int state, SpellCast* spellCastInfo) {
 	if (spellCastInfo == nullptr) return;
 	if (state != 12) return;
-	if (spellCastInfo->GetCasterHandle() == globals::localPlayer->GetHandle()) return;
+	if (spellCastInfo->GetCasterHandle() == ObjectManager::GetLocalPlayer()->GetHandle()) return;
 	if (spellCastInfo->IsAutoAttack()) return;
 
 	const auto caster = ObjectManager::GetClientByHandle(spellCastInfo->GetCasterHandle());

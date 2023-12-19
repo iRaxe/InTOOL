@@ -18,12 +18,12 @@ void Awarenesss::LastHitDamage::Draw() {
 	for (auto minion : ObjectManager::GetMinionsAs(Alliance::Enemy))
 	{
 		if (!minion) continue;
-		if (minion->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > globals::localPlayer->GetRealAttackRange()) continue;
+		if (minion->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > ObjectManager::GetLocalPlayer()->GetRealAttackRange()) continue;
 		const Vector2 screenPos = Engine::GetHpBarPosition(minion);
 		const ImVec2 topLeft = CalculateTopLeft(screenPos);
 		const ImVec2 bottomRight = CalculateBottomRight(screenPos, (60 * minion->GetPercentHealth()) / 100);
 
-		const float damage = Damage::CalculateAutoAttackDamage(globals::localPlayer, minion);
+		const float damage = Damage::CalculateAutoAttackDamage(ObjectManager::GetLocalPlayer(), minion);
 		const float minionHealth = minion->GetHealth();
 		const bool canKill = damage > minionHealth;
 

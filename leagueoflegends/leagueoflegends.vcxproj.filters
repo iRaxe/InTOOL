@@ -367,12 +367,6 @@
     <ClInclude Include="ManagerTemplate.h">
       <Filter>Scripts\Utilities\Orbwalker</Filter>
     </ClInclude>
-    <ClInclude Include="InitializeEvents.h">
-      <Filter>Hooks\EventManager\Initialize</Filter>
-    </ClInclude>
-    <ClInclude Include="DestroyEvents.h">
-      <Filter>Hooks\EventManager\Destroy</Filter>
-    </ClInclude>
     <ClInclude Include="MenuComponent.h">
       <Filter>Rendering\Menu\Components</Filter>
     </ClInclude>
@@ -453,29 +447,11 @@
     <ClInclude Include="Icons.h">
       <Filter>Rendering\CompressedImages</Filter>
     </ClInclude>
-    <ClInclude Include="Syscaller.h">
-      <Filter>Main\Bypass</Filter>
-    </ClInclude>
-    <ClInclude Include="Kernel.h">
-      <Filter>Main\Bypass</Filter>
-    </ClInclude>
-    <ClInclude Include="DecryptMemoryPages.h">
-      <Filter>Main\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="FindHiddenModule.h">
-      <Filter>Main\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="MenuSettings.h">
       <Filter>Rendering\Menu</Filter>
     </ClInclude>
     <ClInclude Include="NewMenu.h">
       <Filter>Rendering\Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="UltimateHooks.h">
-      <Filter>Main\OldBypass\UltimateHooks</Filter>
-    </ClInclude>
-    <ClInclude Include="makesyscall.h">
-      <Filter>Main\OldBypass\UltimateHooks</Filter>
     </ClInclude>
     <ClInclude Include="OnProcessSpellCast.h">
       <Filter>Hooks\VMTHook</Filter>
@@ -506,9 +482,6 @@
     </ClInclude>
     <ClInclude Include="TargetingClient.h">
       <Filter>Global\SpellBook</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory.h">
-      <Filter>Main\Memory</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\Champions\Ashe\Ashe.h">
       <Filter>Scripts\Champions\Ashe</Filter>
@@ -569,6 +542,9 @@
     </ClInclude>
     <ClInclude Include="Yone.h">
       <Filter>Scripts\Champions\New\Yone</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjManager.h">
+      <Filter>Global\ObjectManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -669,12 +645,6 @@
     <ClCompile Include="Eventmanager.h">
       <Filter>Hooks\EventManager\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="InitializeEvents.cpp">
-      <Filter>Hooks\EventManager\Initialize</Filter>
-    </ClCompile>
-    <ClCompile Include="DestroyEvents.cpp">
-      <Filter>Hooks\EventManager\Destroy</Filter>
-    </ClCompile>
     <ClCompile Include="MenuComponent.cpp">
       <Filter>Rendering\Menu\Components</Filter>
     </ClCompile>
@@ -720,17 +690,11 @@
     <ClCompile Include="clipper.cpp">
       <Filter>Global</Filter>
     </ClCompile>
-    <ClCompile Include="Syscaller.cpp">
-      <Filter>Main\Bypass</Filter>
-    </ClCompile>
     <ClCompile Include="MenuSettings.cpp">
       <Filter>Rendering\Menu</Filter>
     </ClCompile>
     <ClCompile Include="NewMenu.cpp">
       <Filter>Rendering\Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="UltimateHooks.cpp">
-      <Filter>Main\OldBypass\UltimateHooks</Filter>
     </ClCompile>
     <ClCompile Include="Cooldowns.cpp">
       <Filter>Scripts\Utilities\Awarenesss\HPBar</Filter>
@@ -755,9 +719,6 @@
     </ClCompile>
     <ClCompile Include="TargetingClient.cpp">
       <Filter>Global\SpellBook</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory.cpp">
-      <Filter>Main\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Ashe\Ashe.cpp">
       <Filter>Scripts\Champions\Ashe</Filter>
@@ -821,6 +782,9 @@
     </ClCompile>
     <ClCompile Include="Yone.cpp">
       <Filter>Scripts\Champions\New\Yone</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjManager.cpp">
+      <Filter>Global\ObjectManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

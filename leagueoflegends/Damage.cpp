@@ -185,7 +185,7 @@ DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* targe
 DamageOnHitResult Damage::ComputeDamageOnHit(Object* source, Object* target)
 {
 	DamageOnHitResult result;
-	HeroInventory* inventory = globals::localPlayer->GetHeroInventory();
+	HeroInventory* inventory = ObjectManager::GetLocalPlayer()->GetHeroInventory();
 
 	// Struttura per associare item ID ai loro calcoli di danno
 	std::unordered_map<ItemsDatabase, std::function<void()>> itemDamageHandlers = {

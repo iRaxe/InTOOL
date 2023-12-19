@@ -1,4 +1,5 @@
 #pragma once
+#include "ObjManager.h"
 #include "classes/classes.h"
 
 namespace UPasta
@@ -24,7 +25,7 @@ namespace UPasta
 
 			template <typename DmgSkill, typename ADMulti>
 			float CalculateSlotPhysicalDamage(SpellIndex spellIndex, Object* pEnemy, DmgSkill dmgSkill, ADMulti additionalPercentageAD) {
-				const int levelSpell = globals::localPlayer->GetSpellBySlotId(spellIndex)->GetLevel();
+				const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(spellIndex)->GetLevel();
 
 				float spellslotDamage;
 				if constexpr (std::is_pointer_v<DmgSkill>) spellslotDamage = dmgSkill[levelSpell];
@@ -34,16 +35,16 @@ namespace UPasta
 				if constexpr (std::is_pointer_v<ADMulti>) attackDamageMultiplier = additionalPercentageAD[levelSpell];
 				else attackDamageMultiplier = additionalPercentageAD;
 
-				const float attackDamage = globals::localPlayer->GetBonusAttackDamage();
+				const float attackDamage = ObjectManager::GetLocalPlayer()->GetBonusAttackDamage();
 				const float attackDamageModifier = attackDamageMultiplier * attackDamage;
 				const float physicalDamage = spellslotDamage + attackDamageModifier;
 
-				return CalculatePhysicalDamage(globals::localPlayer, pEnemy, physicalDamage);
+				return CalculatePhysicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, physicalDamage);
 			}
 
 			template <typename DmgSkill, typename APMulti>
 			float CalculateSlotMagicalDamage(SpellIndex spellIndex, Object* pEnemy, DmgSkill dmgSkill, APMulti additionalPercentageAP) {
-				const int levelSpell = globals::localPlayer->GetSpellBySlotId(spellIndex)->GetLevel();
+				const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(spellIndex)->GetLevel();
 
 				float spellslotDamage;
 				if constexpr (std::is_pointer_v<DmgSkill>) spellslotDamage = dmgSkill[levelSpell];
@@ -53,11 +54,11 @@ namespace UPasta
 				if constexpr (std::is_pointer_v<APMulti>) abilityPowerMultiplier = additionalPercentageAP[levelSpell];
 				else abilityPowerMultiplier = additionalPercentageAP;
 
-				const float abilityPower = globals::localPlayer->GetAbilityPower();
+				const float abilityPower = ObjectManager::GetLocalPlayer()->GetAbilityPower();
 				const float abilityPowerModifier = abilityPowerMultiplier * abilityPower;
 				const float magicalDamage = spellslotDamage + abilityPowerModifier;
 
-				return CalculateMagicalDamage(globals::localPlayer, pEnemy, magicalDamage);
+				return CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, magicalDamage);
 			}
 
 			template <typename DmgSkill, typename APMulti, typename ADMulti>
@@ -69,7 +70,7 @@ namespace UPasta
 
 			template <typename DmgSkill, typename APMulti, typename ADMulti>
 			float CalculateSlotTrueDamage(SpellIndex spellIndex, DmgSkill dmgSkill, APMulti additionalPercentageAP, ADMulti additionalPercentageAD) {
-				const int levelSpell = globals::localPlayer->GetSpellBySlotId(spellIndex)->GetLevel();
+				const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(spellIndex)->GetLevel();
 				float spellslotDamage;
 				if constexpr (std::is_pointer_v<DmgSkill>) spellslotDamage = dmgSkill[levelSpell];
 				else spellslotDamage = dmgSkill;
@@ -82,10 +83,10 @@ namespace UPasta
 				if constexpr (std::is_pointer_v<ADMulti>) attackDamageMultiplier = additionalPercentageAD[levelSpell];
 				else attackDamageMultiplier = additionalPercentageAD;
 
-				const float abilityPower = globals::localPlayer->GetAbilityPower();
+				const float abilityPower = ObjectManager::GetLocalPlayer()->GetAbilityPower();
 				const float abilityPowerModifier = abilityPowerMultiplier * abilityPower;
 
-				const float attackDamage = globals::localPlayer->GetBonusAttackDamage();
+				const float attackDamage = ObjectManager::GetLocalPlayer()->GetBonusAttackDamage();
 				const float attackDamageModifier = attackDamageMultiplier * attackDamage;
 
 				return spellslotDamage + abilityPowerModifier + attackDamageModifier;

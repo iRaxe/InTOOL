@@ -1,6 +1,6 @@
 #include "../stdafx.h"
 #include "../Orbwalker.h"
-
+#include "../ObjManager.h"
 class SyndraModule : public ChampionModule
 {
 private:
@@ -36,13 +36,13 @@ public:
 
     bool SphereForEExists(Vector3 targetPos)
     {
-        auto playerPos = globals::localPlayer->GetPosition();
+        auto playerPos = ObjectManager::GetLocalPlayer()->GetPosition();
         playerPos.y = 0.0f;
         targetPos.y = 0.0f;
 
         std::vector<QWORD> includeFilterTypeHashes = { ObjectType::Special, ObjectType::Less };
 
-        for (Object* obj : *globals::minionManager)
+        for (Object* obj : *ObjectManager::GetMinionList())
         {
             float dist = obj->GetPosition().Distance(playerPos);
             if (dist > 800.0f || dist < 150.0f) continue;
@@ -119,14 +119,14 @@ public:
         Modules::prediction::PredictionOutput wPrediction;
         Modules::prediction::PredictionOutput ePrediction;
 
-        auto spellCast = globals::localPlayer->GetActiveSpellCast();
+        auto spellCast = ObjectManager::GetLocalPlayer()->GetActiveSpellCast();
         if (spellCast && spellCast->GetSpellId() == SpellIndex::E) return;
 
         if (e.IsCastable() && Modules::prediction::GetPrediction(e, ePrediction))
         {
             if (q.IsCastable() && (q.GetStacks() > 0 || q.GetName().size() == 7) &&
-                globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetManaCost() +
-                globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetManaCost() <= globals::localPlayer->GetMana())
+                ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E)->GetManaCost() +
+                ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetManaCost() <= ObjectManager::GetLocalPlayer()->GetMana())
             {
                 Engine::CastToPosition(SpellIndex::Q, ePrediction.position);
                 lastQForECastTime = gameTime;
@@ -228,7 +228,7 @@ public:
     {
         if (e.IsCastable())
         {
-            render::RenderCircleWorld(globals::localPlayer->GetPosition(), 40, e.GetRange(), COLOR_PURPLE, 1.0f);
+            render::RenderCircleWorld(ObjectManager::GetLocalPlayer()->GetPosition(), 40, e.GetRange(), COLOR_PURPLE, 1.0f);
         }
 
         if (lastEObjPos.IsValid() && lastEProjectionPos.IsValid() && lastETargetPos.IsValid() )

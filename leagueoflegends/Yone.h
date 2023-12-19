@@ -222,10 +222,10 @@ namespace UPasta {
                     inline float healthPercentageArray[6] = { 0, 0.11, 0.12, 0.13, 0.14, 0.15 };
 
                     static float GetDamage(Object* obj) {
-                        if (globals::localPlayer == nullptr) {
+                        if (ObjectManager::GetLocalPlayer() == nullptr) {
                             return 0;
                         }
-                        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
+                        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetLevel();
 
 
                         float maxHealth = obj->GetMaxHealth();
@@ -257,7 +257,7 @@ namespace UPasta {
 
                     static float GetDamage(Object* obj, float damage)
                     {
-                        auto spell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E);
+                        auto spell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E);
                         int level = spell->GetLevel();
 
                         return damage * getPercentStored[level];

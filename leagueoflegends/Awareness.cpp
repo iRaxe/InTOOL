@@ -173,9 +173,9 @@ namespace UPasta
 
 					void DrawTracker()
 					{
-						for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+						for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
 						{
-							auto obj = globals::heroManager->GetIndex(i);
+							auto obj = ObjectManager::GetHeroList()->GetIndex(i);
 							if (obj->GetName() == "PracticeTool_TargetDummy") continue;
 
 							if (obj != nullptr)
@@ -207,7 +207,7 @@ namespace UPasta
 						for (auto ward : ObjectManager::GetWards(Alliance::Enemy))
 						{
 							if (!ward) continue;
-							if (ward->GetDistanceTo(globals::localPlayer) > 1100.0f) continue;
+							if (ward->GetDistanceTo(ObjectManager::GetLocalPlayer()) > 1100.0f) continue;
 
 							auto objDrawPos = Engine::GetBaseDrawPosition(ward);
 							auto objPos = Engine::WorldToScreen(objDrawPos);
@@ -286,7 +286,7 @@ namespace UPasta
 					{
 						if (obj->IsAlive() && obj->IsVisible())
 						{
-							if (obj->GetNetId() == globals::localPlayer->GetNetId())
+							if (obj->GetNetId() == ObjectManager::GetLocalPlayer()->GetNetId())
 							{
 								if (Configs::Radius::showAARadiusSelf->Value == true)
 								{
@@ -308,7 +308,7 @@ namespace UPasta
 						if (obj->IsAlive() && obj->IsVisible())
 						{
 
-							if (obj->GetNetId() == globals::localPlayer->GetNetId())
+							if (obj->GetNetId() == ObjectManager::GetLocalPlayer()->GetNetId())
 							{
 								if (Configs::Radius::showAARadiusSelf->Value == true)
 									DrawRadius(obj->GetPosition(), obj->GetRealAttackRange(), COLOR_WHITE, 1.0f, false, Configs::Radius::rainbowMode->Value);
@@ -340,12 +340,12 @@ namespace UPasta
 						{
 							if (Configs::Radius::status->Value == true)
 							{
-								for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+								for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
 								{
-									auto obj = globals::heroManager->GetIndex(i);
+									auto obj = ObjectManager::GetHeroList()->GetIndex(i);
 									if (!obj->IsAlive()) continue;
 									if (!obj->IsVisible()) continue;
-									if (obj->GetDistanceTo(globals::localPlayer) > 2000.0f) continue;
+									if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > 2000.0f) continue;
 
 									if (obj)
 									{
@@ -357,12 +357,12 @@ namespace UPasta
 									}
 								}
 
-								for (int i = 0; i < globals::turretManager->GetListSize(); i++)
+								for (int i = 0; i < ObjectManager::GetTurretsList()->GetListSize(); i++)
 								{
-									auto obj = globals::turretManager->GetIndex(i);
+									auto obj = ObjectManager::GetTurretsList()->GetIndex(i);
 									if (!obj->IsAlive()) continue;
 									if (!obj->IsVisible()) continue;
-									if (obj->GetDistanceTo(globals::localPlayer) > 2000.0f) continue;
+									if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > 2000.0f) continue;
 
 									if (obj)
 									{
@@ -412,9 +412,9 @@ namespace UPasta
 						{
 							gameTime = Engine::GetGameTime();
 
-							const Vector3 pathEnd = globals::localPlayer->GetAiManager()->GetPathEnd();
+							const Vector3 pathEnd = ObjectManager::GetLocalPlayer()->GetAiManager()->GetPathEnd();
 
-							if (!globals::localPlayer->GetAiManager()->IsMoving()) //&& Orbwalker::Functions::lastActionTime + 5.0f < gameTime)
+							if (!ObjectManager::GetLocalPlayer()->GetAiManager()->IsMoving()) //&& Orbwalker::Functions::lastActionTime + 5.0f < gameTime)
 							{
 								refresh = true;
 								if (refresh)
@@ -426,11 +426,11 @@ namespace UPasta
 
 							Vector2 pathEnd2D = pathEnd2DLast;
 
-							const Vector3 worldPlayer = globals::localPlayer->GetPosition();
+							const Vector3 worldPlayer = ObjectManager::GetLocalPlayer()->GetPosition();
 							const Vector2 worldPlayer2D = Vector2(worldPlayer.x, worldPlayer.z);
 							Vector2 diffVec = worldPlayer2D - pathEnd2D;
 							diffVec.Normalized();
-							diffVec.Multiply(globals::localPlayer->GetMovementSpeed());
+							diffVec.Multiply(ObjectManager::GetLocalPlayer()->GetMovementSpeed());
 
 							const Vector2 destPos = diffVec;
 							const float dX = destPos.x;

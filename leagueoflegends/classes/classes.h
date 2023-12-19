@@ -1,5 +1,4 @@
 #pragma once
-
 class LolString
 {
 	char content[0x10]; // 0x0
@@ -44,15 +43,16 @@ private:
 class InventorySlot
 {
 public:
+	STRING_GETTER(LolString, GetName, UPasta::Offsets::ItemManager::ItemName);
+	STRING_GETTER(LolString, GetTexturePath, UPasta::Offsets::ItemManager::ItemTexturePath);
+
 	ItemsDatabase GetId();
-	std::string GetTexturePath();
-	std::string GetName();
 };
 
 class ItemListObject
 {
 public:
-	InventorySlot* GetSlot();
+	CLASS_GETTER(InventorySlot*, GetSlot, UPasta::Offsets::ItemManager::InventorySlot);
 };
 
 class HeroInventory
@@ -67,10 +67,9 @@ class Perk
 {
 public:
 	CLASS_GETTER_P(PerkID, GetId, UPasta::Offsets::Perks::PerkID);
-
-	std::string GetName();
-	std::string GetRawName();
-	std::string GetRawDescription();
+	STRING_GETTER(LolString, GetName, UPasta::Offsets::Perks::PerkName);
+	STRING_GETTER(LolString, GetRawName, UPasta::Offsets::Perks::PerkRawName);
+	STRING_GETTER(LolString, GetRawDescription, UPasta::Offsets::Perks::PerkRawDescription);
 };
 
 class Perks
@@ -210,8 +209,7 @@ class CharacterData
 public:
 	CLASS_GETTER(float, GetSize, UPasta::Offsets::CharData::Size);
 	CLASS_GETTER(ChampionID, GetHeroID, UPasta::Offsets::CharData::HeroID);
-
-
+	
 	QWORD GetObjectTypeHash();
 	QWORD GetObjectTypeHashDetailed();
 };
@@ -228,13 +226,12 @@ public:
 	CLASS_GETTER(float, GetCastSpeed, UPasta::Offsets::SpellData::MissileSpeed);
 	CLASS_GETTER(float, GetDelay, UPasta::Offsets::SpellData::DelayCastOffsetPerce);
 	CLASS_GETTER(float, GetCastTime, UPasta::Offsets::SpellData::CastTime);
+	STRING_GETTER(LolString, GetName, UPasta::Offsets::SpellBook::SpellSlot::Name);
 
-	std::string GetName();
 	std::string GetTexturePath();
 	Vector3 GetSpellEndPos();
 	float GetManaCostByLevel(int level);
 };
-
 
 class Missiles
 {
@@ -251,7 +248,8 @@ class MissileData
 public:
 	std::string GetMissileName();
 	bool IsAutoAttack();
-	std::string GetSpellName();
+	STRING_GETTER(LolString, GetSpellName, UPasta::Offsets::MissileManager::SpellName);
+
 
 	int Resource;
 };
@@ -260,10 +258,12 @@ class Missile
 {
 public:
 	CLASS_GETTER(DWORD, GetHandle, UPasta::Offsets::Client::Handle);
-	CLASS_GETTER(float, GetSpellSpeed, UPasta::Offsets::MissileManager::Speed);
+	CLASS_GETTER(MissileData*, GetMissileData, UPasta::Offsets::MissileManager::SpellInfo::SpellInfoInstance);
 
-	MissileData* GetMissileData();
-	int GetMissileSrcId();
+
+	CLASS_GETTER(float, GetSpellSpeed, UPasta::Offsets::MissileManager::Speed);
+	CLASS_GETTER(int, GetMissileSrcId, UPasta::Offsets::MissileManager::SrcIdx);
+
 	Vector3 GetSpellStartPos();
 	Vector3 GetSpellPos();
 	Vector3 GetSpellEndPos();
@@ -272,7 +272,8 @@ public:
 class SpellInfo
 {
 public:
-	SpellData* GetSpellData();
+	CLASS_GETTER(SpellData*, GetSpellData, UPasta::Offsets::SpellInfo::SpellDataInstance);
+
 	Vector3 EndPosition;
 	Vector3 StartPosition;
 	uintptr_t SpellIndex;
@@ -294,11 +295,14 @@ public:
 class Spell
 {
 public:
+	CLASS_GETTER(SpellInfo*, GetSpellInfo, UPasta::Offsets::SpellBook::SpellSlot::SpellInfoInstance);
+
 	CLASS_GETTER(int, GetLevel, UPasta::Offsets::SpellBook::SpellSlot::Level);
 	CLASS_GETTER(int, GetStacks, UPasta::Offsets::SpellBook::SpellSlot::Stacks);
 
 	CLASS_GETTER(float, GetCooldownTimer, UPasta::Offsets::SpellBook::SpellSlot::Cooldown);
 	CLASS_GETTER(float, GetTotalCooldown, UPasta::Offsets::SpellBook::SpellSlot::TotalCooldown);
+
 
 	bool IsReady() { return this->GetRelativeCooldown() == 0.0f;	};
 	std::string GetName() { return this->GetSpellInfo()->GetSpellData()->GetName(); }
@@ -306,7 +310,6 @@ public:
 	float GetCooldown();
 	float GetRelativeCooldown();
 	SpellInput* GetSpellInput();
-	SpellInfo* GetSpellInfo();
 	float GetManaCost();
 };
 
@@ -314,6 +317,8 @@ class SpellCast
 {
 public:
 	CLASS_GETTER(DWORD, GetCasterHandle, UPasta::Offsets::SpellCast::CasterHandle);
+	CLASS_GETTER(SpellInfo*, GetSpellInfo, UPasta::Offsets::ActiveCast::Info);
+	CLASS_GETTER(SpellInfo*, GetProcessSpellInfo, 0x0);
 
 	CLASS_GETTER(int, GetSpellId, UPasta::Offsets::SpellCast::SlotID);
 
@@ -322,9 +327,8 @@ public:
 	CLASS_GETTER(bool, IsAutoAttack, UPasta::Offsets::SpellCast::IsBasicAttack);
 	CLASS_GETTER(bool, IsSpell, UPasta::Offsets::SpellCast::IsSpell);
 
-	SpellInfo* GetSpellInfo();
-	SpellInfo* GetProcessSpellInfo();
-	std::string GetCasterName();
+	STRING_GETTER(LolString, GetCasterName, UPasta::Offsets::SpellCast::CasterName);
+
 	Vector3 GetStartPosition();
 	Vector3 GetEndPosition();
 	Vector3 GetMousePosition();
@@ -342,6 +346,7 @@ public:
 	CLASS_GETTER(int, GetStacks, UPasta::Offsets::BuffManager::BuffEntryBuffCount);
 
 	int GetMaxStacks() { return max(this->GetStacksAlt(), this->GetStacks()); }
+
 
 	std::string GetName();
 	bool isActive();
@@ -496,8 +501,9 @@ public:
 
 	bool IsInAARange();
 
-	QWORD* GetBuffManagerEntriesEnd();
-	BuffManager* GetBuffManager();
+
+	CLASS_GETTER(BuffManager*, GetBuffManager, UPasta::Offsets::BuffManager::BuffManagerInstance);
+	CLASS_GETTER(QWORD*, GetBuffManagerEntriesEnd, UPasta::Offsets::BuffManager::BuffManagerInstance + UPasta::Offsets::BuffManager::BuffEntriesEnd);
 	Buff* GetBuffByName(std::string name);
 	Buff* GetBuffByType(BuffType type);
 	int GetBuffListSize();
@@ -505,14 +511,15 @@ public:
 	bool HasBuff(const char* buffname);
 	bool IsCursed() { return this->GetBuffByName("cursedtouch"); }
 	bool HasConqueror() { return this->GetBuffByName("ASSETS/Perks/Styles/Precision/Conqueror/ConquerorEnrage.lua"); }
-	std::string GetName();
-	std::string GetClassicName();
-	SpellCast* GetActiveSpellCast();
-	Spell* GetSpellBySlotId(int slotId);
-	Missile* GetMissileByIndex();
 
+	STRING_GETTER(LolString, GetName, UPasta::Offsets::Client::AiName);
+	STRING_GETTER(LolString, GetClassicName, UPasta::Offsets::Client::Name);
+
+	Spell* GetSpellBySlotId(int slotId);
 	AiManager* GetAiManager();
 
+	CLASS_GETTER(SpellCast*, GetActiveSpellCast, UPasta::Offsets::ActiveCast::ActiveCastInstance);
+	CLASS_GETTER(Missile*, GetMissileByIndex, UPasta::Offsets::MissileManager::Index);
 	CLASS_GETTER_P(HeroInventory, GetHeroInventory, UPasta::Offsets::ItemManager::ItemManagerInstance);
 	CLASS_GETTER_P(Perks, GetHeroPerks, UPasta::Offsets::Perks::PerksManagerInstance);
 	CLASS_GETTER_P(CharacterDataStack, GetCharacterDataStack, UPasta::Offsets::CharData::CharDataInstance);
@@ -552,109 +559,33 @@ public:
 	TYPE GetType();
 };
 
-class ObjectManager
+class Camera
 {
-private:
-	static QWORD GetFirst(const QWORD& objectManager);
-	static QWORD GetNext(const QWORD& objectManager, const QWORD& obj);
-
-	static inline std::vector<Object*> _hero_list;
-	static inline std::vector<Object*> _minion_list;
-	static inline std::vector<Object*> _turret_list;
-	static inline std::vector<Object*> _inhibitor_list;
-	static inline std::vector<Object*> _nexus_list;
-	static inline std::vector<Object*> _particle_list;
-
-	static inline std::unordered_map<DWORD, Object*> _client_map;
-
-	static void HandleObject(Object* obj);
-	static void Flush();
-
 public:
-	uintptr_t* vtable;
-	std::map<uintptr_t, Missile*> missile_map;
-	std::map<uintptr_t, Object*> units_map;
-	Object* GetIndex(int index);
-	CLASS_GETTER(int, GetListSize, UPasta::Offsets::Instance::Lists::ManagerListSize);
-
-
-	class iterator
-	{
-	private:
-		ObjectManager* objectManager;
-		int index;
-
-	public:
-		iterator(ObjectManager* _objectManager, int _index)
-			: objectManager(_objectManager), index(_index)
-		{
-		}
-
-		iterator& operator++()
-		{
-			index++;
-			return *this;
-		}
-
-		bool operator!=(const iterator& other) const
-		{
-			return index != other.index;
-		}
-
-		Object* operator*()
-		{
-			return objectManager->GetIndex(index);
-		}
-	};
-
-	iterator begin()
-	{
-		return iterator(this, 0);
-	}
-
-	iterator end()
-	{
-		return iterator(this, GetListSize());
-	}
-
-	static void Update();
-
-	static std::vector<Object*> GetHeroes() { return _hero_list; }
-	static std::vector<Object*> GetHeroesAs(Alliance team);
-	static Object* GetHeroAs(Alliance team, Vector3 position, float range);
-
-	static int CountHeroesInRange(Alliance team, Vector3 position, float range);
-
-	static Object* GetObjectInRange(std::string name, float range);
-	static Object* GetObjectInRange(float range, std::string name, std::vector<QWORD> includeFilterTypeHashes, std::vector<QWORD> excludeFilterTypeHashesDetailed, bool isSpecial);
-
-	static std::vector<Object*> GetMinions() { return _minion_list; }
-	static std::vector<Object*> GetMinionsAs(Alliance team);
-	static int CountMinionsInRange(Alliance team, Vector3 position, float range);
-
-	static std::vector<Object*> GetJungleMonsters();
-	static int CountJungleMonstersInRange(Vector3 position, float range);
-
-	static std::vector<Object*> GetJunglePlants();
-	static std::vector<Object*> GetJungleRespawnCamps();
-
-	static std::vector<Object*> GetWards(Alliance team);
-
-	static std::vector<Object*> GetTurrets() { return _turret_list; }
-	static std::vector<Object*> GetTurretsAs(Alliance team);
-	static int CountTurretsInRange(Alliance team, Vector3 position, float range);
-
-	static std::vector<Object*> GetInhibitors() { return _inhibitor_list; }
-	static std::vector<Object*> GetInhibitorsAs(Alliance team);
-	static int CountInhibitorsInRange(Alliance team, Vector3 position, float range);
-
-	static std::vector<Object*> GetNexuses() { return _nexus_list; }
-	static Object* GetNexusAs(Alliance team);
-
-	static std::vector<Object*> GetParticles() { return _particle_list; }
-	static std::map<QWORD, Object*> GetMissilesAs(Alliance type);
-
-	static Object* GetClientByHandle(DWORD handle);
+	CLASS_GETTER(float, GetLimit, UPasta::Offsets::Instance::HUD::Camera::Limit);
 };
 
+class CameraStats
+{
+public:
+	CLASS_GETTER(uintptr_t, GetCamera, UPasta::Offsets::Instance::HUD::Camera::Camera);
+	CLASS_GETTER(float, GetValue, UPasta::Offsets::Instance::HUD::Camera::Value);
+	void SetZoomMultiplier(float new_value) { *(float*)UPasta::Offsets::Instance::HUD::Camera::Value = new_value; }
+};
+
+class HUD
+{
+public:
+	CLASS_GETTER(CameraStats*, GetCamera, UPasta::Offsets::Instance::HUD::Camera::Camera);
+};
+
+class Core
+{
+public:
+	static Core* GetBase();
+
+	CLASS_GETTER(HUD*, GetHUD, UPasta::Offsets::Instance::HUD::HudInstance);
+	CLASS_GETTER(Camera*, GetCameraInstance, UPasta::Offsets::Instance::HUD::Camera::CameraInstance);
+
+};
 

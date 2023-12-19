@@ -19,19 +19,19 @@ private:
 
 
     [[nodiscard]] bool isTimeToCastQ() const {
-        return gameTime > QCastedTime + database.KogMawQ.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+        return gameTime > QCastedTime + database.KogMawQ.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastW() const {
-        return gameTime > WCastedTime + database.KogMawW.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+        return gameTime > WCastedTime + database.KogMawW.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastE() const {
-        return gameTime > ECastedTime + database.KogMawE.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+        return gameTime > ECastedTime + database.KogMawE.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastR() const {
-        return gameTime > RCastedTime + database.KogMawR.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+        return gameTime > RCastedTime + database.KogMawR.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
     }
 
     static bool HasEnoughMana(OrbwalkState mode) {
@@ -39,9 +39,9 @@ private:
 
         switch (mode) {
         case OrbwalkState::Clear:
-            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) > 0)
+            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(KogMawConfig::KogMawClear::minMana->Value);  // NOLINT(bugprone-branch-clone)
-            else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
+            else if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(KogMawConfig::KogMawClear::minMana->Value);
             break;
         case OrbwalkState::Harass:
@@ -51,7 +51,7 @@ private:
             return false;
         }
 
-        return globals::localPlayer->GetPercentMana() > minManaThreshold;
+        return ObjectManager::GetLocalPlayer()->GetPercentMana() > minManaThreshold;
     }
 
     static float qRange() {
@@ -59,7 +59,7 @@ private:
     }
 
     static float wRange() {
-        return globals::localPlayer->GetRealAttackRange() + KogMawDamages::WSpell::addtionalRangeArray[globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel()] + static_cast<float>(KogMawConfig::KogMawSpellsSettings::wRangeOffset->Value);
+        return ObjectManager::GetLocalPlayer()->GetRealAttackRange() + KogMawDamages::WSpell::addtionalRangeArray[ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetLevel()] + static_cast<float>(KogMawConfig::KogMawSpellsSettings::wRangeOffset->Value);
     }
 
     static float eRange() {
@@ -75,47 +75,47 @@ private:
     }
 
     static float KogQDamage(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::Q))
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q))
             return -9999;
 
-        const int level = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const int level = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         if (level == 0)
             return 0.0f;
 
         const float dmgSkill = KogMawDamages::QSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * KogMawDamages::QSpell::additionalPercentageAP;
+        const float abilityPowerModifier = ObjectManager::GetLocalPlayer()->GetAbilityPower() * KogMawDamages::QSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
-        return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), target, damage);
     }
 
 
     static float KogEDamage(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::E))
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E))
             return -9999;
 
-        const int level = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
+        const int level = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         if (level == 0)
             return 0.0f;
 
         const float dmgSkill = KogMawDamages::ESpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * KogMawDamages::ESpell::additionalPercentageAP;
-        const float attackDamageModifier = globals::localPlayer->GetBonusAttackDamage() * KogMawDamages::ESpell::additionalPercentageAD;
+        const float abilityPowerModifier = ObjectManager::GetLocalPlayer()->GetAbilityPower() * KogMawDamages::ESpell::additionalPercentageAP;
+        const float attackDamageModifier = ObjectManager::GetLocalPlayer()->GetBonusAttackDamage() * KogMawDamages::ESpell::additionalPercentageAD;
         const float damage = dmgSkill + abilityPowerModifier + attackDamageModifier;
 
-        return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), target, damage);
     }
 
     static float KogRDamage(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !target->IsAlive())
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !target->IsAlive())
             return 0.0f;
-        const int level = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int level = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         if (level == 0)
             return 0.0f;
 
         const float dmgSkill = KogMawDamages::RSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * KogMawDamages::RSpell::additionalPercentageAP;
-        const float attackDamageModifier = globals::localPlayer->GetBonusAttackDamage() * KogMawDamages::RSpell::additionalPercentageAD;
+        const float abilityPowerModifier = ObjectManager::GetLocalPlayer()->GetAbilityPower() * KogMawDamages::RSpell::additionalPercentageAP;
+        const float attackDamageModifier = ObjectManager::GetLocalPlayer()->GetBonusAttackDamage() * KogMawDamages::RSpell::additionalPercentageAD;
         float damage = dmgSkill + abilityPowerModifier + attackDamageModifier;
         const float targetHPPercent = target->GetHealth() / target->GetMaxHealth() * 100;
 
@@ -126,7 +126,7 @@ private:
             damage = damage * 2;
         }
 
-        return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), target, damage);
     }
 
 
@@ -207,7 +207,7 @@ public:
 
     
     void CastQSpell(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !isTimeToCastQ())
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !isTimeToCastQ())
             return;
 
         if (target->IsMinion()) {
@@ -224,14 +224,14 @@ public:
 
         Modules::prediction::PredictionOutput predOut;
 
-        if (GetPrediction(globals::localPlayer, target, database.KogMawQ, predOut)) {
+        if (GetPrediction(ObjectManager::GetLocalPlayer(), target, database.KogMawQ, predOut)) {
             Engine::CastToPosition(SpellIndex::Q, predOut.position);
             QCastedTime = gameTime;
         }
     }
 
     void CastWSpell() {
-        if (globals::localPlayer == nullptr || !isTimeToCastW())
+        if (ObjectManager::GetLocalPlayer() == nullptr || !isTimeToCastW())
             return;
 
         Engine::CastSelf(SpellIndex::W);
@@ -239,7 +239,7 @@ public:
     }
 
     void CastESpell(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !isTimeToCastE())
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !isTimeToCastE())
             return;
 
         if (target->IsMinion()) {
@@ -255,19 +255,19 @@ public:
         }
 
         Modules::prediction::PredictionOutput predOut;
-        if (GetPrediction(globals::localPlayer, target, database.KogMawE, predOut)) {
+        if (GetPrediction(ObjectManager::GetLocalPlayer(), target, database.KogMawE, predOut)) {
             Engine::CastToPosition(SpellIndex::E, predOut.position);
             ECastedTime = gameTime;
         }
     }
 
     void CastRSpell(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !isTimeToCastR())
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !isTimeToCastR())
             return;
 
         Modules::prediction::PredictionOutput predOut;
 
-        if (GetPrediction(globals::localPlayer, target, database.KogMawR, predOut)) {
+        if (GetPrediction(ObjectManager::GetLocalPlayer(), target, database.KogMawR, predOut)) {
             Engine::CastToPosition(SpellIndex::R, predOut.position);
             RCastedTime = gameTime;
         }
@@ -281,7 +281,7 @@ public:
     void Combo() override {
 
         if (KogMawConfig::KogMawCombo::UseQ->Value && isTimeToCastQ()) {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange());
             if (qTarget != nullptr) {
 	            if (qTarget->GetTotalArmor() >= qMinArmor()) {
 	            	CastQSpell(qTarget);
@@ -290,23 +290,23 @@ public:
         }
 
         if (KogMawConfig::KogMawCombo::UseW->Value && isTimeToCastW()) {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
-                if (wTarget->GetDistanceTo(globals::localPlayer) <= wRange()) {
+                if (wTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= wRange()) {
                     CastWSpell();
                 }
             }
         }
 
         if (KogMawConfig::KogMawCombo::UseE->Value && isTimeToCastE()) {
-            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
             if (eTarget != nullptr) {
                 CastESpell(eTarget);
             }
         }
 
         if (KogMawConfig::KogMawCombo::UseR->Value && !KogMawConfig::KogMawCombo::UseROnlyInBetweenAAS->Value && isTimeToCastR()) {
-            const auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
+            const auto target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
             if (target != nullptr) {
                 CastRSpell(target);
             }
@@ -317,7 +317,7 @@ public:
     {
         if (!HasEnoughMana(OrbwalkState::Harass)) return;
         if (KogMawConfig::KogMawHarass::UseQ->Value && isTimeToCastQ()) {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr) {
                 if (qTarget->GetTotalArmor() >= qMinArmor()) {
                     CastQSpell(qTarget);
@@ -325,18 +325,18 @@ public:
             }
         }
         if (KogMawConfig::KogMawHarass::UseE->Value && isTimeToCastE()) {
-            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
             if (eTarget != nullptr && KogMawConfig::KogMawHarass::UseEOnlyWhenEnemyAttacking->Value) {
-                if (eTarget->GetAiManager()->GetDirection() != globals::localPlayer->GetPosition()) {
+                if (eTarget->GetAiManager()->GetDirection() != ObjectManager::GetLocalPlayer()->GetPosition()) {
                     CastESpell(eTarget);
                 }
             }
         }
 
         if (KogMawConfig::KogMawHarass::UseW->Value && isTimeToCastW()) {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
-                if (wTarget->GetDistanceTo(globals::localPlayer) <= wRange()) {
+                if (wTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= wRange()) {
                     CastWSpell();
                 }
             }
@@ -347,10 +347,10 @@ public:
     void Clear() override {
         if (!HasEnoughMana(OrbwalkState::Clear)) return;
 
-        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange()) > 0)
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0)
         {
             if (KogMawConfig::KogMawClear::UseQ->Value && isTimeToCastQ()) {
-                const auto qMinion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), qRange(), Alliance::Enemy);
+                const auto qMinion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), Alliance::Enemy);
                 if (qMinion != nullptr && qMinion->GetHealth() < KogQDamage(qMinion)) {
                     CastQSpell(qMinion);
                     return;
@@ -358,7 +358,7 @@ public:
             }
 
             if (KogMawConfig::KogMawClear::UseW->Value && isTimeToCastW()) {
-                const auto wMinion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), wRange(), Alliance::Enemy);
+                const auto wMinion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), Alliance::Enemy);
                 if (wMinion != nullptr) {
                     CastWSpell();
                     return;
@@ -367,10 +367,10 @@ public:
         }
 
 
-        if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange()) > 0)
+        if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0)
         {
             if (KogMawConfig::KogMawClear::UseQ->Value && isTimeToCastQ()) {
-                const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(),qRange());
+                const auto qMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(),qRange());
                 if (qMonster != nullptr) {
                     CastQSpell(qMonster);
                     return;
@@ -378,7 +378,7 @@ public:
             }
 
             if (KogMawConfig::KogMawJungle::UseW->Value) {
-                const auto wMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
+                const auto wMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
                 if (wMonster != nullptr) {
                     CastQSpell(wMonster);
                 }
@@ -389,10 +389,10 @@ public:
     void Lasthit() override {
         if (!HasEnoughMana(OrbwalkState::Lasthit)) return;
 
-        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange()) > 0) {
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0) {
             if (KogMawConfig::KogMawLastHit::UseQ->Value && isTimeToCastQ())
             {
-                const auto qMinion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), qRange(), Alliance::Enemy);
+                const auto qMinion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), Alliance::Enemy);
                 if (qMinion != nullptr && qMinion->GetHealth() < KogQDamage(qMinion)) {
                     CastQSpell(qMinion);
                 }
@@ -402,7 +402,7 @@ public:
 
     void Flee() override {
         if (KogMawConfig::KogMawFlee::UseE->Value && isTimeToCastE()) {
-            const auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
+            const auto target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),eRange());
             if (target != nullptr) {
                 CastESpell(target);
             }
@@ -412,7 +412,7 @@ public:
     void Killsteal() {
         __try {
             if (KogMawConfig::KogMawKillsteal::UseR->Value && isTimeToCastR()) {
-                const auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
+                const auto target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
                 if (target != nullptr) {
                     if (KogMawConfig::KogMawCombo::UseROnlyInBetweenAAS->Value && target->IsInAARange() 
                         || !KogMawConfig::KogMawCombo::UseROnlyInBetweenAAS->Value) {
@@ -430,7 +430,7 @@ public:
     void OnAfterAttack() override {
         if (KogMawConfig::KogMawCombo::UseROnlyInBetweenAAS->Value && isTimeToCastR())
         {
-            const auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
+            const auto target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
             if (target != nullptr) {
                 CastRSpell(target);
             }
@@ -452,13 +452,13 @@ public:
     void Render() override {
         __try {
             if (KogMawConfig::KogMawSpellsSettings::qDraw->Value && (KogMawConfig::KogMawSpellsSettings::DrawIfReady->Value == true && database.KogMawQ.IsCastable() || KogMawConfig::KogMawSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
             if (KogMawConfig::KogMawSpellsSettings::wDraw->Value && (KogMawConfig::KogMawSpellsSettings::DrawIfReady->Value == true && database.KogMawW.IsCastable() || KogMawConfig::KogMawSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_RED, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), COLOR_RED, 1.0f);
             if (KogMawConfig::KogMawSpellsSettings::eDraw->Value && (KogMawConfig::KogMawSpellsSettings::DrawIfReady->Value == true && database.KogMawE.IsCastable() || KogMawConfig::KogMawSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
             if (KogMawConfig::KogMawSpellsSettings::rDraw->Value && (KogMawConfig::KogMawSpellsSettings::DrawIfReady->Value == true && database.KogMawR.IsCastable() || KogMawConfig::KogMawSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
         }
         __except (1)
         {

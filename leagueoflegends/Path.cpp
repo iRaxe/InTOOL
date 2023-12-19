@@ -1,5 +1,7 @@
 #include "Path.h"
 
+#include "ObjManager.h"
+
 void Awarenesss::PathTracker::DrawPlayerPaths(Object* obj)
 {
 	const auto path = obj->GetAiManager()->GetFutureSegments();
@@ -21,8 +23,8 @@ void Awarenesss::PathTracker::DrawPlayerPaths(Object* obj)
 
 void Awarenesss::PathTracker::Draw(Object* obj)
 {
-	const bool shouldDrawPath = (Configs::EnemyTracker::showPathsSelf->Value && obj->GetNetId() == globals::localPlayer->GetNetId()) ||
-		(Configs::EnemyTracker::showPathsAllies->Value && obj->IsAlly() && obj->GetNetId() != globals::localPlayer->GetNetId()) ||
+	const bool shouldDrawPath = (Configs::EnemyTracker::showPathsSelf->Value && obj->GetNetId() == ObjectManager::GetLocalPlayer()->GetNetId()) ||
+		(Configs::EnemyTracker::showPathsAllies->Value && obj->IsAlly() && obj->GetNetId() != ObjectManager::GetLocalPlayer()->GetNetId()) ||
 		(Configs::EnemyTracker::showPathsEnemies->Value && obj->IsEnemy());
 
 	if (shouldDrawPath) {

@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "globals.h"
 
 namespace globals
 {
@@ -14,15 +14,6 @@ namespace globals
 	float windowWidth = 0.0f;
 	float windowHeight = 0.0f;
 
-	Object* localPlayer;
-	ObjectManager* heroManager;
-	ObjectManager* minionManager;
-	ObjectManager* turretManager;
-	ObjectManager* inhibitorsManager;
-	ObjectManager* missileManager;
-	ObjectManager* attackableManager;
-
-	ObjectManager* objManager;
 	LPDIRECT3DDEVICE9 pDeviceDX9var;
 
 	ID3D11Device* pDeviceDX11var;

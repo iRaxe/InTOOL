@@ -19,19 +19,19 @@ private:
     float RCastedTime = 0.0f;
 
     [[nodiscard]] bool isTimeToCastQ() const {
-        return gameTime > QCastedTime + 1.0f && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+        return gameTime > QCastedTime + 1.0f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastW() const {
-        return gameTime > WCastedTime + database.JinxW.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+        return gameTime > WCastedTime + database.JinxW.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastE() const {
-        return gameTime > ECastedTime + database.JinxE.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+        return gameTime > ECastedTime + database.JinxE.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastR() const {
-        return gameTime > RCastedTime + database.JinxR.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+        return gameTime > RCastedTime + database.JinxR.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
     }
 
     static float qRange() {
@@ -68,7 +68,7 @@ private:
             return false;
         }
 
-        return globals::localPlayer->GetPercentMana() > minManaThreshold;
+        return ObjectManager::GetLocalPlayer()->GetPercentMana() > minManaThreshold;
     }
 
     static bool hasE(Object* pEnemy) {
@@ -117,9 +117,9 @@ public:
         JinxConfig::JinxAntiMelee::UseW = antiMeleeMenu->AddCheckBox("Use W", "Use SpellSlot W", true);
         JinxConfig::JinxAntiMelee::UseE = antiMeleeMenu->AddCheckBox("Use E", "Use SpellSlot E", true);
         const auto antiMeleewhitelistMenu = antiMeleeMenu->AddMenu("Whitelist Settings", "Whitelist");
-        for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+        for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
         {
-            auto obj = globals::heroManager->GetIndex(i);
+            auto obj = ObjectManager::GetHeroList()->GetIndex(i);
             if (obj != nullptr && obj->IsEnemy())
             {
                 const auto antiGap_checkbox = antiGapwhitelistMenu->AddCheckBox(obj->GetName().c_str(),
@@ -172,9 +172,9 @@ public:
         JinxConfig::JinxSpellsSettings::qCastMode = qSpellMenu->AddList("castMode", "Cast Mode", std::vector<std::string>{"Doesn't Matter", "While attacking"}, 0);
         JinxConfig::JinxSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange",
             "Maximum Range",
-            static_cast<float>(globals::localPlayer->GetRealAttackRange()) * 1.5f,
+            static_cast<float>(ObjectManager::GetLocalPlayer()->GetRealAttackRange()) * 1.5f,
             100,
-            static_cast<float>(globals::localPlayer->GetRealAttackRange()) * 2.0f, 50);
+            static_cast<float>(ObjectManager::GetLocalPlayer()->GetRealAttackRange()) * 2.0f, 50);
         JinxConfig::JinxSpellsSettings::DrawQ = qSpellMenu->AddCheckBox("Draw Q", "Draw Range", true);
 
         const auto wSpellMenu = spellsMenu->AddMenu("SpellSlot W Settings", "SpellSlot W");
@@ -197,7 +197,7 @@ public:
 
     static float Jinx_dmgE(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::E))
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E))
             return -9999;
 
         if (hasE(pEnemy))
@@ -205,11 +205,11 @@ public:
             const int stacks = pEnemy->GetBuffByName("JinxDeadlyVenom")->GetStacks();
             if (stacks > 0)
             {
-                const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
+                const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E)->GetLevel();
                 const int eDMG = levelSpell * 5 + 10;
-                const float sDMG = (eDMG + (globals::localPlayer->GetBonusAttackDamage() * .35) + globals::localPlayer->GetAbilityPower() * .30) * stacks;
+                const float sDMG = (eDMG + (ObjectManager::GetLocalPlayer()->GetBonusAttackDamage() * .35) + ObjectManager::GetLocalPlayer()->GetAbilityPower() * .30) * stacks;
 
-                return Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, sDMG);
+                return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, sDMG);
             }
         }
 
@@ -219,10 +219,10 @@ public:
 
     void Jinx_UseQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastQ())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastQ())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= qRange())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= qRange())
         {
             Engine::CastSelf(SpellIndex::Q);
             QCastedTime = gameTime;
@@ -231,10 +231,10 @@ public:
 
     void Jinx_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastW())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastW())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= wRange())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= wRange())
         {
             Modules::prediction::PredictionOutput wPrediction;
 
@@ -247,10 +247,10 @@ public:
     }
 
     void Jinx_UseE(Object* pEnemy) {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastE())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastE())
             return;
 
-        if (pEnemy->GetDistanceTo(globals::localPlayer) <= eRange())
+        if (pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= eRange())
         {
             Engine::CastSelf(SpellIndex::E);
             ECastedTime = gameTime;
@@ -258,7 +258,7 @@ public:
     }
 
     void Jinx_UseR() {
-        if (globals::localPlayer == nullptr || !isTimeToCastR())
+        if (ObjectManager::GetLocalPlayer() == nullptr || !isTimeToCastR())
             return;
 
         Engine::CastSelf(SpellIndex::R);
@@ -276,7 +276,7 @@ public:
             && JinxConfig::JinxSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange());
             if (wTarget != nullptr)
             {
                 Jinx_UseW(wTarget);
@@ -287,7 +287,7 @@ public:
             && JinxConfig::JinxSpellsSettings::qCastMode->Value == 0
             && isTimeToCastQ())
         {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange());
             if (qTarget != nullptr)
             {
                 Jinx_UseQ(qTarget);
@@ -295,7 +295,7 @@ public:
         }
 
         if (JinxConfig::JinxCombo::UseR->Value == true
-            && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), rMinRange()) >= JinxConfig::JinxCombo::enemiesInRange->Value
+            && ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), rMinRange()) >= JinxConfig::JinxCombo::enemiesInRange->Value
             && isTimeToCastR())
         {
             Jinx_UseR();
@@ -303,12 +303,12 @@ public:
     }
 
     void Clear() override {
-		if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
+		if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
         {
             if (!HasEnoughMana(OrbwalkState::Clear)) return;
 
             if (JinxConfig::JinxJungle::UseW->Value == true && isTimeToCastW()) {
-                const auto wTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
+                const auto wTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
                 if (wTarget != nullptr) {
                     Jinx_UseW(wTarget);
                 }
@@ -323,7 +323,7 @@ public:
             && JinxConfig::JinxSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange());
             if (wTarget != nullptr) {
                 Jinx_UseW(wTarget);
             }
@@ -333,7 +333,7 @@ public:
             && JinxConfig::JinxSpellsSettings::qCastMode->Value == 0
             && isTimeToCastE())
         {
-            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange());
+            const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange());
             if (eTarget != nullptr && eTarget->GetHealth() < Jinx_dmgE(eTarget)) {
                 Jinx_UseE(eTarget);
             }
@@ -353,7 +353,7 @@ public:
         __try {
             if (JinxConfig::JinxKillsteal::UseE->Value && isTimeToCastE())
             {
-                const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),eRange());
+                const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),eRange());
                 if (eTarget != nullptr && eTarget->GetHealth() < Jinx_dmgE(eTarget))
                 {
                     Jinx_UseE(eTarget);
@@ -388,10 +388,10 @@ public:
     void Render() override {
         __try {
             if (JinxConfig::JinxSpellsSettings::DrawW->Value == true && (JinxConfig::JinxSpellsSettings::DrawIfReady->Value == true && database.JinxW.IsCastable() || JinxConfig::JinxSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
 
             if (JinxConfig::JinxSpellsSettings::DrawE->Value == true && (JinxConfig::JinxSpellsSettings::DrawIfReady->Value == true && database.JinxE.IsCastable() || JinxConfig::JinxSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
         }
         __except (1)
         {

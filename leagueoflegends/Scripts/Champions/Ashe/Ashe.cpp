@@ -18,12 +18,12 @@ private:
 
     static bool Ashe_IsQReady()
     {
-        return globals::localPlayer->GetBuffByName("asheqcastready");
+        return ObjectManager::GetLocalPlayer()->GetBuffByName("asheqcastready");
     }
 
     static bool Ashe_IsCastingQ()
     {
-        return globals::localPlayer->GetBuffByName("AsheQAttack");
+        return ObjectManager::GetLocalPlayer()->GetBuffByName("AsheQAttack");
     }
 
     static bool Ashe_TargetSlowed(Object* pEnemy)
@@ -71,7 +71,7 @@ private:
 
     static float aaRange()
     {
-        return globals::localPlayer->GetRealAttackRange();
+        return ObjectManager::GetLocalPlayer()->GetRealAttackRange();
     }
 
     static float wRange()
@@ -134,9 +134,9 @@ public:
         const auto antiMeleeMenu = additionalMenu->AddMenu("AntiMelee Settings", "AntiMelee Settings");
         AsheConfig::AsheAntiMelee::UseW = antiMeleeMenu->AddCheckBox("Use W", "Use SpellSlot W", false);
 
-        for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+        for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
         {
-            auto obj = globals::heroManager->GetIndex(i);
+            auto obj = ObjectManager::GetHeroList()->GetIndex(i);
             if (obj != nullptr && obj->IsEnemy())
             {
                 const auto antiGap_checkbox = antiGapMenu->AddCheckBox(obj->GetName().c_str(),
@@ -213,7 +213,7 @@ public:
 
     static bool Ashe_CanCastW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable())
             return false;
 
         return pEnemy != nullptr && (AsheConfig::AsheSpellsSettings::UseWIfInAARange->Value == true && pEnemy->IsInAARange() || AsheConfig::AsheSpellsSettings::UseWIfInAARange->Value == false && !pEnemy->IsInAARange());
@@ -221,63 +221,63 @@ public:
 
     static float Ashe_dmgW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = AsheDamages::WSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = ObjectManager::GetLocalPlayer()->GetAttackDamage();
         const float additionalAttackDamageSkillDamage = AsheDamages::WSpell::additionalPercentageAD;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage);
-        return Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, totalDamage);
+        return Damage::CalculatePhysicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, totalDamage);
     }
 
     static float Ashe_dmgR(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheR.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.AsheR.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = AsheDamages::RSpell::dmgSkillArray[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalAbilityPowerSkillDamage = AsheDamages::RSpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
-        return Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, totalDamage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, totalDamage);
     }
 
     static bool Ashe_HasEnoughComboMana()
     {
-        if (globals::localPlayer == nullptr)
+        if (ObjectManager::GetLocalPlayer() == nullptr)
             return false;
 
-        const float qSpellManaCost = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetManaCost();
-        const float wSpellManaCost = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetManaCost();
-        const float rSpellManaCost = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetManaCost();
+        const float qSpellManaCost = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetManaCost();
+        const float wSpellManaCost = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetManaCost();
+        const float rSpellManaCost = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetManaCost();
 
-        if (globals::localPlayer->GetLevel() >= 6)
-            return globals::localPlayer->GetMana() > qSpellManaCost + wSpellManaCost + rSpellManaCost;
+        if (ObjectManager::GetLocalPlayer()->GetLevel() >= 6)
+            return ObjectManager::GetLocalPlayer()->GetMana() > qSpellManaCost + wSpellManaCost + rSpellManaCost;
 
-        return globals::localPlayer->GetMana() > qSpellManaCost + wSpellManaCost;
+        return ObjectManager::GetLocalPlayer()->GetMana() > qSpellManaCost + wSpellManaCost;
     }
 
     static bool Ashe_HasEnoughMana(float minValue)
     {
-        if (globals::localPlayer == nullptr || AsheConfig::AsheSpellsSettings::saveMana->Value && !Ashe_HasEnoughComboMana())
+        if (ObjectManager::GetLocalPlayer() == nullptr || AsheConfig::AsheSpellsSettings::saveMana->Value && !Ashe_HasEnoughComboMana())
             return false;
 
-        return globals::localPlayer->GetPercentMana() > minValue;
+        return ObjectManager::GetLocalPlayer()->GetPercentMana() > minValue;
     }
 
     void Ashe_UseQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !Ashe_IsQReady())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !Ashe_IsQReady())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < aaRange() && isTimeToCastQ())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < aaRange() && isTimeToCastQ())
         {
             Engine::CastSelf(SpellIndex::Q);
             QCastedTime = gameTime;
@@ -286,13 +286,13 @@ public:
 
     void Ashe_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable() || AsheConfig::AsheSpellsSettings::UseWIfFullAASpeed->Value && globals::localPlayer->GetAttackSpeed() > 2.0f)
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.AsheW.IsCastable() || AsheConfig::AsheSpellsSettings::UseWIfFullAASpeed->Value && ObjectManager::GetLocalPlayer()->GetAttackSpeed() > 2.0f)
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < wRange() && isTimeToCastW())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < wRange() && isTimeToCastW())
         {
             Modules::prediction::PredictionOutput wPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, database.AsheW, wPrediction))
+            if (GetPrediction(ObjectManager::GetLocalPlayer(), pEnemy, database.AsheW, wPrediction))
             {
                 Engine::CastToPosition(SpellIndex::W, wPrediction.position);
                 WCastedTime = gameTime;
@@ -302,13 +302,13 @@ public:
 
     void Ashe_UseR(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.AsheR.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.AsheR.IsCastable())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < rRange() && isTimeToCastR())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < rRange() && isTimeToCastR())
         {
             Modules::prediction::PredictionOutput rPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, database.AsheR, rPrediction))
+            if (GetPrediction(ObjectManager::GetLocalPlayer(), pEnemy, database.AsheR, rPrediction))
             {
                 Engine::CastToPosition(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
@@ -355,7 +355,7 @@ public:
     void test2()
     {
 
-            for (auto& obj : globals::heroManager->units_map)
+            for (auto& obj : ObjectManager::GetHeroList()->units_map)
             {
                 uintptr_t network_id = obj.first;
                 Object* object = obj.second;
@@ -373,15 +373,15 @@ public:
         Killsteal();
         AntiGapCloser(); 
         AntiMelee();
-        //LOG("AAAA %s", globals::localPlayer->GetSpellBySlotId(0)->GetSpellInfo()->GetSpellData()->GetTexturePath().c_str());
+        //LOG("AAAA %s", ObjectManager::GetLocalPlayer()->GetSpellBySlotId(0)->GetSpellInfo()->GetSpellData()->GetTexturePath().c_str());
 
-        //LOG("%f", Functions::GetSpellRange(globals::localPlayer->GetSpellBySlotId(1)));
-        //auto rune1 = globals::localPlayer->GetHeroPerks()->GetPerkByIndex(1);
-        //auto spell = globals::localPlayer->GetSpellBySlotId(1)->GetSpellInfo();
-        //LOG("%f", ListManager::Functions::GetCooldownFromChampSpellMap(globals::localPlayer->GetNetId(), 1));
-        //LOG("%f", globals::localPlayer->GetSpellBySlotId(1)->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(1)->GetBaseCooldown());
+        //LOG("%f", Functions::GetSpellRange(ObjectManager::GetLocalPlayer()->GetSpellBySlotId(1)));
+        //auto rune1 = ObjectManager::GetLocalPlayer()->GetHeroPerks()->GetPerkByIndex(1);
+        //auto spell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(1)->GetSpellInfo();
+        //LOG("%f", ListManager::Functions::GetCooldownFromChampSpellMap(ObjectManager::GetLocalPlayer()->GetNetId(), 1));
+        //LOG("%f", ObjectManager::GetLocalPlayer()->GetSpellBySlotId(1)->GetSpellInfo()->GetSpellData()->GetCooldownArray()->GetArrayIndex(1)->GetBaseCooldown());
 
-        /*auto reduction = 100 / (100 + globals::localPlayer->GetAbilityHaste());
+        /*auto reduction = 100 / (100 + ObjectManager::GetLocalPlayer()->GetAbilityHaste());
         LOG("REDUCTION %f", reduction);
         LOG("TIME READY %f", 30 + 24 * reduction);*/
 
@@ -390,7 +390,7 @@ public:
             switch (AsheConfig::AsheSpellsSettings::targetMode->Value)
             {
             case 0: //Inherit
-                if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange()))
+                if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange()))
                     Ashe_UseR(rTarget);
                 break;
             case 1: //NearMouse
@@ -398,7 +398,7 @@ public:
                     Ashe_UseR(rTarget2);
                 break;
             case 2: //NearChampion
-                if (const auto rTarget3 = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), 500.0f))
+                if (const auto rTarget3 = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), 500.0f))
                     Ashe_UseR(rTarget3);
                 break;
             }
@@ -408,22 +408,22 @@ public:
     void Combo() override
     {
         if (AsheConfig::AsheCombo::UseR->Value == true && database.AsheR.IsCastable()
-            && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), AsheConfig::AsheSpellsSettings::minRDistance->Value) >= AsheConfig::AsheCombo::enemiesInRange->Value)
+            && ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), AsheConfig::AsheSpellsSettings::minRDistance->Value) >= AsheConfig::AsheCombo::enemiesInRange->Value)
         {
-            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange()))
+            if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange()))
                 Ashe_UseR(rTarget);
         }
 
         if (AsheConfig::AsheCombo::UseW->Value == true && database.AsheW.IsCastable() && AsheConfig::AsheSpellsSettings::wCastMode->Value == 0)
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr && Ashe_CanCastW(wTarget))
             	Ashe_UseW(wTarget);
         }
 
         if (AsheConfig::AsheCombo::UseQ->Value == true && Ashe_IsQReady() && AsheConfig::AsheSpellsSettings::qCastMode->Value == 0)
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), aaRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), aaRange()))
                 Ashe_UseQ(qTarget);
         }
     }
@@ -431,33 +431,33 @@ public:
     void Clear() override
     {
         //Laneclear
-        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange()) > 0)
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0)
         {
             if (!Ashe_HasEnoughMana(AsheConfig::AsheClear::minMana->Value)) return;
 
-            if (AsheConfig::AsheClear::UseW->Value == true && database.AsheW.IsCastable() && ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange()) >= AsheConfig::AsheClear::minWMinions->Value && AsheConfig::AsheSpellsSettings::wCastMode->Value == 0)
+            if (AsheConfig::AsheClear::UseW->Value == true && database.AsheW.IsCastable() && ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) >= AsheConfig::AsheClear::minWMinions->Value && AsheConfig::AsheSpellsSettings::wCastMode->Value == 0)
             {
-                const auto wTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), wRange(), Alliance::Enemy);
+                const auto wTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), Alliance::Enemy);
                 if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget) && Ashe_CanCastW(wTarget))
                     Ashe_UseW(wTarget);
             }
         }
 
         //Jungleclear
-        else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange()) > 0)
+        else if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0)
         {
             if (!Ashe_HasEnoughMana(AsheConfig::AsheJungle::minMana->Value)) return;
 
             if (AsheConfig::AsheJungle::UseW->Value == true && database.AsheW.IsCastable() && AsheConfig::AsheSpellsSettings::wCastMode->Value == 0)
             {
-                const auto wTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
+                const auto wTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
                 if (wTarget != nullptr && Ashe_CanCastW(wTarget))
                     Ashe_UseW(wTarget);
             }
 
             if (AsheConfig::AsheJungle::UseQ->Value == true && Ashe_IsQReady() && AsheConfig::AsheSpellsSettings::qCastMode->Value == 0)
             {
-                if (const auto qTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), aaRange()))
+                if (const auto qTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), aaRange()))
                     Ashe_UseQ(qTarget);
             }
         }
@@ -471,14 +471,14 @@ public:
 
         if (AsheConfig::AsheHarass::UseW->Value == true && database.AsheW.IsCastable() && AsheConfig::AsheSpellsSettings::wCastMode->Value == 0)
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange());
             if (wTarget != nullptr && Ashe_CanCastW(wTarget))
                 Ashe_UseW(wTarget);
         }
 
         if (AsheConfig::AsheHarass::UseQ->Value == true && Ashe_IsQReady() && AsheConfig::AsheSpellsSettings::qCastMode->Value == 0)
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), aaRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), aaRange()))
                 Ashe_UseQ(qTarget);
         }
     }
@@ -490,7 +490,7 @@ public:
 
         if (AsheConfig::AsheLastHit::UseW->Value == true && database.AsheW.IsCastable())
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget))
                 Ashe_UseW(wTarget);
         }
@@ -500,7 +500,7 @@ public:
     {
         if (AsheConfig::AsheFlee::UseW->Value == true && database.AsheW.IsCastable())
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr)
                 Ashe_UseW(wTarget);
         }
@@ -511,7 +511,7 @@ public:
         __try {
             if (AsheConfig::AsheKillsteal::UseW->Value == true && database.AsheW.IsCastable())
             {
-                const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange());
+                const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange());
                 if (wTarget != nullptr && wTarget->GetHealth() < Ashe_dmgW(wTarget))
                 {
                     Ashe_UseW(wTarget);
@@ -520,10 +520,10 @@ public:
 
             if (AsheConfig::AsheKillsteal::UseR->Value == true && database.AsheR.IsCastable())
             {
-                const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange());
+                const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),rRange());
                 if (rTarget != nullptr
-                    && rTarget->GetDistanceTo(globals::localPlayer) > AsheConfig::AsheSpellsSettings::minRDistance->Value
-                    && rTarget->GetDistanceTo(globals::localPlayer) < AsheConfig::AsheSpellsSettings::maxRDistance->Value
+                    && rTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) > AsheConfig::AsheSpellsSettings::minRDistance->Value
+                    && rTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) < AsheConfig::AsheSpellsSettings::maxRDistance->Value
                     && rTarget->GetHealth() < Ashe_dmgR(rTarget))
                 {
                     Ashe_UseR(rTarget);
@@ -541,7 +541,7 @@ public:
         for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
         {
             if (!target) continue;
-            if (target->GetDistanceTo(globals::localPlayer) > wRange()) continue;
+            if (target->GetDistanceTo(ObjectManager::GetLocalPlayer()) > wRange()) continue;
             if (!Engine::MenuItemContains(AsheConfig::AsheAntiGapCloser::whitelist, target->GetName().c_str())) continue;
             if (!target->GetAiManager()->IsDashing()) continue;
             if (target->GetBuffByName("rocketgrab2")) continue;
@@ -564,10 +564,10 @@ public:
             for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
                 if (!target) continue;
-                if (target->GetDistanceTo(globals::localPlayer) > wRange()) continue;
+                if (target->GetDistanceTo(ObjectManager::GetLocalPlayer()) > wRange()) continue;
                 if (!Engine::MenuItemContains(AsheConfig::AsheAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->GetDistanceTo(globals::localPlayer) < target->GetRealAttackRange())
+                if (target != nullptr && target->GetDistanceTo(ObjectManager::GetLocalPlayer()) < target->GetRealAttackRange())
                 {
                 	Ashe_UseW(target);
                 }
@@ -651,7 +651,7 @@ public:
     {
         __try {
             if (AsheConfig::AsheSpellsSettings::DrawW->Value == true && (AsheConfig::AsheSpellsSettings::DrawIfReady->Value == true && database.AsheW.IsCastable() || AsheConfig::AsheSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
 
         }
         __except (1)

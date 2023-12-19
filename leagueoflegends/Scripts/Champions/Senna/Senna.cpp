@@ -21,23 +21,23 @@ private:
     float RCastedTime = 0.0f;
 
     [[nodiscard]] bool isTimeToCastQ() const {
-        return gameTime > QCastedTime + database.SennaQ.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+        return gameTime > QCastedTime + database.SennaQ.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastW() const {
-        return gameTime > WCastedTime + database.SennaW.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+        return gameTime > WCastedTime + database.SennaW.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastE() const {
-        return gameTime > ECastedTime + database.SennaE.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+        return gameTime > ECastedTime + database.SennaE.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastR() const {
-        return gameTime > RCastedTime + database.SennaR.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+        return gameTime > RCastedTime + database.SennaR.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
     }
 
     static float qRange() {
-        return globals::localPlayer->GetRealAttackRange();
+        return ObjectManager::GetLocalPlayer()->GetRealAttackRange();
     }
 
     static float wRange() {
@@ -45,7 +45,7 @@ private:
     }
 
     static float eRange() {
-        return globals::localPlayer->GetRealAttackRange() * 1.5f;
+        return ObjectManager::GetLocalPlayer()->GetRealAttackRange() * 1.5f;
     }
 
     static float rRange() {
@@ -59,9 +59,9 @@ private:
 
         switch (mode) {
         case OrbwalkState::Clear:
-            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) > 0)
+            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(SennaConfig::SennaClear::minMana->Value);
-            else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
+            else if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(SennaConfig::SennaJungle::minMana->Value);
             break;
         case OrbwalkState::Harass:
@@ -74,51 +74,51 @@ private:
             return false;
         }
 
-        return globals::localPlayer->GetPercentMana() > minManaThreshold;
+        return ObjectManager::GetLocalPlayer()->GetPercentMana() > minManaThreshold;
     }
 
 
     static float Senna_dmgQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::Q))
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q))
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float AttackDMG = SennaDamages::QSpell::additionalPercentageAD;
         const float DMG = SennaDamages::QSpell::dmgSkillArray[levelSpell];
-        const float pDMG = (DMG + (globals::localPlayer->GetBonusAttackDamage() * AttackDMG));
-        const float PhsyDMG = Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, pDMG);
+        const float pDMG = (DMG + (ObjectManager::GetLocalPlayer()->GetBonusAttackDamage() * AttackDMG));
+        const float PhsyDMG = Damage::CalculatePhysicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, pDMG);
         return PhsyDMG;
 
     }
 
     static float Senna_dmgW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::W))
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W))
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float AttackDMG = SennaDamages::WSpell::additionalPercentageAD;
         const float DMG = SennaDamages::WSpell::dmgSkillArray[levelSpell];
-        const float pDMG = (DMG + (globals::localPlayer->GetBonusAttackDamage() * AttackDMG));
-        const float PhsyDMG = Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, pDMG);
+        const float pDMG = (DMG + (ObjectManager::GetLocalPlayer()->GetBonusAttackDamage() * AttackDMG));
+        const float PhsyDMG = Damage::CalculatePhysicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, pDMG);
         return PhsyDMG;
 
     }
 
     static float Senna_dmgR(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::R))
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R))
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float AttackDMG = SennaDamages::RSpell::additionalPercentageAD;
         const float APDMG = SennaDamages::RSpell::additionalPercentageAP;
         const float DMG = SennaDamages::RSpell::dmgSkillArray[levelSpell];
-        const float pDMG = (DMG + (globals::localPlayer->GetBonusAttackDamage() * AttackDMG));
-        const float aDMG = ((globals::localPlayer->GetAbilityPower() * APDMG));
-        const float PhsyDMG = Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, pDMG);
-        const float APPDMG = Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, aDMG);
+        const float pDMG = (DMG + (ObjectManager::GetLocalPlayer()->GetBonusAttackDamage() * AttackDMG));
+        const float aDMG = ((ObjectManager::GetLocalPlayer()->GetAbilityPower() * APDMG));
+        const float PhsyDMG = Damage::CalculatePhysicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, pDMG);
+        const float APPDMG = Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, aDMG);
         return PhsyDMG + APPDMG;
 
     }
@@ -141,7 +141,7 @@ private:
         std::vector<Object*> possible_targets;
         for (auto hero : ObjectManager::GetHeroesAs(Alliance::Ally)) {
             if (!hero) continue;
-            if (hero->GetDistanceTo(globals::localPlayer) > qRange()) continue;
+            if (hero->GetDistanceTo(ObjectManager::GetLocalPlayer()) > qRange()) continue;
 
             possible_targets.push_back(hero);
         }
@@ -278,7 +278,7 @@ public:
 
     void DrawDamage(Object* pEnemy) const
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastR())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastR())
             return;
 
         const Vector2 screenPos = Engine::GetHpBarPosition(pEnemy);
@@ -297,10 +297,10 @@ public:
 
     void Senna_UseQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastQ())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastQ())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < qRange() && isTimeToCastQ())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < qRange() && isTimeToCastQ())
         {
             Engine::CastTargeted(SpellIndex::Q, pEnemy);
             QCastedTime = gameTime;
@@ -309,10 +309,10 @@ public:
 
     void Senna_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastW())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastW())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= wRange())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= wRange())
         {
             if (pEnemy->IsMinion() || pEnemy->IsJungle()) {
                 Engine::CastToPosition(SpellIndex::W, pEnemy->GetPosition());
@@ -338,7 +338,7 @@ public:
             return;
         }
 
-        auto orbtarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange(), Alliance::Enemy);
+        auto orbtarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), ObjectManager::GetLocalPlayer()->GetRealAttackRange(), Alliance::Enemy);
         if (orbtarget != nullptr and orbtarget->GetName() == MINION_SENNA_SOUL) {
             Orbwalker::AttackTarget(orbtarget);
             return;
@@ -348,7 +348,7 @@ public:
     void TryWOnControlledTarget() {
         if (SennaConfig::SennaAuto::UseW->Value && !isTimeToCastW()) return;
 
-        auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+        auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
         if (wTarget != nullptr) {
             if (IsControlled(wTarget)) {
                 Senna_UseW(wTarget);
@@ -358,7 +358,7 @@ public:
 
     void TryQHealAlly() {
         if (!SennaConfig::SennaAuto::AutoHeal->Value || !SennaConfig::SennaCombo::UseQAlly->Value && OrbwalkState::Attack) return;
-        const float manaPercent = globals::localPlayer->GetMana() / globals::localPlayer->GetMaxMana() * 100;
+        const float manaPercent = ObjectManager::GetLocalPlayer()->GetMana() / ObjectManager::GetLocalPlayer()->GetMaxMana() * 100;
         if (SennaConfig::SennaAuto::MinManaHeal->Value > manaPercent) return;
         if (!isTimeToCastQ()) return;
 
@@ -369,9 +369,9 @@ public:
     }
 
     bool isEnemyCountSufficient(Object* hero, const Modules::prediction::PredictionOutput& rPrediction) {
-        float distanceToPrediction = globals::localPlayer->GetPosition().Distance(rPrediction.position);
+        float distanceToPrediction = ObjectManager::GetLocalPlayer()->GetPosition().Distance(rPrediction.position);
         auto newPosition = rPrediction.position.Extend(rPrediction.position, distanceToPrediction + rRange());
-        int enemyCount = Modules::prediction::CountObjectsInWay(globals::localPlayer->GetPosition(), newPosition, hero, Alliance::Enemy, database.SennaR.GetRadius());
+        int enemyCount = Modules::prediction::CountObjectsInWay(ObjectManager::GetLocalPlayer()->GetPosition(), newPosition, hero, Alliance::Enemy, database.SennaR.GetRadius());
 
         return (enemyCount >= SennaConfig::SennaCombo::enemiesInRange->Value);
     }
@@ -383,7 +383,7 @@ public:
 
         for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
             if (!hero) continue;
-            float distanceToHero = hero->GetPosition().Distance(globals::localPlayer->GetPosition());
+            float distanceToHero = hero->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition());
             if (distanceToHero > rRange() + hero->GetBoundingRadius() / 2 || distanceToHero < SennaConfig::SennaSpellsSettings::minRDistance->Value + hero->GetBoundingRadius() / 2)
                 continue;
 
@@ -419,7 +419,7 @@ public:
             && SennaConfig::SennaSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
                 Senna_UseW(wTarget);
             }
@@ -429,7 +429,7 @@ public:
             && SennaConfig::SennaSpellsSettings::qCastMode->Value == 0
             && isTimeToCastQ())
         {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr) {
                 Senna_UseQ(qTarget);
             }
@@ -441,31 +441,31 @@ public:
     }
     void Clear() override {
         if (!HasEnoughMana(OrbwalkState::Clear)) return;
-        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), wRange()) > 0)
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0)
         {
             if (SennaConfig::SennaClear::UseQ->Value && isTimeToCastQ()) {
-                const auto qMinion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), qRange(), Alliance::Enemy);
+                const auto qMinion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), Alliance::Enemy);
                 if (qMinion != nullptr) {
                     Senna_UseQ(qMinion);
                 }
             }
 
             if (SennaConfig::SennaClear::UseW->Value && isTimeToCastW()) {
-                const auto wMinion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), wRange(), Alliance::Enemy);
+                const auto wMinion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), Alliance::Enemy);
                 if (wMinion != nullptr) {
-                    float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, wMinion);
+                    float AAdamage = Damage::CalculateAutoAttackDamage(ObjectManager::GetLocalPlayer(), wMinion);
                     if (wMinion != nullptr && AAdamage * 2 < wMinion->GetHealth()) {
                         Senna_UseW(wMinion);
                     }
                 }
             }
         }
-        else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange()) > 0)
+        else if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0)
         {
             if (SennaConfig::SennaJungle::UseW->Value && isTimeToCastW()) {
-                const auto wJungle = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), wRange());
+                const auto wJungle = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
                 if (wJungle != nullptr) {
-                    const float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, wJungle);
+                    const float AAdamage = Damage::CalculateAutoAttackDamage(ObjectManager::GetLocalPlayer(), wJungle);
                     if (AAdamage * 2 < wJungle->GetHealth()) {
                         Senna_UseW(wJungle);
                     }
@@ -474,7 +474,7 @@ public:
             }
 
             if (SennaConfig::SennaJungle::UseQ->Value && isTimeToCastQ()) {
-                const auto qJungle = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), qRange());
+                const auto qJungle = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
                 if (qJungle != nullptr) {
                     Senna_UseQ(qJungle);
                 }
@@ -489,7 +489,7 @@ public:
             && SennaConfig::SennaSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
                 Senna_UseW(wTarget);
             }
@@ -498,7 +498,7 @@ public:
         if (SennaConfig::SennaHarass::UseQ->Value == true
             && isTimeToCastQ())
         {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr)
             {
                 Senna_UseQ(qTarget);
@@ -508,7 +508,7 @@ public:
 
     void Lasthit() override {
         if (SennaConfig::SennaLastHit::UseQ->Value && isTimeToCastQ()) {
-            const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), qRange(), Alliance::Enemy);
+            const auto minion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), Alliance::Enemy);
             if (minion != nullptr) {
                 if (CanKill(minion, Senna_dmgQ(minion))) {
                     Senna_UseQ(minion);
@@ -518,7 +518,7 @@ public:
     }
 
     void Flee() override {
-        const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+        const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
         if (wTarget != nullptr) {
             if (SennaConfig::SennaFlee::UseE->Value && isTimeToCastE())
             {
@@ -539,7 +539,7 @@ public:
 
 
         if (SennaConfig::SennaKillsteal::UseQ->Value && isTimeToCastQ()) {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr) {
                 if (CanKill(qTarget, Senna_dmgQ(qTarget))) {
                     Senna_UseQ(qTarget);
@@ -548,7 +548,7 @@ public:
         }
 
         if (SennaConfig::SennaKillsteal::UseW->Value && isTimeToCastW()) {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
                 if (CanKill(wTarget, Senna_dmgW(wTarget))) {
                     Senna_UseW(wTarget);
@@ -582,21 +582,21 @@ public:
 
     void Render() override {
         if (SennaConfig::SennaSpellsSettings::DrawQ->Value == true && (SennaConfig::SennaSpellsSettings::DrawIfReady->Value == true && database.SennaQ.IsCastable() || SennaConfig::SennaSpellsSettings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
 
         if (SennaConfig::SennaSpellsSettings::DrawW->Value == true && (SennaConfig::SennaSpellsSettings::DrawIfReady->Value == true && database.SennaW.IsCastable() || SennaConfig::SennaSpellsSettings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
 
         if (SennaConfig::SennaSpellsSettings::DrawE->Value == true && (SennaConfig::SennaSpellsSettings::DrawIfReady->Value == true && database.SennaE.IsCastable() || SennaConfig::SennaSpellsSettings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
 
         if (SennaConfig::SennaSpellsSettings::DrawR->Value == true && (SennaConfig::SennaSpellsSettings::DrawIfReady->Value == true && database.SennaR.IsCastable() || SennaConfig::SennaSpellsSettings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
 
         if (SennaConfig::SennaHPBAR::DrawRDamage->Value == true) {
             for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
                 if (!hero) continue;
-                if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable() and hero->GetPosition().Distance(globals::localPlayer->GetPosition()) <= rRange() + hero->GetBoundingRadius() / 2)
+                if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable() and hero->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition()) <= rRange() + hero->GetBoundingRadius() / 2)
                     DrawDamage(hero);
             }
         }

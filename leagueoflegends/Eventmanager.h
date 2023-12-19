@@ -8,34 +8,14 @@ public:
 		OnInject,
 		OnDraw,
 		OnWndProc,
-		OnPresent,
-
 		OnGameStart,
 		OnGameTick,
-
 		OnProcessSpell,
-
 		OnCastSpell,
 		OnImpactSpell,
 		OnFinishCast,
-
 		OnBeforeAttack,
 		OnAfterAttack,
-
-		OnCreateObject,
-		OnDeleteObject,
-
-		OnIssueMove,
-
-		OnDoCast,
-		OnDoCastDelayed,
-		OnPlayAnimation,
-		
-		
-		OnReleaseSpell,
-		OnGapCloserSpell,
-		OnInterruptibleSpell,
-		OnNewPath,
 		Size
 	};
 

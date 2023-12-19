@@ -19,19 +19,19 @@ private:
     float RCastedTime = 0.0f;
 
     [[nodiscard]] bool isTimeToCastQ() const {
-        return gameTime > QCastedTime + database.TwitchQ.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+        return gameTime > QCastedTime + database.TwitchQ.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastW() const {
-        return gameTime > WCastedTime + database.TwitchW.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+        return gameTime > WCastedTime + database.TwitchW.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastE() const {
-        return gameTime > ECastedTime + database.TwitchE.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+        return gameTime > ECastedTime + database.TwitchE.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastR() const {
-        return gameTime > RCastedTime + database.TwitchR.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+        return gameTime > RCastedTime + database.TwitchR.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
     }
 
     static float qRange() {
@@ -47,7 +47,7 @@ private:
     }
 
     static float rRange() {
-        return globals::localPlayer->GetRealAttackRange() + 300.0f;
+        return ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 300.0f;
     }
 
     static bool HasEnoughMana(OrbwalkState mode) {
@@ -55,9 +55,9 @@ private:
 
         switch (mode) {
         case OrbwalkState::Clear:
-            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) > 0)
+            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(TwitchConfig::TwitchClear::minMana->Value);
-            else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
+            else if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(TwitchConfig::TwitchJungle::minMana->Value);
             break;
         case OrbwalkState::Harass:
@@ -67,7 +67,7 @@ private:
             return false;
         }
 
-        return globals::localPlayer->GetPercentMana() > minManaThreshold;
+        return ObjectManager::GetLocalPlayer()->GetPercentMana() > minManaThreshold;
     }
 
     static bool hasE(Object* pEnemy) {
@@ -75,14 +75,14 @@ private:
     }
 
     static int getEStacks(Object* pEnemy) {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !hasE(pEnemy))
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !hasE(pEnemy))
             return -9999;
 
         return pEnemy->GetBuffByName("TwitchDeadlyVenom")->GetStacks();
     }
 
     static bool hasEnoughStacks(Object* pEnemy, int stacksAmount) {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !hasE(pEnemy))
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !hasE(pEnemy))
             return -9999;
 
         return getEStacks(pEnemy) >= stacksAmount;
@@ -159,9 +159,9 @@ public:
         TwitchConfig::TwitchSpellsSettings::qCastMode = qSpellMenu->AddList("castMode", "Cast Mode", std::vector<std::string>{"Doesn't Matter", "While attacking"}, 0);
         TwitchConfig::TwitchSpellsSettings::qRange = qSpellMenu->AddSlider("maxQRange",
             "Maximum Range",
-            globals::localPlayer->GetRealAttackRange() * 1.5f,
+            ObjectManager::GetLocalPlayer()->GetRealAttackRange() * 1.5f,
             100,
-            globals::localPlayer->GetRealAttackRange() * 2.0f, 50);
+            ObjectManager::GetLocalPlayer()->GetRealAttackRange() * 2.0f, 50);
         TwitchConfig::TwitchSpellsSettings::DrawQ = qSpellMenu->AddCheckBox("Draw Q", "Draw Range", true);
 
         //Creating second parent menu that is itself a child of spellsMenu
@@ -187,7 +187,7 @@ public:
 
     static float Twitch_dmgE(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::E))
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E))
             return -9999;
 
         if (hasE(pEnemy))
@@ -195,14 +195,14 @@ public:
             const int stacks = getEStacks(pEnemy);
             if (stacks > 0)
             {
-                const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
+                const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E)->GetLevel();
                 float base = levelSpell * 10 + 10;
                 const int eDMG = 15 + (levelSpell - 1) * 5;
-                float attackDamage = base + (eDMG + (globals::localPlayer->GetBonusAttackDamage() * 0.35f) * stacks);
-                const float pDMG = Damage::CalculatePhysicalDamage(globals::localPlayer, pEnemy, attackDamage);
-                float abilityPowerDamage = (globals::localPlayer->GetAbilityPower() * .30) * stacks;
+                float attackDamage = base + (eDMG + (ObjectManager::GetLocalPlayer()->GetBonusAttackDamage() * 0.35f) * stacks);
+                const float pDMG = Damage::CalculatePhysicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, attackDamage);
+                float abilityPowerDamage = (ObjectManager::GetLocalPlayer()->GetAbilityPower() * .30) * stacks;
 
-                const float aDMG = Damage::CalculateMagicalDamage(globals::localPlayer, pEnemy, abilityPowerDamage);
+                const float aDMG = Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, abilityPowerDamage);
                 return pDMG + aDMG;
             }
         }
@@ -220,7 +220,7 @@ public:
 
     void DrawDamage(Object* pEnemy) const
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastE() || !hasE(pEnemy))
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastE() || !hasE(pEnemy))
             return;
 
         const Vector2 screenPos = Engine::GetHpBarPosition(pEnemy);
@@ -240,10 +240,10 @@ public:
 
     void Twitch_UseQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastQ())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastQ())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= qRange())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= qRange())
         {
             Engine::CastSelf(SpellIndex::Q);
             QCastedTime = gameTime;
@@ -252,10 +252,10 @@ public:
 
     void Twitch_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastW())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastW())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= wRange())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= wRange())
         {
 
             if (pEnemy->IsMinion() || pEnemy->IsJungle()) {
@@ -273,10 +273,10 @@ public:
     }
 
     void Twitch_UseE(Object* pEnemy) {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastE())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastE())
             return;
 
-        if (pEnemy->GetDistanceTo(globals::localPlayer) <= eRange())
+        if (pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= eRange())
         {
             Engine::CastSelf(SpellIndex::E);
             ECastedTime = gameTime;
@@ -284,7 +284,7 @@ public:
     }
 
     void Twitch_UseR() {
-        if (globals::localPlayer == nullptr || !isTimeToCastR())
+        if (ObjectManager::GetLocalPlayer() == nullptr || !isTimeToCastR())
             return;
 
         Engine::CastSelf(SpellIndex::R);
@@ -301,7 +301,7 @@ public:
         if (TwitchConfig::TwitchCombo::UseE->Value == true
             && isTimeToCastE())
         {
-            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
             if (eTarget != nullptr)
             {
                 const bool canKillTarget = eTarget->GetHealth() + eTarget->GetShield() < Twitch_dmgE(eTarget);
@@ -317,7 +317,7 @@ public:
             && TwitchConfig::TwitchSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr)
             {
                 Twitch_UseW(wTarget);
@@ -328,7 +328,7 @@ public:
             && TwitchConfig::TwitchSpellsSettings::qCastMode->Value == 0
             && isTimeToCastQ())
         {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr)
             {
                 Twitch_UseQ(qTarget);
@@ -336,7 +336,7 @@ public:
         }
 
         if (TwitchConfig::TwitchCombo::UseR->Value == true
-            && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), rRange()) >= TwitchConfig::TwitchCombo::enemiesInRange->Value
+            && ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), rRange()) >= TwitchConfig::TwitchCombo::enemiesInRange->Value
             && isTimeToCastR())
         {
             Twitch_UseR();
@@ -345,7 +345,7 @@ public:
     void Clear() override {
         if (!HasEnoughMana(OrbwalkState::Clear)) return;
 
-        const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), eRange());
+        const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
 
         if (minionsInRange > 0) {
             if (TwitchConfig::TwitchClear::UseE->Value && isTimeToCastE()) {
@@ -353,7 +353,7 @@ public:
                 for (auto minion : ObjectManager::GetHeroesAs(Alliance::Enemy))
                 {
                     if (!minion) continue;
-                    if (minion->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > eRange()) continue;
+                    if (minion->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > eRange()) continue;
                     if (minion->GetHealth() < Twitch_dmgE(minion)) {
                         kill_count++;
                         if (kill_count >= TwitchConfig::TwitchClear::minMinion->Value) {
@@ -365,14 +365,14 @@ public:
             }
 
             if (TwitchConfig::TwitchClear::UseW->Value && isTimeToCastW()) {
-                const auto wTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), wRange(), Alliance::Enemy);
+                const auto wTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), Alliance::Enemy);
                 if (wTarget != nullptr) {
                     Twitch_UseW(wTarget);
                 }
             }
         }
         else {
-            const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange());
+            const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (jungleMonstersInRange > 0) {
                 Object* highestHpMonster = nullptr;
                 float highestHp = 0.0f;
@@ -381,9 +381,9 @@ public:
                 for (auto monster : ObjectManager::GetJungleMonsters())
                 {
                     if (!monster) continue;
-                    if (monster->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > wRange()) continue;
+                    if (monster->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > wRange()) continue;
 
-                    float AAdamage = Damage::CalculateAutoAttackDamage(globals::localPlayer, monster);
+                    float AAdamage = Damage::CalculateAutoAttackDamage(ObjectManager::GetLocalPlayer(), monster);
                     totalAAsNeeded += std::ceil(monster->GetHealth() / AAdamage);
 
                     if (monster->GetHealth() > highestHp) {
@@ -417,7 +417,7 @@ public:
             && TwitchConfig::TwitchSpellsSettings::wCastMode->Value == 0
             && isTimeToCastW())
         {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
                 Twitch_UseW(wTarget);
             }
@@ -426,7 +426,7 @@ public:
         if (TwitchConfig::TwitchHarass::UseE->Value == true
             && isTimeToCastE())
         {
-            const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), eRange());
+            const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), eRange());
             if (eTarget != nullptr)
             {
                 const bool canKillTarget = eTarget->GetHealth() + eTarget->GetShield() < Twitch_dmgE(eTarget);
@@ -457,7 +457,7 @@ public:
         {
             for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
                 if (!hero) continue;
-                if (hero->GetPosition().Distance(globals::localPlayer->GetPosition()) > eRange() + hero->GetBoundingRadius() / 2) continue;
+                if (hero->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition()) > eRange() + hero->GetBoundingRadius() / 2) continue;
                 if (hero->GetHealth() + hero->GetShield() < Twitch_dmgE(hero)) {
                     Twitch_UseE(hero);
                     break;
@@ -486,16 +486,16 @@ public:
 
     void Render() override {
         if (TwitchConfig::TwitchSpellsSettings::DrawQ->Value == true && (TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == true && database.TwitchQ.IsCastable() || TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
 
         if (TwitchConfig::TwitchSpellsSettings::DrawW->Value == true && (TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == true && database.TwitchW.IsCastable() || TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), COLOR_WHITE, 1.0f);
 
         if (TwitchConfig::TwitchSpellsSettings::DrawE->Value == true && (TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == true && database.TwitchE.IsCastable() || TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), eRange(), COLOR_WHITE, 1.0f);
 
         if (TwitchConfig::TwitchSpellsSettings::DrawR->Value == true && (TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == true && database.TwitchR.IsCastable() || TwitchConfig::TwitchSpellsSettings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
 
         if (TwitchConfig::TwitchHPBAR::DrawEDamage->Value == true) {
             for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {

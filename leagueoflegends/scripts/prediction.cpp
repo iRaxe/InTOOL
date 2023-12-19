@@ -1,3 +1,4 @@
+#include "../ObjManager.h"
 #include "../stdafx.h"
 #include "../TargetSelector.h"
 
@@ -84,7 +85,7 @@ namespace Modules::prediction
 			return false;
 			};
 
-		return objectInWay(*globals::minionManager) || objectInWay(*globals::heroManager);
+		return objectInWay(*ObjectManager::GetMinionList()) || objectInWay(*ObjectManager::GetHeroList());
 	}
 
 	Vector3 GetObjectPositionAfterTime(Object* obj, float time, float distanceBuffer)
@@ -159,11 +160,11 @@ namespace Modules::prediction
 	bool GetPrediction(Skillshot& skillshot, Modules::prediction::PredictionOutput& out)
 	{
 
-		auto target = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), skillshot.GetMaxRange());
+		auto target = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), skillshot.GetMaxRange());
 		if (!target)
 			return false;
 
-		return GetPrediction(globals::localPlayer, target, skillshot, out);
+		return GetPrediction(ObjectManager::GetLocalPlayer(), target, skillshot, out);
 	}
 
 	bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot& skillshot, Modules::prediction::PredictionOutput& out)

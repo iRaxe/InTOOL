@@ -57,14 +57,14 @@ namespace UPasta {
                 }
 
                 namespace TristanaSpellsSettings {
-                    static float GetQRange() { return globals::localPlayer->GetRealAttackRange(); }
+                    static float GetQRange() { return ObjectManager::GetLocalPlayer()->GetRealAttackRange(); }
 
                     inline Slider* wRange;
                     inline CheckBox* DrawW;
                     static float GetWRange() { return static_cast<float>(wRange->Value); }
 
                     inline CheckBox* DrawE;
-                    static float GetERange() { return 517.0f + (8.0f * globals::localPlayer->GetLevel()); }
+                    static float GetERange() { return 517.0f + (8.0f * ObjectManager::GetLocalPlayer()->GetLevel()); }
 
                     inline CheckBox* DrawR;
                     static float GetRRange() { return GetERange(); }

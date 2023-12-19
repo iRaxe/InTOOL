@@ -22,7 +22,7 @@ namespace UPasta {
 
 		void HealthPrediction::Initialize() {
 			//Aggiungere eventi agli eventi lul
-			Event::Subscribe(Event::OnPresent, OnGameUpdate);
+			Event::Subscribe(Event::OnGameTick, OnGameUpdate);
 			Event::Subscribe(Event::OnProcessSpell, OnProcessSpell);
 		}
 

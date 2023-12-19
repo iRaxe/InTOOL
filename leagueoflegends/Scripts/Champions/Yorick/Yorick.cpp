@@ -114,13 +114,13 @@ public:
 
     static float Yorick_dmgQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.YorickQ.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.YorickQ.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = YorickDamages::QSpell::dmgSkillArray[levelSpell - 1];
 
-        const float attackDamage = globals::localPlayer->GetAttackDamage();
+        const float attackDamage = ObjectManager::GetLocalPlayer()->GetAttackDamage();
         const float additionalAttackDamageSkillDamage = YorickDamages::QSpell::additionalPercentageAD;
 
         const float totalDamage = skillDamage + (attackDamage * additionalAttackDamageSkillDamage);
@@ -129,13 +129,13 @@ public:
 
     static float Yorick_dmgE(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.YorickE.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.YorickE.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = YorickDamages::ESpell::dmgSkillArray[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalAbilityPowerSkillDamage = YorickDamages::ESpell::additionalPercentageAP;
 
         const float totalDamage = skillDamage + (additionalAbilityPowerSkillDamage * abilityPowerDamage);
@@ -144,13 +144,13 @@ public:
 
     bool IsCastingQ()
     {
-        SpellCast* spellCast = globals::localPlayer->GetActiveSpellCast();
+        SpellCast* spellCast = ObjectManager::GetLocalPlayer()->GetActiveSpellCast();
         return spellCast && spellCast->GetSpellInfo()->GetSpellData()->GetName() == "YorickQ2";
     }
 
     bool IsCastingR()
     {
-        return globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetName() == "YorickR2";
+        return ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetName() == "YorickR2";
     }
 
     bool IsMaidenAround()
@@ -176,7 +176,7 @@ public:
         int gravesToReturn = 0;
         for (auto objToFind : ObjectManager::GetMinions()) {
             if (!objToFind) continue;
-            if (!objToFind->GetDistanceTo(globals::localPlayer) > database.YorickR.GetMaxRange()) continue;
+            if (!objToFind->GetDistanceTo(ObjectManager::GetLocalPlayer()) > database.YorickR.GetMaxRange()) continue;
 
             if (objToFind->GetName() != "TestCubeRender10Vision") continue;
             gravesToReturn++;
@@ -187,7 +187,7 @@ public:
 
     void Yorick_UseQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.YorickQ.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.YorickQ.IsCastable())
             return;
 
         if (pEnemy && isTimeToCastQ())
@@ -199,7 +199,7 @@ public:
 
     void Yorick_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.YorickW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.YorickW.IsCastable())
             return;
 
         if (pEnemy && isTimeToCastW())
@@ -224,7 +224,7 @@ public:
 
     void Yorick_UseE(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.YorickE.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.YorickE.IsCastable())
             return;
 
         if (pEnemy && isTimeToCastE())
@@ -248,7 +248,7 @@ public:
 
     void Yorick_UseR(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || IsCastingR())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || IsCastingR())
         	return;
 
         if (pEnemy && isTimeToCastR())
@@ -274,46 +274,46 @@ public:
     {
         if (database.YorickR.IsCastable() && YorickConfig::YorickCombo::UseR->Value == true)
         {
-            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickR.GetMaxRange()))
+            if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickR.GetMaxRange()))
                 Yorick_UseR(rTarget);
         }
 
         if (database.YorickW.IsCastable() && YorickConfig::YorickCombo::UseW->Value == true)
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickW.GetRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickW.GetRange()))
                 Yorick_UseW(wTarget);
 
         if (database.YorickE.IsCastable() && YorickConfig::YorickCombo::UseE->Value == true)
-            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetRange() + 300.0f))
+            if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickE.GetRange() + 300.0f))
                 Yorick_UseE(eTarget);
 
         if (database.YorickQ.IsCastable() && YorickConfig::YorickCombo::UseQ->Value == true)
-			if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),globals::localPlayer->GetRealAttackRange() + 50.0f))
+			if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 50.0f))
 				Yorick_UseQ(qTarget);
     }
 
     void Clear() override
     {
-        if (globals::localPlayer->GetPercentMana() < static_cast<float>(YorickConfig::YorickJungle::minMana->Value))
+        if (ObjectManager::GetLocalPlayer()->GetPercentMana() < static_cast<float>(YorickConfig::YorickJungle::minMana->Value))
             return;
 
         if (database.YorickQ.IsCastable())
         {
-            if (const auto turret = TargetSelector::FindTurret(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange() + 50.0f, Alliance::Enemy); YorickConfig::YorickClear::UseQOnTowers->Value == true)
+            if (const auto turret = TargetSelector::FindTurret(ObjectManager::GetLocalPlayer()->GetPosition(), ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 50.0f, Alliance::Enemy); YorickConfig::YorickClear::UseQOnTowers->Value == true)
                 Yorick_UseQ(turret);
 
-            if (const auto inhibitor = TargetSelector::FindInhibitor(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange() + 50.0f, Alliance::Enemy); YorickConfig::YorickClear::UseQOnTowers->Value == true)
+            if (const auto inhibitor = TargetSelector::FindInhibitor(ObjectManager::GetLocalPlayer()->GetPosition(), ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 50.0f, Alliance::Enemy); YorickConfig::YorickClear::UseQOnTowers->Value == true)
                 Yorick_UseQ(inhibitor);
 
-            if (const auto monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), globals::localPlayer->GetRealAttackRange() + 50.0f);
+            if (const auto monster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 50.0f);
                 YorickConfig::YorickJungle::UseQ->Value == true
                 && monster)
             {
                 Yorick_UseQ(monster);
             }
 
-            if (const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),globals::localPlayer->GetRealAttackRange() + 50.0f, Alliance::Enemy);
+            if (const auto minion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(),ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 50.0f, Alliance::Enemy);
                 YorickConfig::YorickLastHit::UseQ->Value == true
-                && minion && minion->GetHealth() < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
+                && minion && minion->GetHealth() < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(ObjectManager::GetLocalPlayer(), minion))
             {
                 Yorick_UseQ(minion);
             }
@@ -321,7 +321,7 @@ public:
 
         if (database.YorickW.IsCastable())
         {
-            if (const auto monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.YorickW.GetRange());
+            if (const auto monster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), database.YorickW.GetRange());
                 YorickConfig::YorickJungle::UseW->Value == true
                 && monster)
             {
@@ -331,14 +331,14 @@ public:
 
         if (database.YorickE.IsCastable())
         {
-            if (const auto monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.YorickE.GetRange());
+            if (const auto monster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), database.YorickE.GetRange());
                 YorickConfig::YorickJungle::UseE->Value == true
                 && monster)
             {
                 Yorick_UseE(monster);
             }
 
-            if (const auto minion= TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), database.YorickE.GetRange(), Alliance::Enemy);
+            if (const auto minion= TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), database.YorickE.GetRange(), Alliance::Enemy);
                 YorickConfig::YorickClear::UseE->Value == true
                 && minion 
                 && ObjectManager::CountMinionsInRange(Alliance::Enemy, minion->GetPosition(), database.YorickE.GetRadius()) >= YorickConfig::YorickClear::minMinions->Value)
@@ -350,19 +350,19 @@ public:
 
     void Harass() override
     {
-        if (globals::localPlayer->GetPercentMana() < static_cast<float>(YorickConfig::YorickHarass::minMana->Value))
+        if (ObjectManager::GetLocalPlayer()->GetPercentMana() < static_cast<float>(YorickConfig::YorickHarass::minMana->Value))
             return;
 
         if (database.YorickQ.IsCastable() && YorickConfig::YorickHarass::UseQ->Value == true)
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),globals::localPlayer->GetRealAttackRange() + 50.0f))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),ObjectManager::GetLocalPlayer()->GetRealAttackRange() + 50.0f))
                 Yorick_UseQ(qTarget);
 
         if (database.YorickW.IsCastable() && YorickConfig::YorickHarass::UseW->Value == true)
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickW.GetMaxRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickW.GetMaxRange()))
             	Yorick_UseW(wTarget);
 
         if (database.YorickE.IsCastable() && YorickConfig::YorickHarass::UseE->Value == true)
-            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetMaxRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickE.GetMaxRange()))
                 if (AreGravesAround() && CountGravesAround() >= YorickConfig::YorickHarass::minGraves->Value)
 					Yorick_UseE(eTarget);
         
@@ -370,22 +370,22 @@ public:
 
     void Lasthit() override
     {
-        if (globals::localPlayer->GetPercentMana() < static_cast<float>(YorickConfig::YorickLastHit::minMana->Value))
+        if (ObjectManager::GetLocalPlayer()->GetPercentMana() < static_cast<float>(YorickConfig::YorickLastHit::minMana->Value))
             return;
 
         if (YorickConfig::YorickLastHit::UseQ->Value == true && database.YorickQ.IsCastable())
-            if (const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),database.YorickQ.GetRange(), Alliance::Enemy); minion->GetHealth() < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(globals::localPlayer, minion))
+            if (const auto minion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickQ.GetRange(), Alliance::Enemy); minion->GetHealth() < Yorick_dmgQ(minion) + Damage::CalculateAutoAttackDamage(ObjectManager::GetLocalPlayer(), minion))
                 Yorick_UseQ(minion);
     }
 
     void Flee() override
     {
         if (YorickConfig::YorickFlee::UseE->Value == true && database.YorickE.IsCastable())
-            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickE.GetRange()))
                 Yorick_UseE(eTarget);
 
         if (YorickConfig::YorickFlee::UseW->Value == true && database.YorickW.IsCastable())
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickW.GetRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickW.GetRange()))
                 Yorick_UseW(wTarget);
     }
 
@@ -393,7 +393,7 @@ public:
     {
         if (YorickConfig::YorickKillsteal::UseQ->Value == true && database.YorickQ.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickQ.GetRange());
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickQ.GetRange());
                 qTarget && qTarget->GetHealth() < Yorick_dmgQ(qTarget))
             {
                 Yorick_UseQ(qTarget);
@@ -402,7 +402,7 @@ public:
 
         if (YorickConfig::YorickKillsteal::UseE->Value == true && database.YorickE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.YorickE.GetRange());
+            if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.YorickE.GetRange());
                 eTarget && eTarget->GetHealth() < Yorick_dmgE(eTarget))
             {
                 Yorick_UseE(eTarget);
@@ -417,7 +417,7 @@ public:
             for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
                 if (!target) continue;
-                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > database.YorickW.GetRange()) continue;
+                if (target->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > database.YorickW.GetRange()) continue;
                 if (!Engine::MenuItemContains(YorickConfig::YorickAntiGapCloser::whitelist, target->GetName().c_str())) continue;
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
@@ -425,7 +425,7 @@ public:
                 if (target)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < database.YorickW.GetRange())
+                    if (pathEnd.IsValid() && ObjectManager::GetLocalPlayer()->GetPosition().distanceTo(pathEnd) < database.YorickW.GetRange())
                     {
                         Yorick_UseW(target);
                     }
@@ -454,13 +454,13 @@ public:
     void Render() override
     {
        if (YorickConfig::YorickDrawings::DrawW->Value == true && (YorickConfig::YorickDrawings::DrawIfReady->Value == true && database.YorickW.IsCastable() || YorickConfig::YorickDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.YorickW.GetRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), database.YorickW.GetRange(), COLOR_WHITE, 1.0f);
 
        if (YorickConfig::YorickDrawings::DrawE->Value == true && (YorickConfig::YorickDrawings::DrawIfReady->Value == true && database.YorickE.IsCastable() || YorickConfig::YorickDrawings::DrawIfReady->Value == false))
-           Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.YorickE.GetRange(), COLOR_WHITE, 1.0f);
+           Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), database.YorickE.GetRange(), COLOR_WHITE, 1.0f);
 
        if (YorickConfig::YorickDrawings::DrawR->Value == true && (YorickConfig::YorickDrawings::DrawIfReady->Value == true && database.YorickR.IsCastable() || YorickConfig::YorickDrawings::DrawIfReady->Value == false))
-           Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.YorickR.GetRange(), COLOR_WHITE, 1.0f);
+           Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), database.YorickR.GetRange(), COLOR_WHITE, 1.0f);
     }
 };
 

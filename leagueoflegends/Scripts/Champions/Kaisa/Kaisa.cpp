@@ -52,7 +52,7 @@ private:
     }
 
     static float rRange() {
-        const int Rlevel = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int Rlevel = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         return KaisaDamages::RSpell::Rrange[Rlevel];
     }
 
@@ -61,7 +61,7 @@ private:
     }
 
     float w_dmg(Object* pEnemy) const {
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         return Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::W, pEnemy, KaisaDamages::WSpell::dmgSkillArray, KaisaDamages::QSpell::additionalPercentageAD);
     }
 
@@ -127,9 +127,9 @@ public:
         KaisaConfig::KaisaAntiMelee::eMode = antiMeleeMenu->AddList("eMode", "Dash To", std::vector<std::string>{"Near Mouse", "Extend Enemy Dash Position"}, 0);
         KaisaConfig::KaisaAntiMelee::UseE = antiMeleeMenu->AddCheckBox("Use E", "Use SpellSlot E To Mouse", false);
         const auto antiMeleewhitelistMenu = antiMeleeMenu->AddMenu("Whitelist Settings", "Whitelist");
-        for (int i = 0; i < globals::heroManager->GetListSize(); i++)
+        for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++)
         {
-            auto obj = globals::heroManager->GetIndex(i);
+            auto obj = ObjectManager::GetHeroList()->GetIndex(i);
             if (obj != nullptr && obj->IsEnemy())
             {
                 const auto antiGap_checkbox = antiGapwhitelistMenu->AddCheckBox(obj->GetName().c_str(),
@@ -192,7 +192,7 @@ public:
 
     void Kaisa_UseAbility(Object* pEnemy, SpellIndex spellID)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr) return;
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr) return;
 
         auto isCastable = [&]() -> bool {
             switch (spellID) {
@@ -214,7 +214,7 @@ public:
             default: return 0.0f;
             }};
 
-        if (pEnemy->GetDistanceTo(globals::localPlayer) > abilityRange()) return;
+        if (pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) > abilityRange()) return;
 
         auto isTimeToCast = [&]() -> bool {
             switch (spellID) {
@@ -229,7 +229,7 @@ public:
 
         auto handleSpellCast = [&](Skillshot spellData) {
             Modules::prediction::PredictionOutput prediction;
-            if (GetPrediction(globals::localPlayer, pEnemy, spellData, prediction))
+            if (GetPrediction(ObjectManager::GetLocalPlayer(), pEnemy, spellData, prediction))
                 Engine::CastToPosition(spellID, prediction.position);
             };
 
@@ -268,7 +268,7 @@ public:
         //ObjectManager::CountMinionsInRange(Alliance::Enemy, 
         if (KaisaConfig::QConfig::AutoQ->Value == true && database.KaisaQ.IsCastable())
         {
-            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 0 && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 1)
+            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) == 0 && ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) == 1)
             {
                 Engine::CastSelf(SpellIndex::Q);
             }
@@ -289,7 +289,7 @@ public:
 
         if (KaisaConfig::QConfig::ComboQ->Value == 0 && database.KaisaQ.IsCastable())
         {
-            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange())== 0 && ObjectManager::CountHeroesInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) == 1)
+            if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange())== 0 && ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) == 1)
             {
                 Engine::CastSelf(SpellIndex::Q);
             }
@@ -297,18 +297,18 @@ public:
 
         if (KaisaConfig::QConfig::ComboQ->Value == 1 && database.KaisaQ.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange()))
                 Kaisa_UseAbility(qTarget, Q);
         }
         if (KaisaConfig::EConfig::ComboE->Value == 1 && database.KaisaE.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange()))
                 Engine::CastSelf(SpellIndex::E);
         }
 
         if (KaisaConfig::WConfig::ComboW->Value == 0 && database.KaisaW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange()))
             {
                 if (wTarget->GetBuffByType(BuffType::Stun))
                 {
@@ -319,7 +319,7 @@ public:
         }
         if (KaisaConfig::WConfig::ComboW->Value == 1 && database.KaisaW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange()))
             {
                 auto stacks = wTarget->GetBuffByName("kaisapassivemarker");
                 if (stacks->GetStacks() >= KaisaConfig::WConfig::wstack->Value)
@@ -332,9 +332,9 @@ public:
         }
         if (KaisaConfig::RConfig::ComboR->Value == 1 && database.KaisaR.IsCastable())
         {
-            if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),rRange()))
+            if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),rRange()))
             {
-                int meHP = globals::localPlayer->GetPercentHealth();
+                int meHP = ObjectManager::GetLocalPlayer()->GetPercentHealth();
                 int targetHP = rTarget->GetPercentHealth();
                 float R_Radius = 525;
                 float highestDistance = 0;
@@ -390,7 +390,7 @@ public:
     void Clear() override
     {
         //Laneclear
-        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), qRange()) >= KaisaConfig::KaisaClear::Qmin->Value)
+        if (ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) >= KaisaConfig::KaisaClear::Qmin->Value)
         {
 
             if (KaisaConfig::KaisaClear::UseQ->Value == true && database.KaisaQ.IsCastable())
@@ -400,12 +400,12 @@ public:
         }
 
         //Jungleclear
-        else if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
+        else if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
         {
 
             if (KaisaConfig::KaisaJungle::UseQ->Value == true && database.KaisaQ.IsCastable())
             {
-                if (const auto qTarget = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), qRange()))
+                if (const auto qTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()))
                     Kaisa_UseAbility(qTarget, Q);
             }
         }
@@ -417,13 +417,13 @@ public:
 
         if (KaisaConfig::KaisaHarass::UseW->Value == true && database.KaisaW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),wRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),wRange()))
                 Kaisa_UseAbility(wTarget, W);
         }
 
         if (KaisaConfig::KaisaHarass::UseQ->Value == true && database.KaisaQ.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),qRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),qRange()))
                 Kaisa_UseAbility(qTarget, Q);
         }
     }
@@ -434,9 +434,9 @@ public:
 
             if (KaisaConfig::KaisaKillsteal::UseW->Value == true && database.KaisaW.IsCastable())
             {
-                const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),KaisaConfig::KaisaKillsteal::wksRange->Value);
+                const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),KaisaConfig::KaisaKillsteal::wksRange->Value);
                 if (wTarget != nullptr
-                    && wTarget->GetDistanceTo(globals::localPlayer) <= KaisaConfig::KaisaKillsteal::wksRange->Value
+                    && wTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= KaisaConfig::KaisaKillsteal::wksRange->Value
                     && wTarget->GetHealth() < w_dmg(wTarget))
                 {
                     Kaisa_UseAbility(wTarget, W);
@@ -457,7 +457,7 @@ public:
             {
                 if (!target) continue;
                 if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiGapCloser::whitelist, target->GetName().c_str())) continue;
-                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 450.0f) continue;
+                if (target->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > 450.0f) continue;
 
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
@@ -465,7 +465,7 @@ public:
                 if (target != nullptr)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 350.0f)
+                    if (pathEnd.IsValid() && ObjectManager::GetLocalPlayer()->GetPosition().distanceTo(pathEnd) < 350.0f)
                     {
                         Engine::CastSelf(SpellIndex::E);
                     }
@@ -481,13 +481,13 @@ public:
             for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
                 if (!target) continue;
-                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > 450.0f) continue;
+                if (target->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > 450.0f) continue;
                 if (!Engine::MenuItemContains(KaisaConfig::KaisaAntiMelee::whitelist, target->GetName().c_str())) continue;
 
-                if (target != nullptr && target->GetDistanceTo(globals::localPlayer) < target->GetRealAttackRange())
+                if (target != nullptr && target->GetDistanceTo(ObjectManager::GetLocalPlayer()) < target->GetRealAttackRange())
                 {
                     const Vector3 pathEnd = Engine::GetMouseWorldPos();
-                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < 350.0f)
+                    if (pathEnd.IsValid() && ObjectManager::GetLocalPlayer()->GetPosition().distanceTo(pathEnd) < 350.0f)
                     {
                         Engine::CastSelf(SpellIndex::E);
                     }
@@ -524,10 +524,10 @@ public:
     {
         __try {
             if (KaisaConfig::KaisaSpellsSettings::DrawQ->Value == true && (KaisaConfig::KaisaSpellsSettings::DrawIfReady->Value == true && database.KaisaQ.IsCastable() || KaisaConfig::KaisaSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
 
             if (KaisaConfig::KaisaSpellsSettings::DrawW->Value == true && (KaisaConfig::KaisaSpellsSettings::DrawIfReady->Value == true && database.KaisaW.IsCastable() || KaisaConfig::KaisaSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), wRange(), COLOR_PURPLE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), wRange(), COLOR_PURPLE, 1.0f);
 
         }
         __except (1)

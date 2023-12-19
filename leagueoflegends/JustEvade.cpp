@@ -1,4 +1,6 @@
 #include "JustEvade.h"
+
+#include "ObjManager.h"
 #define _DEBUGEVADE 0
 #define _DEBUGMISSILES 0
 
@@ -75,9 +77,9 @@ namespace Evade
 		InitSpells();
 		InitializeMenu();
 		Subscribe();
-		BoundingRadius = globals::localPlayer->GetBoundingRadius() + 15;
+		BoundingRadius = ObjectManager::GetLocalPlayer()->GetBoundingRadius() + 15;
 
-		for (auto hero : *globals::heroManager) {
+		for (auto hero : *ObjectManager::GetHeroList()) {
 			if (hero->IsAlly())				continue;
 
 			for (Champ spell : SpellDB) {
@@ -93,7 +95,7 @@ namespace Evade
 		for (auto& hero : ChampsInGame) {
 			if (hero.obj->GetName() == "Sylas") {
 				LOG("Found Sylas in game, loopin through ally spells for add in evade list");
-				for (auto teamate : *globals::heroManager) {
+				for (auto teamate : *ObjectManager::GetHeroList()) {
 					for (Champ cham : SpellDB) {
 						if (teamate->GetName() == cham.hero) {
 							for (auto spell : cham.spells) {
@@ -153,13 +155,13 @@ namespace Evade
 		render::RenderCircleWorld(PreviousPos, 50, 200, COLOR_BLACK, 3);
 		
 		if (IsSafePos(MyHeroPos, 300))
-			render::RenderTextWorld("SAFE ZONE", globals::localPlayer->GetPosition(), 24.0f, COLOR_GREEN, true);
+			render::RenderTextWorld("SAFE ZONE", ObjectManager::GetLocalPlayer()->GetPosition(), 24.0f, COLOR_GREEN, true);
 		
 	}
 
 	void Core::OnGameUpdate() {
-		if (globals::localPlayer == nullptr) return;
-		if (!globals::localPlayer->IsAlive()) return;
+		if (ObjectManager::GetLocalPlayer() == nullptr) return;
+		if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
 
 		GameTimer = Engine::GetGameTime();
 
@@ -216,7 +218,7 @@ namespace Evade
 
 		for (Spell spell : DetectedSkillshots)
 		{
-			if (spell.path.IsInside(globals::localPlayer->GetAiManager()->GetPosition())) {
+			if (spell.path.IsInside(ObjectManager::GetLocalPlayer()->GetAiManager()->GetPosition())) {
 				DangerSkillshots.emplace_back(spell);
 			}
 			EnabledSkillshots.emplace_back(spell);
@@ -230,9 +232,9 @@ namespace Evade
 			Evading = false;
 		}
 
-		if (!Evading && !IsDangerous(PreviousPos) && IsDangerous(globals::localPlayer->GetAiManager()->GetPathEnd())) {
+		if (!Evading && !IsDangerous(PreviousPos) && IsDangerous(ObjectManager::GetLocalPlayer()->GetAiManager()->GetPathEnd())) {
 			SetEvading(true);
-			MoveToPos(globals::localPlayer->GetAiManager()->GetPathEnd().Extend(globals::localPlayer->GetPosition(), BoundingRadius));
+			MoveToPos(ObjectManager::GetLocalPlayer()->GetAiManager()->GetPathEnd().Extend(ObjectManager::GetLocalPlayer()->GetPosition(), BoundingRadius));
 		}
 
 		StartEvading();
@@ -276,7 +278,7 @@ namespace Evade
 
 	bool Core::CheckPosCollision()
 	{
-		auto aim = globals::localPlayer->GetAiManager();
+		auto aim = ObjectManager::GetLocalPlayer()->GetAiManager();
 		bool flag = aim->GetSegmentsCount() > 0;
 		for (Spell spell : DetectedSkillshots) {
 			if (!Evading && GetMovePath().IsValid()) {
@@ -352,7 +354,7 @@ namespace Evade
 	}
 
 	void Core::StartEvading()	{
-		MyHeroPos = globals::localPlayer->GetPosition();
+		MyHeroPos = ObjectManager::GetLocalPlayer()->GetPosition();
 
 		if (PreviousPos.IsValid() && MyHeroPos.distanceTo(PreviousPos) > 200) {
 			SetEvading(false);
@@ -362,7 +364,7 @@ namespace Evade
 
 		PreviousPos = MyHeroPos;
 
-		if (!globals::localPlayer->IsAlive() || globals::localPlayer->GetAiManager()->IsDashing()) {
+		if (!ObjectManager::GetLocalPlayer()->IsAlive() || ObjectManager::GetLocalPlayer()->GetAiManager()->IsDashing()) {
 			SetEvading(false);
 			EvadeToPoint = Vector3();
 			return;
@@ -407,7 +409,7 @@ namespace Evade
 	Vector3 Core::GetExtendedSafePos(Vector3 pos)	{
 		float distance = MyHeroPos.distanceTo(pos);
 		std::list<Vector3>positions;
-		for (auto minion : *globals::minionManager) {
+		for (auto minion : *ObjectManager::GetMinionList()) {
 			if (minion == nullptr) continue;
 			if (minion->IsAlly()) continue;
 			if (!minion->IsTargetable()) continue;
@@ -478,10 +480,10 @@ namespace Evade
 	}
 
 	Vector3 Core::GetMovePath()	{
-		if (!globals::localPlayer->GetAiManager()->IsMoving())
+		if (!ObjectManager::GetLocalPlayer()->GetAiManager()->IsMoving())
 			return Vector3();
 
-		return globals::localPlayer->GetAiManager()->GetPathEnd();
+		return ObjectManager::GetLocalPlayer()->GetAiManager()->GetPathEnd();
 	}
 
 	void Core::OnSpellCast(Spell& spell)
@@ -532,7 +534,7 @@ namespace Evade
 	}
 
 	float Core::GetMovementSpeed(bool extra, EvadeSpell evadeSpell)	{
-		Object* localPlayer = globals::localPlayer;
+		Object* localPlayer = ObjectManager::GetLocalPlayer();
 		if (localPlayer == nullptr) return false;
 
 		float moveSpeed = localPlayer->GetMovementSpeed();
@@ -605,7 +607,7 @@ namespace Evade
 
 		float minDist = FLT_MAX;
 
-		for (auto hero : *globals::heroManager) {
+		for (auto hero : *ObjectManager::GetHeroList()) {
 			if (hero == nullptr) continue;
 			if (hero->IsAlly()) continue;
 			if (!hero->IsTargetable()) continue;
@@ -622,7 +624,7 @@ namespace Evade
 
 		float minDist = FLT_MAX;
 
-		for (auto minion : *globals::minionManager) {
+		for (auto minion : *ObjectManager::GetMinionList()) {
 			if (minion == nullptr) continue;
 			if (minion->IsAlly()) continue;
 			if (!minion->IsTargetable()) continue;
@@ -638,7 +640,7 @@ namespace Evade
 	float Core::GetDistanceToTurrets(Vector3 pos) {
 		float minDist = FLT_MAX;
 
-		for (Object* turret : *globals::turretManager) {
+		for (Object* turret : *ObjectManager::GetTurretsList()) {
 			if (turret == nullptr) continue;
 			if (turret->IsAlly()) continue;
 			if (!turret->IsTargetable()) continue;
@@ -651,7 +653,7 @@ namespace Evade
 	}
 
 	bool Core::isNearEnemy(Vector3 pos, float distance) {
-		Object* localPlayer = globals::localPlayer;
+		Object* localPlayer = ObjectManager::GetLocalPlayer();
 		if (localPlayer == nullptr) return false;
 
 		float curDistToEnemies = GetDistanceToChampions(localPlayer->GetPosition());
@@ -661,7 +663,7 @@ namespace Evade
 	}
 
 	bool Core::isNearMinion(Vector3 pos, float distance) {
-		Object* localPlayer = globals::localPlayer;
+		Object* localPlayer = ObjectManager::GetLocalPlayer();
 		if (localPlayer == nullptr) return false;
 
 		float curDistToEnemies = GetDistanceToMinions(localPlayer->GetPosition());
@@ -755,7 +757,7 @@ namespace Evade
 				Vector3 startPos = startPos1.Extend(placementPos, 45);
 				std::list<Vector3>minions;
 				if (spellInfo.collision) {
-					for (Object* minion : *globals::minionManager)
+					for (Object* minion : *ObjectManager::GetMinionList())
 					{
 						if (minion == nullptr) continue;
 						if (minion->IsAlly()) continue;
@@ -822,7 +824,7 @@ namespace Evade
 
 	void Core::OnProcessSpell(int state, SpellCast* spellCastInfo) {
 		if (spellCastInfo == nullptr) return;
-		if (spellCastInfo->GetCasterHandle() == globals::localPlayer->GetHandle()) return;
+		if (spellCastInfo->GetCasterHandle() == ObjectManager::GetLocalPlayer()->GetHandle()) return;
 
 		const auto caster = ObjectManager::GetClientByHandle(spellCastInfo->GetCasterHandle());
 		if (caster == nullptr) return;

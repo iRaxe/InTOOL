@@ -18,8 +18,9 @@ typedef unsigned long long QWORD;
 #define DEFINE_MEMBER_0(x)                    x;
 #define DEFINE_MEMBER_N(x,offset)            struct { MAKE_PAD((QWORD)offset - DEFINE_PADDING); x; };
 #define ReadQWORD2(type,base, addr) *reinterpret_cast<type*>((QWORD)base + (QWORD)addr)
-
 #define ReadQWORD(base, addr) *reinterpret_cast<QWORD*>((QWORD)base + (QWORD)addr)
+#define ReadQWORD2(type,base, addr) *reinterpret_cast<type*>((QWORD)base + (QWORD)addr)
+
 #define ReadFLOAT(base, addr) *reinterpret_cast<float*>((QWORD)base + addr)
 #define ReadINT(base, addr) *reinterpret_cast<int*>((QWORD)base + addr)
 #define ReadDWORD(base, addr) *reinterpret_cast<DWORD*>((QWORD)base + addr)
@@ -48,6 +49,12 @@ public:
 [[nodiscard]] inline returnType* name() const noexcept \
 { \
 	return reinterpret_cast<returnType*>((QWORD)this + offset); \
+}
+
+#define STRING_GETTER(returnType, name, offset) \
+[[nodiscard]] inline std::string name() const noexcept \
+{ \
+	return *reinterpret_cast<returnType*>((QWORD)this + offset); \
 }
 
 bool StringContains(std::string strA, std::string strB, bool ignore_case = false);

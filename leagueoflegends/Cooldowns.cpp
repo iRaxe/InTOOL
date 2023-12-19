@@ -79,8 +79,8 @@ void Awarenesss::HPBar::Draw(Object* obj) {
     const Vector2 basePos(screenPos.x + XOffset, screenPos.y - YOffset);
 
     const bool shouldDrawExperience = Configs::EnemyTracker::showExperience->Value && 
-        ((Configs::EnemyTracker::showExperienceSelf->Value && obj->GetNetId() == globals::localPlayer->GetNetId()) ||
-        (Configs::EnemyTracker::showExperienceAllies->Value && obj->IsAlly() && obj->GetNetId() != globals::localPlayer->GetNetId()) ||
+        ((Configs::EnemyTracker::showExperienceSelf->Value && obj->GetNetId() == ObjectManager::GetLocalPlayer()->GetNetId()) ||
+        (Configs::EnemyTracker::showExperienceAllies->Value && obj->IsAlly() && obj->GetNetId() != ObjectManager::GetLocalPlayer()->GetNetId()) ||
         (Configs::EnemyTracker::showExperienceEnemies->Value && obj->IsEnemy()));
 
     if (shouldDrawExperience) {
@@ -88,8 +88,8 @@ void Awarenesss::HPBar::Draw(Object* obj) {
     }
 
     const bool shouldDrawCooldowns = Configs::EnemyTracker::showCooldowns->Value &&
-        ((Configs::EnemyTracker::showCooldownsSelf->Value && obj->GetNetId() == globals::localPlayer->GetNetId()) ||
-            (Configs::EnemyTracker::showCooldownsAllies->Value && obj->IsAlly() && obj->GetNetId() != globals::localPlayer->GetNetId()) ||
+        ((Configs::EnemyTracker::showCooldownsSelf->Value && obj->GetNetId() == ObjectManager::GetLocalPlayer()->GetNetId()) ||
+            (Configs::EnemyTracker::showCooldownsAllies->Value && obj->IsAlly() && obj->GetNetId() != ObjectManager::GetLocalPlayer()->GetNetId()) ||
             (Configs::EnemyTracker::showCooldownsEnemies->Value && obj->IsEnemy()));
 
     if (shouldDrawCooldowns) {

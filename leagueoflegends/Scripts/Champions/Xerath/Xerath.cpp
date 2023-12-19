@@ -114,13 +114,13 @@ public:
 
     static float Xerath_dmgQ(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.XerathQ.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.XerathQ.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         const float skillDamage = XerathDamages::QSpell::dmgSkillQ[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalSkillDamage = XerathDamages::QSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -129,13 +129,13 @@ public:
 
     static float Xerath_dmgW(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.XerathW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.XerathW.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::W)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::W)->GetLevel();
         const float skillDamage = XerathDamages::WSpell::dmgSkillW[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalSkillDamage = XerathDamages::WSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -144,13 +144,13 @@ public:
 
     static float Xerath_dmgE(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.XerathE.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.XerathE.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::E)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::E)->GetLevel();
         const float skillDamage = XerathDamages::ESpell::dmgSkillE[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalSkillDamage = XerathDamages::ESpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -159,13 +159,13 @@ public:
 
     float Xerath_dmgR(const Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.XerathR.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.XerathR.IsCastable())
             return -9999;
 
-        const int levelSpell = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         const float skillDamage = XerathDamages::RSpell::dmgSkillR[levelSpell - 1];
 
-        const float abilityPowerDamage = globals::localPlayer->GetAbilityPower();
+        const float abilityPowerDamage = ObjectManager::GetLocalPlayer()->GetAbilityPower();
         const float additionalSkillDamage = XerathDamages::RSpell::additionalPercentageAP;
         const float totalDamage = skillDamage + (additionalSkillDamage * abilityPowerDamage);
 
@@ -174,7 +174,7 @@ public:
 
     int Xerath_GetRStacks()
     {
-	    const auto rSkill = globals::localPlayer->GetSpellBySlotId(SpellIndex::R);
+	    const auto rSkill = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R);
         if (rSkill)
         {
 	        const int Rstack[4] = { 0, 3, 4, 5 };
@@ -185,13 +185,13 @@ public:
 
     bool IsCastingQ()
     {
-        SpellCast* spellCast = globals::localPlayer->GetActiveSpellCast();
+        SpellCast* spellCast = ObjectManager::GetLocalPlayer()->GetActiveSpellCast();
         return spellCast && spellCast->GetSpellInfo()->GetSpellData()->GetName() == "XerathArcanopulseChargeUp";
     }
 
     bool IsCastingR()
     {
-        SpellCast* spellCast = globals::localPlayer->GetActiveSpellCast();
+        SpellCast* spellCast = ObjectManager::GetLocalPlayer()->GetActiveSpellCast();
         return spellCast && spellCast->GetSpellInfo()->GetSpellData()->GetName() == "XerathLocusOfPower2";
     }
 
@@ -209,10 +209,10 @@ public:
 
     void Xerath_UseQ(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || IsCastingQ())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || IsCastingQ())
         	return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= database.XerathQ.GetRange() && isTimeToCastQ())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= database.XerathQ.GetRange() && isTimeToCastQ())
         {
             Engine::CastSelf(SpellIndex::Q);
             QCastedTime = gameTime;
@@ -221,15 +221,15 @@ public:
 
     void Xerath_UseQ2(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !IsCastingQ())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !IsCastingQ())
         	return;
 
-    	if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= database.XerathQ.GetRange() && isTimeToCastQ())
+    	if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= database.XerathQ.GetRange() && isTimeToCastQ())
         {
             float rangeCharged = Xerath_QRange();
 
             float moveSpeed = (pEnemy->GetMovementSpeed() > 1) ? pEnemy->GetMovementSpeed() : 350.0f;
-            if (pEnemy->GetDistanceTo(globals::localPlayer) <= 750.0f - moveSpeed * database.XerathQ.GetCastTime() + 50.0f)
+            if (pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= 750.0f - moveSpeed * database.XerathQ.GetCastTime() + 50.0f)
             {
 	            if (pEnemy->IsHero())
 	            {
@@ -248,7 +248,7 @@ public:
 
                 if (rangeCharged > 1499) rangeCheck = rangeCharged;
 
-                if (pEnemy->GetDistanceTo(globals::localPlayer) <= rangeCheck)
+                if (pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= rangeCheck)
                 {
                     if (pEnemy->IsHero())
                     {
@@ -268,10 +268,10 @@ public:
 
     void Xerath_UseW(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.XerathW.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.XerathW.IsCastable())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= database.XerathW.GetRange() && isTimeToCastW())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= database.XerathW.GetRange() && isTimeToCastW())
         {
             if (pEnemy->IsHero())
             {
@@ -293,10 +293,10 @@ public:
 
     void Xerath_UseE(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.XerathE.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.XerathE.IsCastable())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= database.XerathE.GetRange() && isTimeToCastE())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= database.XerathE.GetRange() && isTimeToCastE())
         {
             if (pEnemy->IsHero())
             {
@@ -318,13 +318,13 @@ public:
 
     void Xerath_UseR(Object* pEnemy)
     {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !database.XerathR.IsCastable())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !database.XerathR.IsCastable())
             return;
        
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= database.XerathR.GetRange() && isTimeToCastR())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= database.XerathR.GetRange() && isTimeToCastR())
         {
             Modules::prediction::PredictionOutput rPrediction;
-            if (GetPrediction(globals::localPlayer, pEnemy,database.XerathR, rPrediction))
+            if (GetPrediction(ObjectManager::GetLocalPlayer(), pEnemy,database.XerathR, rPrediction))
             {
                 Engine::CastToPosition(SpellIndex::R, rPrediction.position);
                 RCastedTime = gameTime;
@@ -343,7 +343,7 @@ public:
             switch (XerathConfig::XerathUltimate::targetMode->Value)
             {
             case 0: //Inherit
-                if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathR.GetRange()))
+                if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathR.GetRange()))
                     Xerath_UseR(rTarget);
             	break;
             case 1: //NearMouse
@@ -362,7 +362,7 @@ public:
 	    {
             if (XerathConfig::XerathCombo::UseQ->Value == true && database.XerathQ.IsCastable())
             {
-                if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathQ.GetRange()))
+                if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathQ.GetRange()))
                 {
                     if (IsCastingQ())
                     {
@@ -379,7 +379,7 @@ public:
             {
                 if (XerathConfig::XerathCombo::UseW->Value == true && database.XerathW.IsCastable())
                 {
-                    if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange()))
+                    if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathW.GetRange()))
                     {
                         Xerath_UseW(wTarget);
                     }
@@ -387,7 +387,7 @@ public:
 
                 if (XerathConfig::XerathCombo::UseE->Value == true && database.XerathE.IsCastable())
                 {
-                    if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()))
+                    if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathE.GetRange()))
                     {
                         Xerath_UseE(eTarget);
                     }
@@ -398,7 +398,7 @@ public:
 	    {
             if (XerathConfig::XerathCombo::UseR->Value == true && database.XerathR.IsCastable())
             {
-                if (const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathR.GetRange()))
+                if (const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathR.GetRange()))
                 {
                     Xerath_UseR(rTarget);
                 }
@@ -409,8 +409,8 @@ public:
 
     void Clear() override
     {
-        const auto minion = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(),database.XerathQ.GetRange(), Alliance::Enemy);
-        if (minion && globals::localPlayer->GetPercentMana() >= XerathConfig::XerathLaneClear::minMana->Value)
+        const auto minion = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathQ.GetRange(), Alliance::Enemy);
+        if (minion && ObjectManager::GetLocalPlayer()->GetPercentMana() >= XerathConfig::XerathLaneClear::minMana->Value)
         {
             if (XerathConfig::XerathLaneClear::UseQ->Value == true && database.XerathQ.IsCastable() 
                 && ObjectManager::CountMinionsInRange(Alliance::Enemy, minion->GetPosition(), 300.0f) >= XerathConfig::XerathLaneClear::minQMinions->Value)
@@ -428,8 +428,8 @@ public:
             }
         }
 
-        const auto monster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), database.XerathQ.GetRange());
-        if (monster && globals::localPlayer->GetPercentMana() >= XerathConfig::XerathJungle::minMana->Value)
+        const auto monster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), database.XerathQ.GetRange());
+        if (monster && ObjectManager::GetLocalPlayer()->GetPercentMana() >= XerathConfig::XerathJungle::minMana->Value)
         {
             if (XerathConfig::XerathJungle::UseQ->Value == true && database.XerathQ.IsCastable())
             {
@@ -453,12 +453,12 @@ public:
 
     void Harass() override
     {
-        if (globals::localPlayer->GetPercentMana() < XerathConfig::XerathHarass::minMana->Value)
+        if (ObjectManager::GetLocalPlayer()->GetPercentMana() < XerathConfig::XerathHarass::minMana->Value)
             return;
 
         if (XerathConfig::XerathHarass::UseQ->Value == true && database.XerathQ.IsCastable())
         {
-            if (const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathQ.GetRange()))
+            if (const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathQ.GetRange()))
             {
                 if (!IsCastingQ())
                     Xerath_UseQ(qTarget);
@@ -469,7 +469,7 @@ public:
 
         if (XerathConfig::XerathHarass::UseW->Value == true && database.XerathW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange()))
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathW.GetRange()))
             {
                 Xerath_UseW(wTarget);
             }
@@ -477,7 +477,7 @@ public:
 
         if (XerathConfig::XerathHarass::UseE->Value == true && database.XerathE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathE.GetRange()))
             {
                 Xerath_UseE(eTarget);
             }
@@ -486,18 +486,18 @@ public:
 
     void Lasthit() override
     {
-        if (globals::localPlayer->GetPercentMana() < XerathConfig::XerathLastHit::minMana->Value)
+        if (ObjectManager::GetLocalPlayer()->GetPercentMana() < XerathConfig::XerathLastHit::minMana->Value)
             return;
 
         if (XerathConfig::XerathLastHit::UseW->Value == true && database.XerathW.IsCastable())
         {
-            if (const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange()); Xerath_dmgW(wTarget) > wTarget->GetHealth())
+            if (const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathW.GetRange()); Xerath_dmgW(wTarget) > wTarget->GetHealth())
                 Xerath_UseW(wTarget);
         }
 
         if (XerathConfig::XerathLastHit::UseE->Value == true && database.XerathE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()); Xerath_dmgE(eTarget) > eTarget->GetHealth())
+            if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathE.GetRange()); Xerath_dmgE(eTarget) > eTarget->GetHealth())
                 Xerath_UseE(eTarget);
         }
     }
@@ -506,7 +506,7 @@ public:
     {
         if (XerathConfig::XerathFlee::UseE->Value == true && database.XerathE.IsCastable())
         {
-            if (const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange()))
+            if (const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathE.GetRange()))
             {
                 Xerath_UseE(eTarget);
             }
@@ -519,7 +519,7 @@ public:
 	    {
             if (XerathConfig::XerathKillsteal::UseQ->Value == true && database.XerathQ.IsCastable())
             {
-                const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathQ.GetRange());
+                const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathQ.GetRange());
                 if (qTarget && qTarget->GetHealth() < Xerath_dmgQ(qTarget))
                 {
                     if (!IsCastingQ())
@@ -535,7 +535,7 @@ public:
 
             if (XerathConfig::XerathKillsteal::UseE->Value == true && database.XerathE.IsCastable())
             {
-                const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathE.GetRange());
+                const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathE.GetRange());
                 if (eTarget && eTarget->GetHealth() < Xerath_dmgE(eTarget))
                 {
                     Xerath_UseE(eTarget);
@@ -544,7 +544,7 @@ public:
 
             if (XerathConfig::XerathKillsteal::UseW->Value == true && database.XerathW.IsCastable())
             {
-                const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(),database.XerathW.GetRange());
+                const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(),database.XerathW.GetRange());
                 if (wTarget && wTarget->GetHealth() < Xerath_dmgW(wTarget))
                 {
                     Xerath_UseW(wTarget);
@@ -560,7 +560,7 @@ public:
             for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
             {
                 if (!target) continue;
-                if (target->GetPosition().distanceTo(globals::localPlayer->GetPosition()) > database.XerathE.GetRange()) continue;
+                if (target->GetPosition().distanceTo(ObjectManager::GetLocalPlayer()->GetPosition()) > database.XerathE.GetRange()) continue;
          
                 if (!target->GetAiManager()->IsDashing()) continue;
                 if (target->GetBuffByName("rocketgrab2")) continue;
@@ -568,7 +568,7 @@ public:
                 if (target)
                 {
                     const Vector3 pathEnd = target->GetAiManager()->GetPathEnd();
-                    if (pathEnd.IsValid() && globals::localPlayer->GetPosition().distanceTo(pathEnd) < database.XerathE.GetRange())
+                    if (pathEnd.IsValid() && ObjectManager::GetLocalPlayer()->GetPosition().distanceTo(pathEnd) < database.XerathE.GetRange())
                         Xerath_UseE(target);
                 }
             }
@@ -595,11 +595,11 @@ public:
     void Render() override
     {
         if (XerathConfig::XerathDrawings::DrawQ->Value == true && (XerathConfig::XerathDrawings::DrawIfReady->Value == true && database.XerathQ.IsCastable() || XerathConfig::XerathDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), max(database.XerathQ.GetRange(),Xerath_QRange()), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), max(database.XerathQ.GetRange(),Xerath_QRange()), COLOR_WHITE, 1.0f);
         if (XerathConfig::XerathDrawings::DrawE->Value == true && (XerathConfig::XerathDrawings::DrawIfReady->Value == true && database.XerathE.IsCastable() || XerathConfig::XerathDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.XerathE.GetRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), database.XerathE.GetRange(), COLOR_WHITE, 1.0f);
         if (XerathConfig::XerathDrawings::DrawR->Value == true && (XerathConfig::XerathDrawings::DrawIfReady->Value == true && database.XerathR.IsCastable() || XerathConfig::XerathDrawings::DrawIfReady->Value == false))
-            Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), database.XerathR.GetRange(), COLOR_WHITE, 1.0f);
+            Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), database.XerathR.GetRange(), COLOR_WHITE, 1.0f);
         if (IsCastingR() && XerathConfig::XerathUltimate::targetMode->Value == 1)
             Awareness::Functions::Radius::DrawRadius(Engine::GetMouseWorldPos(), 300.0f, COLOR_WHITE, 1.0f);
 

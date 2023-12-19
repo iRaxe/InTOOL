@@ -44,17 +44,17 @@ namespace Modules
 
 		void Init()
 		{
-			if (globals::localPlayer->GetName() == "Brand") {
+			if (ObjectManager::GetLocalPlayer()->GetName() == "Brand") {
 				UPasta::Plugins::Brand::Events::Initialize();
 			}
-			else if (globals::localPlayer->GetName() == "Tristana") {
+			else if (ObjectManager::GetLocalPlayer()->GetName() == "Tristana") {
 				UPasta::Plugins::Tristana::Events::Initialize();
 			}
-			else if (globals::localPlayer->GetName() == "Yone") {
+			else if (ObjectManager::GetLocalPlayer()->GetName() == "Yone") {
 				UPasta::Plugins::Yone::Events::Initialize();
 			}
 			else {
-				activeChampModule = ChampionModuleManager::GetModule(globals::localPlayer->GetName());
+				activeChampModule = ChampionModuleManager::GetModule(ObjectManager::GetLocalPlayer()->GetName());
 				if (!activeChampModule) return;
 
 				activeChampModule->Initialize();

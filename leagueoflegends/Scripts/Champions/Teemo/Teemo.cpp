@@ -19,19 +19,19 @@ private:
 
 
     [[nodiscard]] bool isTimeToCastQ() const {
-        return gameTime > QCastedTime + 0.25f && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+        return gameTime > QCastedTime + 0.25f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastW() const {
-        return gameTime > WCastedTime + 0.00f && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+        return gameTime > WCastedTime + 0.00f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastE() const {
-        return gameTime > ECastedTime + 0.00f && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+        return gameTime > ECastedTime + 0.00f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
     }
 
     [[nodiscard]] bool isTimeToCastR() const {
-        return gameTime > RCastedTime + 0.25f && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+        return gameTime > RCastedTime + 0.25f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
     }
 
     static bool HasEnoughMana(OrbwalkState mode) {
@@ -39,7 +39,7 @@ private:
 
         switch (mode) {
         case OrbwalkState::Clear:
-            if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), qRange()) > 0)
+            if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), qRange()) > 0)
                 minManaThreshold = static_cast<float>(TeemoConfig::TeemoJungle::minMana->Value);
             break;
         case OrbwalkState::Harass:
@@ -49,11 +49,11 @@ private:
             return false;
         }
 
-        return globals::localPlayer->GetPercentMana() > minManaThreshold;
+        return ObjectManager::GetLocalPlayer()->GetPercentMana() > minManaThreshold;
     }
 
     static float qRange() {
-        return globals::localPlayer->GetRealAttackRange();
+        return ObjectManager::GetLocalPlayer()->GetRealAttackRange();
     }
 
     static float wRange() {
@@ -65,32 +65,32 @@ private:
     }
 
     static float TeemoQDamage(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::Q))
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q))
             return -9999;
 
-        const int level = globals::localPlayer->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
+        const int level = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetLevel();
         if (level == 0)
             return 0.0f;
 
         const float dmgSkill = TeemoDamages::QSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * TeemoDamages::QSpell::additionalPercentageAP;
+        const float abilityPowerModifier = ObjectManager::GetLocalPlayer()->GetAbilityPower() * TeemoDamages::QSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
-        return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), target, damage);
     }
 
     static float TeemoRDamage(Object* target) {
-        if (globals::localPlayer == nullptr || target == nullptr || !globals::localPlayer->CanCastSpell(SpellIndex::R))
+        if (ObjectManager::GetLocalPlayer() == nullptr || target == nullptr || !ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R))
             return -9999;
-        const int level = globals::localPlayer->GetSpellBySlotId(SpellIndex::R)->GetLevel();
+        const int level = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::R)->GetLevel();
         if (level == 0)
             return 0.0f;
 
         const float dmgSkill = TeemoDamages::RSpell::dmgSkillArray[level];
-        const float abilityPowerModifier = globals::localPlayer->GetAbilityPower() * TeemoDamages::RSpell::additionalPercentageAP;
+        const float abilityPowerModifier = ObjectManager::GetLocalPlayer()->GetAbilityPower() * TeemoDamages::RSpell::additionalPercentageAP;
         const float damage = dmgSkill + abilityPowerModifier;
 
-        return Damage::CalculateMagicalDamage(globals::localPlayer, target, damage);
+        return Damage::CalculateMagicalDamage(ObjectManager::GetLocalPlayer(), target, damage);
     }
 
 
@@ -147,7 +147,7 @@ public:
         TeemoConfig::TeemoSpellsSettings::qDraw = qSpellMenu->AddCheckBox("Q Draw", "Draw Q", true);
 
         const auto wSpellMenu = spellsMenu->AddMenu("SpellSlot W Settings", "SpellSlot W Settings");
-        TeemoConfig::TeemoSpellsSettings::wRange = wSpellMenu->AddSlider("WRange", "Maximum Range", globals::localPlayer->GetRealAttackRange(), 0, 1000, 50);
+        TeemoConfig::TeemoSpellsSettings::wRange = wSpellMenu->AddSlider("WRange", "Maximum Range", ObjectManager::GetLocalPlayer()->GetRealAttackRange(), 0, 1000, 50);
 
         const auto rSpellMenu = spellsMenu->AddMenu("SpellSlot R Settings", "SpellSlot R Settings");
         TeemoConfig::TeemoSpellsSettings::rRange = rSpellMenu->AddSlider("RRange", "Maximum Range", 900, 600, 900, 150);
@@ -158,10 +158,10 @@ public:
 
 
     void CastQSpell(Object* pEnemy) {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastQ())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastQ())
             return;
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) < qRange())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) < qRange())
         {
             Engine::CastTargeted(SpellIndex::Q, pEnemy);
             QCastedTime = gameTime;
@@ -169,7 +169,7 @@ public:
     }
 
     void CastWSpell() {
-        if (globals::localPlayer == nullptr || !isTimeToCastW())
+        if (ObjectManager::GetLocalPlayer() == nullptr || !isTimeToCastW())
             return;
 
         Engine::CastSelf(SpellIndex::W);
@@ -177,11 +177,11 @@ public:
     }
 
     void CastRSpell(Object* pEnemy) {
-        if (globals::localPlayer == nullptr || pEnemy == nullptr || !isTimeToCastR())
+        if (ObjectManager::GetLocalPlayer() == nullptr || pEnemy == nullptr || !isTimeToCastR())
             return;
 
 
-        if (pEnemy && pEnemy->GetDistanceTo(globals::localPlayer) <= rRange() && isTimeToCastR())
+        if (pEnemy && pEnemy->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= rRange() && isTimeToCastR())
         {
             if (pEnemy->IsHero())
             {
@@ -208,21 +208,21 @@ public:
 
     void Combo() override {
         if (TeemoConfig::TeemoCombo::UseQ->Value && isTimeToCastQ()) {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr) {
                 CastQSpell(qTarget);
             }
         }
 
         if (TeemoConfig::TeemoCombo::UseW->Value && isTimeToCastW()) {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
                 CastWSpell();
             }
         }
 
         if (TeemoConfig::TeemoCombo::UseR->Value && isTimeToCastR()) {
-            const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
+            const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
             if (rTarget != nullptr) {
                 CastRSpell(rTarget);
             }
@@ -236,14 +236,14 @@ public:
     {
         if (!HasEnoughMana(OrbwalkState::Harass)) return;
         if (TeemoConfig::TeemoHarass::UseQ->Value && isTimeToCastQ()) {
-            const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+            const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
             if (qTarget != nullptr) {
                 CastQSpell(qTarget);
             }
         }
 
         if (TeemoConfig::TeemoHarass::UseR->Value && isTimeToCastR()) {
-            const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
+            const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
             if (rTarget != nullptr) {
                 CastRSpell(rTarget);
             }
@@ -254,10 +254,10 @@ public:
     void Clear() override {
         if (!HasEnoughMana(OrbwalkState::Clear)) return;
 
-        if (ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), wRange()) > 0)
+        if (ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), wRange()) > 0)
         {
             if (TeemoConfig::TeemoJungle::UseQ->Value && isTimeToCastQ()) {
-                const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), qRange());
+                const auto qMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
                 if (qMonster != nullptr) {
                     CastQSpell(qMonster);
                     return;
@@ -265,7 +265,7 @@ public:
             }
 
             if (TeemoConfig::TeemoJungle::UseR->Value && isTimeToCastR()) {
-                const auto rMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), rRange());
+                const auto rMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
                 if (rMonster != nullptr) {
                     CastRSpell(rMonster);
                     return;
@@ -280,7 +280,7 @@ public:
 
     void Flee() override {
         if (TeemoConfig::TeemoFlee::UseW->Value && isTimeToCastW()) {
-            const auto wTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), wRange());
+            const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), wRange());
             if (wTarget != nullptr) {
                 CastWSpell();
             }
@@ -290,7 +290,7 @@ public:
     void Killsteal() {
         __try {
             if (TeemoConfig::TeemoKillsteal::UseQ->Value && isTimeToCastQ()) {
-                const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), qRange());
+                const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), qRange());
                 if (qTarget != nullptr) {
                     if (qTarget->GetHealth() < TeemoQDamage(qTarget)) {
                         CastQSpell(qTarget);
@@ -299,7 +299,7 @@ public:
             }
 
             if (TeemoConfig::TeemoKillsteal::UseR->Value && isTimeToCastR()) {
-                const auto rTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), rRange());
+                const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), rRange());
                 if (rTarget != nullptr) {
                     if (rTarget->GetHealth() < TeemoRDamage(rTarget)) {
                         CastRSpell(rTarget);
@@ -332,9 +332,9 @@ public:
     void Render() override {
         __try {
             if (TeemoConfig::TeemoSpellsSettings::qDraw->Value && (TeemoConfig::TeemoSpellsSettings::DrawIfReady->Value == true && isTimeToCastQ() || TeemoConfig::TeemoSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), qRange(), COLOR_WHITE, 1.0f);
             if (TeemoConfig::TeemoSpellsSettings::rDraw->Value && (TeemoConfig::TeemoSpellsSettings::DrawIfReady->Value == true && isTimeToCastR() || TeemoConfig::TeemoSpellsSettings::DrawIfReady->Value == false))
-                Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
+                Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), rRange(), COLOR_WHITE, 1.0f);
         }
         __except (1)
         {

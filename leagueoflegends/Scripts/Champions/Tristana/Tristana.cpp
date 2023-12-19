@@ -15,22 +15,22 @@ float gameTime = 0.0f;
 
 float QCastedTime = 0.0f;
 [[nodiscard]] bool isTimeToCastQ() {
-	return gameTime > QCastedTime && globals::localPlayer->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
+	return gameTime > QCastedTime && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::Q) && Engine::GetSpellState(Q) == 0;
 }
 
 float WCastedTime = 0.0f;
 [[nodiscard]] bool isTimeToCastW() {
-	return gameTime > WCastedTime + database.TristanaW.GetCastTime() && globals::localPlayer->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
+	return gameTime > WCastedTime + database.TristanaW.GetCastTime() && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::W) && Engine::GetSpellState(W) == 0;
 }
 
 float ECastedTime = 0.0f;
 [[nodiscard]] bool isTimeToCastE() {
-	return gameTime > ECastedTime + 0.22f && globals::localPlayer->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
+	return gameTime > ECastedTime + 0.22f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::E) && Engine::GetSpellState(E) == 0;
 }
 
 float RCastedTime = 0.0f;
 [[nodiscard]] bool isTimeToCastR() {
-	return gameTime > RCastedTime + 0.25f && globals::localPlayer->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
+	return gameTime > RCastedTime + 0.25f && ObjectManager::GetLocalPlayer()->CanCastSpell(SpellIndex::R) && Engine::GetSpellState(R) == 0;
 }
 
 Object* Functions::GetETarget(float range)
@@ -116,8 +116,8 @@ void Functions::InitializeMenu()
 	const auto antiMeleeMenu = additionalMenu->AddMenu("AntiMelee Settings", "AntiMelee Settings");
 	TristanaAntiMelee::UseW = antiMeleeMenu->AddCheckBox("Use W", "Use SpellSlot W", false);
 
-	for (int i = 0; i < globals::heroManager->GetListSize(); i++) {
-		auto obj = globals::heroManager->GetIndex(i);
+	for (int i = 0; i < ObjectManager::GetHeroList()->GetListSize(); i++) {
+		auto obj = ObjectManager::GetHeroList()->GetIndex(i);
 		if (obj != nullptr && obj->IsEnemy()) {
 			const auto antiGap_checkbox = antiGapMenu->AddCheckBox(obj->GetName().c_str(), obj->GetName().c_str(), true,
 				[obj](const CheckBox* self, bool newValue) {
@@ -193,32 +193,32 @@ void Events::Unsubscribe() {
 }
 
 void Functions::UseQ(Object* obj) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
-	if (!globals::localPlayer->IsTargetable()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
 
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastQ()) return;
 
-	if (obj->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetQRange()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > TristanaSpellsSettings::GetQRange()) return;
 
 	Engine::CastSelf(SpellIndex::Q);
 	QCastedTime = gameTime;
 }
 
 void Functions::UseW(Object* obj) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
-	if (!globals::localPlayer->IsTargetable()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
 
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastW()) return;
 
-	if (obj->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetWRange()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > TristanaSpellsSettings::GetWRange()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
 		Engine::CastToPosition(SpellIndex::W, obj->GetPosition());
@@ -234,49 +234,49 @@ void Functions::UseW(Object* obj) {
 }
 
 void Functions::UseE(Object* obj) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
-	if (!globals::localPlayer->IsTargetable()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
 
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastE()) return;
 
-	if (obj->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetERange()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > TristanaSpellsSettings::GetERange()) return;
 
 	Engine::CastTargeted(SpellIndex::E, obj);
 	ECastedTime = gameTime;
 }
 
 void Functions::UseR(Object* obj) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
-	if (!globals::localPlayer->IsTargetable()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
 
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastR()) return;
 
-	if (obj->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetRRange()) return;
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > TristanaSpellsSettings::GetRRange()) return;
 
 	Engine::CastTargeted(SpellIndex::R, obj);
 	RCastedTime = gameTime;
 }
 
 void Functions::DrawSpellRadius(float range) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
-	if (!globals::localPlayer->IsTargetable()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
 
-	Awareness::Functions::Radius::DrawRadius(globals::localPlayer->GetPosition(), range, COLOR_WHITE, 1.0f);
+	Awareness::Functions::Radius::DrawRadius(ObjectManager::GetLocalPlayer()->GetPosition(), range, COLOR_WHITE, 1.0f);
 	return;
 }
 
 void Functions::DrawDamageOnHPBar(Object* obj) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
@@ -307,8 +307,8 @@ void Functions::DrawDamageOnHPBar(Object* obj) {
 }
 
 void Functions::DrawDamageOnPos(Object* obj) {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
 	if (obj == nullptr) return;
 	if (!obj->IsAlive()) return;
 	if (!obj->IsTargetable()) return;
@@ -346,7 +346,7 @@ void Events::OnDraw() {
 
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 		if (!hero) continue;
-		if (hero->GetDistanceTo(globals::localPlayer) > 1500.0f) continue;
+		if (hero->GetDistanceTo(ObjectManager::GetLocalPlayer()) > 1500.0f) continue;
 
 		if (TristanaSpellsSettings::DrawPosDamage->Value == true) {
 			Functions::DrawDamageOnPos(hero);
@@ -359,8 +359,8 @@ void Events::OnDraw() {
 }
 
 void Events::OnGameUpdate() {
-	if (globals::localPlayer == nullptr) return;
-	if (!globals::localPlayer->IsAlive()) return;
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
 
 	gameTime = Engine::GetGameTime();
 
@@ -406,7 +406,7 @@ void Modes::Combo() {
 	if (!Orbwalker::CanCastAfterAttack()) return;
 
 	if (TristanaCombo::UseE->Value == true && isTimeToCastE()) {
-		const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetERange());
+		const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetERange());
 		if (eTarget != nullptr) {
 			Functions::UseE(eTarget);
 		}
@@ -416,19 +416,19 @@ void Modes::Combo() {
 void Modes::Clear() {
 	if (!Orbwalker::CanCastAfterAttack()) return;
 
-	const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetWRange());
+	const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetWRange());
 	if (minionsInRange > 0) {
-		if (TristanaClear::GetMinimumMana() >= globals::localPlayer->GetPercentMana()) return;
+		if (TristanaClear::GetMinimumMana() >= ObjectManager::GetLocalPlayer()->GetPercentMana()) return;
 
 		if (TristanaClear::UseQ->Value && isTimeToCastQ()) {
-			const auto qTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange(), Alliance::Enemy);
+			const auto qTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange(), Alliance::Enemy);
 			if (qTarget != nullptr) {
 				Functions::UseQ(qTarget);
 			}
 		}
 
 		if (TristanaClear::UseE->Value && isTimeToCastE()) {
-			const auto eTarget = TargetSelector::FindBestMinion(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetERange(), Alliance::Enemy);
+			const auto eTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetERange(), Alliance::Enemy);
 			if (eTarget != nullptr) {
 				const auto minionsAroundWTarget = ObjectManager::CountMinionsInRange(Alliance::Enemy, eTarget->GetPosition(), 600.0f);
 				if (minionsAroundWTarget >= TristanaClear::GetMinimumMinions()) {
@@ -438,26 +438,26 @@ void Modes::Clear() {
 		}
 	}
 	else {
-		const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetWRange());
+		const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetWRange());
 		if (jungleMonstersInRange > 0) {
-			if (TristanaJungle::GetMinimumMana() >= globals::localPlayer->GetPercentMana()) return;
+			if (TristanaJungle::GetMinimumMana() >= ObjectManager::GetLocalPlayer()->GetPercentMana()) return;
 
 			if (TristanaJungle::UseE->Value && isTimeToCastE()) {
-				const auto eMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetERange());
+				const auto eMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetERange());
 				if (eMonster != nullptr) {
 					Functions::UseE(eMonster);
 				}
 			}
 
 			if (TristanaJungle::UseQ->Value && isTimeToCastQ()) {
-				const auto qMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange());
+				const auto qMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange());
 				if (qMonster != nullptr) {
 					Functions::UseQ(qMonster);
 				}
 			}
 
 			if (TristanaJungle::UseW->Value && isTimeToCastW()) {
-				const auto wMonster = TargetSelector::FindBestJungle(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetWRange());
+				const auto wMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetWRange());
 				if (wMonster != nullptr) {
 					if (Functions::GetBombStacks(wMonster) >= 3) {
 						Functions::UseW(wMonster);
@@ -470,17 +470,17 @@ void Modes::Clear() {
 
 void Modes::Harass() {
 	if (!Orbwalker::CanCastAfterAttack()) return;
-	if (TristanaHarass::GetMinimumMana() >= globals::localPlayer->GetPercentMana()) return;
+	if (TristanaHarass::GetMinimumMana() >= ObjectManager::GetLocalPlayer()->GetPercentMana()) return;
 
 	if (TristanaHarass::UseE->Value && isTimeToCastE()) {
-		const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetERange());
+		const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetERange());
 		if (eTarget != nullptr) {
 			Functions::UseE(eTarget);
 		}
 	}
 
 	if (TristanaHarass::UseQ->Value && isTimeToCastQ()) {
-		const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange());
+		const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange());
 		if (qTarget != nullptr) {
 			Functions::UseQ(qTarget);
 		}
@@ -492,7 +492,7 @@ void Modes::Killsteal() {
 
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 		if (!hero) continue;
-		if (hero->GetPosition().Distance(globals::localPlayer->GetPosition()) > TristanaSpellsSettings::GetWRange() + hero->GetBoundingRadius() / 2) continue;
+		if (hero->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition()) > TristanaSpellsSettings::GetWRange() + hero->GetBoundingRadius() / 2) continue;
 		if (hero->IsInvulnerable()) continue;
 
 		const float heroHealth = hero->GetHealth() + hero->GetShield();
@@ -508,7 +508,7 @@ void Modes::AntiGapCloser()
 	for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
 	{
 		if (!target) continue;
-		if (target->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetWRange()) continue;
+		if (target->GetDistanceTo(ObjectManager::GetLocalPlayer()) > TristanaSpellsSettings::GetWRange()) continue;
 		if (!Engine::MenuItemContains(TristanaAntiGapCloser::whitelist, target->GetName().c_str())) continue;
 		if (!target->GetAiManager()->IsDashing()) continue;
 		if (target->GetBuffByName("rocketgrab2")) continue;
@@ -530,7 +530,7 @@ void Modes::AntiMelee()
 		for (auto target : ObjectManager::GetHeroesAs(Alliance::Enemy))
 		{
 			if (!target) continue;
-			if (target->GetDistanceTo(globals::localPlayer) > TristanaSpellsSettings::GetWRange()) continue;
+			if (target->GetDistanceTo(ObjectManager::GetLocalPlayer()) > TristanaSpellsSettings::GetWRange()) continue;
 			if (!Engine::MenuItemContains(TristanaAntiMelee::whitelist, target->GetName().c_str())) continue;
 
 			if (target != nullptr) {
@@ -543,7 +543,7 @@ void Modes::AntiMelee()
 void Events::OnBeforeAttack() {
 	if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Attack) 	{
 		if (TristanaCombo::UseQ->Value && isTimeToCastQ()) {
-			const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange());
+			const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange());
 			if (qTarget != nullptr) {
 				Functions::UseQ(qTarget);
 			}
@@ -551,20 +551,20 @@ void Events::OnBeforeAttack() {
 	}
 
 	if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Clear) {
-		const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange());
+		const auto minionsInRange = ObjectManager::CountMinionsInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange());
 		if (minionsInRange > 0) {
 			if (TristanaClear::UseQ->Value && isTimeToCastQ()) {
-				const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange());
+				const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange());
 				if (qTarget != nullptr) {
 					Functions::UseQ(qTarget);
 				}
 			}
 		}
 		else {
-			const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange());
+			const auto jungleMonstersInRange = ObjectManager::CountJungleMonstersInRange(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange());
 			if (jungleMonstersInRange > 0) {
 				if (TristanaJungle::UseQ->Value && isTimeToCastQ()) {
-					const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange());
+					const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange());
 					if (qTarget != nullptr) {
 						Functions::UseQ(qTarget);
 					}
@@ -575,7 +575,7 @@ void Events::OnBeforeAttack() {
 
 	if (globals::scripts::orbwalker::orbwalkState == OrbwalkState::Harass) {
 		if (TristanaHarass::UseQ->Value && isTimeToCastQ()) {
-			const auto qTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetQRange());
+			const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetQRange());
 			if (qTarget != nullptr) {
 				Functions::UseQ(qTarget);
 			}
@@ -587,12 +587,12 @@ void Events::OnCastSpell(SpellCast* spellCastInfo) {
 	if (TristanaCombo::UseE->Value == false) return;
 	if (Engine::GetSpellState(SpellIndex::E) != 0) return;
 	if (spellCastInfo == nullptr) return;
-	if (spellCastInfo->GetCasterHandle() != globals::localPlayer->GetHandle()) return;
+	if (spellCastInfo->GetCasterHandle() != ObjectManager::GetLocalPlayer()->GetHandle()) return;
 	if (spellCastInfo->GetSpellId() != SpellIndex::W) return;
 
-	const auto eTarget = TargetSelector::FindBestTarget(globals::localPlayer->GetPosition(), TristanaSpellsSettings::GetERange());
+	const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), TristanaSpellsSettings::GetERange());
 	if (eTarget != nullptr) {
-		if (eTarget->GetDistanceTo(globals::localPlayer) <= TristanaSpellsSettings::GetERange()) {
+		if (eTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= TristanaSpellsSettings::GetERange()) {
 			Engine::CastTargeted(SpellIndex::E, eTarget);
 			ECastedTime = gameTime;
 		}
