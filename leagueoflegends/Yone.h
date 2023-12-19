@@ -150,24 +150,10 @@ namespace UPasta {
                 void Unsubscribe();
                 void OnGameUpdate();
                 void OnWndProc(UINT msg, WPARAM param);
-                void OnBeforeAttack();
+                void OnAfterAttack();
 
                 void OnDraw();
-                void OnCreateMissile(Object* unit);
-                void OnDeleteMissile(Object* unit);
-                void OnCreateObject(Object* unit);
-                void OnDeleteObject(Object* unit);
-                void OnIssueOrder(Object* unit, OrbwalkState order, Vector3* position, Object* target);
-                void OnCastSpell(void* spellbook, SpellInfo* pSpellInfo, SpellIndex slot, Vector3* _end_position, Vector3* _start_position, DWORD netId);
-                void OnSpellCast(SpellIndex slot);
-                void OnDoCast(SpellInfo* castInfo, SpellData* spellData);
-                void OnCreateSpell(SpellCast* spellCastInfo);
-                void OnDoCastDelayed(SpellInfo* castInfo, SpellData* spellData);
-                void OnProcessSpell(uintptr_t* castInfo, SpellCast* spellData);
-                void OnPlayAnimation(Object* ptr, char* name, float animationTime);
-                void OnFinishCast(SpellInfo* castInfo, Object* object);
-                void OnGapCloserSpell(SpellInfo* castInfo, SpellData* spellData);
-                void OnInterruptibleSpell(SpellInfo* castInfo, SpellData* spellData);
+
                 static void MyTThing(int state, SpellCast* spellCastInfo);
             }
 
@@ -195,7 +181,7 @@ namespace UPasta {
                 bool EKills(Object* target);
 
                 Object* GetRTarget(float range); // Code from gay boy
-               
+                float CountEnemiesInLine();
 
         
 
@@ -264,7 +250,6 @@ namespace UPasta {
                     }
                 }
                 
-
                 namespace RSpell {
                     inline float dmgSkillArray[4] = { 0, 200, 400, 600 };
                     inline float additionalPercentageAD = .8f;
@@ -272,7 +257,15 @@ namespace UPasta {
                     static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotPhysicalDamage<float*, float>(SpellIndex::R, obj, dmgSkillArray, additionalPercentageAD); }
                 }
 
-               
+                static float GetComboDamage(Object* obj)
+                {
+                    const float qDamage = QSpell::GetDamage(obj);
+                    const float wDamage = WSpell::GetDamage(obj);
+                    const float rDamage = RSpell::GetDamage(obj);
+                    const float eDamage = ESpell::GetDamage(obj, wDamage + qDamage + rDamage);
+
+	                return qDamage + wDamage + eDamage + rDamage;
+                }
             }
         }
     }

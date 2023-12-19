@@ -57,6 +57,13 @@ public:
 	return *reinterpret_cast<returnType*>((QWORD)this + offset); \
 }
 
+#define STRING_GETTER_P(name, offset) \
+[[nodiscard]] inline std::string name() const noexcept \
+{ \
+	return *reinterpret_cast<char**>((QWORD)this + offset); \
+}
+
+
 bool StringContains(std::string strA, std::string strB, bool ignore_case = false);
 bool StringContains(std::wstring strA, std::wstring strB, bool ignore_case = false);
 bool StringCompare(std::string strA, std::string strB, bool ignore_case = false);

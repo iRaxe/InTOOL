@@ -30,10 +30,38 @@ std::string_view Spell::GetTextureName()
 	return targetPath;
 }
 
+std::string InventorySlot::GetTexturePath()
+{
+	const auto item_texture_path = reinterpret_cast<uintptr_t>(this) + UPasta::Offsets::ItemManager::ItemTexturePath;
+	const auto pointer = *reinterpret_cast<char**>(item_texture_path);
+	if (IsValidPtr(pointer))
+		return pointer;
+
+	LOG("GetTexturePath Doesnt work");
+	return "";
+}
+
+std::string InventorySlot::GetName()
+{
+	const auto item_name = *(char**)(*(QWORD*)this + UPasta::Offsets::ItemManager::ItemName);
+	if (IsValidPtr(item_name))
+	{
+		return item_name;
+	}
+
+	LOG("GetName Doesnt work");
+	return "";
+}
+
 ItemsDatabase InventorySlot::GetId()
 {
 	const auto item_id = *(ItemsDatabase*)(*(QWORD*)this + UPasta::Offsets::ItemManager::ItemId);
 	return item_id;
+}
+
+std::string SpellData::GetName()
+{
+	return *(char**)((QWORD)this + UPasta::Offsets::SpellBook::SpellSlot::Name);
 }
 
 std::string SpellData::GetTexturePath()
@@ -247,6 +275,10 @@ float Spell::GetManaCost()
 	return this->GetSpellInfo()->GetSpellData()->GetManaCostByLevel(this->GetLevel());
 }
 
+std::string SpellCast::GetCasterName()
+{
+	return ReadQWORD2(LolString, this, UPasta::Offsets::SpellCast::CasterName);
+}
 
 Vector3 SpellCast::GetStartPosition()
 {
@@ -343,6 +375,28 @@ AiManager* Object::GetAiManager()
 	return (AiManager*)(*(QWORD*)(Decrypt(aiManagerObf) + 0x10));
 }
 
+std::string Object::GetName()
+{
+	char* name = *reinterpret_cast<char**>(reinterpret_cast<QWORD>(this) + UPasta::Offsets::Client::AiName);
+	if (!IsValidPtr(name))
+	{
+		LOG("Error in getting Object Name");
+		return "";
+	}
+	return name;
+}
+
+std::string Object::GetClassicName()
+{
+	char* name = *reinterpret_cast<char**>(reinterpret_cast<QWORD>(this) + UPasta::Offsets::Client::Name);
+	if (!IsValidPtr(name))
+	{
+		LOG("Error in getting Object Name");
+		return "";
+	}
+	return name;
+}
+
 Spell* Object::GetSpellBySlotId(int slotId)
 {
 	return *(Spell**)((QWORD)this + UPasta::Offsets::Client::SpellBookInstance +
@@ -362,6 +416,19 @@ std::string MissileData::GetMissileName()
 bool MissileData::IsAutoAttack()
 {
 	return this->GetMissileName().contains("Attack") || this->GetSpellName().contains("Attack");
+}
+
+std::string MissileData::GetSpellName()
+{
+	const auto missileDataPtr = *reinterpret_cast<MissileData**>(reinterpret_cast<QWORD>(this) +
+		UPasta::Offsets::MissileManager::SpellName);
+	if (IsValidPtr(missileDataPtr))
+	{
+		const char* textToReturnPtr = reinterpret_cast<char*>(missileDataPtr);
+		return textToReturnPtr;
+	}
+
+	return "";
 }
 
 Vector3 Missile::GetSpellStartPos()
@@ -429,7 +496,7 @@ bool Object::CanCastSpell(SpellIndex slotId)
 	Spell* spellSlot = this->GetSpellBySlotId(slotId);
 	if (spellSlot == nullptr) return false;
 
-	return spellSlot->IsReady() && spellSlot->GetManaCost() <= this->GetMana();
+	return spellSlot->IsReady();
 }
 
 bool Object::IsFacing(Object* secondObj, float angle)

@@ -72,6 +72,42 @@ Object* TargetSelector::FindBestTarget(Vector3 from, float range) {
 	return _last_target;
 }
 
+Object* TargetSelector::FindFarestBestTarget(Vector3 from, float range) {
+
+	if (IsValid(_override_target, from, range)) return _override_target;
+
+	std::vector<Object*> possible_targets;
+	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
+
+		if (!hero) continue;
+
+		if (!hero->IsEnemy()) continue;
+		if (hero->IsAlive() and hero->IsVisible() and hero->IsTargetable() and !hero->IsInvulnerable() and hero->GetPosition().Distance(from) <= range + hero->GetBoundingRadius() / 2)
+			possible_targets.push_back(hero);
+
+	}
+
+	if (possible_targets.empty()) {
+		_last_target = nullptr;
+		return nullptr;
+	}
+
+	if (possible_targets.size() > 1)
+		std::sort(possible_targets.begin(), possible_targets.end(),
+			[](Object* pFirst, Object* pSecond) -> bool
+			{
+				auto me = ObjectManager::GetLocalPlayer();
+
+				auto distance_first = me->GetDistanceTo(pFirst);
+				auto distance_second = me->GetDistanceTo(pSecond);
+
+				return distance_first > distance_second;
+
+			});
+
+	_last_target = possible_targets.front();
+	return _last_target;
+}
 Object* TargetSelector::FindBestMinion(Vector3 from, float range, Alliance team) {
 
 	if (IsValid(_override_target, from, range)) return _override_target;

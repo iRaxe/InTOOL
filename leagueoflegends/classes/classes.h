@@ -43,8 +43,8 @@ private:
 class InventorySlot
 {
 public:
-	STRING_GETTER(LolString, GetName, UPasta::Offsets::ItemManager::ItemName);
-	STRING_GETTER(LolString, GetTexturePath, UPasta::Offsets::ItemManager::ItemTexturePath);
+	std::string GetName();
+	std::string GetTexturePath();
 
 	ItemsDatabase GetId();
 };
@@ -67,9 +67,9 @@ class Perk
 {
 public:
 	CLASS_GETTER_P(PerkID, GetId, UPasta::Offsets::Perks::PerkID);
-	STRING_GETTER(LolString, GetName, UPasta::Offsets::Perks::PerkName);
-	STRING_GETTER(LolString, GetRawName, UPasta::Offsets::Perks::PerkRawName);
-	STRING_GETTER(LolString, GetRawDescription, UPasta::Offsets::Perks::PerkRawDescription);
+	std::string GetName();
+	std::string GetRawName();
+	std::string GetRawDescription();
 };
 
 class Perks
@@ -226,8 +226,7 @@ public:
 	CLASS_GETTER(float, GetCastSpeed, UPasta::Offsets::SpellData::MissileSpeed);
 	CLASS_GETTER(float, GetDelay, UPasta::Offsets::SpellData::DelayCastOffsetPerce);
 	CLASS_GETTER(float, GetCastTime, UPasta::Offsets::SpellData::CastTime);
-	STRING_GETTER(LolString, GetName, UPasta::Offsets::SpellBook::SpellSlot::Name);
-
+	std::string GetName();
 	std::string GetTexturePath();
 	Vector3 GetSpellEndPos();
 	float GetManaCostByLevel(int level);
@@ -248,7 +247,7 @@ class MissileData
 public:
 	std::string GetMissileName();
 	bool IsAutoAttack();
-	STRING_GETTER(LolString, GetSpellName, UPasta::Offsets::MissileManager::SpellName);
+	std::string GetSpellName();
 
 
 	int Resource;
@@ -327,7 +326,7 @@ public:
 	CLASS_GETTER(bool, IsAutoAttack, UPasta::Offsets::SpellCast::IsBasicAttack);
 	CLASS_GETTER(bool, IsSpell, UPasta::Offsets::SpellCast::IsSpell);
 
-	STRING_GETTER(LolString, GetCasterName, UPasta::Offsets::SpellCast::CasterName);
+	std::string GetCasterName();
 
 	Vector3 GetStartPosition();
 	Vector3 GetEndPosition();
@@ -512,8 +511,9 @@ public:
 	bool IsCursed() { return this->GetBuffByName("cursedtouch"); }
 	bool HasConqueror() { return this->GetBuffByName("ASSETS/Perks/Styles/Precision/Conqueror/ConquerorEnrage.lua"); }
 
-	STRING_GETTER(LolString, GetName, UPasta::Offsets::Client::AiName);
-	STRING_GETTER(LolString, GetClassicName, UPasta::Offsets::Client::Name);
+	std::string GetName();
+	std::string GetClassicName();
+
 
 	Spell* GetSpellBySlotId(int slotId);
 	AiManager* GetAiManager();

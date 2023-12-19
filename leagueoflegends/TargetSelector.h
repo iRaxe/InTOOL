@@ -14,6 +14,7 @@ public:
 	static void Initialize();
 	static void OnWndProc(UINT msg, WPARAM param);
 	static Object* FindBestTarget(Vector3 from, float range);
+	static Object* FindFarestBestTarget(Vector3 from, float range);
 	static Object* FindBestMinion(Vector3 from, float range, Alliance team);
 	static Object* FindBestJungle(Vector3 from, float range);
 	static Object* FindTurret(Vector3 from, float range, Alliance team);
