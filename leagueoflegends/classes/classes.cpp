@@ -275,6 +275,11 @@ float Spell::GetManaCost()
 	return this->GetSpellInfo()->GetSpellData()->GetManaCostByLevel(this->GetLevel());
 }
 
+SpellInfo* SpellCast::GetProcessSpellInfo()
+{
+	return *(SpellInfo**)((QWORD)this);
+}
+
 std::string SpellCast::GetCasterName()
 {
 	return ReadQWORD2(LolString, this, UPasta::Offsets::SpellCast::CasterName);

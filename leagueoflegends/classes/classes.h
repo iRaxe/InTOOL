@@ -317,7 +317,7 @@ class SpellCast
 public:
 	CLASS_GETTER(DWORD, GetCasterHandle, UPasta::Offsets::SpellCast::CasterHandle);
 	CLASS_GETTER(SpellInfo*, GetSpellInfo, UPasta::Offsets::ActiveCast::Info);
-	CLASS_GETTER(SpellInfo*, GetProcessSpellInfo, 0x0);
+	SpellInfo* GetProcessSpellInfo();
 
 	CLASS_GETTER(int, GetSpellId, UPasta::Offsets::SpellCast::SlotID);
 
