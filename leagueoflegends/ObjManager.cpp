@@ -270,7 +270,7 @@ std::vector<Object*> ObjectManager::GetMinionsAs(Alliance team)
 		if (!minion) continue;
 		if (team == Alliance::Ally && !minion->IsAlly() || team == Alliance::Enemy && !minion->IsEnemy()) continue;
 
-		if (minion->IsAlive() and minion->IsVisible() and minion->IsTargetable() and !minion->IsInvulnerable())
+		if (minion->IsAlive() and minion->IsVisible() and minion->IsTargetable())
 			possible_targets.push_back(minion);
 	}
 
@@ -298,7 +298,7 @@ std::vector<Object*> ObjectManager::GetJungleMonsters()
 		if (!monster) continue;
 		if (!monster->IsJungle()) continue;
 		if (monster->GetCharacterData()->GetObjectTypeHash() == Plants) continue;
-		if (monster->IsAlive() and monster->IsVisible() and monster->IsTargetable() and !monster->IsInvulnerable())
+		if (monster->IsAlive() and monster->IsVisible() and monster->IsTargetable())
 			possible_targets.push_back(monster);
 	}
 	return possible_targets;
@@ -323,7 +323,7 @@ std::vector<Object*> ObjectManager::GetJunglePlants()
 	{
 		if (!plant) continue;
 		if (plant->GetCharacterData()->GetObjectTypeHash() != Plants) continue;
-		if (plant->IsAlive() and plant->IsVisible() and plant->IsTargetable() and !plant->IsInvulnerable())
+		if (plant->IsAlive() and plant->IsVisible() and plant->IsTargetable())
 			possible_targets.push_back(plant);
 	}
 	return possible_targets;
@@ -388,10 +388,8 @@ std::vector<Object*> ObjectManager::GetInhibitorsAs(Alliance team)
 	for (auto inhibitor : GetInhibitors())
 	{
 		if (!inhibitor) continue;
-		if (team == Alliance::Ally && !inhibitor->IsAlly() || team == Alliance::Enemy && !inhibitor->IsEnemy()) continue
-			;
-		if (inhibitor->IsAlive() and inhibitor->IsVisible() and inhibitor->IsTargetable() and !inhibitor->
-			IsInvulnerable())
+		if (team == Alliance::Ally && !inhibitor->IsAlly() || team == Alliance::Enemy && !inhibitor->IsEnemy()) continue;
+		if (inhibitor->IsAlive() and inhibitor->IsVisible() and inhibitor->IsTargetable())
 			possible_targets.push_back(inhibitor);
 	}
 

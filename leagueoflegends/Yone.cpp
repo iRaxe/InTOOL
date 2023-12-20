@@ -191,18 +191,46 @@ void Events::Initialize() {
 void Events::Subscribe() {
 	TryCatch(Event::Subscribe(Event::OnDraw, &OnDraw), "Error subscribing to OnDraw event");
 	TryCatch(Event::Subscribe(Event::OnGameTick, &OnGameUpdate), "Error subscribing to OnGameTick event");
-	TryCatch(Event::Subscribe(Event::OnWndProc, &OnWndProc), "Error subscribing to OnWndProc event");
 	TryCatch(Event::Subscribe(Event::OnProcessSpell, &MyTThing), "Error subscribing to OnProcessSpell event");
 	TryCatch(Event::Subscribe(Event::OnAfterAttack, &OnAfterAttack), "Error subscribing to OnAfterAttack event");
-
 }
 
 void Events::Unsubscribe() {
 	TryCatch(Event::UnSubscribe(Event::OnDraw, &OnDraw), "Error unsubscribing to OnDraw event");
 	TryCatch(Event::UnSubscribe(Event::OnGameTick, &OnGameUpdate), "Error unsubscribing to OnGameTick event");
-	TryCatch(Event::UnSubscribe(Event::OnWndProc, &OnWndProc), "Error unsubscribing to OnWndProc event");
 	TryCatch(Event::UnSubscribe(Event::OnProcessSpell, &MyTThing), "Error unsubscribing to OnProcessSpell event");
 	TryCatch(Event::UnSubscribe(Event::OnAfterAttack, &OnAfterAttack), "Error unsubscribing to OnAfterAttack event");
+}
+
+int CountEnemiesInLineWidth(Vector3 sourcePos, Vector3 endPos, Object* target, float lineWidth) {
+	int enemiesInLine = 0;
+	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
+		if (!hero) continue;
+		if (!hero->IsTargetable()) continue;
+		if (!Modules::prediction::IsSpecificObjectInWay(sourcePos, endPos, target, lineWidth)) continue;
+		enemiesInLine += 1;
+	}
+
+	return enemiesInLine;
+}
+
+void Functions::UseQ(Object* obj) {
+	if (ObjectManager::GetLocalPlayer() == nullptr) return;
+	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
+
+	if (obj == nullptr) return;
+	if (!obj->IsAlive()) return;
+	if (!obj->IsTargetable()) return;
+	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastQYone()) return;
+
+	const auto qSpellSlotName = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetName();
+	if (qSpellSlotName == "YoneQ3") return;
+
+	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > YoneSpellsSettings::GetQRange()) return;
+
+	Engine::CastToPosition(SpellIndex::Q, obj->GetPosition());
+	QCastedTimeYone = gameTimeYone;
 }
 
 void Functions::UseQ3(Object* obj) {
@@ -228,31 +256,12 @@ void Functions::UseQ3(Object* obj) {
 
 	if (YoneSpellsSettings::useQ3Tower->Value == false && obj->IsUnderTower(Alliance::Enemy)) return;
 	Modules::prediction::PredictionOutput q3Prediction;
-	if (GetPrediction(database.YoneQ2, q3Prediction)) {
+	if (GetPrediction(ObjectManager::GetLocalPlayer(), obj, database.YoneR, q3Prediction)) {
 		const Vector3 dashPosition = ObjectManager::GetLocalPlayer()->GetPosition().Extend(q3Prediction.position, YoneSpellsSettings::GetQ3Range());
 		Engine::CastToPosition(SpellIndex::Q, dashPosition);
 		QCastedTimeYone = gameTimeYone;
 	}
 
-}
-
-void Functions::UseQ(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
-
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
-	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastQYone()) return;
-
-	const auto qSpellSlotName = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(SpellIndex::Q)->GetName();
-	if (qSpellSlotName == "YoneQ3") return;
-
-	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > YoneSpellsSettings::GetQRange()) return;
-
-	Engine::CastToPosition(SpellIndex::Q, obj->GetPosition());
-	QCastedTimeYone = gameTimeYone;
 }
 
 void Functions::UseW(Object* obj) {
@@ -269,18 +278,6 @@ void Functions::UseW(Object* obj) {
 
 	Engine::CastToPosition(SpellIndex::W, obj->GetPosition());
 	WCastedTimeYone = gameTimeYone;
-}
-
-int CountEnemiesInLineWidth(Vector3 sourcePos, Vector3 endPos, Object* target, float lineWidth) {
-	int enemiesInLine = 0;
-	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
-		if (!hero) continue;
-		if (!hero->IsTargetable()) continue;
-		if (!Modules::prediction::IsSpecificObjectInWay(sourcePos, endPos, target, lineWidth)) continue;
-		enemiesInLine += 1;
-	}
-
-	return enemiesInLine;
 }
 
 void Functions::UseE(Object* obj) {
@@ -453,43 +450,23 @@ void Events::OnDraw() {
 void Events::OnGameUpdate() {
 	if (ObjectManager::GetLocalPlayer() == nullptr) return;
 	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (Orbwalker::State == Orbwalker::CHANNELING || Orbwalker::State == Orbwalker::DODGING) return;
 
 	gameTimeYone = Engine::GetGameTime();
+
+	if (Orbwalker::Mode == Attack) {
+		Modes::Combo();
+	}
+	if (Orbwalker::Mode == Harass) {
+		Modes::Harass();
+	}
+	if (Orbwalker::Mode == Clear) {
+		Modes::Clear();
+	}
+
 	shadowYone = FindYoneShadow();
 	Modes::Killsteal();
-	Modes::Auto();
-
-	// TODO: HANDLE IS EVADING SPELL
-}
-
-void Events::OnWndProc(UINT msg, WPARAM param) {
-	if (param == OrbwalkerConfig::comboKey->Key) {
-		switch (msg) {
-		case WM_KEYDOWN: Modes::Combo(); break;
-		case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::harassKey->Key) {
-		switch (msg) {
-		case WM_KEYDOWN: Modes::Harass(); break;
-		case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::laneClearKey->Key) {
-		switch (msg) {
-		case WM_KEYDOWN: Modes::Clear(); break;
-		case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::fastClearKey->Key) {
-		switch (msg) {
-		case WM_KEYDOWN: Modes::Clear(); break;
-		case WM_KEYUP: break;
-		}
-	}
+	//Modes::Auto();
 }
 
 void Modes::Combo() {

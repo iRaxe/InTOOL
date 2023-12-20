@@ -108,16 +108,16 @@ Object* TargetSelector::FindFarestBestTarget(Vector3 from, float range) {
 	_last_target = possible_targets.front();
 	return _last_target;
 }
-Object* TargetSelector::FindBestMinion(Vector3 from, float range, Alliance team) {
 
-	if (IsValid(_override_target, from, range)) return _override_target;
+Object* TargetSelector::FindBestMinion(Vector3 from, float range, Alliance team) {
 
 	std::vector<Object*> possible_targets;
 	for (auto minion : ObjectManager::GetMinionsAs(team)) {
 
 		if (!minion) continue;
 		if (team == Alliance::Ally && !minion->IsAlly() || team == Alliance::Enemy && !minion->IsEnemy()) continue;
-		if (minion->IsAlive() and minion->IsVisible() and minion->IsTargetable() and !minion->IsInvulnerable() and minion->GetPosition().Distance(from) <= range + minion->GetBoundingRadius() / 2)
+		if (minion->GetPosition().Distance(from) > range) continue;
+		if (minion->IsAlive() and minion->IsVisible() and minion->IsTargetable())
 			possible_targets.push_back(minion);
 	}
 
@@ -154,9 +154,9 @@ Object* TargetSelector::FindBestJungle(Vector3 from, float range) {
 
 	std::vector<Object*> possible_targets;
 	for (auto jungle : ObjectManager::GetJungleMonsters()) {
-
-		if (!jungle) continue;
-			possible_targets.push_back(jungle);
+		if (jungle == nullptr) continue;
+		if (!IsValid(jungle, from, range)) continue;
+		possible_targets.push_back(jungle);
 	}
 
 	if (possible_targets.empty()) {
@@ -194,8 +194,8 @@ Object* TargetSelector::FindTurret(Vector3 from, float range, Alliance team) {
 
 		if (!turret) continue;
 		if (team == Alliance::Ally && !turret->IsAlly() || team == Alliance::Enemy && !turret->IsEnemy()) continue;
-		if (turret->IsAlive() and turret->IsVisible() and turret->IsTargetable() and !turret->IsInvulnerable() and turret->GetPosition().Distance(from) <= range + turret->GetBoundingRadius() / 2)
-			possible_targets.push_back(turret);
+		if (!IsValid(turret, from, range)) continue;
+		possible_targets.push_back(turret);
 	}
 
 	if (possible_targets.empty()) {
@@ -233,8 +233,8 @@ Object* TargetSelector::FindInhibitor(Vector3 from, float range, Alliance team) 
 
 		if (!inhibitor) continue;
 		if (team == Alliance::Ally && !inhibitor->IsAlly() || team == Alliance::Enemy && !inhibitor->IsEnemy()) continue;
-		if (inhibitor->IsAlive() and inhibitor->IsVisible() and inhibitor->IsTargetable() and !inhibitor->IsInvulnerable() and inhibitor->GetPosition().Distance(from) <= range + inhibitor->GetBoundingRadius() / 2)
-			possible_targets.push_back(inhibitor);
+		if (!IsValid(inhibitor, from, range)) continue;
+		possible_targets.push_back(inhibitor);
 	}
 
 	if (possible_targets.empty()) {

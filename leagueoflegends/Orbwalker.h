@@ -43,9 +43,6 @@ public:
     };
 
 private:
-
-    static inline STATE _state = IDLE;
-    static inline OrbwalkState _mode = Off;
     static inline float _last_aa = 0;
     static inline float _last_action = 0;
     static inline float _draw_range = 1500.0f;
@@ -58,6 +55,10 @@ private:
     static void InitializeMenu();
 
 public:
+
+    static inline STATE State = IDLE;
+    static inline OrbwalkState Mode = Off;
+
     static void Init();
     static void OnTick();
     static void OnDraw();

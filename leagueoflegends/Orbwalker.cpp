@@ -81,43 +81,43 @@ void Orbwalker::Init() {
 void Orbwalker::OnWndProc(UINT msg, WPARAM param) {
 	if (param == UPasta::SDK::OrbwalkerConfig::comboKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: _mode = Attack; break;
-		case WM_KEYUP: _mode = Off; break;
+		case WM_KEYDOWN: Mode = Attack; break;
+		case WM_KEYUP: Mode = Off; break;
 		}
 	}
 
 	if (param == UPasta::SDK::OrbwalkerConfig::harassKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: _mode = Harass; break;
-		case WM_KEYUP: _mode = Off; break;
+		case WM_KEYDOWN: Mode = Harass; break;
+		case WM_KEYUP: Mode = Off; break;
 		}
 	}
 
 	if (param == UPasta::SDK::OrbwalkerConfig::lastHitKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: _mode = Lasthit; break;
-		case WM_KEYUP: _mode = Off; break;
+		case WM_KEYDOWN: Mode = Lasthit; break;
+		case WM_KEYUP: Mode = Off; break;
 		}
 	}
 
 	if (param == UPasta::SDK::OrbwalkerConfig::laneClearKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: _mode = Clear; break;
-		case WM_KEYUP: _mode = Off; break;
+		case WM_KEYDOWN: Mode = Clear; break;
+		case WM_KEYUP: Mode = Off; break;
 		}
 	}
 
 	if (param == UPasta::SDK::OrbwalkerConfig::fastClearKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: _mode = FastClear; break;
-		case WM_KEYUP: _mode = Off; break;
+		case WM_KEYDOWN: Mode = FastClear; break;
+		case WM_KEYUP: Mode = Off; break;
 		}
 	}
 
 	if (param == UPasta::SDK::OrbwalkerConfig::fleeKey->Key) {
 		switch (msg) {
-		case WM_KEYDOWN: _mode = Flee; break;
-		case WM_KEYUP: _mode = Off; break;
+		case WM_KEYDOWN: Mode = Flee; break;
+		case WM_KEYUP: Mode = Off; break;
 		}
 	}
 }
@@ -216,14 +216,14 @@ void Orbwalker::DrawRange(Object* obj) {
 }
 
 void Orbwalker::OnTick() {
-	if (_mode == Off) return;
+	if (Mode == Off) return;
 	auto me = ObjectManager::GetLocalPlayer();
 	if (!me) return;
 	if (!me->IsAlive()) return;
 
 	if (!CanMove()) return;
 
-	if (_state == CHANNELING or _state == DODGING) return;
+	if (State == CHANNELING or State == DODGING) return;
 
 	auto current_cast = me->GetActiveSpellCast();
 	if (current_cast and current_cast->IsSpell()) {
@@ -245,13 +245,13 @@ void Orbwalker::OnTick() {
 		return;
 	}
 
-	if (_mode == Attack) {
+	if (Mode == Attack) {
 		OnCombo();
 	}
-	if (_mode == Harass) {
+	if (Mode == Harass) {
 		OnHarass();
 	}
-	if (_mode == Clear) {
+	if (Mode == Clear) {
 		OnClear();
 	}
 }
@@ -260,7 +260,7 @@ void Orbwalker::OnCastSound(uintptr_t state, SpellCast* cast) {
 	if (cast->GetCasterHandle() != ObjectManager::GetLocalPlayer()->GetHandle()) return;
 	if (!cast->IsAutoAttack()) return;
 
-	_state = IDLE;
+	State = IDLE;
 	Event::Publish(Event::OnAfterAttack);
 	return;
 }
@@ -274,7 +274,7 @@ void Orbwalker::AttackTarget(Object* target) {
 	if (target->GetDistanceTo(ObjectManager::GetLocalPlayer()) <= ObjectManager::GetLocalPlayer()->GetRealAttackRange()) {
 		Engine::AttackObject(target->GetPosition());
 		_last_aa = GetTickCount64() + GetLatency();
-		_state = ATTACKING;
+		State = ATTACKING;
 		return;
 	}
 	return;
@@ -291,7 +291,7 @@ void Orbwalker::OnCombo() {
 	Event::Publish(Event::OnBeforeAttack);
 	Engine::AttackObject(target->GetPosition());
 	_last_aa = GetTickCount64() + GetLatency();
-	_state = ATTACKING;
+	State = ATTACKING;
 	return;
 
 }
@@ -313,7 +313,7 @@ void Orbwalker::OnHarass() {
 	Event::Publish(Event::OnBeforeAttack);
 	Engine::AttackObject(target->GetPosition());
 	_last_aa = GetTickCount64() + GetLatency();//(Engine::GetGameTime() * 1000)
-	_state = ATTACKING;
+	State = ATTACKING;
 	return;
 
 }
@@ -331,6 +331,6 @@ void Orbwalker::OnClear() {
 	Event::Publish(Event::OnBeforeAttack);
 	Engine::AttackObject(target->GetPosition());
 	_last_aa = GetTickCount64() + GetLatency();//(Engine::GetGameTime() * 1000)
-	_state = ATTACKING;
+	State = ATTACKING;
 	return;
 }
