@@ -7,6 +7,7 @@
 #include "Champions/Brand/Brand.h"
 #include "Champions/Tristana/Tristana.h"
 #include "../Yone.h"
+#include "Champions/Ashe/Ashe.h"
 
 namespace Modules
 {
@@ -52,6 +53,9 @@ namespace Modules
 			}
 			else if (ObjectManager::GetLocalPlayer()->GetName() == "Yone") {
 				UPasta::Plugins::Yone::Events::Initialize();
+			}
+			else if (ObjectManager::GetLocalPlayer()->GetName() == "Ashe") {
+				UPasta::Plugins::Ashe::Events::Initialize();
 			}
 			else {
 				activeChampModule = ChampionModuleManager::GetModule(ObjectManager::GetLocalPlayer()->GetName());

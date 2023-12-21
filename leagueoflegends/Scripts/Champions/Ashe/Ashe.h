@@ -107,7 +107,7 @@ namespace UPasta {
                 void Unsubscribe();
                 void OnGameUpdate();
                 void OnWndProc(UINT msg, WPARAM param);
-                void OnBeforeAttack();
+                void OnAfterAttack();
                 void OnCastSpell(SpellCast* spellCastInfo);
 
                 void OnDraw();
@@ -131,6 +131,7 @@ namespace UPasta {
                 void AimR();
                 void Combo();
                 void Clear();
+                void LastHit();
                 void Harass();
                 void Killsteal();
                 void AntiGapCloser();
@@ -155,47 +156,19 @@ namespace UPasta {
             namespace Damages
             {
                 namespace WSpell {
-                    inline float dmgSkillArray[6] = { 0, 95, 145, 195, 245, 295 };
-                    inline float additionalPercentageAP = 0.50f;
+
+                    inline float dmgSkillArray[6] = { 0, 20, 35, 50, 65, 80 };
+                    inline float additionalPercentageAD = 1.00f;
 
                     static float GetDamage(Object* obj) {
-	                    return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::W, obj, dmgSkillArray, additionalPercentageAP);
-                    }
-                }
-
-                namespace ESpell {
-                    inline float dmgAPSkillArray[6] = { 0, 55, 80, 105, 130, 155 };
-                    inline float additionalDmgAPPercentageAP = 0.25f;
-
-                    inline float dmgADSkillArray[6] = { 0, 70, 80, 90, 100, 110 };
-                    inline float additionalDmgADPercentageAD[6] = { 0, 0.50f, 0.75f, 1.0f, 1.25f, 1.50f };
-                    inline float additionalDmgADPercentageAP = 0.50f;
-
-                    inline float dmgStackADSkillArray[6] = { 0, 21, 24, 27, 30, 33 };
-                    inline float additionalDmgStackPercentageAD[6] = { 0, 0.15f, 0.225f, 0.30f, 0.375f, 0.45f };
-                    inline float additionalDmgStackPercentageAP = 0.15f;
-
-                    inline float dmgMaxSkillArray[6] = { 0, 205, 235, 264, 293, 323 };
-                    inline float additionalDmgMaxPercentageAD[6] = { 0, 1.46f, 2.199f, 2.933f, 3.666f, 4.399f };
-                    inline float additionalDmgMaxPercentageAP = 1.456f;
-
-                    static float GetDamage(Object* obj)
-                    {
-	                    const float magicDamage = SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::E, obj, dmgAPSkillArray, additionalDmgAPPercentageAP);
-                        const float minDamage = SDK::Damage::CalculateSlotMixedDamage<float*, float, float*>(SpellIndex::E, obj, dmgADSkillArray, additionalDmgADPercentageAP, additionalDmgADPercentageAD);
-                        const float stackDamage = SDK::Damage::CalculateSlotMixedDamage<float*, float, float*>(SpellIndex::E, obj, dmgStackADSkillArray, additionalDmgStackPercentageAP, additionalDmgStackPercentageAD);
-                        const float stacksDamage = 0;
-                        const float defMinDamage = magicDamage + minDamage + stacksDamage;
-                        const float maxDamage = SDK::Damage::CalculateSlotMixedDamage<float*, float, float*>(SpellIndex::E, obj, dmgMaxSkillArray, additionalDmgMaxPercentageAP, additionalDmgMaxPercentageAD);
-                        const float defDamage = defMinDamage > maxDamage ? maxDamage : minDamage;
-	                    return defDamage;
+	                    return SDK::Damage::CalculateSlotPhysicalDamage<float*, float>(SpellIndex::W, obj, dmgSkillArray, additionalPercentageAD);
                     }
                 }
 
                 namespace RSpell {
-                    inline float dmgSkillArray[4] = { 0, 300, 400, 500 };
-                    inline float additionalPercentageAP = 1.00f;
-                    inline float knockbackDistance[4] = { 0, 600, 800, 1000 };
+                    inline float dmgSkillArray[4] = { -9999, 200, 400, 600 };
+                    inline float dmgSkillArrayMonster[6] = { -9999, 175, 250, 325 };
+                    inline float additionalPercentageAP = 1.20f;
 
                     static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMagicalDamage<float*, float>(SpellIndex::R, obj, dmgSkillArray, additionalPercentageAP); }
                 }

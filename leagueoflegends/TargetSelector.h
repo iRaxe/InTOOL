@@ -7,9 +7,9 @@ class TargetSelector
 	static inline Object* _last_jungle;
 	static inline Object* _last_turret;
 	static inline Object* _override_target;
-	static bool IsValid(Object* target, Vector3 from, float range);
 
 public:
+	static bool IsValid(Object* target, Vector3 from, float range);
 
 	static void Initialize();
 	static void OnWndProc(UINT msg, WPARAM param);
