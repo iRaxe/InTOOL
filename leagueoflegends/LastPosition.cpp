@@ -76,7 +76,6 @@ void Awarenesss::LastPosition::InitializeMenu()
 {
 	const auto LastPosMenu = Configs::AwarenessMenu->AddMenu("LastPosMenu", "Last Position Tracker");
 	Configs::EnemyTracker::showLastPosition = LastPosMenu->AddCheckBox("showLastPosition", "Show last position", true);
-	Configs::EnemyTracker::showPosGuesser = LastPosMenu->AddCheckBox("showPosGuesser", "Show position guesser circle", true);
 	Configs::EnemyTracker::showLastPositionWorld = LastPosMenu->AddCheckBox("showLastPositionWorld", "Show on world", true);
 	Configs::EnemyTracker::showLastPositionMiniMap = LastPosMenu->AddCheckBox("showLastPositionMiniMap", "Show on minimap", true);
 }

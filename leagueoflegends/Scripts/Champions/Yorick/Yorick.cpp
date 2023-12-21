@@ -174,7 +174,7 @@ public:
     int CountGravesAround()
     {
         int gravesToReturn = 0;
-        for (auto objToFind : ObjectManager::GetMinions()) {
+        for (auto objToFind : *ObjectManager::GetMinionList()) {
             if (!objToFind) continue;
             if (!objToFind->GetDistanceTo(ObjectManager::GetLocalPlayer()) > database.YorickR.GetMaxRange()) continue;
 

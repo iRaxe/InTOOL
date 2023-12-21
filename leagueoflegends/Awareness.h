@@ -41,7 +41,6 @@ namespace UPasta::SDK::Awareness
             inline CheckBox* showPathsEnemies;
 
             inline CheckBox* showLastPosition;
-            inline CheckBox* showPosGuesser;
         	inline CheckBox* showLastPositionWorld;
         	inline CheckBox* showLastPositionMiniMap;
 

@@ -75,7 +75,6 @@ public:
 
 	static void Update();
 
-	static std::vector<Object*> GetHeroes() { return _hero_list; }
 	static std::vector<Object*> GetHeroesAs(Alliance team);
 	static Object* GetHeroAs(Alliance team, Vector3 position, float range);
 
@@ -84,7 +83,6 @@ public:
 	static Object* GetObjectInRange(std::string name, float range);
 	static Object* GetObjectInRange(float range, std::string name, std::vector<QWORD> includeFilterTypeHashes, std::vector<QWORD> excludeFilterTypeHashesDetailed, bool isSpecial);
 
-	static std::vector<Object*> GetMinions() { return _minion_list; }
 	static std::vector<Object*> GetMinionsAs(Alliance team);
 	static int CountMinionsInRange(Alliance team, Vector3 position, float range);
 
@@ -96,11 +94,9 @@ public:
 
 	static std::vector<Object*> GetWards(Alliance team);
 
-	static std::vector<Object*> GetTurrets() { return _turret_list; }
 	static std::vector<Object*> GetTurretsAs(Alliance team);
 	static int CountTurretsInRange(Alliance team, Vector3 position, float range);
 
-	static std::vector<Object*> GetInhibitors() { return _inhibitor_list; }
 	static std::vector<Object*> GetInhibitorsAs(Alliance team);
 	static int CountInhibitorsInRange(Alliance team, Vector3 position, float range);
 

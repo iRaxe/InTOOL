@@ -19,11 +19,8 @@ void Awarenesss::LastHitDamage::Draw() {
 	{
 		if (!minion) continue;
 
-		if (!minion->IsMinion()) continue;
+		if (!TargetSelector::IsValid(minion, ObjectManager::GetLocalPlayer()->GetPosition(), ObjectManager::GetLocalPlayer()->GetRealAttackRange())) continue;
 		if (minion->IsJungle()) continue;
-		if (!minion->IsValidTarget()) continue;
-
-		if (minion->GetDistanceTo(ObjectManager::GetLocalPlayer()) > ObjectManager::GetLocalPlayer()->GetRealAttackRange()) continue;
 
 		const Vector2 screenPos = Engine::GetHpBarPosition(minion);
 		const ImVec2 topLeft = CalculateTopLeft(screenPos);
@@ -52,9 +49,8 @@ void Awarenesss::LastHitDamage::Draw() {
 	}
 }
 
-void Awarenesss::LastHitDamage::InitializeMenu()
-{
+void Awarenesss::LastHitDamage::InitializeMenu() {
 	const auto MinionDrawings = Configs::AwarenessMenu->AddMenu("MinionDrawings", "Minions Tracker");
-	Configs::EnemyTracker::showDamagePrediction = MinionDrawings->AddCheckBox("showDamagePrediction", " ", true);
+	Configs::EnemyTracker::showDamagePrediction = MinionDrawings->AddCheckBox("showDamagePrediction", "Show damage prediction", true);
 	Configs::EnemyTracker::showKillableStatus = MinionDrawings->AddCheckBox("showKillableStatus", "Show killable status", true);
 }

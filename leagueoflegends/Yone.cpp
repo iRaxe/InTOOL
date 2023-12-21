@@ -404,7 +404,7 @@ void Functions::DrawDamageOnPos(Object* obj) {
 Object* FindYoneShadow() {
 	Object* shadowToReturn = nullptr;
 
-	for (auto shadow : ObjectManager::GetMinions()) {
+	for (auto shadow : *ObjectManager::GetMinionList()) {
 		if (!shadow) continue;
 		if (shadow->GetCharacterData()->GetObjectTypeHashDetailed() == YoneShadow) {
 			shadowToReturn = shadow;

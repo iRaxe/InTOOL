@@ -149,7 +149,7 @@ Object* ObjectManager::GetClientByHandle(DWORD handle)
 std::vector<Object*> ObjectManager::GetHeroesAs(Alliance team)
 {
 	std::vector<Object*> possible_targets;
-	for (auto hero : GetHeroes())
+	for (auto hero : *GetHeroList())
 	{
 		if (!hero) continue;
 		if (team == Alliance::Ally && !hero->IsAlly() || team == Alliance::Enemy && !hero->IsEnemy()) continue;
@@ -198,7 +198,7 @@ Object* ObjectManager::GetObjectInRange(std::string name, float range)
 {
 	Object* best = nullptr;
 
-	for (auto objToFind : GetMinions())
+	for (auto objToFind : *GetMinionList())
 	{
 		if (!objToFind) continue;
 		if (!objToFind->GetDistanceTo(ObjectManager::GetLocalPlayer()) > range) continue;
@@ -218,7 +218,7 @@ Object* ObjectManager::GetObjectInRange(float range, std::string name, std::vect
 	std::vector<QWORD> excludeFilterTypeHashesDetailed, bool isSpecial)
 {
 	Object* best = nullptr;
-	for (auto obj : GetMinions())
+	for (auto obj : *GetMinionList())
 	{
 		if (!(isSpecial || obj->IsValidTarget())) continue;
 
@@ -265,7 +265,7 @@ Object* ObjectManager::GetObjectInRange(float range, std::string name, std::vect
 std::vector<Object*> ObjectManager::GetMinionsAs(Alliance team)
 {
 	std::vector<Object*> possible_targets;
-	for (auto minion : GetMinions())
+	for (auto minion : *GetMinionList())
 	{
 		if (!minion) continue;
 		if (team == Alliance::Ally && !minion->IsAlly() || team == Alliance::Enemy && !minion->IsEnemy()) continue;
@@ -293,7 +293,7 @@ int ObjectManager::CountMinionsInRange(Alliance team, Vector3 position, float ra
 std::vector<Object*> ObjectManager::GetJungleMonsters()
 {
 	std::vector<Object*> possible_targets;
-	for (auto monster : GetMinions())
+	for (auto monster : *GetMinionList())
 	{
 		if (!monster) continue;
 		if (!monster->IsJungle()) continue;
@@ -319,7 +319,7 @@ int ObjectManager::CountJungleMonstersInRange(Vector3 position, float range)
 std::vector<Object*> ObjectManager::GetJunglePlants()
 {
 	std::vector<Object*> possible_targets;
-	for (auto plant : GetMinions())
+	for (auto plant : *GetMinionList())
 	{
 		if (!plant) continue;
 		if (plant->GetCharacterData()->GetObjectTypeHash() != Plants) continue;
@@ -332,7 +332,7 @@ std::vector<Object*> ObjectManager::GetJunglePlants()
 std::vector<Object*> ObjectManager::GetJungleRespawnCamps()
 {
 	std::vector<Object*> possible_targets;
-	for (auto campRespawn : GetMinions())
+	for (auto campRespawn : *GetMinionList())
 	{
 		if (!campRespawn) continue;
 		if (campRespawn->GetCharacterData()->GetObjectTypeHash() != RespawnMarker) continue;
@@ -344,7 +344,7 @@ std::vector<Object*> ObjectManager::GetJungleRespawnCamps()
 std::vector<Object*> ObjectManager::GetWards(Alliance team)
 {
 	std::vector<Object*> possible_targets;
-	for (auto ward : GetMinions())
+	for (auto ward : *GetMinionList())
 	{
 		if (!ward) continue;
 		if (team == Alliance::Ally && !ward->IsAlly() || team == Alliance::Enemy && !ward->IsEnemy()) continue;
@@ -359,7 +359,7 @@ std::vector<Object*> ObjectManager::GetWards(Alliance team)
 std::vector<Object*> ObjectManager::GetTurretsAs(Alliance team)
 {
 	std::vector<Object*> possible_targets;
-	for (auto turret : GetTurrets())
+	for (auto turret : *GetTurretsList())
 	{
 		if (!turret) continue;
 		if (team == Alliance::Ally && !turret->IsAlly() || team == Alliance::Enemy && !turret->IsEnemy()) continue;
@@ -385,7 +385,7 @@ int ObjectManager::CountTurretsInRange(Alliance team, Vector3 position, float ra
 std::vector<Object*> ObjectManager::GetInhibitorsAs(Alliance team)
 {
 	std::vector<Object*> possible_targets;
-	for (auto inhibitor : GetInhibitors())
+	for (auto inhibitor : *GetInhibitorsList())
 	{
 		if (!inhibitor) continue;
 		if (team == Alliance::Ally && !inhibitor->IsAlly() || team == Alliance::Enemy && !inhibitor->IsEnemy()) continue;
