@@ -42,6 +42,9 @@ namespace UPasta {
                     inline CheckBox* UseR;
                 }
 
+                namespace YoneAuto {
+                    inline CheckBox* UseQ;
+                }
 
                 namespace YoneSpellsSettings {
                     inline Slider* qRange;
@@ -257,15 +260,7 @@ namespace UPasta {
                     static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotPhysicalDamage<float*, float>(SpellIndex::R, obj, dmgSkillArray, additionalPercentageAD); }
                 }
 
-                static float GetComboDamage(Object* obj)
-                {
-                    const float qDamage = QSpell::GetDamage(obj);
-                    const float wDamage = WSpell::GetDamage(obj);
-                    const float rDamage = RSpell::GetDamage(obj);
-                    const float eDamage = ESpell::GetDamage(obj, wDamage + qDamage + rDamage);
-
-	                return qDamage + wDamage + eDamage + rDamage;
-                }
+ 
             }
         }
     }

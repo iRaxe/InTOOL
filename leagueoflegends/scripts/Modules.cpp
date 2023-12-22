@@ -7,7 +7,9 @@
 #include "Champions/Brand/Brand.h"
 #include "Champions/Tristana/Tristana.h"
 #include "../Yone.h"
+#include "../Yasuo.h"
 #include "Champions/Ashe/Ashe.h"
+#include "../Activator.h"
 
 namespace Modules
 {
@@ -35,6 +37,7 @@ namespace Modules
 			TargetSelector::Initialize();
 			UPasta::SDK::Awareness::Functions::Initialize();
 			Orbwalker::Init();
+			UPasta::Plugins::Activator::Events::Initialize();
 			//Evade::Core::Initalize();
 		}
 	}
@@ -53,6 +56,9 @@ namespace Modules
 			}
 			else if (ObjectManager::GetLocalPlayer()->GetName() == "Yone") {
 				UPasta::Plugins::Yone::Events::Initialize();
+			}
+			else if (ObjectManager::GetLocalPlayer()->GetName() == "Yasuo") {
+				UPasta::Plugins::Yasuo::Events::Initialize();
 			}
 			else if (ObjectManager::GetLocalPlayer()->GetName() == "Ashe") {
 				UPasta::Plugins::Ashe::Events::Initialize();

@@ -227,6 +227,9 @@
     <Filter Include="Scripts\Champions\New\Yone">
       <UniqueIdentifier>{5430b667-7b99-4d0a-8985-076c0794598b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Champions\New\Yasuo">
+      <UniqueIdentifier>{21b089a4-0a18-4683-aa3d-9731719b8756}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global\globals.h">
@@ -546,6 +549,9 @@
     <ClInclude Include="ObjManager.h">
       <Filter>Global\ObjectManager</Filter>
     </ClInclude>
+    <ClInclude Include="Yasuo.h">
+      <Filter>Scripts\Champions\New\Yasuo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -785,6 +791,9 @@
     </ClCompile>
     <ClCompile Include="ObjManager.cpp">
       <Filter>Global\ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Yasuo.cpp">
+      <Filter>Scripts\Champions\New\Yasuo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -179,6 +179,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Activator.h" />
     <ClInclude Include="Awareness.h" />
     <ClInclude Include="background.h" />
     <ClInclude Include="Checkbox.h" />
@@ -286,10 +287,12 @@
     <ClInclude Include="TargetSelector.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="VMTHook.h" />
+    <ClInclude Include="Yasuo.h" />
     <ClInclude Include="Yone.h" />
     <ClInclude Include="zoom.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Activator.cpp" />
     <ClCompile Include="Awareness.cpp" />
     <ClCompile Include="Checkbox.cpp" />
     <ClCompile Include="classes\classes.cpp" />
@@ -368,6 +371,7 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TargetingClient.cpp" />
     <ClCompile Include="VMTHook.cpp" />
+    <ClCompile Include="Yasuo.cpp" />
     <ClCompile Include="Yone.cpp" />
     <ClCompile Include="zoom.cpp" />
   </ItemGroup>
