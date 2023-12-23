@@ -8,6 +8,7 @@
 #include "Champions/Tristana/Tristana.h"
 #include "../Yone.h"
 #include "../Yasuo.h"
+#include "../Illaoi.h"
 #include "Champions/Ashe/Ashe.h"
 #include "../Activator.h"
 
@@ -53,6 +54,9 @@ namespace Modules
 			}
 			else if (ObjectManager::GetLocalPlayer()->GetName() == "Tristana") {
 				UPasta::Plugins::Tristana::Events::Initialize();
+			}
+			else if (ObjectManager::GetLocalPlayer()->GetName() == "Illaoi") {
+				UPasta::Plugins::Illaoi::Events::Initialize();
 			}
 			else if (ObjectManager::GetLocalPlayer()->GetName() == "Yone") {
 				UPasta::Plugins::Yone::Events::Initialize();

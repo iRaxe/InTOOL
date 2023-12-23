@@ -281,16 +281,16 @@ void Modes::Auto() {
 	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
 
 	
-	int buffs_index = ObjectManager::GetLocalPlayer()->GetBuffListSize();
-	for (int i = 0; i < ObjectManager::GetLocalPlayer()->GetBuffListSize(); i++) {
-		const auto buffEntry = ObjectManager::GetLocalPlayer()->GetBuffManager()->GetBuffEntryByIndex(i);
-		if (buffEntry) {
-			const auto buff = buffEntry->GetBuff();
-			if (buff && buff->GetEndTime() >= Engine::GetGameTime()) {
-				Engine::PrintChat(buff->GetName());
-			}
-		}
-	}
+	//int buffs_index = ObjectManager::GetLocalPlayer()->GetBuffListSize();
+	//for (int i = 0; i < ObjectManager::GetLocalPlayer()->GetBuffListSize(); i++) {
+	//	const auto buffEntry = ObjectManager::GetLocalPlayer()->GetBuffManager()->GetBuffEntryByIndex(i);
+	//	if (buffEntry) {
+	//		const auto buff = buffEntry->GetBuff();
+	//		if (buff && buff->GetEndTime() >= Engine::GetGameTime()) {
+	//			Engine::PrintChat(buff->GetName());
+	//		}
+	//	}
+	//}
 
 	if ((ObjectManager::GetLocalPlayer()->GetHealth() / ObjectManager::GetLocalPlayer()->GetMaxHealth()) * 100 < 25)
 	{

@@ -144,7 +144,7 @@ void Skillshot::PopulateSpellsDB()
 	database.HeimerdingerE = SkillshotManager::RegisterSpell(SP_STRING("Heimerdinger"), E, Skillshot(970, 250, 1200, 0.25, SkillshotCircle, {}));
 	database.HeimerdingerE2 = SkillshotManager::RegisterSpell(SP_STRING("Heimerdinger"), E, Skillshot(970, 250, 1200, 0.25, SkillshotCircle, {}));
 	database.IllaoiQ = SkillshotManager::RegisterSpell(SP_STRING("Illaoi"), Q, Skillshot(850, 100, FLT_MAX, 0.75, SkillshotLine, {}));
-	database.IllaoiE = SkillshotManager::RegisterSpell(SP_STRING("Illaoi"), E, Skillshot(900, 50, 1900, 0.25, SkillshotLine, {}));
+	database.IllaoiE = SkillshotManager::RegisterSpell(SP_STRING("Illaoi"), E, Skillshot(900, 50, 1900, 0.25, SkillshotLine, { CollidableObjects::Objects }));
 	database.IreliaW = SkillshotManager::RegisterSpell(SP_STRING("Irelia"), W, Skillshot(825, 120, FLT_MAX, 0.25, SkillshotLine, {}));
 	database.IreliaR = SkillshotManager::RegisterSpell(SP_STRING("Irelia"), R, Skillshot(950, 160, 2000, 0.4, SkillshotLine, {}));
 	database.IvernQ = SkillshotManager::RegisterSpell(SP_STRING("Ivern"), Q, Skillshot(1075, 80, 1300, 0.25, SkillshotLine, {}));

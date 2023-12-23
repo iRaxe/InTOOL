@@ -210,6 +210,7 @@
     <ClInclude Include="hooks\impl\impl.h" />
     <ClInclude Include="Icons.h" />
     <ClInclude Include="icon_font.h" />
+    <ClInclude Include="Illaoi.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -309,6 +310,7 @@
     <ClCompile Include="HealthPrediction.cpp" />
     <ClCompile Include="hooks\hooks.cpp" />
     <ClCompile Include="hooks\impl\impl.cpp" />
+    <ClCompile Include="Illaoi.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx11.cpp" />

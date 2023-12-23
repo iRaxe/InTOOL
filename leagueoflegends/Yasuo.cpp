@@ -168,7 +168,7 @@ void Events::Initialize() {
 void Events::Subscribe() {
 	TryCatch(Event::Subscribe(Event::OnDraw, &OnDraw), "Error subscribing to OnDraw event");
 	TryCatch(Event::Subscribe(Event::OnGameTick, &OnGameUpdate), "Error subscribing to OnGameTick event");
-	TryCatch(Event::Subscribe(Event::OnWndProc, &OnWndProc), "Error subscribing to OnWndProc event");
+	//TryCatch(Event::Subscribe(Event::OnWndProc, &OnWndProc), "Error subscribing to OnWndProc event");
 	TryCatch(Event::Subscribe(Event::OnProcessSpell, &OnProcessSpell), "Error unsubscribing to OnProcessSpell event");
 	//TryCatch(Event::Subscribe(Event::OnFinishCast, &OnFinishCast), "Error unsubscribing to OnProcessSpell event");
 }
@@ -176,7 +176,7 @@ void Events::Subscribe() {
 void Events::Unsubscribe() {
 	TryCatch(Event::UnSubscribe(Event::OnDraw, &OnDraw), "Error unsubscribing to OnDraw event");
 	TryCatch(Event::UnSubscribe(Event::OnGameTick, &OnGameUpdate), "Error unsubscribing to OnGameTick event");
-	TryCatch(Event::UnSubscribe(Event::OnWndProc, &OnWndProc), "Error unsubscribing to OnWndProc event");
+	//TryCatch(Event::UnSubscribe(Event::OnWndProc, &OnWndProc), "Error unsubscribing to OnWndProc event");
 	TryCatch(Event::UnSubscribe(Event::OnProcessSpell, &OnProcessSpell), "Error unsubscribing to OnProcessSpell event");
 }
 
@@ -512,7 +512,7 @@ void Events::OnDraw() {
 			}
 		}
 
-	//}
+	}
 	//render::RenderLineWorld(ObjectManager::GetLocalPlayer()->GetPosition(), Engine::GetMouseWorldPos(), COLOR_RED, 2.0f);
 	//render::RenderTextWorld(std::to_string(nig), Engine::GetMouseWorldPos(), 30.0f, COLOR_WHITE, true);
 
@@ -543,36 +543,6 @@ void Events::OnGameUpdate() {
 	// TODO: HANDLE IS EVADING SPELL
 }
 
-void Events::OnWndProc(UINT msg, WPARAM param) {
-	if (param == OrbwalkerConfig::comboKey->Key) {
-		switch (msg) {
-		case WM_KEYDOWN: Modes::Combo(); break;
-		case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::harassKey->Key) {
-		switch (msg) {
-		case WM_KEYDOWN: Modes::Harass(); break;
-		case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::laneClearKey->Key) {
-		switch (msg) {
-		case WM_KEYDOWN: Modes::Clear(); break;
-		case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::fastClearKey->Key) {
-		switch (msg) {
-		case WM_KEYDOWN: Modes::Clear(); break;
-		case WM_KEYUP: break;
-		}
-	}
-
-}
 
 void Modes::Combo() {
 	if (!Orbwalker::CanCastAfterAttack()) return;

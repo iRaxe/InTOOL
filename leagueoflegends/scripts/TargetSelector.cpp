@@ -6,6 +6,15 @@ void TargetSelector::Initialize() {
 	Event::Subscribe(Event::OnWndProc, &TargetSelector::OnWndProc);
 }
 
+
+void TargetSelector::SetFocusTarget(Object* obj) {
+
+	if (obj == nullptr) { return; }
+	if (!obj->IsEnemy()) return;
+	if (!obj->IsAlive() or !obj->IsVisible() or !obj->IsTargetable() or obj->IsInvulnerable()) return;
+	_override_target = obj;
+}
+
 void TargetSelector::OnWndProc(UINT msg, WPARAM param) {
 
 	if (msg != WM_LBUTTONDOWN) return;
@@ -21,7 +30,7 @@ void TargetSelector::OnWndProc(UINT msg, WPARAM param) {
 bool TargetSelector::IsValid(Object* target, Vector3 from, float range) {
 
 	if (!target) return false;
-
+	if (target == nullptr) return false;
 	if (!target->IsAlive() or !target->IsVisible() or !target->IsTargetable() or target->IsInvulnerable() or target->GetPosition().Distance(from) > range + target->GetBoundingRadius() / 2) return false;
 
 	return true;
