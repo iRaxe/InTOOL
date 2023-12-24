@@ -189,7 +189,7 @@ void Functions::UseW(Object* obj) {
 	}
 
 	Modules::prediction::PredictionOutput wPrediction;
-	if (GetPrediction(database.BrandW, wPrediction)) {
+	if (AoeCalc(ObjectManager::GetLocalPlayer(), database.BrandW, wPrediction)) {
 		Engine::CastToPosition(SpellIndex::W, wPrediction.position);
 		BrandWCastedTime = Brandgametime;
 	}

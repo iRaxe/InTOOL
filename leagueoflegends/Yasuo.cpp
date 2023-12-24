@@ -353,7 +353,7 @@ void Functions::UseR() {
 	Object* obj = GetBestKnockedUpTarget();
 
 	if (obj == nullptr) return;
-	if (YasuoSpellsSettings::useETower->Value == false && obj->IsUnderTower(Alliance::Enemy)) return;
+	if (YasuoSpellsSettings::useRTower->Value == false && obj->IsUnderTower(Alliance::Enemy)) return;
 	Engine::CastToPosition(SpellIndex::R, obj->GetPosition());
 	YasuoRCastedTime = Yasuogametime;
 }
@@ -473,6 +473,14 @@ void Functions::DrawDamageOnPos(Object* obj) {
 }
 
 void Events::OnDraw() {
+
+	if (ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), 1500.0f) > 0)
+	{
+		Modules::prediction::PredictionOutput aoePrediction;
+		if (AoeCalc(ObjectManager::GetLocalPlayer(),database.XerathW, aoePrediction)) {
+			Awareness::Functions::Radius::DrawRadius(aoePrediction.position, database.XerathW.GetRadius(), COLOR_PURPLE, 1.0f);
+		}
+	}
 	if (YasuoSpellsSettings::DrawQ->Value == true && (YasuoSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastYasuoQ() || !YasuoSpellsSettings::ShouldDrawOnlyIfReady()))
 		Functions::DrawSpellRadius(YasuoSpellsSettings::GetQRange());
 
@@ -756,6 +764,8 @@ void Modes::Killsteal() {
 
 void Modes::Auto() {
 	if (!Orbwalker::CanCastAfterAttack()) return;
+
+
 
 	if (ObjectManager::GetLocalPlayer()->IsUnderTower(Alliance::Enemy)) return;
 	if (YasuoAuto::UseQ->Value) {

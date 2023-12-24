@@ -26,6 +26,7 @@ namespace Modules
 
 		Vector3 GetObjectPositionAfterTime(Object* obj, float time, float distanceBuffer = 0.0f);
 
+		bool AoeCalc(Object* sourceObj, Skillshot skillshot, Modules::prediction::PredictionOutput& out);
 		bool GetPrediction(Skillshot &spell, PredictionOutput& out);
 		bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot &spell, PredictionOutput &out);
 

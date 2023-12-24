@@ -157,6 +157,46 @@ namespace Modules::prediction
 		return predictedPosition;
 	}
 
+	bool AoeCalc(Object* sourceObj, Skillshot skillshot, Modules::prediction::PredictionOutput& out) {
+		std::vector<Vector3> predictedPositions;
+
+		// Get the predicted future positions of all targets within the skillshot range.
+		for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
+			if (hero == nullptr) continue;
+			if (sourceObj->GetDistanceTo(hero) > skillshot.GetRange() + hero->GetBoundingRadius() / 2) continue;
+
+			Modules::prediction::PredictionOutput heroPrediction;
+			if (GetPrediction(sourceObj, hero, skillshot, heroPrediction)) {
+				predictedPositions.push_back(heroPrediction.position);
+			}
+}
+
+		// If no targets are predicted within range, return false.
+		if (predictedPositions.empty()) {
+			return false;
+		}
+
+		// Calculate the centroid of the predicted positions.
+		Vector3 aggregatePosition = std::accumulate(predictedPositions.begin(), predictedPositions.end(), Vector3()) / static_cast<float>(predictedPositions.size());
+
+		// Now, check if the centroid is within the skillshot's radius of enough targets.
+		int count = 0;
+		for (const auto& pos : predictedPositions) {
+			if (aggregatePosition.Distance(pos) <= skillshot.GetRadius()) {
+				count++;
+			}
+		}
+
+		// If the centroid is not effective enough (not within the skillshot's radius of any target), return false.
+		if (count == 0) {
+			return false;
+		}
+
+		// Set the centroid as the optimal AoE position and return true.
+		out.position = aggregatePosition;
+		return true;
+	}
+
 	bool GetPrediction(Skillshot& skillshot, Modules::prediction::PredictionOutput& out)
 	{
 
@@ -170,18 +210,25 @@ namespace Modules::prediction
 	bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot& skillshot, Modules::prediction::PredictionOutput& out)
 	{
 		const auto sourcePos = sourceObj->GetAiManager()->GetPosition();
+		const auto targetPos = targetObj->GetPosition();
 		const auto targetAiManager = targetObj->GetAiManager();
 		const float spellRadius = skillshot.GetRadius();
 
 		float distance = sourcePos.Distance(targetObj->GetAiManager()->GetPosition());
-		float distanceBuffer = skillshot.GetType() == SkillshotType::SkillshotCircle ? max(spellRadius - 20.0f, 0.0f) : 0.0f;
+		
 
 		if (distance > skillshot.GetMaxRange())
 			return false;
 
 		if (!skillshot.GetSpeed())
 		{
-			out.position = GetObjectPositionAfterTime(targetObj, skillshot.GetCastTime(), distanceBuffer);
+			float travelTime = (distance) + skillshot.GetCastTime();
+			auto predictedPos = PredictTargetPosition(targetObj, travelTime);
+			
+			Vector3 directionToTarget = (targetPos - predictedPos).Normalized();
+			Vector3 adjustment = directionToTarget * (spellRadius / 2.0f);
+			predictedPos = predictedPos + adjustment;
+			out.position = PredictTargetPosition(targetObj, travelTime);
 			return CheckCollision(sourcePos, out.position, sourceObj, targetObj, skillshot);
 		}
 
@@ -196,6 +243,9 @@ namespace Modules::prediction
 
 		float travelTime = (distance / skillshot.GetSpeed()) + skillshot.GetCastTime();
 		auto predictedPos = PredictTargetPosition(targetObj, travelTime);
+		Vector3 directionToTarget = (targetPos - predictedPos).Normalized();
+		Vector3 adjustment = directionToTarget * (spellRadius / 2.0f);
+		predictedPos = predictedPos + adjustment;
 
 		distance = predictedPos.Distance(sourcePos);
 		float missileTime = (distance / skillshot.GetSpeed()) + skillshot.GetCastTime();
@@ -204,6 +254,9 @@ namespace Modules::prediction
 		{
 			travelTime = missileTime;
 			predictedPos = PredictTargetPosition(targetObj, travelTime);
+			Vector3 directionToTarget = (targetPos - predictedPos).Normalized();
+			Vector3 adjustment = directionToTarget * (spellRadius / 2.0f);
+			predictedPos = predictedPos + adjustment;
 
 			distance = predictedPos.Distance(sourcePos);
 			if (distance > skillshot.GetMaxRange())
