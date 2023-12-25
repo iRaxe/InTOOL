@@ -95,16 +95,16 @@ namespace UPasta
 		{
 			namespace Drawings {
 				static uintptr_t constexpr GetBaseDrawPosition = 0x208F50;					//E8 ? ? ? ? EB 06 49 8B 06
-				static uintptr_t constexpr WorldToScreen = 0xE710B0;						//E8 ? ? ? ? 49 8D 97 ? ? ? ? 4C 8D 45 D8
-				static uintptr_t constexpr GetCollisionFlags = 0xDE6720;					//48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A
+				static uintptr_t constexpr WorldToScreen = 0xE71060;						//E8 ? ? ? ? 49 8D 97 ? ? ? ? 4C 8D 45 D8
+				static uintptr_t constexpr GetCollisionFlags = 0xDE66D0;					//48 83 EC 28 48 8B D1 48 8B 0D ? ? ? ? 48 8B 49 08 E8 ? ? ? ? 48 8B C8 48 85 C0 74 1A
 			}
 
 			namespace Orders {
-				static uintptr_t constexpr IssueClick = 0x8C3010;							//45 33 C0 E8 ? ? ? ? 48 83 C4 48
+				static uintptr_t constexpr IssueClick = 0x8C3010;	     //TODO				//45 33 C0 E8 ? ? ? ? 48 83 C4 48
 				static uintptr_t constexpr IssueRClick = 0x8C3250;							//48 89 5C 24 ? 57 48 83 EC 50 48 8B D9 0F 29 74 24 ? 48 8B 0D ? ? ? ?
 				static uintptr_t constexpr IssueMove = 0x8C2630;							//48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B F1 41 0F B6 F9
-				static uintptr_t constexpr BuildNavPath = 0xDE2890;							//48 8B C4 48 89 58 10 55 56 57 41 54 41 55 41 56 41 57 48 8D
-				static uintptr_t constexpr BuildSmoothPath = 0x917CD0;						//40 53 55 41 56 48 83 EC 50 48
+				static uintptr_t constexpr BuildNavPath = 0xDE2840;							//48 8B C4 48 89 58 10 55 56 57 41 54 41 55 41 56 41 57 48 8D
+				static uintptr_t constexpr BuildSmoothPath = 0x917CD0;	//TODO				//40 53 55 41 56 48 83 EC 50 48
 			}
 
 			namespace HUD {
@@ -119,8 +119,8 @@ namespace UPasta
 
 				static uintptr_t constexpr RenderUsualSuspects = 0x60C180;					//48 8B C4 48 89 58 18 89
 
-				static uintptr_t constexpr GetHeightAtPosition = 0xDF1070;					//E8 ? ? ? ? F3 0F 10 45 ? B0 01
-				static uintptr_t constexpr IsNotWall = 0xDECB70;							//E8 ? ? ? ? 34 01 44 3A F0
+				static uintptr_t constexpr GetHeightAtPosition = 0xDF1020;					//E8 ? ? ? ? F3 0F 10 45 ? B0 01
+				static uintptr_t constexpr IsNotWall = 0xDECB20;							//E8 ? ? ? ? 34 01 44 3A F0
 
 			}
 
@@ -146,7 +146,7 @@ namespace UPasta
 				static uintptr_t constexpr IsCasting = 0x215420;			//TODO			//48 83 EC 28 48 81 C1 ? ? ? ? 48 8B 01 FF 50 50
 				static uintptr_t constexpr IsTargetableToTeam = 0x2553D0;	//TODO			//E8 ? ? ? ? 84 C0 74 35 48 8D 8F ? ? ? ?
 
-				static uintptr_t constexpr IsCellPassable = 0xDECB70;		//TODO			//E8 ? ? ? ? 44 3A E8
+				static uintptr_t constexpr IsCellPassable = 0xDECB20;		//TODO			//E8 ? ? ? ? 44 3A E8
 
 				static uintptr_t constexpr HasBuff = 0x211600;				//TODO			//48 89 5C 24 ? 57 48 83 EC 20 48 8B 01 41 8B D8
 				static uintptr_t constexpr HasBuffOfType = 0x211640;		//TODO			//E9 ? ? ? ? 48 8B 74 24 ? 32 C0
@@ -168,8 +168,8 @@ namespace UPasta
 				static uintptr_t constexpr GetBoundingRadius = 0x2064A0;					//E8 ? ? ? ? 0F 28 F8 48 8B D6
 				static uintptr_t constexpr GetObjectFromNetID = 0x3B4BD0;					//4C 8B C1 85 D2 74 1B
 
-				static uintptr_t constexpr IsNotLocalPlayer = 0x215290;						//33 C0 48 3B 0D ? ? ? ?
-				static uintptr_t constexpr IsAttackingLocalPlayer = 0x216EF0;				//5B C3 CC CC CC CC CC 48 8D 91 ? ? ? ? SUB SOTTO (QUESTO E' SOLO UN RIFERIMENTO)
+				static uintptr_t constexpr IsNotLocalPlayer = 0x215290;			//TODO				//33 C0 48 3B 0D ? ? ? ?
+				static uintptr_t constexpr IsAttackingLocalPlayer = 0x216EF0;	//TODO				//5B C3 CC CC CC CC CC 48 8D 91 ? ? ? ? SUB SOTTO (QUESTO E' SOLO UN RIFERIMENTO)
 
 				static uintptr_t constexpr IsObjectType = 0x2167A0;							//0F B6 41 48 4C 8B C9
 				static uintptr_t constexpr IsCanSee = 0x266AD0;								//40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 90 ? ? ? ? 84 C0 75 19
