@@ -2,7 +2,6 @@
 #include "../Damage.h"
 #include "../PluginTemplate.h"
 
-#define PI 3.14159265f
 namespace UPasta {
     namespace Plugins {
         namespace Ashe {

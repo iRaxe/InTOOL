@@ -1,115 +1,145 @@
 #pragma once
-#include "../NewMenu.h"
-using namespace UPasta::SDK;
+#include "../Damage.h"
+#include "../PluginTemplate.h"
+namespace UPasta {
+    namespace Plugins {
+        namespace Twitch {
+            namespace Config {
 
-namespace TwitchConfig
-{
+                using namespace UPasta::SDK;
+                namespace TwitchCombo {
+                    inline CheckBox* UseQ;
+                    inline CheckBox* UseW;
+                    inline CheckBox* UseE;
+                    inline CheckBox* UseEWithStacks;
+                    inline Slider* minStacks;
+                    static float GetMinimumEStacks() { return static_cast<float>(minStacks->Value); }
 
-    namespace TwitchCombo {
-        inline CheckBox* UseQ;
-        inline CheckBox* UseW;
-        inline CheckBox* UseE;
-        inline CheckBox* UseR;
-        inline CheckBox* UseEWithStacks;
-        inline Slider* minStacks;
-        inline Slider* enemiesInRange;
+                    inline CheckBox* UseR;
+
+                    inline Slider* enemiesInRange;
+                    static float GetMinimumREnemies() { return static_cast<float>(enemiesInRange->Value); }
+
+                }
+
+                namespace TwitchHarass {
+                    inline CheckBox* UseW;
+                    inline CheckBox* UseE;
+                    inline CheckBox* UseEWithStacks;
+                    inline Slider* minStacks;
+                    static float GetMinimumEStacks() { return static_cast<float>(minStacks->Value); }
+
+                    inline Slider* minMana;
+                    static float GetMinimumMana() { return static_cast<float>(minMana->Value); }
+                }
+
+                namespace TwitchClear {
+                    inline CheckBox* UseW;
+                    inline CheckBox* UseE;
+                    inline Slider* minMinions;
+                    static int GetMinimumMinions() { return minMinions->Value; }
+
+                    inline Slider* minMana;
+                    static float GetMinimumMana() { return static_cast<float>(minMana->Value); }
+                }
+
+                namespace TwitchJungle {
+                    inline CheckBox* UseQ;
+                    inline CheckBox* UseW;
+                    inline CheckBox* UseE;
+                    inline CheckBox* UseEWithStacks;
+                    inline Slider* minStacks;
+                    static float GetMinimumEStacks() { return static_cast<float>(minStacks->Value); }
+
+                    inline Slider* minMana;
+                    static float GetMinimumMana() { return static_cast<float>(minMana->Value); }
+                }
+
+                namespace TwitchKillsteal {
+                    inline CheckBox* UseE;
+                }
+
+                namespace TwitchFlee {
+                    inline CheckBox* UseQ;
+                    inline CheckBox* UseW;
+                }
+
+                namespace TwitchAntiGapCloser {
+                    inline CheckBox* UseQ;
+                    inline CheckBox* UseW;
+                    inline std::vector<Object*> whitelist;
+                }
+
+                namespace TwitchSpellsSettings {
+                    inline Slider* qRange;
+                    inline CheckBox* DrawQ;
+                    static float GetQRange() { return static_cast<float>(qRange->Value); }
+
+                    inline Slider* wRange;
+                    inline CheckBox* DrawW;
+                    static float GetWRange() { return static_cast<float>(wRange->Value); }
+
+                    inline Slider* eRange;
+                    inline CheckBox* DrawE;
+                    static float GetERange() { return static_cast<float>(eRange->Value); }
+
+                    inline Slider* rRange;
+                    inline CheckBox* DrawR;
+                    static float GetRRange() { return static_cast<float>(rRange->Value); }
+
+                    inline CheckBox* DrawHPDamage;
+                    inline CheckBox* DrawPosDamage;
+
+                    inline CheckBox* DrawIfReady;
+                    static bool ShouldDrawOnlyIfReady() { return DrawIfReady->Value; }
+                }
+            }
+
+            namespace Events {
+                void Initialize();
+                void Subscribe();
+                void Unsubscribe();
+                void OnGameUpdate();
+                void OnAfterAttack();
+                void OnDraw();
+            }
+
+            namespace Modes {
+                void Combo();
+                void Clear();
+                void Harass();
+                void Killsteal();
+                void AntiGapCloser();
+                void Flee();
+
+            }
+
+            namespace Functions {
+                bool HasTwitchE(Object* obj);
+                int GetDeadlyVenomStacks(Object* obj);
+                float GetTwitchEDamage(Object* obj);
+
+                void InitializeMenu();
+
+                void UseQ();
+                void UseW(Object* obj);
+                void UseE(Object* obj);
+                void UseR(Object* obj);
+
+                void DrawSpellRadius(float range);
+                void DrawDamageOnHPBar(Object* obj);
+                void DrawDamageOnPos(Object* obj);
+            }
+
+            namespace Damages
+            {
+                namespace ESpell {
+                    inline float dmgSkillArray[6] = { 0, 20, 30, 40, 50, 60 };
+                    inline float perStackDamage[6] = { 0, 15, 20, 25, 30, 35 };
+                    inline float additionalPercentageAD = 0.35f;
+                }
+            }
+        }
     }
-
-    namespace TwitchHarass {
-        inline CheckBox* UseW;
-        inline CheckBox* UseE;
-        inline CheckBox* UseEWithStacks;
-        inline Slider* minStacks;
-        inline Slider* minMana;
-
-    }
-
-    namespace TwitchClear {
-        inline CheckBox* UseW;
-        inline CheckBox* UseE;
-        inline Slider* minMana;
-        inline Slider* minMinion;
-    }
-
-    namespace TwitchJungle {
-        inline CheckBox* UseW;
-        inline CheckBox* UseE;
-        inline CheckBox* UseEWithStacks;
-        inline Slider* minStacks;
-        inline Slider* minMana;
-    }
-
-    namespace TwitchLastHit {
-    }
-
-    namespace TwitchSpellsSettings {
-
-        inline CheckBox* saveMana;
-
-        inline List* qCastMode;
-        inline Slider* qRange;
-        inline CheckBox* DrawQ;
-
-        inline List* wCastMode;
-        inline Slider* wRange;
-        inline CheckBox* DrawW;
-
-        inline Slider* eRange;
-        inline CheckBox* DrawE;
-
-        inline List* targetMode;
-        inline CheckBox* DrawR;
-
-        inline CheckBox* DrawIfReady;
-    }
-
-    namespace TwitchKillsteal {
-        inline CheckBox* UseE;
-    }
-
-    namespace TwitchFlee {
-        inline CheckBox* UseQ;
-    }
-
-    namespace TwitchHPBAR {
-        inline CheckBox* DrawEDamage;
-    }
-
 }
 
-namespace TwitchDamages
-{
-    static constexpr float barWidth = 100.0f;
-    static constexpr float yOffset = 23.5f;
-    static constexpr float xOffset = -46.0f;
-    static constexpr float widthMultiplier = 105;
-
-    namespace QSpell
-    {
-        inline float dmgSkillArray[6] = { 0, 0, 0, 0, 0, 0 };
-        inline float additionalPercentageAD = 0.0f;
-        inline float additionalPercentageAP = 0.0f;
-    }
-
-    namespace WSpell
-    {
-        inline float dmgSkillArray[6] = { 0, 0, 0, 0, 0, 0 };
-        inline float additionalPercentageAD = 0.0f;
-        inline float additionalPercentageAP = 0.0f;
-    }
-
-    namespace ESpell
-    {
-        inline float dmgSkillArray[6] = { 0, 20, 30, 40, 50, 60 };
-        inline float perStackDamage[6] = { 0, 15, 20, 25, 30, 35 };
-        inline float additionalPercentageAD = 0.35f;
-        inline float additionalPercentageAP = 0.0f;
-    }
-
-    namespace RSpell
-    {
-        inline float dmgSkillArray[4] = { -9999, 40, 55 ,70 };
-        inline float additionalPercentageAD = 0.0f;
-        inline float additionalPercentageAP = 0.0f;
-    }
-}

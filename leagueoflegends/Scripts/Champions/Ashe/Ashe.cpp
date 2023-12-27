@@ -140,8 +140,6 @@ void Functions::InitializeMenu()
 
 	AsheSpellsSettings::DrawIfReady = spellsMenu->AddCheckBox("DrawIfReady", "Draw SpellSlots Only If Ready", true);
 
-	AsheSpellsSettings::DrawIfReady = spellsMenu->AddCheckBox("DrawIfReady", "Draw SpellSlots Only If Ready", true);
-
 	const auto miscMenu = additionalMenu->AddMenu("Hp bar", "Damage Drawings");
 	AsheSpellsSettings::DrawHPDamage = miscMenu->AddCheckBox("DrawHPDamage", "Draw Damage over HealthBar", false);
 	AsheSpellsSettings::DrawPosDamage = miscMenu->AddCheckBox("DrawPosDamage", "Draw Damage on target position", false);
@@ -167,49 +165,22 @@ void Events::Unsubscribe() {
 }
 
 void Functions::UseQ(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
-
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastAsheQ()) return;
-
-	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > AsheSpellsSettings::GetQRange()) return;
 
 	Engine::CastSelf(SpellIndex::Q);
 	AsheQCastedTime = asheGameTime;
 }
 
 void Functions::UseW(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
-	if (AsheSpellsSettings::UseWIfFullAASpeed->Value == false && ObjectManager::GetLocalPlayer()->GetAttackSpeed() >= 2.5f) return;
-
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastAsheW()) return;
-
-	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > AsheSpellsSettings::GetWRange()) return;
+	if (AsheSpellsSettings::UseWIfFullAASpeed->Value == false && ObjectManager::GetLocalPlayer()->GetAttackSpeed() >= 2.5f) return;
 
 	Engine::CastToPosition(SpellIndex::W, obj->GetPosition());
 	AsheWCastedTime = asheGameTime;
 }
 
 void Functions::UseR(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
-
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastAsheR()) return;
-
-	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) < AsheSpellsSettings::GetMinRRange()) return;
 
 	Modules::prediction::PredictionOutput rPrediction;
 	if (GetPrediction(database.AsheR, rPrediction)) {
@@ -228,13 +199,7 @@ void Functions::DrawSpellRadius(float range) {
 }
 
 void Functions::DrawDamageOnHPBar(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
-
-	const Vector2 objHPBarScreenPos = Engine::GetHpBarPosition(obj);
+		const Vector2 objHPBarScreenPos = Engine::GetHpBarPosition(obj);
 	if (!objHPBarScreenPos.IsValid()) return;
 
 	const float wDamage = Damages::WSpell::GetDamage(obj);
@@ -259,12 +224,6 @@ void Functions::DrawDamageOnHPBar(Object* obj) {
 }
 
 void Functions::DrawDamageOnPos(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
-
 	const auto dmgPos = Engine::GetBaseDrawPosition(obj);
 	if (!dmgPos.IsValid()) return;
 
@@ -286,8 +245,7 @@ void Events::OnDraw() {
 		Functions::DrawSpellRadius(AsheSpellsSettings::GetWRange());
 
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
-		if (!hero) continue;
-		if (hero->GetDistanceTo(ObjectManager::GetLocalPlayer()) > 1500.0f) continue;
+		if (!TargetSelector::IsValid(hero, ObjectManager::GetLocalPlayer()->GetPosition(), 1500.0f)) return;
 
 		if (AsheSpellsSettings::DrawPosDamage->Value == true) {
 			Functions::DrawDamageOnPos(hero);
@@ -361,16 +319,16 @@ void Modes::Combo() {
 
 	if (AsheCombo::UseW->Value == true && isTimeToCastAsheW()) {
 		const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange());
-		if (wTarget != nullptr) {
-			Functions::UseW(wTarget);
-		}
+		if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange())) return;
+
+		Functions::UseW(wTarget);
 	}
 
 	if (AsheCombo::UseR->Value == true && isTimeToCastAsheR()) {
 		const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetMaxRRange());
-		if (rTarget != nullptr) {
-			Functions::UseR(rTarget);
-		}
+		if (!TargetSelector::IsValid(rTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetMaxRRange())) return;
+
+		Functions::UseR(rTarget);
 	}
 }
 
@@ -384,11 +342,9 @@ void Modes::Clear() {
 
 		if (AsheClear::UseW->Value && isTimeToCastAsheW()) {
 			const auto wTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange(), Alliance::Enemy);
-			if (wTarget != nullptr) {
-				if (wTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) < ObjectManager::GetLocalPlayer()->GetRealAttackRange()) return;
+			if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange())) return;
 
-				Functions::UseW(wTarget);
-			}
+			Functions::UseW(wTarget);
 		}
 	}
 	else {
@@ -398,11 +354,9 @@ void Modes::Clear() {
 
 			if (AsheClear::UseW->Value && isTimeToCastAsheW()) {
 				const auto wTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange());
-				if (wTarget != nullptr) {
-					if (wTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) < ObjectManager::GetLocalPlayer()->GetRealAttackRange()) return;
+				if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange())) return;
 
-					Functions::UseW(wTarget);
-				}
+				Functions::UseW(wTarget);
 			}
 		}
 	}
@@ -417,7 +371,7 @@ void Modes::LastHit() {
 	if (minionsInRange == 0) return;
 
 	const auto wTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange(), Alliance::Enemy);
-	if (wTarget == nullptr) return;
+	if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange())) return;
 	if (wTarget->GetHealth() > Damages::WSpell::GetDamage(wTarget)) return;
 
 	Functions::UseW(wTarget);
@@ -432,7 +386,7 @@ void Modes::Harass() {
 	if (enemiesInRange == 0) return;
 
 	const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange());
-	if (wTarget == nullptr) return;
+	if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange())) return;
 
 	Functions::UseW(wTarget);
 }
@@ -512,16 +466,16 @@ void Events::OnAfterAttack() {
 	if (Orbwalker::Mode == Attack) {
 		if (AsheCombo::UseQ->Value && isTimeToCastAsheQ()) {
 			const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange());
-			if (qTarget != nullptr) {
-				Functions::UseQ(qTarget);
-			}
+			if (!TargetSelector::IsValid(qTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange())) return;
+
+			Functions::UseQ(qTarget);
 		}
 
 		if (AsheCombo::UseW->Value && AsheSpellsSettings::UseWIfInAARange->Value && isTimeToCastAsheW()) {
 			const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange());
-			if (wTarget != nullptr) {
-				Functions::UseW(wTarget);
-			}
+			if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange())) return;
+
+			Functions::UseW(wTarget);
 		}
 	}
 
@@ -533,17 +487,15 @@ void Events::OnAfterAttack() {
 
 			if (AsheClear::UseQ->Value && isTimeToCastAsheQ()) {
 				const auto qTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange(), Alliance::Enemy);
-				if (qTarget != nullptr) {
-					Functions::UseQ(qTarget);
-				}
+				if (!TargetSelector::IsValid(qTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange())) return;
+
+				Functions::UseQ(qTarget);
 			}
 			if (AsheClear::UseW->Value && isTimeToCastAsheW()) {
 				const auto wTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange(), Alliance::Enemy);
-				if (wTarget != nullptr) {
-					if (wTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) < ObjectManager::GetLocalPlayer()->GetRealAttackRange()) return;
+				if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange())) return;
 
-					Functions::UseW(wTarget);
-				}
+				Functions::UseW(wTarget);
 			}
 		}
 		else {
@@ -551,20 +503,18 @@ void Events::OnAfterAttack() {
 			if (jungleMonstersInRange > 0) {
 				if (AsheJungle::GetMinimumMana() >= ObjectManager::GetLocalPlayer()->GetPercentMana()) return;
 
+				if (AsheJungle::UseQ->Value && isTimeToCastAsheQ()) {
+					const auto qTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange());
+					if (!TargetSelector::IsValid(qTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange())) return;
+
+					Functions::UseQ(qTarget);
+				}
+
 				if (AsheClear::UseW->Value && isTimeToCastAsheW()) {
-					if (AsheJungle::UseQ->Value && isTimeToCastAsheQ()) {
-						const auto qTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange());
-						if (qTarget != nullptr) {
-							Functions::UseQ(qTarget);
-						}
-					}
-
 					const auto wTarget = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange());
-					if (wTarget != nullptr) {
-						if (wTarget->GetDistanceTo(ObjectManager::GetLocalPlayer()) < ObjectManager::GetLocalPlayer()->GetRealAttackRange()) return;
+					if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetWRange())) return;
 
-						Functions::UseW(wTarget);
-					}
+					Functions::UseW(wTarget);
 				}
 			}
 		}
@@ -575,9 +525,9 @@ void Events::OnAfterAttack() {
 
 		if (AsheHarass::UseQ->Value && isTimeToCastAsheQ()) {
 			const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange());
-			if (qTarget != nullptr) {
-				Functions::UseQ(qTarget);
-			}
+			if (!TargetSelector::IsValid(qTarget, ObjectManager::GetLocalPlayer()->GetPosition(), AsheSpellsSettings::GetQRange())) return;
+
+			Functions::UseQ(qTarget);
 		}
 	}
 }

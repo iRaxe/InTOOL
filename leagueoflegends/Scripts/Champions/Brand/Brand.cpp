@@ -135,27 +135,15 @@ void Events::Initialize() {
 void Events::Subscribe() {
 	TryCatch(Event::Subscribe(Event::OnDraw, &OnDraw), "Error subscribing to OnDraw event");
 	TryCatch(Event::Subscribe(Event::OnGameTick, &OnGameUpdate), "Error subscribing to OnGameTick event");
-	TryCatch(Event::Subscribe(Event::OnWndProc, &OnWndProc), "Error subscribing to OnWndProc event");
 }
 
 void Events::Unsubscribe() {
 	TryCatch(Event::UnSubscribe(Event::OnDraw, &OnDraw), "Error unsubscribing to OnDraw event");
 	TryCatch(Event::UnSubscribe(Event::OnGameTick, &OnGameUpdate), "Error unsubscribing to OnGameTick event");
-	TryCatch(Event::UnSubscribe(Event::OnWndProc, &OnWndProc), "Error unsubscribing to OnWndProc event");
-	//TryCatch(Event::UnSubscribe(Event::OnProcessSpell, &OnProcessSpell), "Error unsubscribing to OnProcessSpell event");
 }
 
 void Functions::UseQ(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
-
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastBrandQ()) return;
-
-	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > BrandSpellsSettings::GetQRange()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
 		Engine::CastToPosition(SpellIndex::Q, obj->GetPosition());
@@ -171,16 +159,7 @@ void Functions::UseQ(Object* obj) {
 }
 
 void Functions::UseW(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
-
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastBrandW()) return;
-
-	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > BrandSpellsSettings::GetWRange()) return;
 
 	if (obj->IsMinion() || obj->IsJungle()) {
 		Engine::CastToPosition(SpellIndex::W, obj->GetPosition());
@@ -196,32 +175,14 @@ void Functions::UseW(Object* obj) {
 }
 
 void Functions::UseE(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
-
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastBrandE()) return;
-
-	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > BrandSpellsSettings::GetERange()) return;
 
 	Engine::CastTargeted(SpellIndex::E, obj);
 	BrandECastedTime = Brandgametime;
 }
 
 void Functions::UseR(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (!ObjectManager::GetLocalPlayer()->IsTargetable()) return;
-
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
 	if (!Orbwalker::CanCastAfterAttack() || !isTimeToCastBrandR()) return;
-
-	if (obj->GetDistanceTo(ObjectManager::GetLocalPlayer()) > BrandSpellsSettings::GetRRange()) return;
 
 	Engine::CastTargeted(SpellIndex::R, obj);
 	BrandRCastedTime = Brandgametime;
@@ -237,12 +198,6 @@ void Functions::DrawSpellRadius(float range) {
 }
 
 void Functions::DrawDamageOnHPBar(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
-		
 	const Vector2 objHPBarScreenPos = Engine::GetHpBarPosition(obj);
 	if (!objHPBarScreenPos.IsValid()) return;
 
@@ -270,12 +225,6 @@ void Functions::DrawDamageOnHPBar(Object* obj) {
 }
 
 void Functions::DrawDamageOnPos(Object* obj) {
-	if (ObjectManager::GetLocalPlayer() == nullptr) return;
-	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
-	if (obj == nullptr) return;
-	if (!obj->IsAlive()) return;
-	if (!obj->IsTargetable()) return;
-
 	const auto dmgPos = Engine::GetBaseDrawPosition(obj);
 	if (!dmgPos.IsValid()) return;
 
@@ -318,10 +267,8 @@ void Events::OnDraw() {
 	if (BrandSpellsSettings::DrawR->Value == true && (BrandSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastBrandR() || !BrandSpellsSettings::ShouldDrawOnlyIfReady()))
 		Functions::DrawSpellRadius(BrandSpellsSettings::GetRRange());
 
-	auto nig = 0;
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
-		if (!hero) continue;
-		if (hero->GetDistanceTo(ObjectManager::GetLocalPlayer()) > 1500.0f) continue;
+		if (!TargetSelector::IsValid(hero, ObjectManager::GetLocalPlayer()->GetPosition(), 1500.0f)) continue;
 
 		if (BrandSpellsSettings::DrawPosDamage->Value == true) {
 			Functions::DrawDamageOnPos(hero);
@@ -330,56 +277,27 @@ void Events::OnDraw() {
 		if (BrandSpellsSettings::DrawHPDamage->Value == true) {
 			Functions::DrawDamageOnHPBar(hero);
 		}
-
-		if (Modules::prediction::IsSpecificObjectInWay(ObjectManager::GetLocalPlayer()->GetPosition(), Engine::GetMouseWorldPos(), hero, 300)) 	{
-			nig++;
-		}
 	}
-
-	render::RenderLineWorld(ObjectManager::GetLocalPlayer()->GetPosition(), Engine::GetMouseWorldPos(), COLOR_RED, 2.0f);
-	render::RenderTextWorld(std::to_string(nig), Engine::GetMouseWorldPos(), 30.0f, COLOR_WHITE, true);
-
 }
 
 void Events::OnGameUpdate() {
 	if (ObjectManager::GetLocalPlayer() == nullptr) return;
 	if (!ObjectManager::GetLocalPlayer()->IsAlive()) return;
+	if (Orbwalker::State == Orbwalker::CHANNELING || Orbwalker::State == Orbwalker::DODGING) return;
 
 	Brandgametime = Engine::GetGameTime();
 
+	if (Orbwalker::Mode == Attack) {
+		Modes::Combo();
+	}
+	if (Orbwalker::Mode == Harass) {
+		Modes::Harass();
+	}
+	if (Orbwalker::Mode == Clear || Orbwalker::Mode == FastClear) {
+		Modes::Clear();
+	}
+
 	Modes::Killsteal();
-	// TODO: HANDLE IS EVADING SPELL
-}
-
-void Events::OnWndProc(UINT msg, WPARAM param) {
-	if (param == OrbwalkerConfig::comboKey->Key) {
-		switch (msg) {
-			case WM_KEYDOWN: Modes::Combo(); break;
-			case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::harassKey->Key) {
-		switch (msg) {
-			case WM_KEYDOWN: Modes::Harass(); break;
-			case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::laneClearKey->Key) {
-		switch (msg) {
-			case WM_KEYDOWN: Modes::Clear(); break;
-			case WM_KEYUP: break;
-		}
-	}
-
-	if (param == OrbwalkerConfig::fastClearKey->Key) {
-		switch (msg) {
-			case WM_KEYDOWN: Modes::Clear(); break;
-			case WM_KEYUP: break;
-		}
-	}
-
 }
 
 void Modes::Combo() {
@@ -387,16 +305,16 @@ void Modes::Combo() {
 
 	if (BrandCombo::UseW->Value == true && isTimeToCastBrandW()) {
 		const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange());
-		if (wTarget != nullptr) {
-			Functions::UseW(wTarget);
-		}
+		if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange())) return;
+
+		Functions::UseW(wTarget);
 	}
 
 	if (BrandCombo::UseE->Value == true && isTimeToCastBrandE()) {
 		const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetERange());
-		if (eTarget != nullptr) {
-			Functions::UseE(eTarget);
-		}
+		if (!TargetSelector::IsValid(eTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetERange())) return;
+
+		Functions::UseE(eTarget);
 	}
 
 	if (BrandCombo::UseQ->Value == true && isTimeToCastBrandQ()) {
@@ -406,17 +324,17 @@ void Modes::Combo() {
 		}
 
 		const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetQRange());
-		if (qTarget != nullptr) {
-			Functions::UseQ(qTarget);
-		}
+		if (!TargetSelector::IsValid(qTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetQRange())) return;
+
+		Functions::UseQ(qTarget);
 	}
 
 	const int heroesInRange = ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetRRange());
 	if (BrandCombo::UseR->Value == true && isTimeToCastBrandR() && BrandCombo::GetMinimumEnemies() <= heroesInRange) {
 		const auto rTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetRRange());
-		if (rTarget != nullptr) {
-			Functions::UseR(rTarget);
-		}
+		if (!TargetSelector::IsValid(rTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetRRange())) return;
+
+		Functions::UseR(rTarget);
 	}
 }
 
@@ -429,21 +347,21 @@ void Modes::Clear() {
 
 		if (BrandClear::UseW->Value && isTimeToCastBrandW()) {
 			const auto wTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange(), Alliance::Enemy);
-			if (wTarget != nullptr) {
-				const auto minionsAroundWTarget = ObjectManager::CountMinionsInRange(Alliance::Enemy, wTarget->GetPosition(), database.BrandW.GetRadius());
-				if (minionsAroundWTarget >= BrandClear::GetMinimumMinions()) {
-					Functions::UseW(wTarget);
-				}
+			if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange())) return;
+
+			const auto minionsAroundWTarget = ObjectManager::CountMinionsInRange(Alliance::Enemy, wTarget->GetPosition(), database.BrandW.GetRadius());
+			if (minionsAroundWTarget >= BrandClear::GetMinimumMinions()) {
+				Functions::UseW(wTarget);
 			}
 		}
 
 		if (BrandClear::UseE->Value && isTimeToCastBrandE()) {
 			const auto eTarget = TargetSelector::FindBestMinion(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetERange(), Alliance::Enemy);
-			if (eTarget != nullptr) {
-				const auto minionsAroundWTarget = ObjectManager::CountMinionsInRange(Alliance::Enemy, eTarget->GetPosition(), database.BrandW.GetRadius());
-				if (minionsAroundWTarget >= BrandClear::GetMinimumMinions()) {
-					Functions::UseE(eTarget);
-				}
+			if (!TargetSelector::IsValid(eTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetERange())) return;
+
+			const auto minionsAroundWTarget = ObjectManager::CountMinionsInRange(Alliance::Enemy, eTarget->GetPosition(), database.BrandW.GetRadius());
+			if (minionsAroundWTarget >= BrandClear::GetMinimumMinions()) {
+				Functions::UseE(eTarget);
 			}
 		}
 	}
@@ -454,23 +372,23 @@ void Modes::Clear() {
 
 			if (BrandJungle::UseW->Value && isTimeToCastBrandW()) {
 				const auto wMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange());
-				if (wMonster != nullptr) {
-					Functions::UseW(wMonster);
-				}
+				if (!TargetSelector::IsValid(wMonster, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange())) return;
+
+				Functions::UseW(wMonster);
 			}
 
 			if (BrandJungle::UseE->Value && isTimeToCastBrandE()) {
 				const auto eMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetERange());
-				if (eMonster != nullptr) {
-					Functions::UseE(eMonster);
-				}
+				if (!TargetSelector::IsValid(eMonster, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetERange())) return;
+
+				Functions::UseE(eMonster);
 			}
 
 			if (BrandJungle::UseQ->Value && isTimeToCastBrandQ()) {
 				const auto qMonster = TargetSelector::FindBestJungle(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetQRange());
-				if (qMonster != nullptr) {
-					Functions::UseQ(qMonster);
-				}
+				if (!TargetSelector::IsValid(qMonster, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetQRange())) return;
+
+				Functions::UseQ(qMonster);
 			}
 		}
 	}
@@ -482,23 +400,23 @@ void Modes::Harass() {
 
 	if (BrandHarass::UseW->Value && isTimeToCastBrandW()) {
 		const auto wTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange());
-		if (wTarget != nullptr) {
-			Functions::UseW(wTarget);
-		}
+		if (!TargetSelector::IsValid(wTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange())) return;
+
+		Functions::UseW(wTarget);
 	}
 
 	if (BrandHarass::UseE->Value && isTimeToCastBrandE()) {
 		const auto eTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetERange());
-		if (eTarget != nullptr) {
-			Functions::UseE(eTarget);
-		}
+		if (!TargetSelector::IsValid(eTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetERange())) return;
+
+		Functions::UseE(eTarget);
 	}
 
 	if (BrandHarass::UseQ->Value && isTimeToCastBrandQ()) {
 		const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetQRange());
-		if (qTarget != nullptr) {
-			Functions::UseQ(qTarget);
-		}
+		if (!TargetSelector::IsValid(qTarget, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetQRange())) return;
+
+		Functions::UseQ(qTarget);
 	}
 }
 
@@ -506,9 +424,7 @@ void Modes::Killsteal() {
 	if (!Orbwalker::CanCastAfterAttack()) return;
 
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
-		if (!hero) continue;
-		if (hero->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition()) > BrandSpellsSettings::GetWRange() + hero->GetBoundingRadius() / 2) continue;
-		if (hero->IsInvulnerable()) continue;
+		if (!TargetSelector::IsValid(hero, ObjectManager::GetLocalPlayer()->GetPosition(), BrandSpellsSettings::GetWRange())) return;
 
 		const float heroHealth = hero->GetHealth() + hero->GetShield();
 		if (BrandKillsteal::UseE->Value && isTimeToCastBrandQ() && heroHealth < Damages::ESpell::GetDamage(hero)) {

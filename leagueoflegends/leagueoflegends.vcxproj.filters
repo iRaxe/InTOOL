@@ -59,9 +59,6 @@
     <Filter Include="Scripts\Champions">
       <UniqueIdentifier>{5a45deb9-074c-4900-9f80-84a3b603b3b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scripts\Champions\Ashe">
-      <UniqueIdentifier>{aabc1889-aac5-4540-a536-c1074fe288f9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scripts\Utilities">
       <UniqueIdentifier>{8802827e-c99d-4dbc-aa4c-fa7059a5f130}</UniqueIdentifier>
     </Filter>
@@ -194,9 +191,6 @@
     <Filter Include="Global\SpellBook">
       <UniqueIdentifier>{8b4e11cd-56b6-4843-a2b0-d672ed41e089}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scripts\Champions\Twitch">
-      <UniqueIdentifier>{5df439ce-ba7f-4e05-a9a3-c06724121a94}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scripts\Champions\Jinx">
       <UniqueIdentifier>{16c432dc-9b94-4a8c-8b7d-ae979816fc87}</UniqueIdentifier>
     </Filter>
@@ -205,9 +199,6 @@
     </Filter>
     <Filter Include="Scripts\Champions\KogMaw">
       <UniqueIdentifier>{33bba00c-6aa5-42d8-8c12-9ff7b870794c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts\Champions\Blitzcrank">
-      <UniqueIdentifier>{eb8ce28d-78d9-4700-a425-133ece7faa46}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scripts\Champions\Teemo">
       <UniqueIdentifier>{e9bf0a52-b790-48bf-9e9d-d9fc54942d39}</UniqueIdentifier>
@@ -229,6 +220,15 @@
     </Filter>
     <Filter Include="Scripts\Champions\New\Yasuo">
       <UniqueIdentifier>{21b089a4-0a18-4683-aa3d-9731719b8756}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\New\Ashe">
+      <UniqueIdentifier>{aabc1889-aac5-4540-a536-c1074fe288f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\New\Blitzcrank">
+      <UniqueIdentifier>{eb8ce28d-78d9-4700-a425-133ece7faa46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Champions\New\Twitch">
+      <UniqueIdentifier>{5df439ce-ba7f-4e05-a9a3-c06724121a94}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -487,7 +487,7 @@
       <Filter>Global\SpellBook</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\Champions\Ashe\Ashe.h">
-      <Filter>Scripts\Champions\Ashe</Filter>
+      <Filter>Scripts\Champions\New\Ashe</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\Champions\Ezreal\Ezreal.h">
       <Filter>Scripts\Champions\Ezreal</Filter>
@@ -511,7 +511,7 @@
       <Filter>Scripts\Champions\Thresh</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\Champions\Twitch\Twitch.h">
-      <Filter>Scripts\Champions\Twitch</Filter>
+      <Filter>Scripts\Champions\New\Twitch</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\Champions\Vayne\Vayne.h">
       <Filter>Scripts\Champions\Vayne</Filter>
@@ -529,7 +529,7 @@
       <Filter>Scripts\Utilities\Evade</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\Champions\Blitzcrank\Blitzcrank.h">
-      <Filter>Scripts\Champions\Blitzcrank</Filter>
+      <Filter>Scripts\Champions\New\Blitzcrank</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\Champions\Amumu\Amumu.h">
       <Filter>Scripts\Champions\Amumu</Filter>
@@ -552,6 +552,8 @@
     <ClInclude Include="Yasuo.h">
       <Filter>Scripts\Champions\New\Yasuo</Filter>
     </ClInclude>
+    <ClInclude Include="Activator.h" />
+    <ClInclude Include="Illaoi.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global\globals.cpp">
@@ -727,7 +729,7 @@
       <Filter>Global\SpellBook</Filter>
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Ashe\Ashe.cpp">
-      <Filter>Scripts\Champions\Ashe</Filter>
+      <Filter>Scripts\Champions\New\Ashe</Filter>
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Ezreal\Ezreal.cpp">
       <Filter>Scripts\Champions\Ezreal</Filter>
@@ -754,7 +756,7 @@
       <Filter>Scripts\Champions\Thresh</Filter>
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Twitch\Twitch.cpp">
-      <Filter>Scripts\Champions\Twitch</Filter>
+      <Filter>Scripts\Champions\New\Twitch</Filter>
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Vayne\Vayne.cpp">
       <Filter>Scripts\Champions\Vayne</Filter>
@@ -772,7 +774,7 @@
       <Filter>Scripts\Utilities\Evade</Filter>
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Blitzcrank\Blitzcrank.cpp">
-      <Filter>Scripts\Champions\Blitzcrank</Filter>
+      <Filter>Scripts\Champions\New\Blitzcrank</Filter>
     </ClCompile>
     <ClCompile Include="Scripts\Champions\Amumu\Amumu.cpp">
       <Filter>Scripts\Champions\Amumu</Filter>
@@ -794,6 +796,12 @@
     </ClCompile>
     <ClCompile Include="Yasuo.cpp">
       <Filter>Scripts\Champions\New\Yasuo</Filter>
+    </ClCompile>
+    <ClCompile Include="Activator.cpp">
+      <Filter>Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Illaoi.cpp">
+      <Filter>Global</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

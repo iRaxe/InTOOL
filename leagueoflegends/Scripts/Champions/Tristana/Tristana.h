@@ -83,25 +83,9 @@ namespace UPasta {
                 void Subscribe();
                 void Unsubscribe();
                 void OnGameUpdate();
-                void OnWndProc(UINT msg, WPARAM param);
                 void OnBeforeAttack();
                 void OnCastSpell(SpellCast* spellCastInfo);
-
                 void OnDraw();
-                void OnCreateMissile(Object* unit);
-                void OnDeleteMissile(Object* unit);
-                void OnCreateObject(Object* unit);
-                void OnDeleteObject(Object* unit);
-                void OnIssueOrder(Object* unit, OrbwalkState order, Vector3* position, Object* target);
-                //void OnCastSpell(void* spellbook, SpellInfo* pSpellInfo, SpellIndex slot, Vector3* _end_position, Vector3* _start_position, DWORD netId);
-                void OnSpellCast(SpellIndex slot);
-                void OnDoCast(SpellInfo* castInfo, SpellData* spellData);
-                void OnDoCastDelayed(SpellInfo* castInfo, SpellData* spellData);
-                void OnProcessSpell(uintptr_t* castInfo, SpellCast* spellData);
-                void OnPlayAnimation(Object* ptr, char* name, float animationTime);
-                void OnFinishCast(SpellInfo* castInfo, Object* object);
-                void OnGapCloserSpell(SpellInfo* castInfo, SpellData* spellData);
-                void OnInterruptibleSpell(SpellInfo* castInfo, SpellData* spellData);
             }
 
             namespace Modes {

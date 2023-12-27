@@ -86,7 +86,6 @@ namespace UPasta {
                 void Unsubscribe();
 
                 void OnGameUpdate();
-                void OnWndProc(UINT msg, WPARAM param);
                 void OnDraw();
             }
 
