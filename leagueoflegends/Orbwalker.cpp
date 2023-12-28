@@ -7,7 +7,7 @@
 static bool is_kalista = false;
 
 int Orbwalker::GetLatency(int extra) {
-	return  extra + 140 / 2;
+	return  extra + 150;
 }
 
 bool Orbwalker::CanAttack() {

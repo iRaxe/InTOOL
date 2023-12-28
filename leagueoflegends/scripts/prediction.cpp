@@ -171,7 +171,7 @@ namespace Modules::prediction
 			}
 }
 
-		// If no targets are predicted within range, return false.
+		// If no targets are predicted within range.
 		if (predictedPositions.empty()) {
 			return false;
 		}
@@ -179,7 +179,7 @@ namespace Modules::prediction
 		// Calculate the centroid of the predicted positions.
 		Vector3 aggregatePosition = std::accumulate(predictedPositions.begin(), predictedPositions.end(), Vector3()) / static_cast<float>(predictedPositions.size());
 
-		// Now, check if the centroid is within the skillshot's radius of enough targets.
+		// Check if the centroid is within the skillshot's radius of enough targets.
 		int count = 0;
 		for (const auto& pos : predictedPositions) {
 			if (aggregatePosition.Distance(pos) <= skillshot.GetRadius()) {
@@ -187,7 +187,7 @@ namespace Modules::prediction
 			}
 		}
 
-		// If the centroid is not effective enough (not within the skillshot's radius of any target), return false.
+		// Not within SpellShot range
 		if (count == 0) {
 			return false;
 		}

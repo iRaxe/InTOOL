@@ -325,9 +325,9 @@ Object* GetBestKnockedUpTarget()
 
 		if (isKnockedup(hero))
 		{
-			float dmg = Damages::RSpell::GetDamage(hero) + Damages::QSpell::GetDamage(hero) + Damage::CalculateAutoAttackDamage(ObjectManager::GetLocalPlayer(), hero);
-			float enemy_health = hero->GetHealth() + hero->GetShield();
-			LOG("Damage: %.2f", dmg);
+			float dmg = Damages::RSpell::GetDamage(hero) + Damages::QSpell::GetDamage(hero) ; //+ Damage::CalculateAutoAttackDamage(ObjectManager::GetLocalPlayer(), hero)
+			float enemy_health = hero->GetHealth(); //+ hero->GetShield();
+			LOG("Damage: %.f", dmg);
 			LOG("Enemy Health: %.2f", enemy_health);
 			if (dmg >= enemy_health)
 			{
@@ -474,13 +474,7 @@ void Functions::DrawDamageOnPos(Object* obj) {
 
 void Events::OnDraw() {
 
-	if (ObjectManager::CountHeroesInRange(Alliance::Enemy, ObjectManager::GetLocalPlayer()->GetPosition(), 1500.0f) > 0)
-	{
-		Modules::prediction::PredictionOutput aoePrediction;
-		if (AoeCalc(ObjectManager::GetLocalPlayer(),database.XerathW, aoePrediction)) {
-			Awareness::Functions::Radius::DrawRadius(aoePrediction.position, database.XerathW.GetRadius(), COLOR_PURPLE, 1.0f);
-		}
-	}
+
 	if (YasuoSpellsSettings::DrawQ->Value == true && (YasuoSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastYasuoQ() || !YasuoSpellsSettings::ShouldDrawOnlyIfReady()))
 		Functions::DrawSpellRadius(YasuoSpellsSettings::GetQRange());
 
@@ -493,7 +487,7 @@ void Events::OnDraw() {
 	if (YasuoSpellsSettings::DrawR->Value == true && (YasuoSpellsSettings::ShouldDrawOnlyIfReady() && isTimeToCastYasuoR() || !YasuoSpellsSettings::ShouldDrawOnlyIfReady()))
 		Functions::DrawSpellRadius(YasuoSpellsSettings::GetRRange());
 
-	auto nig = 0;
+	//auto nig = 0;
 	for (auto hero : ObjectManager::GetHeroesAs(Alliance::Enemy)) {
 		if (!hero) continue;
 		if (hero->GetDistanceTo(ObjectManager::GetLocalPlayer()) > 1500.0f) continue;
@@ -507,20 +501,20 @@ void Events::OnDraw() {
 		}
 	}
 
-	for (auto minion : ObjectManager::GetMinionsAs(Alliance::Enemy)) {
+	//for (auto minion : ObjectManager::GetMinionsAs(Alliance::Enemy)) {
 
-		if (!minion) continue;
-		if (minion->IsAlly()) continue;
-		if (minion->IsAlive() and minion->IsVisible() and minion->IsTargetable() and !minion->IsInvulnerable() and minion->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition()) <= 400 + minion->GetBoundingRadius() / 2)
-		{
-			if (minion->GetBuffByName("YasuoE") != nullptr) continue;
-			if (Modules::prediction::IsSpecificObjectInWay(ObjectManager::GetLocalPlayer()->GetPosition(), Engine::GetMouseWorldPos(), minion, 300))
-			{
-				nig++;
-			}
-		}
+	//	if (!minion) continue;
+	//	if (minion->IsAlly()) continue;
+	//	if (minion->IsAlive() and minion->IsVisible() and minion->IsTargetable() and !minion->IsInvulnerable() and minion->GetPosition().Distance(ObjectManager::GetLocalPlayer()->GetPosition()) <= 400 + minion->GetBoundingRadius() / 2)
+	//	{
+	//		if (minion->GetBuffByName("YasuoE") != nullptr) continue;
+	//		if (Modules::prediction::IsSpecificObjectInWay(ObjectManager::GetLocalPlayer()->GetPosition(), Engine::GetMouseWorldPos(), minion, 300))
+	//		{
+	//			nig++;
+	//		}
+	//	}
 
-	}
+	//}
 	//render::RenderLineWorld(ObjectManager::GetLocalPlayer()->GetPosition(), Engine::GetMouseWorldPos(), COLOR_RED, 2.0f);
 	//render::RenderTextWorld(std::to_string(nig), Engine::GetMouseWorldPos(), 30.0f, COLOR_WHITE, true);
 

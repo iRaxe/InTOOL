@@ -25,22 +25,47 @@ namespace UPasta
 
 			template <typename DmgSkill, typename ADMulti>
 			float CalculateSlotPhysicalDamage(SpellIndex spellIndex, Object* pEnemy, DmgSkill dmgSkill, ADMulti additionalPercentageAD) {
-				const int levelSpell = ObjectManager::GetLocalPlayer()->GetSpellBySlotId(spellIndex)->GetLevel();
+				auto localPlayer = ObjectManager::GetLocalPlayer();
+				if (!localPlayer) {
+					return 0.0f;
+				}
+				if (!pEnemy) {
+					return 0.0f;
+				}
+
+				auto spell = localPlayer->GetSpellBySlotId(spellIndex);
+				if (!spell) {
+					return 0.0f;
+				}
+
+				const int levelSpell = spell->GetLevel();
 
 				float spellslotDamage;
-				if constexpr (std::is_pointer_v<DmgSkill>) spellslotDamage = dmgSkill[levelSpell];
-				else spellslotDamage = dmgSkill;
+				if constexpr (std::is_pointer_v<DmgSkill>) {
+					spellslotDamage = dmgSkill[levelSpell];
+				}
+				else {
+					spellslotDamage = dmgSkill;
+				}
 
 				float attackDamageMultiplier;
-				if constexpr (std::is_pointer_v<ADMulti>) attackDamageMultiplier = additionalPercentageAD[levelSpell];
-				else attackDamageMultiplier = additionalPercentageAD;
+				if constexpr (std::is_pointer_v<ADMulti>) {
+					attackDamageMultiplier = additionalPercentageAD[levelSpell];
+				}
+				else {
+					attackDamageMultiplier = additionalPercentageAD;
+				}
 
-				const float attackDamage = ObjectManager::GetLocalPlayer()->GetBonusAttackDamage();
+				const float attackDamage = localPlayer->GetBonusAttackDamage();
+
 				const float attackDamageModifier = attackDamageMultiplier * attackDamage;
+
 				const float physicalDamage = spellslotDamage + attackDamageModifier;
 
-				return CalculatePhysicalDamage(ObjectManager::GetLocalPlayer(), pEnemy, physicalDamage);
+				float finalDamage = CalculatePhysicalDamage(localPlayer, pEnemy, physicalDamage);
+				return finalDamage;
 			}
+
 
 			template <typename DmgSkill, typename APMulti>
 			float CalculateSlotMagicalDamage(SpellIndex spellIndex, Object* pEnemy, DmgSkill dmgSkill, APMulti additionalPercentageAP) {

@@ -126,22 +126,29 @@ namespace UPasta {
             namespace Damages
             {
                 namespace QSpell {
-                    inline float dmgSkillArray[6] = { 0, 20, 45, 70, 95, 120 };
+                    inline float dmgSkillArray[6] = { 0.0f, 20.0f, 45.0f, 70.0f, 95.0f, 120.0f };
                     inline float additionalPercentageAD = 1.05f;
                     static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotPhysicalDamage<float*, float>(SpellIndex::Q, obj, dmgSkillArray, additionalPercentageAD); }
                 }
 
 
                 namespace ESpell {
-                    inline float dmgSkillArray[6] = { 0, 60, 70, 80, 90, 100 };
+                    inline float dmgSkillArray[6] = { 0.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f };
                     inline float additionalPercentageAP = 0.60f;
                     inline float additionalPercentageAD = .20f;
+                    
 
-                    static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotMixedDamage<float*, float>(SpellIndex::E, obj, dmgSkillArray, additionalPercentageAP, additionalPercentageAD); }
+                    static float GetDamage(Object* obj) {
+                        auto me = ObjectManager::GetLocalPlayer();
+                        int level = me->GetSpellBySlotId(SpellIndex::E)->GetLevel();
+                        float physical = dmgSkillArray[level] + (me->GetAttackDamage() * .20f);
+                        float magical = (me->GetAbilityPower() * .60f);
+                    	return SDK::Damage::CalculatePhysicalDamage(me, obj, physical)
+                        + SDK::Damage::CalculateMagicalDamage(me, obj, magical); }
                 }
 
                 namespace RSpell {
-                    inline float dmgSkillArray[4] = { 0, 200, 350, 500 };
+                    inline float dmgSkillArray[4] = { 0, 200.0f, 350.0f, 500.0f };
                     inline float additionalPercentageAD = 1.5f;
 
                     static float GetDamage(Object* obj) { return SDK::Damage::CalculateSlotPhysicalDamage<float*, float>(SpellIndex::R, obj, dmgSkillArray, additionalPercentageAD); }

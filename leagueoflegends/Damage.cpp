@@ -42,15 +42,22 @@ float Damage::CalculateAutoAttackDamage(Object* source, Object* target) {
 }
 
 float Damage::CalculatePhysicalDamage(Object* source, Object* target, float amount) {
-	if (source == nullptr || target == nullptr) return 0;
-	if (amount <= 0.0f)
-		return 0.0f;
+	if (source == nullptr || target == nullptr) return 0.0f;
+	if (amount <= 0.0f) return 0.0f;
 
 	const auto characterState = source->GetCharacterStateIntermediate();
-	const auto flatArmorPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PhysicalLethality) * (0.6f + 0.4f * source->GetLevel() / 18.0f);
+	if (characterState == nullptr) return 0.0f;
 
-	auto percentArmorPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PercentArmorPenetration);
-	auto percentBonusArmorPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PercentBonusArmorPenetration);
+	float physicalLethality = characterState->ReadClientStat(CharacterStateIntermediate::PhysicalLethality);
+
+	const auto levelFactor = (0.6f + 0.4f * source->GetLevel() / 18.0f);
+
+	const auto flatArmorPenetration = physicalLethality * levelFactor;
+
+	auto percentArmorPenetration = source->GetArmorPenetrationFlat();//characterState->ReadClientStat(CharacterStateIntermediate::PercentArmorPenetration);
+
+	auto percentBonusArmorPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PercentBonusArmorPenetration);;
+
 
 	if (source->IsMinion()) {
 		percentArmorPenetration = 1.0f;
@@ -63,31 +70,39 @@ float Damage::CalculatePhysicalDamage(Object* source, Object* target, float amou
 	const auto armor = target->GetBaseArmor();
 	const auto bonusArmor = target->GetBonusArmor();
 
-	const auto adjustedArmor = armor * percentArmorPenetration - bonusArmor * (1.0f - percentBonusArmorPenetration) - flatArmorPenetration;
+	float adjustedArmor = max(0.0f, armor * percentArmorPenetration - bonusArmor * (1.0f - percentBonusArmorPenetration) - flatArmorPenetration);
+
+	float damageMultiplier = 1.0f;
+	if (adjustedArmor != 0.0f) {
+		if (adjustedArmor > 0.0f) {
+			damageMultiplier = 100.0f / (100.0f + adjustedArmor);
+		}
+		else {
+			damageMultiplier = 2.0f - 100.0f / (100.0f - adjustedArmor);
+		}
+	}
+
+	amount *= damageMultiplier;
 
 	const auto bonusTrueDamage = source->IsHero() && target->IsHero() && source->HasConqueror() ? amount * 0.2f : 0.0f;
 	amount = source->IsHero() && target->IsHero() && source->HasConqueror() ? amount * 0.8f : amount;
+
 	const auto damageModifier = ComputeDamageModifier(source, target, Physical);
 	amount = (amount + damageModifier.Flat) * damageModifier.Percent;
 
-	if (armor < 0.0f) {
-		amount *= 2.0f - 100.0f / (100.0f - armor);
-	}
-	else if (adjustedArmor >= 0.0f) {
-		amount *= 100.0f / (100.0f + adjustedArmor);
-	}
-
 	return max(amount + bonusTrueDamage, 0.0f);
-
 }
 
+
+
 float Damage::CalculateMagicalDamage(Object* source, Object* target, float amount) {
-	if (source == nullptr || target == nullptr) return 0;
-	if (amount <= 0.0f)
-		return 0.0f;
+	if (source == nullptr || target == nullptr) return 0.0f;
+	if (amount <= 0.0f) return 0.0f;
 
 	const auto characterState = source->GetCharacterStateIntermediate();
-	const auto flatMagicPenetration = characterState->ReadClientStat(CharacterStateIntermediate::FlatMagicPenetration);
+	if (characterState == nullptr) return 0.0f;
+
+	const auto flatMagicPenetration = source->GetMagicPenetrationFlat();
 	const auto percentMagicPenetration = characterState->ReadClientStat(CharacterStateIntermediate::PercentMagicPenetration);
 	const auto magicResist = target->GetTotalMagicResist();
 
@@ -108,79 +123,173 @@ float Damage::CalculateMagicalDamage(Object* source, Object* target, float amoun
 		amount *= 2.0f - 100.0f / (100.0f - magicResist);
 	}
 	else {
-		const float adjustedMagicResist = magicResist * percentMagicPenetration - flatMagicPenetration;
+		const float adjustedMagicResist = max(0.0f, magicResist * percentMagicPenetration - flatMagicPenetration);
 		if (adjustedMagicResist >= 0.0f) {
 			amount *= 100.0f / (100.0f + adjustedMagicResist);
 		}
 	}
+
 	return max(amount + bonusTrueDamage, 0.0f);
 }
 
-DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* target, DamageType damageType) {
-	DamageModifierResult result;
-	auto sourceState = source->GetCharacterStateIntermediate();
-	auto targetState = target->GetCharacterStateIntermediate();
-	result.Flat = -sourceState->ReadClientStat(CharacterStateIntermediate::FlatMagicReduction);
-	result.Percent = 1.0f - sourceState->ReadClientStat(CharacterStateIntermediate::FlatMagicReduction);
+static bool buffExistt(Buff* buff, Object* target)
+{
+	if (target == nullptr) return true;
+	
+	if (buff == nullptr)
+	{
+		LOG("NO BUFF TO BE FOUND");
+		return false;
+	};
+}
 
-	// Pushing advantage for minions
-	if (source->IsMinion() && target->IsMinion()) {
-		result.Flat -= targetState->ReadClientStat(CharacterStateIntermediate::FlatDamageReductionFromBarracksMinionMod);
-		result.Percent *= 1.0f + sourceState->ReadClientStat(CharacterStateIntermediate::PercentDamageToBarracksMinionMod);
+// Helper lambda for shield calculations
+void applyShieldCalculation(Object* target,const float shieldArray[], size_t arraySize, float additionalMultiplier, DamageModifierResult& result) {
+	if (target == nullptr) return;
+	auto spell = target->GetSpellBySlotId(arraySize > 0 ? 2 : 1);  // Assuming spell slot 2, adjust as necessary
+	if (spell) {
+		auto spellLevel = spell->GetLevel();
+		if (spellLevel >= 1 && static_cast<size_t>(spellLevel) <= arraySize) {
+			result.Percent *= 1.0f - (shieldArray[spellLevel - 1] + additionalMultiplier) / 100.0f;
+		}
+		else {
+			LOG("Invalid spell level: %d for array size: %zu", spellLevel, arraySize);
+		}
+	}
+};
+
+DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* target, DamageType damageType) {
+	DamageModifierResult result{ 0.0f, 1.0f };  // Initialize to default values
+
+	if (!source || !target) {
+		return result;  // Early return if source or target is null
 	}
 
+	auto sourceState = source->GetCharacterStateIntermediate();
+	auto targetState = target->GetCharacterStateIntermediate();
+	if (!sourceState || !targetState) {
+		return result;  // Early return if null
+	}
+
+	float initialFlatMagicReduction = sourceState->ReadClientStat(CharacterStateIntermediate::FlatMagicReduction);
+	result.Flat = -initialFlatMagicReduction;
+	result.Percent = 1.0f - initialFlatMagicReduction;
+
+	// Additional logic for minions
+	if (source->IsMinion() && target->IsMinion()) {
+		float barracksMinionMod = targetState->ReadClientStat(CharacterStateIntermediate::FlatDamageReductionFromBarracksMinionMod);
+		float percentDamageToBarracksMinionMod = sourceState->ReadClientStat(CharacterStateIntermediate::PercentDamageToBarracksMinionMod);
+
+		result.Flat -= barracksMinionMod;
+		result.Percent *= 1.0f + percentDamageToBarracksMinionMod;
+	}
+
+
+
+
+
+
 	// Target buffs
-	if (target->IsHero()) {
-		static const std::unordered_map<std::string, std::function<void()>> heroBuffHandlers = {
-			{"Annie", [&]() {
-				if (target->GetBuffByName("MoltenShield")) {
-					auto spell = target->GetSpellBySlotId(2);
-					static const float annieShield[] = { 0, 60, 95, 130, 165, 200 };
-					result.Percent *= 1.0f - (annieShield[spell->GetLevel()] + 0.40f * target->GetAbilityPower()) / 100.0f;
-				}
-			}},
-			{"Braum", [&]() {
-				if (target->GetBuffByName("braumeshieldbuff")) {
-					auto spell = target->GetSpellBySlotId(2);
-					static const float braumShield[] = { 0, 0.35f, 0.40f, 0.45f, 0.50f, 0.55f };
-					result.Percent *= 1.0f - braumShield[spell->GetLevel()];
-				}
-			}},
-			{"Galio", [&]() {
-				if (target->GetBuffByName("GalioW")) {
-					auto spell = target->GetSpellBySlotId(1);
-					static const float galioShield[] = { 0, 0.25f, 0.30f, 0.35f, 0.40f, 0.45f };
-					result.Percent *= 1.0f - (galioShield[spell->GetLevel()] + (0.12f * target->GetMagicPenetrationMultiplier()));
-				}
-			}},
-			// Add other heroes similarly...
-		};
+	// Define the map with the correct function signature
+	std::unordered_map<std::string, std::function<void(Object*, DamageModifierResult&)>> heroBuffHandlers = {
+		{"Annie", [](Object* target, DamageModifierResult& result) {
+			auto buff = target->GetBuffByName("MoltenShield");
+			if (buff != nullptr) {
+				if (!buff->isActive()) return;
+				static const float annieShield[] = { 0, 60, 95, 130, 165, 200 };
+				applyShieldCalculation(target, annieShield, std::size(annieShield), 0.40f * target->GetAbilityPower(), result);
+			}
+		}},
+		{"Braum", [](Object* target, DamageModifierResult& result) {
+			auto buff = target->GetBuffByName("braumeshieldbuff");
+			if (buff != nullptr) {
+				if (!buff->isActive()) return;
+				static const float braumShield[] = { 0, 0.35f, 0.40f, 0.45f, 0.50f, 0.55f };
+				applyShieldCalculation(target, braumShield, std::size(braumShield), 0.0f, result);
+			}
+		}},
+		{"Galio", [](Object* target, DamageModifierResult& result) {
+			auto buff = target->GetBuffByName("GalioW");
+			if (buff != nullptr) {
+				if (!buff->isActive()) return;
+				static const float galioShield[] = { 0, 0.25f, 0.30f, 0.35f, 0.40f, 0.45f };
+				applyShieldCalculation(target,galioShield, std::size(galioShield), 0.0f, result);
+			}
+		}},
+		// ... other champions ...
+	};
 
-		if (heroBuffHandlers.find(target->GetName()) != heroBuffHandlers.end()) {
-			heroBuffHandlers.at(target->GetName())();
-		}
+	// Usage in the ComputeDamageModifier function
+	auto heroName = target->GetName();
+	if (heroBuffHandlers.find(heroName) != heroBuffHandlers.end()) {
+		heroBuffHandlers[heroName](target, result);
+	}
 
-		if (target->GetName() == "Kassadin" && damageType == Magical) {
-			result.Percent *= 0.85f;
-		}
-		if (target->GetName() == "Malzahar" && target->GetBuffByName("malzaharpassiveshield")) {
-			result.Percent *= 0.1f;
-		}
-		if (target->GetName() == "MasterYi" && target->GetBuffByName("Meditate")) {
-			auto spell = target->GetSpellBySlotId(1);
+
+	if (target->GetName() == "Kassadin" && damageType == Magical) {
+		result.Percent *= 0.85f;
+	}
+	if (target->GetName() == "Malzahar" && target->GetBuffByName("malzaharpassiveshield")) {
+		result.Percent *= 0.1f;
+	}
+	
+
+	auto meditateBuff = target->GetBuffByName("Meditate");
+	if (meditateBuff != nullptr) {
+		if (meditateBuff->isActive()) {
 			static const float yiShield[] = { 0, 0.45f, 0.475f, 0.50f, 0.525f, 0.550f };
-			result.Percent *= 1.0f - yiShield[spell->GetLevel()];
+			applyShieldCalculation(target, yiShield, std::size(yiShield), 0.0f, result);
 		}
 	}
 
 	// Source debuffs
-	if (source->IsHero() && (source->GetBuffByName("SummonerExhaust") || source->GetBuffByName("sonapassivedebuff") ||
-		source->GetBuffByName("itemsmitechallenge") || source->GetBuffByName("itemphantomdancerdebuff") || source->GetBuffByName("barontarget"))) {
-		result.Percent *= 0.6f;
+	if (source->IsHero()) {
+		// Summoner Exhaust
+		auto exhaustBuff = source->GetBuffByName("SummonerExhaust");
+		if (exhaustBuff != nullptr) {
+			if (exhaustBuff->isActive()) {
+				result.Percent *= 0.6f;
+			}
+		}
+
+		// Sona Passive Debuff
+		auto sonaDebuff = source->GetBuffByName("sonapassivedebuff");
+		if (sonaDebuff != nullptr) {
+			if (sonaDebuff->isActive()) {
+				// Specific modification for Sona Passive Debuff
+			}
+		}
+
+		// Smite Challenge
+		auto smiteChallengeBuff = source->GetBuffByName("itemsmitechallenge");
+		if (smiteChallengeBuff != nullptr) {
+			if (smiteChallengeBuff->isActive()) {
+				// Specific modification for Smite Challenge
+			}
+		}
+
+		// Phantom Dancer Debuff
+		auto phantomDancerDebuff = source->GetBuffByName("itemphantomdancerdebuff");
+		if (phantomDancerDebuff != nullptr) {
+			if (phantomDancerDebuff->isActive()) {
+				// Specific modification for Phantom Dancer Debuff
+			}
+		}
+
+		// Baron Target
+		auto baronTargetBuff = source->GetBuffByName("barontarget");
+		if (baronTargetBuff != nullptr) {
+			if (baronTargetBuff->isActive()) {
+				// Specific modification for Baron Target
+			}
+		}
+
+		// Add checks for any other buffs/debuffs as required
 	}
 
 	return result;
 }
+
 
 DamageOnHitResult Damage::ComputeDamageOnHit(Object* source, Object* target)
 {
@@ -269,14 +378,18 @@ DamageOnHitResult Damage::ComputeDamageOnHit(Object* source, Object* target)
 			result.PhysicalDamage += source->GetAttackDamage() * qBonus[spell->GetLevel()];
 		}},
 	};
-	if (source->IsHero())
-	{
+	if (source->IsHero()) {
 		for (const auto& buffHandler : sourceBuffHandlers) {
-			if (source->GetBuffByName(buffHandler.first)) {
-				buffHandler.second();
+			auto buff = source->GetBuffByName(buffHandler.first);
+			if (buff != nullptr) {
+				if (buff->isActive()) {
+					buffHandler.second();
+				}
 			}
 		}
 	}
+
+	
 
 #pragma endregion
 
@@ -290,14 +403,17 @@ DamageOnHitResult Damage::ComputeDamageOnHit(Object* source, Object* target)
 		}},
 	};
 
-	if (target->IsHero())
-	{
+	if (target->IsHero()) {
 		for (const auto& buffHandler : targetBuffHandlers) {
-			if (target->GetBuffByName(buffHandler.first)) {
-				buffHandler.second();
+			auto buff = target->GetBuffByName(buffHandler.first);
+			if (buff != nullptr) {
+				if (buff->isActive()) {
+					buffHandler.second();
+				}
 			}
 		}
 	}
+
 #pragma endregion
 
 	return result;

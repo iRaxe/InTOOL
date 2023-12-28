@@ -7,7 +7,7 @@
 namespace Engine
 {
 	float lastRefreshTime = 0.0f;
-	
+
 	void* spoof_trampoline = 0x0;
 
 	void Init()
@@ -78,7 +78,8 @@ namespace Engine
 		return -1;
 	}
 
-	bool isShopOpen()	{
+
+	bool isShopOpen() {
 		return Engine::Read<bool>(RVA(UPasta::Offsets::Instance::HUD::Shop::ShopInstance)), UPasta::Offsets::Instance::HUD::Shop::IsOpen;
 	}
 
@@ -247,7 +248,7 @@ namespace Engine
 		call_function<bool>(RVA(UPasta::Offsets::Functions::Drawings::GetBaseDrawPosition), (QWORD*)obj, &out);
 		return out;
 	}
-	
+
 	Vector2 GetHpBarPosition(Object* obj)
 	{
 		Vector3 hpBarPos = obj->GetPosition();
@@ -260,7 +261,7 @@ namespace Engine
 		const float zoomDelta = maxZoom / currentZoom;
 
 		screenPos.y -= (((globals::windowHeight) * 0.00083333335f * zoomDelta) * hpBarHeight);
-		
+
 		return screenPos;
 	}
 
@@ -462,32 +463,6 @@ namespace Engine
 		call_function<void>(RVA(UPasta::Offsets::Functions::D3DX::Functions::Riot_RenderPipelineLOL_RenderMouseOvers), obj);
 	}
 
-
-
-	void TryRightClick(Vector2 pos)
-	{
-		float floatCheck1 = *(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck1);
-		float floatCheck2 = *(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck2);
-		DWORD check = *(DWORD*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickCheck);
-
-		*(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck1) = 0.0f;
-		*(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck2) = 0.0f;
-		*(DWORD*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickCheck) = 0x0;
-
-		unsigned int* params = new unsigned int[20];
-		params[17] = (int)pos.x;
-		params[18] = (int)pos.y;
-		params[19] = 2;
-
-		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueRClick), (QWORD*)ObjectManager::GetLocalPlayer(), params);
-
-		*(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck1) = floatCheck1;
-		*(float*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickFloatCheck2) = floatCheck2;
-		*(DWORD*)((QWORD)ObjectManager::GetLocalPlayer() + UPasta::Offsets::Client::IssueClickCheck) = check;
-		Event::Publish(Event::OnAfterAttack);
-
-	}
-
 	void IssueClick(Vector2 pos)
 	{
 		unsigned int* params = new unsigned int[20];
@@ -495,7 +470,7 @@ namespace Engine
 		params[18] = (int)pos.y;
 		params[19] = 2;
 
-		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueClick), (QWORD*)ObjectManager::GetLocalPlayer(), params[19], 0, 0, params[17], params[18], 0);
+		call_function<bool>(RVA(UPasta::Offsets::Functions::Orders::IssueClick), (QWORD*)ObjectManager::GetLocalPlayer(), params);
 	}
 
 	void IssueMove(Vector2 pos)
@@ -511,7 +486,7 @@ namespace Engine
 		return Read<uintptr_t>(Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::HudInstance)) + UPasta::Offsets::Instance::HUD::SpellInfo);
 	}
 
-	uintptr_t GetMouseInstance()	{
+	uintptr_t GetMouseInstance() {
 		return Read<uintptr_t>(RVA(UPasta::Offsets::Instance::HUD::Mouse::MouseInstance)) + UPasta::Offsets::Instance::HUD::Mouse::Position;
 	}
 
@@ -527,7 +502,7 @@ namespace Engine
 		*(int*)(castScreenPosition + 0x4) = newPosition.y;
 	}
 
-	bool CastSpellLogic(int spellId,SpellCastMode castType, Vector2 originalMousePosition) {
+	bool CastSpellLogic(int spellId, SpellCastMode castType, Vector2 originalMousePosition) {
 		const auto InputLogic = GetInputLogic();
 		call_function<void>(RVA(UPasta::Offsets::Functions::Spells::NewCastSpell), InputLogic, spellId, castType, 0);
 		UpdateMouseInstancePosition(originalMousePosition);
@@ -678,7 +653,7 @@ namespace Engine
 
 		auto screenPos = WorldToScreen(objPos);
 
-		TryRightClick(screenPos);
+		IssueClick(screenPos);
 	}
 
 	void AttackObject(Object* obj)
@@ -691,7 +666,7 @@ namespace Engine
 
 		auto screenPos = WorldToScreen(headPos);
 
-		TryRightClick(screenPos);
+		IssueClick(screenPos);
 	}
 
 	void MoveToMousePos()

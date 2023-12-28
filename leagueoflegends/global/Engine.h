@@ -1,5 +1,4 @@
 #pragma once
-
 namespace Engine
 {
 	extern void* spoof_trampoline;
@@ -33,6 +32,7 @@ namespace Engine
 	}
 
 	void Init();
+
 	bool isShopOpen();
 	std::string GetHexString(QWORD hexNumber);
 	std::string CapitalizeFirstLetter(std::string str);
@@ -40,7 +40,6 @@ namespace Engine
 	Vector3 ReadVector3(QWORD offset);
 	void WriteVector3(QWORD offset, Vector3 vector);
 	void WriteVector2(QWORD offset, Vector2 vector);
-
 
 	Vector2 ReadVector2(QWORD offset);
 	GameState GetGameState();
@@ -103,7 +102,6 @@ namespace Engine
 	void UpgradeSpell(int spellId);
 	void GlowObject(Object* obj);
 
-	void TryRightClick(Vector2 pos);
 	void IssueClick(Vector2 pos);
 	void IssueMove(Vector2 pos);
 
@@ -114,7 +112,7 @@ namespace Engine
 	bool CastSelf(SpellIndex slotID);
 	bool CastTargeted(SpellIndex slotID, Object* target);
 	bool CastToPosition(SpellIndex slotID, Vector3 worldPos);
-	
+
 	bool ReleaseSpell(int spellId, Vector3 pos);
 
 	bool CanSendInput();
