@@ -12,6 +12,7 @@
 #include "Champions/Ashe/Ashe.h"
 #include "../Activator.h"
 #include "Champions/Blitzcrank/Blitzcrank.h"
+#include "Champions/Jinx/Jinx.h"
 #include "Champions/Twitch/Twitch.h"
 
 namespace Modules
@@ -74,6 +75,9 @@ namespace Modules
 			}
 			else if (ObjectManager::GetLocalPlayer()->GetName() == "Twitch") {
 				UPasta::Plugins::Twitch::Events::Initialize();
+			}
+			else if (ObjectManager::GetLocalPlayer()->GetName() == "Jinx") {
+				UPasta::Plugins::Jinx::Events::Initialize();
 			}
 			else {
 				activeChampModule = ChampionModuleManager::GetModule(ObjectManager::GetLocalPlayer()->GetName());

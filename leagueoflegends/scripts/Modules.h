@@ -29,6 +29,7 @@ namespace Modules
 		bool AoeCalc(Object* sourceObj, Skillshot skillshot, Modules::prediction::PredictionOutput& out);
 		bool GetPrediction(Skillshot &spell, PredictionOutput& out);
 		bool GetPrediction(Object* sourceObj, Object* targetObj, Skillshot &spell, PredictionOutput &out);
+		Vector3 PredictTargetPosition(Object* targetObj, float predictionTime);
 
 	}
 

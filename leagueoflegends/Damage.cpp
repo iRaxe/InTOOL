@@ -132,16 +132,6 @@ float Damage::CalculateMagicalDamage(Object* source, Object* target, float amoun
 	return max(amount + bonusTrueDamage, 0.0f);
 }
 
-static bool buffExistt(Buff* buff, Object* target)
-{
-	if (target == nullptr) return true;
-	
-	if (buff == nullptr)
-	{
-		LOG("NO BUFF TO BE FOUND");
-		return false;
-	};
-}
 
 // Helper lambda for shield calculations
 void applyShieldCalculation(Object* target,const float shieldArray[], size_t arraySize, float additionalMultiplier, DamageModifierResult& result) {
@@ -256,7 +246,7 @@ DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* targe
 		auto sonaDebuff = source->GetBuffByName("sonapassivedebuff");
 		if (sonaDebuff != nullptr) {
 			if (sonaDebuff->isActive()) {
-				// Specific modification for Sona Passive Debuff
+				result.Percent *= 0.6f;
 			}
 		}
 
@@ -264,7 +254,7 @@ DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* targe
 		auto smiteChallengeBuff = source->GetBuffByName("itemsmitechallenge");
 		if (smiteChallengeBuff != nullptr) {
 			if (smiteChallengeBuff->isActive()) {
-				// Specific modification for Smite Challenge
+				result.Percent *= 0.6f;
 			}
 		}
 
@@ -272,7 +262,7 @@ DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* targe
 		auto phantomDancerDebuff = source->GetBuffByName("itemphantomdancerdebuff");
 		if (phantomDancerDebuff != nullptr) {
 			if (phantomDancerDebuff->isActive()) {
-				// Specific modification for Phantom Dancer Debuff
+				result.Percent *= 0.6f;
 			}
 		}
 
@@ -280,7 +270,7 @@ DamageModifierResult Damage::ComputeDamageModifier(Object* source, Object* targe
 		auto baronTargetBuff = source->GetBuffByName("barontarget");
 		if (baronTargetBuff != nullptr) {
 			if (baronTargetBuff->isActive()) {
-				// Specific modification for Baron Target
+				result.Percent *= 0.6f;
 			}
 		}
 
