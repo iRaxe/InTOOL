@@ -157,7 +157,7 @@ void Skillshot::PopulateSpellsDB()
 	database.JhinE = SkillshotManager::RegisterSpell(SP_STRING("Jhin"), E, Skillshot(750, 130, 1600, 0.25, SkillshotCircle, {}));
 	database.JhinR = SkillshotManager::RegisterSpell(SP_STRING("Jhin"), R, Skillshot(3500, 80, 5000, 0.25, SkillshotLine, {}));
 	database.JinxW = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), W, Skillshot(1450, 60, 3300, max(0.4f, 0.6f - ((ObjectManager::GetLocalPlayer()->GetAttackSpeed() - 1) * 0.25f / 2.5f)), SkillshotLine, { CollidableObjects::Objects }));
-	database.JinxE = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), E, Skillshot(900, 80, 1100, 1.5, SkillshotCircle, {}));
+	database.JinxE = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), E, Skillshot(900, 80, 1100,.5, SkillshotCircle, {}));
 	database.JinxR = SkillshotManager::RegisterSpell(SP_STRING("Jinx"), R, Skillshot(12500, 140, 1700, 0.6, SkillshotLine, {}));
 	database.KaisaQ = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), Q, Skillshot(600, 600, FLT_MAX, 0.4, SkillshotNone, {}));
 	database.KaisaW = SkillshotManager::RegisterSpell(SP_STRING("Kaisa"), W, Skillshot(3000, 100, 1750, 0.4, SkillshotLine, {CollidableObjects::Objects}));

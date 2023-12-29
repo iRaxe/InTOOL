@@ -426,7 +426,7 @@ void Modes::Combo() {
 	
 	if (JinxCombo::UseQ->Value == true && isTimeToCastJinxQ()) {
 		auto me = ObjectManager::GetLocalPlayer();
-		const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), 1500.0f);
+		const auto qTarget = TargetSelector::FindBestTarget(ObjectManager::GetLocalPlayer()->GetPosition(), 525.0f + addedQRange() + 60);
 		if (qTarget != nullptr) {
 			float distance = ObjectManager::GetLocalPlayer()->GetDistanceTo(qTarget);
 			auto predictedSpot = Modules::prediction::PredictTargetPosition(qTarget, distance + .25f);
